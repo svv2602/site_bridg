@@ -5,7 +5,9 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 
 const mainNav = [
-  { href: "/passenger-tyres", label: "Каталог шин" },
+  { href: "/passenger-tyres", label: "Легкові шини" },
+  { href: "/suv-4x4-tyres", label: "Шини для SUV" },
+  { href: "/lcv-tyres", label: "Комерційні шини" },
   { href: "/tyre-search", label: "Пошук шин" },
   { href: "/dealers", label: "Де купити" },
   { href: "/about", label: "Бренд" },

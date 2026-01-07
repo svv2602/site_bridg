@@ -1,10 +1,11 @@
 "use client";
 
-import type { Metadata } from "next";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MOCK_DEALERS, type Dealer } from "@/lib/data";
 import { Search, MapPin, Phone, Globe, Clock, Navigation, Filter, ChevronDown } from "lucide-react";
+import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import DealersMap from "@/components/DealersMap";
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
@@ -17,11 +18,7 @@ const dealerTypes = [
   { key: "service", label: "Сервісний центр" },
 ];
 
-export const metadata: Metadata = {
-  title: "Де купити шини Bridgestone — офіційні дилери в Україні",
-  description:
-    "Пошук офіційних дилерів та сервісних партнерів Bridgestone в Україні: фільтр за містом, адресою та типом точки. Карта дилерів та контакти.",
-};
+// Note: Metadata is defined in layout.tsx for client components
 
 export default function DealersPage() {
   const [cityQuery, setCityQuery] = useState("");
@@ -54,8 +51,25 @@ export default function DealersPage() {
     return filtered;
   }, [dealers, normalizedQuery, selectedType]);
 
+  const dealerSchemas = MOCK_DEALERS.map((dealer) => generateLocalBusinessSchema(dealer));
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Головна", url: "https://bridgestone.ua/" },
+    { name: "Де купити", url: "https://bridgestone.ua/dealers" },
+  ]);
+
   return (
     <div className="bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
+      />
+      {dealerSchemas.map((schema, idx) => (
+        <script
+          key={`dealer-schema-${idx}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
+        />
+      ))}
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -146,23 +160,18 @@ export default function DealersPage() {
               </div>
             </div>
 
-            {/* Map Placeholder */}
+            {/* Interactive Map */}
             <div className="rounded-2xl border border-border bg-card p-6">
               <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
                 <MapPin className="h-5 w-5 text-primary" />
                 Інтерактивна карта
               </h3>
-              <div className="h-64 rounded-xl bg-background flex flex-col items-center justify-center p-4 text-center">
-                <div className="mb-4 rounded-full bg-primary/20 p-4">
-                  <Navigation className="h-8 w-8 text-primary" />
-                </div>
-                <p className="font-medium">Карта дилерів Bridgestone</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  У фінальній версії тут буде вбудована інтерактивна карта з точками дилерів.
-                </p>
-                <button className="mt-4 rounded-full border border-primary bg-transparent px-6 py-2 text-sm font-semibold text-primary hover:bg-primary/10">
-                  Відкрити карту
-                </button>
+              <div className="h-80 overflow-hidden rounded-xl">
+                <DealersMap
+                  dealers={MOCK_DEALERS}
+                  selectedDealerId={expandedDealer}
+                  onDealerSelect={(id) => setExpandedDealer(id)}
+                />
               </div>
             </div>
           </div>

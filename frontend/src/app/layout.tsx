@@ -6,6 +6,8 @@ import { Search, MapPin, Phone, ChevronRight } from "lucide-react";
 import AnimatedMain from "@/components/AnimatedMain";
 import ThemeToggle from "@/components/ThemeToggle";
 import MainHeader from "@/components/MainHeader";
+import CookiesBanner from "@/components/CookiesBanner";
+import Analytics from "@/components/Analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +26,9 @@ export const metadata: Metadata = {
 };
 
 const mainNav = [
-  { href: "/passenger-tyres", label: "Каталог шин", icon: "🛞" },
+  { href: "/passenger-tyres", label: "Легкові шини", icon: "🚗" },
+  { href: "/suv-4x4-tyres", label: "Шини для SUV", icon: "🚙" },
+  { href: "/lcv-tyres", label: "Комерційні шини", icon: "🚐" },
   { href: "/tyre-search", label: "Пошук шин", icon: "🔍" },
   { href: "/dealers", label: "Де купити", icon: "📍" },
   { href: "/about", label: "Бренд", icon: "🌟" },
@@ -167,6 +171,12 @@ export default function RootLayout({
               </div>
             </div>
           </footer>
+
+          {/* Cookies Consent Banner */}
+          <CookiesBanner />
+
+          {/* Analytics (GA4 + Meta Pixel) - loads after consent */}
+          <Analytics />
         </div>
       </body>
     </html>

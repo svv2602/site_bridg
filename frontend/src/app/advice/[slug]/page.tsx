@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { getArticleBySlug, getArticles } from "@/lib/api/articles";
+import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 
 interface ArticlePageProps {
   params: { slug: string };
@@ -47,8 +48,23 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 
+  const articleSchema = generateArticleSchema(article);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Головна", url: "https://bridgestone.ua/" },
+    { name: "Поради", url: "https://bridgestone.ua/advice" },
+    { name: article.title, url: `https://bridgestone.ua/advice/${article.slug}` },
+  ]);
+
   return (
     <div className="bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
+      />
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-4xl px-4 md:px-8">
           <nav className="mb-4 text-xs text-zinc-400">

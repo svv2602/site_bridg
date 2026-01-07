@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type React from "react";
 import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ArrowLeft, ChevronRight } from "lucide-react";
 import { MOCK_TYRE_MODELS, type Season, type TyreModel } from "@/lib/data";
+import { generateProductSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -85,8 +86,23 @@ export default function TyreModelPage({
         m.vehicleTypes.some((type) => model.vehicleTypes.includes(type))),
   ).slice(0, 3);
 
+  const productSchema = generateProductSchema(model);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Головна", url: "https://bridgestone.ua/" },
+    { name: "Каталог шин", url: "https://bridgestone.ua/passenger-tyres" },
+    { name: model.name, url: `https://bridgestone.ua/shyny/${model.slug}` },
+  ]);
+
   return (
     <div className="bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
+      />
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
