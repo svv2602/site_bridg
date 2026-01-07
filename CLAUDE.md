@@ -77,13 +77,68 @@ Core types for the application:
 
 ## Current State
 
-**Frontend: ~85% complete**
-- All pages implemented with mock data
-- Missing: Google Maps integration for dealers, GA4/Meta Pixel, cookies consent, schema.org
+**Frontend: 100% complete**
+- All pages implemented
+- Strapi CMS integration with fallback to mock data
+- Google Maps integration for dealers
+- GA4/Meta Pixel analytics
+- Cookies consent banner
+- Schema.org structured data
 
-**Backend/CMS: Not started**
-- API layer prepared in lib/api/
-- Recommended: Strapi or similar headless CMS
+**Backend/CMS: Strapi v4.25.12**
+- Located in `/backend` directory
+- SQLite database (development)
+- API layer in `frontend/src/lib/api/strapi.ts`
+
+## CMS (Strapi)
+
+### Commands
+
+```bash
+cd backend
+npm run develop   # Development server at http://localhost:1337
+npm run build     # Production build
+npm run start     # Start production server
+```
+
+### Content Types
+
+| Type | API Endpoint | Description |
+|------|--------------|-------------|
+| Tyre | `/api/tyres` | Tyre models with sizes, EU label, usage |
+| Dealer | `/api/dealers` | Dealer locations with coordinates |
+| Article | `/api/articles` | Blog articles/advice |
+| Technology | `/api/technologies` | Tyre technologies |
+| VehicleFitment | `/api/vehicle-fitments` | Car-to-tyre recommendations |
+
+### Components (Tyre)
+
+- `eu-label` — EU label data (wetGrip, fuelEfficiency, noiseDb)
+- `usage` — Usage scenarios (city, highway, offroad, winter)
+- `size` — Tyre dimensions (width, aspectRatio, diameter, loadIndex, speedIndex)
+
+### Environment Variables
+
+Frontend (`frontend/.env.local`):
+```
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+STRAPI_API_TOKEN=your_api_token_here
+```
+
+### Seed Data
+
+```bash
+cd backend
+node scripts/seed.js   # Requires API token with full access
+```
+
+### Roles
+
+| Role | Permissions |
+|------|-------------|
+| Super Admin | Full access to all settings and content |
+| Content-editor | CRUD for Tyre, Article, Technology, Dealer (no settings) |
+| Public | Read-only access to published content |
 
 ## Language
 

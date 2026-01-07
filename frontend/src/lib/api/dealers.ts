@@ -1,15 +1,52 @@
 import { MOCK_DEALERS, type Dealer, type DealerType } from "@/lib/data";
+import { getStrapiDealers, transformStrapiData } from "./strapi";
 
 export interface DealerSearchParams {
   query?: string;
   type?: DealerType | "all";
 }
 
+// Strapi dealer attributes
+interface StrapiDealerAttributes {
+  name: string;
+  type: DealerType;
+  city: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  website?: string;
+  workingHours?: string;
+}
+
+function transformStrapiDealer(data: StrapiDealerAttributes & { id: number }): Dealer {
+  return {
+    id: String(data.id),
+    name: data.name,
+    type: data.type,
+    city: data.city,
+    address: data.address,
+    latitude: data.latitude,
+    longitude: data.longitude,
+    phone: data.phone,
+    website: data.website,
+    workingHours: data.workingHours,
+  };
+}
+
 /**
- * Повертає повний список дилерів.
- * У продакшн‑версії тут буде запит до CMS / бекенда.
+ * Повертає повний список дилерів. Спробує отримати з Strapi, якщо недоступний — повертає mock дані.
  */
 export async function getDealers(): Promise<Dealer[]> {
+  try {
+    const response = await getStrapiDealers<StrapiDealerAttributes>("*");
+    const data = transformStrapiData<StrapiDealerAttributes>(response);
+    if (data.length > 0) {
+      return data.map(transformStrapiDealer);
+    }
+  } catch (error) {
+    console.warn("Strapi unavailable, using mock data:", error);
+  }
   return MOCK_DEALERS;
 }
 

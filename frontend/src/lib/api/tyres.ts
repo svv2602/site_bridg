@@ -6,6 +6,12 @@ import {
   type TyreSize,
   type VehicleFitment,
 } from "@/lib/data";
+import {
+  getStrapiTyres,
+  getStrapiTyreBySlug,
+  transformStrapiData,
+  transformStrapiSingle,
+} from "./strapi";
 
 /**
  * Параметри пошуку шин за розміром.
@@ -26,10 +32,57 @@ export interface CarSearchParams {
   year: number;
 }
 
+// Strapi attribute types
+interface StrapiTyreAttributes {
+  slug: string;
+  name: string;
+  season: Season;
+  vehicleTypes: string[];
+  isNew?: boolean;
+  isPopular?: boolean;
+  shortDescription: string;
+  euLabel?: {
+    wetGrip?: string;
+    fuelEfficiency?: string;
+    noiseDb?: number;
+  };
+  sizes?: TyreSize[];
+  usage?: {
+    city?: boolean;
+    highway?: boolean;
+    offroad?: boolean;
+    winter?: boolean;
+  };
+}
+
+function transformStrapiTyre(data: StrapiTyreAttributes & { id: number }): TyreModel {
+  return {
+    slug: data.slug,
+    name: data.name,
+    season: data.season,
+    vehicleTypes: data.vehicleTypes as TyreModel["vehicleTypes"],
+    isNew: data.isNew,
+    isPopular: data.isPopular,
+    shortDescription: data.shortDescription,
+    euLabel: data.euLabel as TyreModel["euLabel"],
+    sizes: data.sizes || [],
+    usage: data.usage || {},
+  };
+}
+
 /**
- * Повертає всі моделі шин (у продакшн‑версії тут буде запит до CMS / API).
+ * Повертає всі моделі шин. Спробує отримати з Strapi, якщо недоступний — повертає mock дані.
  */
 export async function getTyreModels(): Promise<TyreModel[]> {
+  try {
+    const response = await getStrapiTyres<StrapiTyreAttributes>("*");
+    const data = transformStrapiData<StrapiTyreAttributes>(response);
+    if (data.length > 0) {
+      return data.map(transformStrapiTyre);
+    }
+  } catch (error) {
+    console.warn("Strapi unavailable, using mock data:", error);
+  }
   return MOCK_TYRE_MODELS;
 }
 
@@ -37,8 +90,17 @@ export async function getTyreModels(): Promise<TyreModel[]> {
  * Повертає одну модель шини за slug або null, якщо не знайдена.
  */
 export async function getTyreModelBySlug(slug: string): Promise<TyreModel | null> {
-  const all = await getTyreModels();
-  const model = all.find((m) => m.slug === slug);
+  try {
+    const response = await getStrapiTyreBySlug<StrapiTyreAttributes>(slug, "*");
+    const data = transformStrapiSingle<StrapiTyreAttributes>(response);
+    if (data) {
+      return transformStrapiTyre(data);
+    }
+  } catch (error) {
+    console.warn("Strapi unavailable, using mock data:", error);
+  }
+  // Fallback to mock data
+  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
   return model ?? null;
 }
 
