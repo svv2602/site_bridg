@@ -1,0 +1,90 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Official Bridgestone Ukraine website for end consumers. Reference: Goodyear EU site UX adapted for Bridgestone brand. Ukrainian language only (with future multi-language architecture support).
+
+## Commands
+
+All commands run from `frontend/` directory:
+
+```bash
+npm run dev      # Development server at http://localhost:3000
+npm run build    # Production build
+npm run start    # Start production server
+npm run lint     # ESLint check
+```
+
+## Architecture
+
+### Tech Stack
+- **Next.js 16** with App Router (React 19)
+- **TypeScript**
+- **Tailwind CSS v4**
+- **Framer Motion** for animations
+- **Lucide React** for icons
+
+### Directory Structure
+
+```
+frontend/src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx           # Homepage with hero, quick search, categories
+│   ├── layout.tsx         # Root layout with header/footer
+│   ├── passenger-tyres/   # Passenger tyres catalog
+│   ├── suv-4x4-tyres/     # SUV tyres catalog
+│   ├── tyre-search/       # Search by size or by car (two modes)
+│   ├── shyny/[slug]/      # Individual tyre model page (dynamic)
+│   ├── dealers/           # Dealer finder with filters
+│   ├── about/             # Brand page
+│   ├── technology/        # Technologies listing
+│   ├── advice/            # Articles list
+│   │   └── [slug]/        # Individual article page
+│   └── contacts/          # Contact form and FAQ
+├── components/
+│   ├── MainHeader.tsx     # Sticky header with burger menu
+│   ├── ThemeToggle.tsx    # Dark/light mode toggle
+│   └── AnimatedMain.tsx   # Page transition wrapper
+└── lib/
+    ├── data.ts            # TypeScript types and mock data
+    └── api/               # API layer (prepared for CMS integration)
+        ├── tyres.ts       # Tyre search functions
+        ├── dealers.ts     # Dealer queries
+        └── articles.ts    # Article queries
+```
+
+### Data Model (lib/data.ts)
+
+Core types for the application:
+- `TyreModel` — tyre with sizes, season, vehicle types, EU label, technologies
+- `TyreSize` — width/aspectRatio/diameter/loadIndex/speedIndex
+- `VehicleFitment` — car make/model/year with recommended sizes
+- `Dealer` — dealer with coordinates, contacts, type (official/partner/service)
+- `Article` — blog article with tags, reading time
+- `Technology` — technology linked to tyre models
+
+### Key Patterns
+
+1. **Search modes**: Tyre search has two tabs — "by size" (width/height/diameter dropdowns) and "by car" (cascading make→model→year dropdowns)
+
+2. **Mock data ready for API**: All data access goes through `lib/api/` functions that currently return mock data but are designed for easy CMS/API replacement
+
+3. **Dynamic routes**: Use `generateStaticParams()` for `/shyny/[slug]` and `/advice/[slug]`
+
+4. **Consistent styling**: Dark hero sections with zinc-900 gradient, cards with border-border bg-card, primary color for CTAs
+
+## Current State
+
+**Frontend: ~85% complete**
+- All pages implemented with mock data
+- Missing: Google Maps integration for dealers, GA4/Meta Pixel, cookies consent, schema.org
+
+**Backend/CMS: Not started**
+- API layer prepared in lib/api/
+- Recommended: Strapi or similar headless CMS
+
+## Language
+
+All UI text is in Ukrainian. Variable names and code comments in English.

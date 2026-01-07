@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+
+  /* Brand tokens Bridgestone / FirstStop */
+  --bridgestone-red: #e30613;
+  --bridgestone-red-dark: #c1000f;
+  --bridgestone-black: #111111;
+  --bridgestone-gray-100: #f4f4f5;
+  --bridgestone-gray-200: #e5e7eb;
+  --bridgestone-gray-500: #6b7280;
+  --bridgestone-gray-700: #4b5563;
+
+  /* Light theme (default) */
+  --background: var(--bridgestone-gray-100);
+  --foreground: #111827;
+  --primary: var(--bridgestone-red);
+  --primary-dark: var(--bridgestone-red-dark);
+  --secondary: var(--bridgestone-black);
+  --accent: var(--bridgestone-gray-700);
+  --muted: var(--bridgestone-gray-500);
+  --card: #ffffff;
+  --border: var(--bridgestone-gray-200);
+
+  --radius: 0.75rem;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.16), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Explicit тёмная тема через data-theme на <html> */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #0b0b0c;
+  --foreground: #f9fafb;
+  --primary: var(--bridgestone-red);
+  --primary-dark: var(--bridgestone-red-dark);
+  --secondary: #e5e7eb;
+  --accent: #9ca3af;
+  --muted: #9ca3af;
+  /* более нейтральная серая поверхность вместо синеватого #111827 */
+  --card: #18181b;
+  --border: #27272a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 0.25rem);
+  --radius-sm: calc(var(--radius) - 0.5rem);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --shadow-default: var(--shadow);
+  --shadow-large: var(--shadow-lg);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  font-variation-settings: "wght" 400;
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Sharper card corners (closer to official Bridgestone style) */
+.rounded-2xl {
+  border-radius: 0.5rem; /* вместо сильно скруглённых 1rem+ */
+}
+
+.rounded-3xl {
+  border-radius: 0.75rem; /* чуть более мягко, но без «пілюль» */
+}
+
+/* Primary buttons: по умолчанию тёмные, при hover — красные.
+   В навигации (header) кнопка «Пошук шин» остаётся червоною. */
+button.bg-primary {
+  background-color: var(--bridgestone-black);
+}
+
+button.bg-primary:hover {
+  background-color: var(--bridgestone-red);
+}
+
+/* Header CTA остаётся брендовым червоним */
+header button.bg-primary {
+  background-color: var(--bridgestone-red);
+}
+
+header button.bg-primary:hover {
+  background-color: var(--bridgestone-red-dark);
+}
+
+/* Убираем красный из чипов, иконок и блоков вне хедера */
+body :not(header) .text-primary {
+  color: var(--bridgestone-gray-700);
+}
+
+body :not(header) .bg-primary,
+body :not(header) .bg-primary\/90 {
+  background-color: #18181b; /* тёмно‑серый блок вместо красного */
+}
+
+body :not(header) .bg-primary\/10 {
+  background-color: rgba(24, 24, 27, 0.08); /* мягкий серый акцент */
+}
+
+body :not(header) .bg-primary\/20 {
+  background-color: rgba(24, 24, 27, 0.16);
+}
+
+body :not(header) .bg-primary\/30 {
+  background-color: rgba(24, 24, 27, 0.24);
+}
+
+/* Gradient text */
+.gradient-text {
+  color: var(--primary);
+}
+
+/* Shine effect */
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  transition: transform 0.6s;
+}
+
+.shine:hover::after {
+  transform: rotate(30deg) translate(20%, 20%);
+}
