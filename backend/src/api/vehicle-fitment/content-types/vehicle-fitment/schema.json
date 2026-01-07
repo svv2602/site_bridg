@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vehicle_fitments",
+  "info": {
+    "singularName": "vehicle-fitment",
+    "pluralName": "vehicle-fitments",
+    "displayName": "Vehicle Fitment",
+    "description": "Vehicle to tyre size mapping"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "make": {
+      "type": "string",
+      "required": true
+    },
+    "model": {
+      "type": "string",
+      "required": true
+    },
+    "bodyType": {
+      "type": "string"
+    },
+    "yearFrom": {
+      "type": "integer",
+      "required": true,
+      "min": 1990,
+      "max": 2030
+    },
+    "yearTo": {
+      "type": "integer",
+      "min": 1990,
+      "max": 2030
+    },
+    "recommendedSizes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "tyre.size"
+    }
+  }
+}
