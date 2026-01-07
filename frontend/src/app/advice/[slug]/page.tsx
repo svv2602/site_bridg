@@ -6,7 +6,7 @@ import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 
 interface ArticlePageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -19,7 +19,8 @@ export async function generateStaticParams() {
 export async function generateMetadata(
   { params }: ArticlePageProps,
 ): Promise<Metadata> {
-  const article = await getArticleBySlug(params.slug);
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     return {
@@ -42,7 +43,8 @@ export async function generateMetadata(
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const article = await getArticleBySlug(params.slug);
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();

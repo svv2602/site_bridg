@@ -49,12 +49,13 @@ export function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}): Metadata {
-  const model = MOCK_TYRE_MODELS.find((m) => m.slug === params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
   if (!model) {
     return {
       title: "Модель шини не знайдена — Bridgestone Україна",
@@ -68,12 +69,13 @@ export function generateMetadata({
   };
 }
 
-export default function TyreModelPage({
+export default async function TyreModelPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const model = MOCK_TYRE_MODELS.find((m) => m.slug === params.slug);
+  const { slug } = await params;
+  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
 
   if (!model) {
     notFound();
