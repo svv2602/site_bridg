@@ -1,0 +1,169 @@
+/**
+ * LLM Prompts for Content Generation
+ *
+ * Centralized prompt templates for tire descriptions, articles, etc.
+ */
+
+// System prompts for different content types
+export const SYSTEM_PROMPTS = {
+  tireDescription: `Ти - експерт з автомобільних шин та професійний копірайтер для офіційного сайту Bridgestone в Україні.
+
+Правила:
+- Пиши виключно українською мовою
+- Використовуй професійний, але доступний стиль
+- Підкреслюй технічні переваги та безпеку
+- НІКОЛИ не згадуй ціни
+- Уникай кліше, канцеляризмів та надмірних епітетів
+- Фокусуйся на перевагах для водія, а не на характеристиках
+- Використовуй конкретні факти з вхідних даних`,
+
+  article: `Ти - автомобільний журналіст, який пише статті для блогу Bridgestone Україна.
+
+Правила:
+- Пиши виключно українською мовою
+- Стиль: інформативний, корисний для водіїв
+- Структура: вступ, основні пункти, висновок
+- Включай практичні поради
+- Уникай рекламного тону
+- НЕ вигадуй дані, яких немає у вхідних`,
+
+  seo: `Ти - SEO-спеціаліст для автомобільного сайту.
+
+Правила:
+- Пиши українською
+- seoTitle: 50-60 символів, включає назву моделі
+- seoDescription: 150-160 символів, включає основну перевагу
+- Використовуй ключові слова природно`,
+};
+
+// Tire description generation prompt
+export function getTireDescriptionPrompt(tire: {
+  name: string;
+  season: "summer" | "winter" | "allseason";
+  vehicleTypes?: string[];
+  technologies?: string[];
+  euLabel?: {
+    wetGrip?: string;
+    fuelEfficiency?: string;
+    noiseDb?: number;
+  };
+  sourceDescription?: string;
+  testResults?: string;
+}): string {
+  const seasonLabels = {
+    summer: "літня",
+    winter: "зимова",
+    allseason: "всесезонна",
+  };
+
+  const vehicleLabels: Record<string, string> = {
+    passenger: "легкові автомобілі",
+    suv: "SUV/кросовери",
+    lcv: "легкі вантажівки",
+    sport: "спортивні автомобілі",
+  };
+
+  const vehicles = tire.vehicleTypes
+    ?.map((v) => vehicleLabels[v] || v)
+    .join(", ");
+
+  return `Створи унікальний контент для шини Bridgestone ${tire.name}.
+
+ВХІДНІ ДАНІ:
+- Модель: Bridgestone ${tire.name}
+- Сезон: ${seasonLabels[tire.season]}
+${vehicles ? `- Типи авто: ${vehicles}` : ""}
+${tire.technologies?.length ? `- Технології: ${tire.technologies.join(", ")}` : ""}
+${tire.euLabel ? `- EU Label: Мокре зчеплення ${tire.euLabel.wetGrip || "-"}, Паливна ефективність ${tire.euLabel.fuelEfficiency || "-"}, Шум ${tire.euLabel.noiseDb || "-"}дБ` : ""}
+${tire.testResults ? `- Результати тестів: ${tire.testResults}` : ""}
+${tire.sourceDescription ? `\nОПИС-РЕФЕРЕНС (НЕ копіювати, лише для розуміння):\n${tire.sourceDescription}` : ""}
+
+ФОРМАТ ВІДПОВІДІ (JSON):
+{
+  "shortDescription": "Короткий опис 2-3 речення, 150-200 символів. Головна перевага + для кого підійде.",
+  "fullDescription": "Повний опис 300-500 слів у форматі Markdown. Включає: вступ, ключові переваги, технології, для кого підійде, висновок.",
+  "keyBenefits": ["Перевага 1", "Перевага 2", "Перевага 3", "Перевага 4"],
+  "seoTitle": "SEO заголовок 50-60 символів",
+  "seoDescription": "SEO опис 150-160 символів"
+}
+
+ВАЖЛИВО:
+- Відповідь ТІЛЬКИ у форматі JSON
+- Контент має бути 100% унікальним
+- НЕ згадуй ціни
+- keyBenefits: 4-5 конкретних пунктів`;
+}
+
+// Article generation prompt
+export function getArticlePrompt(params: {
+  topic: string;
+  type: "model-review" | "test-summary" | "comparison" | "seasonal-guide" | "technology";
+  models?: string[];
+  testData?: {
+    source: string;
+    year: number;
+    results: string;
+  };
+  keywords?: string[];
+}): string {
+  const typeInstructions = {
+    "model-review": "Напиши детальний огляд моделі шини (800-1200 слів)",
+    "test-summary": "Напиши підсумок результатів тесту (600-800 слів)",
+    comparison: "Напиши порівняння моделей (1000-1500 слів)",
+    "seasonal-guide": "Напиши сезонний гайд з вибору шин (800-1000 слів)",
+    technology: "Напиши статтю про технологію (600-800 слів)",
+  };
+
+  return `${typeInstructions[params.type]}
+
+ТЕМА: ${params.topic}
+${params.models?.length ? `МОДЕЛІ: ${params.models.join(", ")}` : ""}
+${params.testData ? `
+ДАНІ ТЕСТУ:
+- Джерело: ${params.testData.source}
+- Рік: ${params.testData.year}
+- Результати: ${params.testData.results}
+` : ""}
+${params.keywords?.length ? `КЛЮЧОВІ СЛОВА: ${params.keywords.join(", ")}` : ""}
+
+ФОРМАТ ВІДПОВІДІ (JSON):
+{
+  "title": "Заголовок статті",
+  "excerpt": "Короткий опис для превʼю (1-2 речення)",
+  "content": "Повний текст статті з підзаголовками (## для H2, ### для H3)",
+  "tags": ["тег1", "тег2"],
+  "readingTime": 5
+}
+
+ВАЖЛИВО:
+- Відповідь ТІЛЬКИ у форматі JSON
+- НЕ вигадуй дані, яких немає у вхідних
+- Включай CTA "Знайти дилера" наприкінці
+- НЕ згадуй ціни`;
+}
+
+// Badge text generation prompt
+export function getBadgeTextPrompt(badge: {
+  type: "winner" | "recommended" | "top3" | "best_category" | "eco";
+  source: string;
+  year: number;
+  testType?: string;
+  category?: string;
+}): string {
+  return `Створи короткий текст для бейджа на картці шини.
+
+ТИП: ${badge.type}
+ДЖЕРЕЛО: ${badge.source}
+РІК: ${badge.year}
+${badge.testType ? `ТИП ТЕСТУ: ${badge.testType}` : ""}
+${badge.category ? `КАТЕГОРІЯ: ${badge.category}` : ""}
+
+Приклади:
+- winner + ADAC + 2024 = "Переможець ADAC 2024"
+- recommended + Auto Bild + 2024 = "Рекомендовано Auto Bild"
+- top3 + TCS + 2024 + winter = "Топ-3 зимових TCS 2024"
+- best_category + ADAC + 2024 + wet = "Найкраще мокре зчеплення"
+- eco + EU Label + 2024 = "Екологічний вибір"
+
+Дай відповідь одним рядком українською (максимум 30 символів).`;
+}

@@ -8,6 +8,7 @@ import { type Season, type TyreModel } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { generateProductSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { EuLabelBadge } from "@/components/ui/EuLabelBadge";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -261,22 +262,43 @@ export default async function TyreModelPage({
                   <h2 className="mb-4 text-xl font-bold">EU‑маркування</h2>
                   <div className="grid gap-4 sm:grid-cols-3 text-sm">
                     <div className="rounded-xl border border-border bg-background p-4">
-                      <p className="text-xs text-muted-foreground">Зчеплення на мокрій дорозі</p>
-                      <p className="mt-1 text-2xl font-bold text-primary">
-                        {model.euLabel.wetGrip ?? "—"}
-                      </p>
+                      <p className="mb-2 text-xs text-muted-foreground">Зчеплення на мокрій дорозі</p>
+                      {model.euLabel.wetGrip ? (
+                        <EuLabelBadge
+                          type="wetGrip"
+                          value={model.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
+                          size="lg"
+                          showLabel={false}
+                        />
+                      ) : (
+                        <p className="text-2xl font-bold text-muted-foreground">—</p>
+                      )}
                     </div>
                     <div className="rounded-xl border border-border bg-background p-4">
-                      <p className="text-xs text-muted-foreground">Економія пального</p>
-                      <p className="mt-1 text-2xl font-bold text-primary">
-                        {model.euLabel.fuelEfficiency ?? "—"}
-                      </p>
+                      <p className="mb-2 text-xs text-muted-foreground">Економія пального</p>
+                      {model.euLabel.fuelEfficiency ? (
+                        <EuLabelBadge
+                          type="fuelEfficiency"
+                          value={model.euLabel.fuelEfficiency as "A" | "B" | "C" | "D" | "E"}
+                          size="lg"
+                          showLabel={false}
+                        />
+                      ) : (
+                        <p className="text-2xl font-bold text-muted-foreground">—</p>
+                      )}
                     </div>
                     <div className="rounded-xl border border-border bg-background p-4">
-                      <p className="text-xs text-muted-foreground">Рівень шуму, dB</p>
-                      <p className="mt-1 text-2xl font-bold text-primary">
-                        {model.euLabel.noiseDb ?? "—"}
-                      </p>
+                      <p className="mb-2 text-xs text-muted-foreground">Рівень шуму</p>
+                      {model.euLabel.noiseDb ? (
+                        <EuLabelBadge
+                          type="noise"
+                          value={model.euLabel.noiseDb}
+                          size="lg"
+                          showLabel={false}
+                        />
+                      ) : (
+                        <p className="text-2xl font-bold text-muted-foreground">—</p>
+                      )}
                     </div>
                   </div>
                 </div>

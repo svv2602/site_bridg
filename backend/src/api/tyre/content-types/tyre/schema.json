@@ -70,6 +70,22 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "badges": {
+      "type": "component",
+      "repeatable": true,
+      "component": "award.badge"
+    },
+    "keyBenefits": {
+      "type": "json"
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "seoDescription": {
+      "type": "text",
+      "maxLength": 170
     }
   }
 }

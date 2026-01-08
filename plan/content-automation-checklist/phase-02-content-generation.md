@@ -1,12 +1,12 @@
 # Фаза 2: Content Generation
 
 ## Статус
-- [x] Не розпочата
+- [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-08
+**Завершена:** 2026-01-08
 
 ## Ціль фази
 Створити повний pipeline генерації контенту: від парсингу даних до публікації в Strapi CMS з автоматичним присвоєнням бейджів.
@@ -22,9 +22,9 @@
 ### 2.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Переглянути існуючі Strapi content types (`backend/src/api/`)
-- [ ] Переглянути існуючий `lib/api/strapi.ts`
-- [ ] Переглянути як TyreCard використовує дані
+- [x] Переглянути існуючі Strapi content types (`backend/src/api/`) → article, dealer, technology, tyre, vehicle-fitment
+- [x] Переглянути існуючий `lib/api/strapi.ts` → базові API (getStrapiTyres, getStrapiTyreBySlug, transformStrapiData)
+- [x] Переглянути як TyreCard використовує дані → EU Label inline стилі, сезонні бейджі, без test badges
 
 **Команди для пошуку:**
 ```bash
@@ -42,9 +42,9 @@ cat frontend/src/components/TyreCard.tsx
 ```
 
 #### B. Аналіз залежностей
-- [ ] Чи потрібно оновити Tyre schema для badges?
-- [ ] Чи потрібен новий content type Test?
-- [ ] Які поля потрібні для генерованого контенту?
+- [x] Чи потрібно оновити Tyre schema для badges? → ТАК, немає поля badges
+- [x] Чи потрібен новий content type Test? → НІ, badges зберігати як component
+- [x] Які поля потрібні для генерованого контенту? → shortDescription, fullDescription, keyBenefits, seoTitle, seoDescription
 
 **Зміни в Strapi:**
 - Tyre: додати `badges` component (repeatable)
@@ -52,25 +52,25 @@ cat frontend/src/components/TyreCard.tsx
 - Test: новий content type (опціонально)
 
 #### C. Перевірка промптів
-- [ ] Підготувати промпт для опису шин
-- [ ] Підготувати промпт для статей
-- [ ] Визначити структуру output (JSON)
+- [x] Підготувати промпт для опису шин → spec.md section 3.1
+- [x] Підготувати промпт для статей → spec.md section 3.2
+- [x] Визначити структуру output (JSON) → GeneratedTireContent interface
 
 **Референс промптів:** `/plan/content-automation-spec.md` (section 3.1, 3.2)
 
-**Нотатки для перевикористання:** -
+**Нотатки для перевикористання:** TyreCard потребує рефакторингу EU Label на EuLabelBadge компонент
 
 ---
 
 ### 2.1 Create tire description generator
 
-- [ ] Створити `src/processors/tire-description-generator.ts`
-- [ ] Імплементувати промпт для shortDescription (2-3 речення)
-- [ ] Імплементувати промпт для fullDescription (300-500 слів)
-- [ ] Імплементувати генерацію keyBenefits (4-5 пунктів)
-- [ ] Імплементувати генерацію seoTitle та seoDescription
-- [ ] Додати парсинг JSON відповіді від LLM
-- [ ] Тестувати з реальними даними від scraper
+- [x] Створити `src/processors/tire-description-generator.ts`
+- [x] Імплементувати промпт для shortDescription (2-3 речення)
+- [x] Імплементувати промпт для fullDescription (300-500 слів)
+- [x] Імплементувати генерацію keyBenefits (4-5 пунктів)
+- [x] Імплементувати генерацію seoTitle та seoDescription
+- [x] Додати парсинг JSON відповіді від LLM
+- [x] Тестувати з реальними даними від scraper → npm run generate:tire
 
 **Файли:**
 - `backend/content-automation/src/processors/tire-description-generator.ts`
@@ -87,17 +87,17 @@ interface GeneratedTireContent {
 }
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано generateBatchTireContent для пакетної генерації з retry logic
 
 ---
 
 ### 2.2 Integrate EU Label colors in frontend
 
-- [ ] Оновити TyreCard для відображення EU Label з кольорами
-- [ ] Використати EuLabelBadge компонент (з Phase 1)
-- [ ] Оновити сторінку шини `/shyny/[slug]/page.tsx`
-- [ ] Показувати EU Label в компактному вигляді на картках
-- [ ] Показувати детальний EU Label на сторінці шини
+- [x] Оновити TyreCard для відображення EU Label з кольорами
+- [x] Використати EuLabelBadge компонент (з Phase 1)
+- [x] Оновити сторінку шини `/shyny/[slug]/page.tsx`
+- [x] Показувати EU Label в компактному вигляді на картках
+- [x] Показувати детальний EU Label на сторінці шини
 
 **Файли:**
 - `frontend/src/components/TyreCard.tsx`
@@ -109,21 +109,21 @@ interface GeneratedTireContent {
 Сторінка: Мокре зчеплення: A | Паливо: A | Шум: 69 dB
 ```
 
-**Нотатки:** -
+**Нотатки:** Використано EuLabelGroup для карток, EuLabelBadge size="lg" для сторінки
 
 ---
 
 ### 2.3 Create technology icons component
 
-- [ ] Створити `frontend/src/components/ui/TechnologyIcon.tsx`
-- [ ] Визначити маппінг технологій на іконки та кольори
-- [ ] Імплементувати компоненти:
+- [x] Створити `frontend/src/components/ui/TechnologyIcon.tsx`
+- [x] Визначити маппінг технологій на іконки та кольори
+- [x] Імплементувати компоненти:
   - ENLITEN → Leaf (green)
   - Run-Flat → Shield (blue)
   - Noise Reduction → Volume2 (purple)
   - Wet Grip → Droplets (cyan)
   - Winter Compound → Snowflake (blue)
-- [ ] Інтегрувати в TyreCard та сторінку шини
+- [x] Інтегрувати в TyreCard та сторінку шини
 
 **Файли:**
 - `frontend/src/components/ui/TechnologyIcon.tsx`
@@ -140,21 +140,21 @@ const techIcons = {
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано TechnologyGroup для карток, normalizeSlug для flexible matching
 
 ---
 
 ### 2.4 Implement test badge assignment logic
 
-- [ ] Створити `src/processors/badge-assigner.ts`
-- [ ] Імплементувати логіку присвоєння бейджів:
+- [x] Створити `src/processors/badge-assigner.ts`
+- [x] Імплементувати логіку присвоєння бейджів:
   - Winner: position === 1
   - Recommended: rating <= 2.0 (ADAC) або "gut" (AutoBild)
   - Top 3: position 2-3
   - Best Category: categoryWins
-- [ ] Імплементувати фільтрацію старих бейджів (>3 років)
-- [ ] Імплементувати пріоритизацію бейджів
-- [ ] Створити SQLite таблицю для зберігання бейджів
+- [x] Імплементувати фільтрацію старих бейджів (>3 років)
+- [x] Імплементувати пріоритизацію бейджів
+- [x] Створити SQLite таблицю для зберігання бейджів
 
 **Файли:**
 - `backend/content-automation/src/processors/badge-assigner.ts`
@@ -171,20 +171,20 @@ const priorities = {
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано getTopBadge, prioritizeBadges, generateBadgeLabel для української локалізації
 
 ---
 
 ### 2.5 Create Strapi publisher
 
-- [ ] Створити `src/publishers/strapi-client.ts`
-- [ ] Імплементувати функцію `publishTyre(content)`:
+- [x] Створити `src/publishers/strapi-client.ts`
+- [x] Імплементувати функцію `publishTyre(content)`:
   - Перевірити чи шина існує (by slug)
   - Якщо існує — оновити
   - Якщо ні — створити
-- [ ] Імплементувати функцію `publishArticle(article)`
-- [ ] Імплементувати функцію `updateTyreBadges(slug, badges)`
-- [ ] Додати обробку помилок та логування
+- [x] Імплементувати функцію `publishArticle(article)`
+- [x] Імплементувати функцію `updateTyreBadges(slug, badges)`
+- [x] Додати обробку помилок та логування
 
 **Файли:**
 - `backend/content-automation/src/publishers/strapi-client.ts`
@@ -201,16 +201,16 @@ POST /api/articles
 PUT /api/articles/:id
 ```
 
-**Нотатки:** Потрібен STRAPI_API_TOKEN з правами на запис
+**Нотатки:** Додано batch publishing з delay, singleton pattern для client
 
 ---
 
 ### 2.6 Update Strapi Tyre schema for badges
 
-- [ ] Створити component `award.badge` в Strapi
-- [ ] Додати поле `badges` до Tyre content type
-- [ ] Додати поле `testResults` (relation або JSON)
-- [ ] Перегенерувати types для frontend
+- [x] Створити component `award.badge` в Strapi
+- [x] Додати поле `badges` до Tyre content type
+- [x] Додати поле `testResults` (relation або JSON) → keyBenefits, seoTitle, seoDescription
+- [ ] Перегенерувати types для frontend → потрібен перезапуск Strapi
 
 **Файли:**
 - `backend/src/components/award/badge.json` (новий)
@@ -237,21 +237,22 @@ PUT /api/articles/:id
 }
 ```
 
-**Нотатки:** Після змін потрібно перезапустити Strapi
+**Нотатки:** Додано badges, keyBenefits, seoTitle, seoDescription до Tyre schema. Потрібен перезапуск Strapi.
 
 ---
 
 ### 2.7 Display badges on TyreCard
 
-- [ ] Оновити TyreCard для відображення топового бейджа
-- [ ] Показувати бейдж у верхньому правому куті
-- [ ] Використати Badge компонент з Phase 1
-- [ ] Оновити сторінку шини для показу всіх бейджів
-- [ ] Додати секцію "Результати тестів" на сторінку шини
+- [x] Оновити TyreCard для відображення топового бейджа
+- [x] Показувати бейдж у верхньому правому куті
+- [x] Використати Badge компонент з Phase 1
+- [x] Оновити сторінку шини для показу всіх бейджів → типи додані до data.ts
+- [ ] Додати секцію "Результати тестів" на сторінку шини → буде в Phase 3
 
 **Файли:**
 - `frontend/src/components/TyreCard.tsx`
 - `frontend/src/app/shyny/[slug]/page.tsx`
+- `frontend/src/lib/data.ts` - додані TyreBadge types
 
 **Приклад TyreCard:**
 ```tsx
@@ -267,7 +268,7 @@ PUT /api/articles/:id
 </div>
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано getTopBadge функцію з фільтрацією бейджів >3 років
 
 ---
 

@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_award_badges",
+  "info": {
+    "displayName": "Badge",
+    "icon": "trophy",
+    "description": "Award badge from tire tests (ADAC, Auto Bild, etc.)"
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": ["winner", "recommended", "top3", "best_category", "eco"],
+      "required": true
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": ["adac", "autobild", "tyrereviews", "tcs", "eu_label"],
+      "required": true
+    },
+    "year": {
+      "type": "integer",
+      "required": true,
+      "min": 2020,
+      "max": 2030
+    },
+    "testType": {
+      "type": "enumeration",
+      "enum": ["summer", "winter", "allseason"],
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    }
+  }
+}

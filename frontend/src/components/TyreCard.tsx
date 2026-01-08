@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type TyreModel, type Season } from "@/lib/data";
+import { type TyreModel, type Season, type TyreBadge, type BadgeType } from "@/lib/data";
 import { Car, Truck, Sun, Snowflake, Cloud, ChevronRight } from "lucide-react";
+import { EuLabelGroup } from "@/components/ui/EuLabelBadge";
+import { TechnologyGroup } from "@/components/ui/TechnologyIcon";
+import { Badge } from "@/components/ui/Badge";
 
 interface TyreCardProps {
   tyre: TyreModel;
@@ -26,6 +29,39 @@ const seasonColors: Record<Season, string> = {
   allseason: "bg-emerald-500",
 };
 
+// Badge priority for displaying top badge
+const badgePriority: Record<BadgeType, number> = {
+  winner: 1,
+  recommended: 2,
+  top3: 3,
+  best_category: 4,
+  eco: 5,
+};
+
+// Map badge type to variant
+const badgeVariantMap: Record<BadgeType, "winner" | "recommended" | "top3" | "category" | "eco"> = {
+  winner: "winner",
+  recommended: "recommended",
+  top3: "top3",
+  best_category: "category",
+  eco: "eco",
+};
+
+// Get top badge from array
+function getTopBadge(badges?: TyreBadge[]): TyreBadge | null {
+  if (!badges || badges.length === 0) return null;
+
+  // Filter out badges older than 3 years
+  const currentYear = new Date().getFullYear();
+  const validBadges = badges.filter((b) => currentYear - b.year <= 3);
+
+  if (validBadges.length === 0) return null;
+
+  // Sort by priority and return first
+  validBadges.sort((a, b) => badgePriority[a.type] - badgePriority[b.type]);
+  return validBadges[0];
+}
+
 function FallbackIcon({ vehicleTypes }: { vehicleTypes: string[] }) {
   const IconComponent = vehicleTypes.includes("lcv") ? Truck : Car;
   return (
@@ -37,6 +73,7 @@ function FallbackIcon({ vehicleTypes }: { vehicleTypes: string[] }) {
 
 export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
   const imageHeight = variant === "compact" ? "h-56" : variant === "featured" ? "h-80" : "h-72";
+  const topBadge = getTopBadge(tyre.badges);
 
   return (
     <Link
@@ -63,8 +100,14 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
           <span>{seasonLabels[tyre.season]}</span>
         </div>
 
-        {/* New Badge */}
-        {tyre.isNew && (
+        {/* Test Badge or New Badge */}
+        {topBadge ? (
+          <div className="absolute top-4 right-4">
+            <Badge variant={badgeVariantMap[topBadge.type]} size="sm">
+              {topBadge.label}
+            </Badge>
+          </div>
+        ) : tyre.isNew && (
           <div className="absolute top-4 right-4 rounded-full bg-green-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
             Новинка
           </div>
@@ -96,22 +139,24 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
 
         {/* EU Label */}
         {tyre.euLabel && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1 rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              <span className="text-[10px] uppercase opacity-70">Зчеплення</span>
-              {tyre.euLabel.wetGrip}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-              <span className="text-[10px] uppercase opacity-70">Паливо</span>
-              {tyre.euLabel.fuelEfficiency}
-            </span>
-            {tyre.euLabel.noiseDb && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                <span className="text-[10px] uppercase opacity-70">Шум</span>
-                {tyre.euLabel.noiseDb} дБ
-              </span>
-            )}
-          </div>
+          <EuLabelGroup
+            wetGrip={tyre.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
+            fuelEfficiency={tyre.euLabel.fuelEfficiency as "A" | "B" | "C" | "D" | "E"}
+            noiseDb={tyre.euLabel.noiseDb}
+            size="sm"
+            className="mb-3"
+          />
+        )}
+
+        {/* Technologies */}
+        {tyre.technologies && tyre.technologies.length > 0 && (
+          <TechnologyGroup
+            technologies={tyre.technologies}
+            size="sm"
+            showLabels={false}
+            maxVisible={4}
+            className="mb-4"
+          />
         )}
 
         {/* Sizes Preview */}

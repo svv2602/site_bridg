@@ -12,6 +12,17 @@ export interface TyreSize {
   speedIndex?: string;
 }
 
+export type BadgeType = "winner" | "recommended" | "top3" | "best_category" | "eco";
+export type BadgeSource = "adac" | "autobild" | "tyrereviews" | "tcs" | "eu_label";
+
+export interface TyreBadge {
+  type: BadgeType;
+  source: BadgeSource;
+  year: number;
+  testType: Season;
+  label: string;
+}
+
 export interface TyreModel {
   slug: string;
   name: string;
@@ -34,6 +45,10 @@ export interface TyreModel {
     winter?: boolean;
   };
   technologies?: string[]; // technology slugs
+  badges?: TyreBadge[]; // test result badges
+  keyBenefits?: string[];
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export interface VehicleFitment {
