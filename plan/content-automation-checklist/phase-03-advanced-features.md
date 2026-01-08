@@ -2,11 +2,11 @@
 
 ## Статус
 - [ ] Не розпочата
-- [x] В процесі
-- [ ] Завершена
+- [ ] В процесі
+- [x] Завершена
 
 **Розпочата:** 2026-01-08
-**Завершена:** -
+**Завершена:** 2026-01-08
 
 ## Ціль фази
 Додати розширені функції: сезонний автоконтент, сторінки порівняння, FAQ генератор та Telegram-бот для команди.
@@ -101,14 +101,14 @@ const seasonalConfig = {
 
 ### 3.2 Create comparison pages generator
 
-- [ ] Створити `src/processors/comparison-generator.ts`:
+- [x] Створити `src/processors/comparison-generator.ts`:
   - Генерувати slug: `blizzak-lm005-vs-turanza-6`
   - Створювати таблицю порівняння
   - Генерувати verdict через LLM
-- [ ] Створити `frontend/src/app/porivnyaty/[slug]/page.tsx`
-- [ ] Імплементувати UI таблиці порівняння
-- [ ] Додати SEO metadata та Schema.org
-- [ ] Створити сторінку з вибором моделей для порівняння
+- [x] Створити `frontend/src/app/porivnyaty/[slug]/page.tsx`
+- [x] Імплементувати UI таблиці порівняння
+- [x] Додати SEO metadata та Schema.org
+- [x] Створити сторінку з вибором моделей для порівняння
 
 **Файли:**
 - `backend/content-automation/src/processors/comparison-generator.ts`
@@ -223,14 +223,14 @@ TELEGRAM_CHAT_ID=-100123456789
 
 ### 3.5 Implement test results scrapers (ADAC, AutoBild)
 
-- [ ] Створити `src/scrapers/adac.ts`:
+- [x] Створити `src/scrapers/adac.ts`:
   - Парсити тести з adac.de
   - Витягувати: models, ratings, positions, categories
-- [ ] Створити `src/scrapers/autobild.ts`:
+- [x] Створити `src/scrapers/autobild.ts`:
   - Парсити тести з autobild.de
   - Витягувати аналогічні дані
-- [ ] Створити `src/scrapers/tyrereviews.ts` (агрегатор)
-- [ ] Зберігати результати в SQLite
+- [x] Створити `src/scrapers/tyrereviews.ts` (агрегатор)
+- [x] Зберігати результати в SQLite
 
 **Файли:**
 - `backend/content-automation/src/scrapers/adac.ts`
