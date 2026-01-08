@@ -1,9 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { MOCK_TYRE_MODELS, type TyreModel, type Season } from "@/lib/data";
-import { Car, Shield, Zap, Mountain, Filter, ChevronRight } from "lucide-react";
+import { type TyreModel, type Season } from "@/lib/data";
+import { getTyreModels } from "@/lib/api/tyres";
+import { TyreCardGrid } from "@/components/TyreCard";
+import { Car, Shield, Zap, Mountain, ChevronRight } from "lucide-react";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -54,8 +53,9 @@ const features = [
   },
 ];
 
-export default function SuvTyresPage() {
-  const suvTyres = MOCK_TYRE_MODELS.filter((m) =>
+export default async function SuvTyresPage() {
+  const allTyres = await getTyreModels();
+  const suvTyres = allTyres.filter((m) =>
     m.vehicleTypes.includes("suv"),
   );
   const bySeason = groupBySeason(suvTyres);
@@ -65,12 +65,7 @@ export default function SuvTyresPage() {
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="grid gap-10 lg:grid-cols-2"
-          >
+          <div className="grid gap-10 lg:grid-cols-2">
             <div className="text-zinc-50">
               <nav className="mb-2 text-xs text-zinc-400">
                 <span className="cursor-pointer hover:text-zinc-100">Головна</span>
@@ -101,12 +96,12 @@ export default function SuvTyresPage() {
                 ))}
               </ul>
               <div className="flex flex-wrap gap-4">
-                <button className="rounded-full bg-zinc-50 px-6 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white">
+                <Link href="/tyre-search" className="rounded-full bg-zinc-50 px-6 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white">
                   Підібрати шини
-                </button>
-                <button className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
+                </Link>
+                <Link href="#catalog" className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
                   Переглянути каталог
-                </button>
+                </Link>
               </div>
             </div>
             <div className="relative">
@@ -122,12 +117,12 @@ export default function SuvTyresPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Season Tabs */}
-      <section className="py-12">
+      <section id="catalog" className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
             <h2 className="mb-4 text-3xl font-bold">Оберіть сезонність</h2>
@@ -141,11 +136,8 @@ export default function SuvTyresPage() {
               if (!items.length) return null;
 
               return (
-                <motion.div
+                <div
                   key={season}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
                   className="rounded-2xl border border-border bg-card p-6 shadow-lg"
                 >
                   <div className="mb-6 flex items-center justify-between">
@@ -173,7 +165,7 @@ export default function SuvTyresPage() {
                         className="rounded-xl border border-border bg-background p-4"
                       >
                         <h4 className="font-semibold">{model.name}</h4>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                           {model.shortDescription}
                         </p>
                         <Link
@@ -185,10 +177,12 @@ export default function SuvTyresPage() {
                       </div>
                     ))}
                   </div>
-                  <button className="mt-6 w-full rounded-full border border-border py-2.5 text-sm font-semibold hover:bg-card">
-                    Переглянути всі моделі
-                  </button>
-                </motion.div>
+                  {items.length > 2 && (
+                    <p className="mt-4 text-center text-sm text-muted-foreground">
+                      та ще {items.length - 2} моделей
+                    </p>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -199,95 +193,31 @@ export default function SuvTyresPage() {
       <section className="py-12 bg-gradient-to-b from-card to-background">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <h2 className="mb-8 text-3xl font-bold text-center">Популярні моделі для SUV</h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {suvTyres.slice(0, 6).map((model, idx) => (
-              <motion.div
-                key={model.slug}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl"
-              >
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Car className="h-20 w-20 text-primary/40" />
-                  </div>
-                  <div className="absolute top-4 left-4 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
-                    {seasonLabels[model.season]}
-                  </div>
-                  <div className="absolute top-4 right-4 rounded-full bg-background/80 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
-                    SUV / 4x4
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">
-                    {model.name}
-                  </h3>
-                  <p className="mb-4 text-sm text-muted-foreground flex-1">
-                    {model.shortDescription}
-                  </p>
-                  <div className="mb-6">
-                    <p className="mb-2 text-sm font-medium">Доступні розміри:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {model.sizes.slice(0, 3).map((size, i) => (
-                        <span
-                          key={i}
-                          className="rounded-full border border-border bg-background px-3 py-1 text-xs"
-                        >
-                          {size.width}/{size.aspectRatio}R{size.diameter}
-                        </span>
-                      ))}
-                      {model.sizes.length > 3 && (
-                        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
-                          +{model.sizes.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-auto flex gap-2">
-                    <Link
-                      href={`/shyny/${model.slug}`}
-                      className="flex-1 rounded-full border border-primary bg-transparent py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 text-center"
-                    >
-                      Детальніше
-                    </Link>
-                    <Link
-                      href="/dealers"
-                      className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-dark text-center"
-                    >
-                      Знайти дилера
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <TyreCardGrid
+            tyres={suvTyres.slice(0, 6)}
+            variant="featured"
+          />
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl"
-          >
+          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини для вашого позашляховика
               з урахуванням стилю водіння, умов експлуатації та бюджету.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <Link href="/contacts" className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
                 Отримати консультацію
-              </button>
-              <button className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
-                Зателефонувати
-              </button>
+              </Link>
+              <Link href="/dealers" className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
+                Знайти дилера
+              </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

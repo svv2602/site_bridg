@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type React from "react";
-import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ArrowLeft, ChevronRight } from "lucide-react";
-import { MOCK_TYRE_MODELS, type Season, type TyreModel } from "@/lib/data";
+import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ArrowLeft, ChevronRight, Truck } from "lucide-react";
+import { type Season, type TyreModel } from "@/lib/data";
+import { getTyreModels } from "@/lib/api/tyres";
+import { TyreCardGrid } from "@/components/TyreCard";
 import { generateProductSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 
 const seasonLabels: Record<Season, string> = {
@@ -43,8 +46,9 @@ function buildTitle(model: TyreModel): string {
   return `${model.name} — ${seasonLabels[model.season]} Bridgestone`;
 }
 
-export function generateStaticParams() {
-  return MOCK_TYRE_MODELS.map((model) => ({
+export async function generateStaticParams() {
+  const tyres = await getTyreModels();
+  return tyres.map((model) => ({
     slug: model.slug,
   }));
 }
@@ -55,7 +59,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
+  const tyres = await getTyreModels();
+  const model = tyres.find((m) => m.slug === slug);
   if (!model) {
     return {
       title: "Модель шини не знайдена — Bridgestone Україна",
@@ -75,13 +80,14 @@ export default async function TyreModelPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
+  const tyres = await getTyreModels();
+  const model = tyres.find((m) => m.slug === slug);
 
   if (!model) {
     notFound();
   }
 
-  const recommended = MOCK_TYRE_MODELS.filter(
+  const recommended = tyres.filter(
     (m) =>
       m.slug !== model.slug &&
       (m.season === model.season ||
@@ -164,20 +170,42 @@ export default async function TyreModelPage({
               </div>
             </div>
             <div className="relative">
-              <div className="relative h-80 overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-800 lg:h-full">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Car className="h-40 w-40 text-zinc-700" />
-                </div>
-                <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-zinc-900/90 px-3 py-1 text-xs font-semibold text-zinc-50 ring-1 ring-zinc-600">
+              <div className="relative aspect-square min-h-[400px] overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 lg:min-h-[500px]">
+                {model.imageUrl ? (
+                  <Image
+                    src={model.imageUrl}
+                    alt={`Шина ${model.name}`}
+                    fill
+                    className="object-contain p-8 transition-transform duration-500 hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {model.vehicleTypes.includes("lcv") ? (
+                      <Truck className="h-48 w-48 text-muted-foreground/20" />
+                    ) : (
+                      <Car className="h-48 w-48 text-muted-foreground/20" />
+                    )}
+                  </div>
+                )}
+                <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-zinc-900/90 px-4 py-2 text-sm font-semibold text-zinc-50 ring-1 ring-zinc-600">
                   {seasonIcons[model.season]}
                   <span className="ml-1">{seasonLabels[model.season]}</span>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
-                  <h3 className="text-lg font-semibold text-zinc-50">Іміджеве зображення шини</h3>
-                  <p className="text-sm text-zinc-300">
-                    У фінальній версії тут буде офіційний рендер моделі {model.name}.
-                  </p>
-                </div>
+                {model.isNew && (
+                  <div className="absolute top-4 right-4 rounded-full bg-green-500 px-4 py-2 text-sm font-semibold text-white shadow-lg">
+                    Новинка
+                  </div>
+                )}
+                {!model.imageUrl && (
+                  <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
+                    <h3 className="text-lg font-semibold text-zinc-50">Фото незабаром</h3>
+                    <p className="text-sm text-zinc-300">
+                      Зображення моделі {model.name} буде додано найближчим часом.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -329,46 +357,7 @@ export default async function TyreModelPage({
             <h2 className="mb-8 text-2xl font-bold md:text-3xl">
               Рекомендовані моделі Bridgestone
             </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {recommended.map((rec) => (
-                <article
-                  key={rec.slug}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
-                >
-                  <div className="relative h-32 overflow-hidden bg-gradient-to-br from-zinc-900 to-zinc-800">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Car className="h-16 w-16 text-zinc-700" />
-                    </div>
-                    <div className="absolute top-3 left-3 rounded-full bg-zinc-900/90 px-3 py-1 text-xs font-semibold text-zinc-50 ring-1 ring-zinc-600">
-                      {seasonLabels[rec.season]}
-                    </div>
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <h3 className="mb-1 text-base font-bold">{rec.name}</h3>
-                    <p className="mb-3 text-xs text-muted-foreground">
-                      {rec.shortDescription}
-                    </p>
-                    <div className="mb-4 flex flex-wrap gap-1">
-                      {rec.sizes.slice(0, 2).map((size, idx) => (
-                        <span
-                          key={`${rec.slug}-${idx}`}
-                          className="rounded-full border border-border bg-background px-2 py-1 text-[11px]"
-                        >
-                          {formatSize(size)}
-                        </span>
-                      ))}
-                    </div>
-                    <Link
-                      href={`/shyny/${rec.slug}`}
-                      className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-                    >
-                      Детальніше про модель
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <TyreCardGrid tyres={recommended} />
           </div>
         </section>
       )}

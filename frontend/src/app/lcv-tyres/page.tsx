@@ -1,8 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { MOCK_TYRE_MODELS, type TyreModel, type Season } from "@/lib/data";
+import { type TyreModel, type Season } from "@/lib/data";
+import { getTyreModels } from "@/lib/api/tyres";
+import { TyreImage } from "@/components/TyreImage";
 import { Truck, Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Weight, Gauge } from "lucide-react";
 
 const seasonLabels: Record<Season, string> = {
@@ -54,12 +53,9 @@ const features = [
   },
 ];
 
-// Note: Metadata is defined in layout.tsx for client components
-// title: "Шини для комерційних авто (LCV) | Bridgestone Україна"
-// description: "Шини Bridgestone для легких комерційних авто..."
-
-export default function LcvTyresPage() {
-  const lcvTyres = MOCK_TYRE_MODELS.filter((m) =>
+export default async function LcvTyresPage() {
+  const allTyres = await getTyreModels();
+  const lcvTyres = allTyres.filter((m) =>
     m.vehicleTypes.includes("lcv"),
   );
   const bySeason = groupBySeason(lcvTyres);
@@ -69,12 +65,7 @@ export default function LcvTyresPage() {
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="grid gap-10 lg:grid-cols-2"
-          >
+          <div className="grid gap-10 lg:grid-cols-2">
             <div className="text-zinc-50">
               <nav className="mb-2 text-xs text-zinc-400">
                 <Link href="/" className="cursor-pointer hover:text-zinc-100">Головна</Link>
@@ -112,9 +103,9 @@ export default function LcvTyresPage() {
                 >
                   Підібрати шини
                 </Link>
-                <button className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
+                <Link href="#catalog" className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
                   Переглянути каталог
-                </button>
+                </Link>
               </div>
             </div>
             <div className="relative">
@@ -130,12 +121,12 @@ export default function LcvTyresPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Season Tabs */}
-      <section className="py-12">
+      <section id="catalog" className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
             <h2 className="mb-4 text-3xl font-bold">Оберіть сезонність</h2>
@@ -153,7 +144,7 @@ export default function LcvTyresPage() {
               </p>
               <Link
                 href="/contacts"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90"
               >
                 Зв&apos;язатися з нами
                 <ChevronRight className="h-4 w-4" />
@@ -166,11 +157,8 @@ export default function LcvTyresPage() {
                 if (!items.length) return null;
 
                 return (
-                  <motion.div
+                  <div
                     key={season}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
                     className="rounded-2xl border border-border bg-card p-6 shadow-lg"
                   >
                     <div className="mb-6 flex items-center justify-between">
@@ -198,7 +186,7 @@ export default function LcvTyresPage() {
                           className="rounded-xl border border-border bg-background p-4"
                         >
                           <h4 className="font-semibold">{model.name}</h4>
-                          <p className="mt-1 text-sm text-muted-foreground">
+                          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                             {model.shortDescription}
                           </p>
                           <Link
@@ -210,10 +198,12 @@ export default function LcvTyresPage() {
                         </div>
                       ))}
                     </div>
-                    <button className="mt-6 w-full rounded-full border border-border py-2.5 text-sm font-semibold hover:bg-card">
-                      Переглянути всі моделі
-                    </button>
-                  </motion.div>
+                    {items.length > 2 && (
+                      <p className="mt-4 text-center text-sm text-muted-foreground">
+                        та ще {items.length - 2} моделей
+                      </p>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -227,18 +217,17 @@ export default function LcvTyresPage() {
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
             <h2 className="mb-8 text-3xl font-bold text-center">Популярні моделі для комерційних авто</h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {lcvTyres.slice(0, 6).map((model, idx) => (
-                <motion.div
+              {lcvTyres.slice(0, 6).map((model) => (
+                <div
                   key={model.slug}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
                   className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl"
                 >
-                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Truck className="h-20 w-20 text-primary/40" />
-                    </div>
+                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900">
+                    <TyreImage
+                      imageUrl={model.imageUrl}
+                      name={model.name}
+                      vehicleType="lcv"
+                    />
                     <div className="absolute top-4 left-4 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
                       {seasonLabels[model.season]}
                     </div>
@@ -250,9 +239,19 @@ export default function LcvTyresPage() {
                     <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">
                       {model.name}
                     </h3>
-                    <p className="mb-4 text-sm text-muted-foreground flex-1">
+                    <p className="mb-4 text-sm text-muted-foreground flex-1 line-clamp-2">
                       {model.shortDescription}
                     </p>
+                    {model.euLabel && (
+                      <div className="mb-4 flex gap-2 text-xs">
+                        <span className="rounded bg-green-100 dark:bg-green-900 px-2 py-1">
+                          Зчеплення: {model.euLabel.wetGrip}
+                        </span>
+                        <span className="rounded bg-blue-100 dark:bg-blue-900 px-2 py-1">
+                          Паливо: {model.euLabel.fuelEfficiency}
+                        </span>
+                      </div>
+                    )}
                     <div className="mb-6">
                       <p className="mb-2 text-sm font-medium">Доступні розміри:</p>
                       <div className="flex flex-wrap gap-2">
@@ -280,13 +279,13 @@ export default function LcvTyresPage() {
                       </Link>
                       <Link
                         href="/dealers"
-                        className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-dark text-center"
+                        className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary/90 text-center"
                       >
                         Знайти дилера
                       </Link>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -296,12 +295,7 @@ export default function LcvTyresPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl"
-          >
+          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна консультація для автопарку?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати оптимальні шини для вашого комерційного
@@ -321,7 +315,7 @@ export default function LcvTyresPage() {
                 Знайти дилера
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
