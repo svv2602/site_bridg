@@ -20,6 +20,7 @@ export interface TyreModel {
   isNew?: boolean;
   isPopular?: boolean;
   shortDescription: string;
+  imageUrl?: string; // URL to tire product image
   euLabel?: {
     wetGrip?: "A" | "B" | "C" | "D" | "E";
     fuelEfficiency?: "A" | "B" | "C" | "D" | "E";
@@ -88,6 +89,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
     isPopular: true,
     shortDescription:
       "Літні шини для щоденних поїздок містом та трасою з відмінним зчепленням на мокрій дорозі.",
+    imageUrl: "https://images.simpletire.com/images/q_auto/line-images/14283/14283-sidetread/bridgestone-turanza-t005.jpg",
     euLabel: {
       wetGrip: "A",
       fuelEfficiency: "B",
@@ -111,6 +113,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
     isPopular: true,
     shortDescription:
       "Зимові шини з фокусом на зчеплення на снігу та мокрому асфальті для безпечного руху взимку.",
+    imageUrl: "https://images.simpletire.com/images/q_auto/line-images/17531/17531-sidetread/bridgestone-blizzak-lm005.png",
     sizes: [
       { width: 195, aspectRatio: 65, diameter: 15, loadIndex: 91, speedIndex: "T" },
       { width: 225, aspectRatio: 50, diameter: 17, loadIndex: 98, speedIndex: "H" },

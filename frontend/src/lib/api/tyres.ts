@@ -32,6 +32,34 @@ export interface CarSearchParams {
   year: number;
 }
 
+// Strapi URL for media
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+
+// Strapi media format
+interface StrapiMediaFormat {
+  url: string;
+  width?: number;
+  height?: number;
+}
+
+interface StrapiMediaAttributes {
+  url: string;
+  formats?: {
+    thumbnail?: StrapiMediaFormat;
+    small?: StrapiMediaFormat;
+    medium?: StrapiMediaFormat;
+    large?: StrapiMediaFormat;
+  };
+}
+
+// Strapi v4 nested media structure
+interface StrapiMedia {
+  data?: {
+    id: number;
+    attributes: StrapiMediaAttributes;
+  } | null;
+}
+
 // Strapi attribute types
 interface StrapiTyreAttributes {
   slug: string;
@@ -41,6 +69,7 @@ interface StrapiTyreAttributes {
   isNew?: boolean;
   isPopular?: boolean;
   shortDescription: string;
+  image?: StrapiMedia;
   euLabel?: {
     wetGrip?: string;
     fuelEfficiency?: string;
@@ -55,6 +84,20 @@ interface StrapiTyreAttributes {
   };
 }
 
+function getImageUrl(image?: StrapiMedia): string | undefined {
+  if (!image?.data?.attributes) return undefined;
+
+  const attrs = image.data.attributes;
+  // Use medium format if available, otherwise original
+  const url = attrs.formats?.medium?.url || attrs.formats?.small?.url || attrs.url;
+
+  // If URL is relative, prepend Strapi URL
+  if (url && url.startsWith('/')) {
+    return `${STRAPI_URL}${url}`;
+  }
+  return url;
+}
+
 function transformStrapiTyre(data: StrapiTyreAttributes & { id: number }): TyreModel {
   return {
     slug: data.slug,
@@ -64,6 +107,7 @@ function transformStrapiTyre(data: StrapiTyreAttributes & { id: number }): TyreM
     isNew: data.isNew,
     isPopular: data.isPopular,
     shortDescription: data.shortDescription,
+    imageUrl: getImageUrl(data.image),
     euLabel: data.euLabel as TyreModel["euLabel"],
     sizes: data.sizes || [],
     usage: data.usage || {},
