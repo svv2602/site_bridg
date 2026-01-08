@@ -1,0 +1,288 @@
+# Фаза 1: Foundation + Design Fixes
+
+## Статус
+- [x] Не розпочата
+- [ ] В процесі
+- [ ] Завершена
+
+**Розпочата:** -
+**Завершена:** -
+
+## Ціль фази
+Виправити проблеми контрастності UI, створити компонент Badge та налаштувати базову структуру системи автоматизації контенту.
+
+## Задачі
+
+### 1.0 ОБОВ'ЯЗКОВО: Аналіз та планування
+
+#### A. Аналіз існуючого коду
+- [ ] Переглянути `globals.css` - поточні CSS змінні
+- [ ] Переглянути існуючі компоненти в `frontend/src/components/`
+- [ ] Переглянути структуру `backend/` для розуміння де створювати automation
+
+**Команди для пошуку:**
+```bash
+# Поточні CSS змінні
+cat frontend/src/app/globals.css | head -50
+
+# Існуючі компоненти
+ls frontend/src/components/
+
+# Backend структура
+ls backend/
+
+# Існуючі API функції
+ls frontend/src/lib/api/
+```
+
+#### B. Аналіз залежностей
+- [ ] Чи є вже Badge компонент? (шукати badge, chip, tag)
+- [ ] Які залежності потрібні для scraper? (puppeteer, cheerio)
+- [ ] Які залежності потрібні для LLM? (@anthropic-ai/sdk)
+
+**Пошук існуючих компонентів:**
+```bash
+grep -r "Badge\|Chip\|Tag" frontend/src/components/
+```
+
+**Нові залежності (backend/content-automation):**
+- puppeteer або playwright (scraping)
+- @anthropic-ai/sdk (Claude API)
+- better-sqlite3 (локальна БД)
+- node-cron (scheduler)
+
+#### C. Перевірка дизайну
+- [ ] Перевірити поточний контраст в dark theme
+- [ ] Визначити де використовується `text-muted-foreground`
+- [ ] Знайти всі місця з `zinc-300` на темному фоні
+
+**Команди:**
+```bash
+# Пошук muted-foreground
+grep -r "muted-foreground" frontend/src/app/
+
+# Пошук zinc-300 на темному фоні (hero секції)
+grep -r "zinc-300" frontend/src/app/page.tsx
+```
+
+**Референс для бейджів:** Дизайн з ТЗ (section 14.4)
+
+**Нотатки для перевикористання:** -
+
+---
+
+### 1.1 Fix contrast issues in globals.css
+
+- [ ] Оновити `--muted` в dark theme: `#9ca3af` → `#a1a1aa`
+- [ ] Оновити `--border` в dark theme: `#27272a` → `#3f3f46`
+- [ ] Оновити `--card` в dark theme: `#18181b` → `#1c1c1f`
+- [ ] Замінити `text-zinc-300` на `text-zinc-100` в hero секціях (page.tsx)
+- [ ] Перевірити контраст після змін (візуально або WCAG checker)
+
+**Файли:**
+- `frontend/src/app/globals.css`
+- `frontend/src/app/page.tsx`
+
+**Зміни в globals.css:**
+```css
+:root[data-theme="dark"] {
+  --muted: #a1a1aa;           /* було #9ca3af */
+  --muted-foreground: #a1a1aa;
+  --border: #3f3f46;          /* було #27272a */
+  --card: #1c1c1f;            /* було #18181b */
+}
+```
+
+**Нотатки:** -
+
+---
+
+### 1.2 Create Badge component with variants
+
+- [ ] Створити файл `frontend/src/components/ui/Badge.tsx`
+- [ ] Імплементувати варіанти: winner, recommended, top3, category, eco
+- [ ] Імплементувати варіанти сезонів: summer, winter, allseason
+- [ ] Додати підтримку розмірів: sm, md, lg
+- [ ] Додати іконки (emoji або Lucide)
+- [ ] Експортувати з `frontend/src/components/ui/index.ts` (створити якщо немає)
+
+**Файли:**
+- `frontend/src/components/ui/Badge.tsx` (новий)
+- `frontend/src/components/ui/index.ts` (новий або оновити)
+
+**Приклад використання:**
+```tsx
+<Badge variant="winner">🏆 Переможець ADAC 2024</Badge>
+<Badge variant="recommended" size="sm">✓ Рекомендовано</Badge>
+<Badge variant="summer">☀️ Літня</Badge>
+```
+
+**Нотатки:** -
+
+---
+
+### 1.3 Create EU Label Badge component
+
+- [ ] Створити файл `frontend/src/components/ui/EuLabelBadge.tsx`
+- [ ] Імплементувати кольори для A, B, C, D, E
+- [ ] Показувати тип (Wet Grip, Fuel, Noise) + значення
+- [ ] Компактний вигляд для карток
+
+**Файли:**
+- `frontend/src/components/ui/EuLabelBadge.tsx` (новий)
+
+**Приклад:**
+```tsx
+<EuLabelBadge type="wetGrip" value="A" />
+<EuLabelBadge type="fuelEfficiency" value="B" />
+<EuLabelBadge type="noise" value={71} />
+```
+
+**Нотатки:** -
+
+---
+
+### 1.4 Setup content-automation project structure
+
+- [ ] Створити папку `backend/content-automation/`
+- [ ] Ініціалізувати package.json (`npm init -y`)
+- [ ] Встановити TypeScript та налаштувати tsconfig.json
+- [ ] Створити структуру папок:
+  ```
+  backend/content-automation/
+  ├── src/
+  │   ├── scrapers/
+  │   ├── processors/
+  │   ├── publishers/
+  │   ├── config/
+  │   └── index.ts
+  ├── data/
+  │   └── .gitkeep
+  ├── logs/
+  │   └── .gitkeep
+  ├── package.json
+  └── tsconfig.json
+  ```
+- [ ] Додати базові залежності
+
+**Файли:**
+- `backend/content-automation/package.json`
+- `backend/content-automation/tsconfig.json`
+- `backend/content-automation/src/index.ts`
+
+**Команди:**
+```bash
+cd backend
+mkdir -p content-automation/src/{scrapers,processors,publishers,config}
+mkdir -p content-automation/{data,logs}
+cd content-automation
+npm init -y
+npm install typescript @types/node ts-node --save-dev
+npx tsc --init
+```
+
+**Нотатки:** -
+
+---
+
+### 1.5 Implement ProKoleso scraper (basic)
+
+- [ ] Встановити puppeteer або playwright
+- [ ] Створити `src/scrapers/prokoleso.ts`
+- [ ] Імплементувати функцію `scrapeProkoleso()`:
+  - Отримати список моделей Bridgestone
+  - Витягти: name, slug, season, sizes, description, imageUrl
+- [ ] Створити тест-скрипт для перевірки
+- [ ] Зберегти результат в JSON для аналізу
+
+**Файли:**
+- `backend/content-automation/src/scrapers/prokoleso.ts`
+- `backend/content-automation/src/scrapers/index.ts`
+
+**URL для парсингу:**
+```
+https://prokoleso.ua/shiny/bridgestone/
+```
+
+**Очікувана структура даних:**
+```typescript
+interface ScrapedTire {
+  name: string;
+  slug: string;
+  season: 'summer' | 'winter' | 'allseason';
+  sizes: Array<{
+    width: number;
+    aspectRatio: number;
+    diameter: number;
+    country: string;
+  }>;
+  description: string;
+  imageUrl: string;
+  sourceUrl: string;
+}
+```
+
+**Нотатки:** -
+
+---
+
+### 1.6 Basic LLM integration (Claude API)
+
+- [ ] Встановити `@anthropic-ai/sdk`
+- [ ] Створити `src/config/env.ts` для API keys
+- [ ] Створити `src/processors/llm-generator.ts`
+- [ ] Імплементувати базову функцію `generateContent(prompt)`
+- [ ] Протестувати з простим промптом
+- [ ] Додати обробку помилок та retry logic
+
+**Файли:**
+- `backend/content-automation/src/config/env.ts`
+- `backend/content-automation/src/processors/llm-generator.ts`
+
+**Приклад використання:**
+```typescript
+const content = await generateContent(`
+  Напиши короткий опис шини Bridgestone Turanza 6 українською.
+  Сезон: літня
+  EU Label: A/A/69dB
+`);
+```
+
+**Нотатки:** Потрібен ANTHROPIC_API_KEY в .env
+
+---
+
+## При завершенні фази
+
+Виконай наступні дії:
+
+1. Переконайся, що всі задачі відмічені [x]
+2. Зміни статус фази:
+   - [ ] Не розпочата
+   - [ ] В процесі
+   - [x] Завершена
+3. Заповни дату "Завершена: YYYY-MM-DD"
+4. Перевір що все працює:
+   ```bash
+   # Frontend з новими стилями
+   cd frontend && npm run dev
+
+   # Content automation
+   cd backend/content-automation && npx ts-node src/index.ts
+   ```
+5. Виконай коміт:
+   ```bash
+   git add .
+   git commit -m "checklist(content-automation): phase-1 foundation completed
+
+   - Fix contrast issues in dark theme
+   - Add Badge and EuLabelBadge components
+   - Setup content-automation project structure
+   - Implement ProKoleso scraper
+   - Add basic Claude API integration"
+   ```
+6. Онови PROGRESS.md:
+   - Поточна фаза: 2
+   - Статус Phase 1: ✅ Завершена
+   - Додай запис в історію
+7. Відкрий `phase-02-content-generation.md` та продовж роботу
