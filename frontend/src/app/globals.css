@@ -37,11 +37,12 @@
   --primary: var(--bridgestone-red);
   --primary-dark: var(--bridgestone-red-dark);
   --secondary: #e5e7eb;
-  --accent: #9ca3af;
-  --muted: #9ca3af;
-  /* более нейтральная серая поверхность вместо синеватого #111827 */
-  --card: #18181b;
-  --border: #27272a;
+  --accent: #a1a1aa;
+  --muted: #a1a1aa;           /* zinc-400 для кращого контрасту (було #9ca3af) */
+  --muted-foreground: #a1a1aa;
+  /* більш нейтральна сіра поверхня */
+  --card: #1c1c1f;            /* трохи світліший для кращого контрасту (було #18181b) */
+  --border: #3f3f46;          /* zinc-700 для кращої видимості (було #27272a) */
 }
 
 @theme inline {

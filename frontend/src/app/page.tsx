@@ -108,16 +108,16 @@ export default function Home() {
               className="space-y-5 text-zinc-50"
             >
               <div className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-1.5 text-xs font-semibold text-zinc-200 ring-1 ring-zinc-700">
-                <Star className="h-4 w-4 text-zinc-300" />
+                <Star className="h-4 w-4 text-zinc-100" />
                 Офіційний сайт шин Bridgestone в Україні
               </div>
               <h1 className="text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Технічний контроль на кожному кілометрі
-                <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
+                <span className="mt-1 block text-base font-normal text-zinc-100 md:text-lg">
                   літні, зимові та всесезонні шини під ваш стиль водіння
                 </span>
               </h1>
-              <p className="max-w-xl text-sm text-zinc-300 md:text-base">
+              <p className="max-w-xl text-sm text-zinc-100 md:text-base">
                 Підбір шин за параметрами авто, типорозміром та сценаріями використання —
                 інтерфейс у більш «технічному» стилі, узгодженому з сторінкою пошуку шин.
               </p>
@@ -161,7 +161,7 @@ export default function Home() {
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
                   <h3 className="text-xl font-semibold text-zinc-50">Готові до будь‑якої погоди</h3>
-                  <p className="text-sm text-zinc-300">
+                  <p className="text-sm text-zinc-100">
                     Місто, траса чи зима — оберіть шини під свої маршрути.
                   </p>
                 </div>
@@ -170,7 +170,7 @@ export default function Home() {
               {/* Quick Search */}
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 text-zinc-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
                 <h2 className="text-xl font-semibold">Швидкий пошук шин</h2>
-                <p className="mt-1 text-sm text-zinc-300">
+                <p className="mt-1 text-sm text-zinc-100">
                   Виберіть спосіб пошуку: за розміром або за вашим автомобілем.
                 </p>
 
