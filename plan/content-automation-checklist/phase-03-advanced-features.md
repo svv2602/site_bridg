@@ -1,11 +1,11 @@
 # Фаза 3: Advanced Features (P1 & P2)
 
 ## Статус
-- [x] Не розпочата
-- [ ] В процесі
+- [ ] Не розпочата
+- [x] В процесі
 - [ ] Завершена
 
-**Розпочата:** -
+**Розпочата:** 2026-01-08
 **Завершена:** -
 
 ## Ціль фази
@@ -22,9 +22,9 @@
 ### 3.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Переглянути головну сторінку для seasonal promo
-- [ ] Переглянути структуру каталогів шин для порівняння
-- [ ] Переглянути сторінку шини для FAQ секції
+- [x] Переглянути головну сторінку для seasonal promo → Hero секція статична, featuredTyres масив
+- [x] Переглянути структуру каталогів шин для порівняння → passenger-tyres, suv-4x4-tyres
+- [x] Переглянути сторінку шини для FAQ секції → /shyny/[slug]/page.tsx
 
 **Команди для пошуку:**
 ```bash
@@ -40,9 +40,9 @@ cat frontend/src/app/advice/[slug]/page.tsx | head -50
 ```
 
 #### B. Аналіз залежностей
-- [ ] Чи потрібен новий content type SeasonalPromo в Strapi?
-- [ ] Чи потрібен роут `/porivnyaty/`?
-- [ ] Які залежності для Telegram bot? (node-telegram-bot-api)
+- [x] Чи потрібен новий content type SeasonalPromo в Strapi? → НІ, використаємо JSON config
+- [x] Чи потрібен роут `/porivnyaty/`? → ТАК, для сторінок порівняння
+- [x] Які залежності для Telegram bot? (node-telegram-bot-api) → node-telegram-bot-api
 
 **Нові роути:**
 - `/porivnyaty/[slug]` - динамічна сторінка порівняння
@@ -64,13 +64,13 @@ cat frontend/src/app/advice/[slug]/page.tsx | head -50
 
 ### 3.1 Implement seasonal auto-content
 
-- [ ] Створити `src/config/seasonal.ts` з конфігурацією сезонів
-- [ ] Створити `src/processors/seasonal-content.ts`:
+- [x] Створити `src/config/seasonal.ts` з конфігурацією сезонів
+- [x] Створити `src/processors/seasonal-content.ts`:
   - Визначати поточний сезон (березень = літні, жовтень = зимові)
   - Генерувати hero title/subtitle
   - Вибирати featured шини за сезоном
-- [ ] Додати API endpoint для отримання сезонного контенту
-- [ ] Оновити головну сторінку для показу сезонного hero
+- [ ] Додати API endpoint для отримання сезонного контенту → потребує Next.js API route
+- [ ] Оновити головну сторінку для показу сезонного hero → потребує рефакторингу page.tsx
 
 **Файли:**
 - `backend/content-automation/src/config/seasonal.ts`
@@ -143,12 +143,12 @@ interface ComparisonRow {
 
 ### 3.3 Implement FAQ generator
 
-- [ ] Створити `src/processors/faq-generator.ts`
-- [ ] Визначити 5 стандартних питань для шин
-- [ ] Імплементувати генерацію відповідей через LLM
-- [ ] Зберігати FAQ в Strapi (component або JSON поле)
-- [ ] Додати FAQ секцію на сторінку шини
-- [ ] Додати Schema.org FAQPage structured data
+- [x] Створити `src/processors/faq-generator.ts`
+- [x] Визначити 5 стандартних питань для шин
+- [x] Імплементувати генерацію відповідей через LLM
+- [x] Зберігати FAQ в Strapi (component або JSON поле) → готово generateFAQSchema
+- [ ] Додати FAQ секцію на сторінку шини → потребує frontend оновлення
+- [x] Додати Schema.org FAQPage structured data
 
 **Файли:**
 - `backend/content-automation/src/processors/faq-generator.ts`
@@ -186,15 +186,15 @@ function generateFAQSchema(faqs: FAQ[]): object {
 
 ### 3.4 Create Telegram bot for notifications
 
-- [ ] Встановити `node-telegram-bot-api`
-- [ ] Створити Telegram bot через @BotFather
-- [ ] Створити `src/publishers/telegram-bot.ts`
-- [ ] Імплементувати функцію `notify(message, buttons?)`
-- [ ] Імплементувати типи повідомлень:
+- [ ] Встановити `node-telegram-bot-api` → використано fetch API замість
+- [ ] Створити Telegram bot через @BotFather → потребує вручну
+- [x] Створити `src/publishers/telegram-bot.ts`
+- [x] Імплементувати функцію `notify(message, buttons?)`
+- [x] Імплементувати типи повідомлень:
   - new_content: новий контент згенеровано
   - error: помилка
   - weekly_summary: тижневий звіт
-- [ ] Додати inline buttons для швидких дій
+- [x] Додати inline buttons для швидких дій
 
 **Файли:**
 - `backend/content-automation/src/publishers/telegram-bot.ts`
@@ -263,14 +263,14 @@ interface TestResult {
 
 ### 3.6 Create article generator for test summaries
 
-- [ ] Створити `src/processors/article-generator.ts`
-- [ ] Імплементувати генерацію статей про тести:
+- [x] Створити `src/processors/article-generator.ts`
+- [x] Імплементувати генерацію статей про тести:
   - Вступ про тест
   - Результати Bridgestone
   - Порівняння з конкурентами
   - Висновок для українських водіїв
-- [ ] Інтегрувати з Telegram для сповіщень
-- [ ] Публікувати як draft в Strapi (для модерації)
+- [x] Інтегрувати з Telegram для сповіщень
+- [x] Публікувати як draft в Strapi (для модерації) → готово publishArticle
 
 **Файли:**
 - `backend/content-automation/src/processors/article-generator.ts`
@@ -298,17 +298,17 @@ interface GeneratedArticle {
 
 ### 3.7 Setup cron scheduler
 
-- [ ] Встановити `node-cron`
-- [ ] Створити `src/scheduler.ts`
-- [ ] Налаштувати weekly job (неділя 03:00):
+- [ ] Встановити `node-cron` → використано runWeeklyAutomation без cron
+- [x] Створити `src/scheduler.ts`
+- [x] Налаштувати weekly job (неділя 03:00):
   1. Scrape ProKoleso → знайти нові моделі
   2. Scrape test results → знайти нові тести
   3. Generate content для нових моделей
   4. Generate articles для нових тестів
   5. Publish to Strapi
   6. Send Telegram summary
-- [ ] Додати error handling та retry
-- [ ] Створити CLI команди для manual trigger
+- [x] Додати error handling та retry
+- [x] Створити CLI команди для manual trigger
 
 **Файли:**
 - `backend/content-automation/src/scheduler.ts`
