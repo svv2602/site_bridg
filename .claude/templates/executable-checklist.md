@@ -325,7 +325,7 @@ ls frontend/src/lib/api/
 ```
 Використай шаблон з .claude/templates/executable-checklist.md
 для задачі: Інтеграція Google Maps для карти дилерів
-Створи в папці: .claude/checklists/google-maps-integration
+Створи в папці: /checklists/google-maps-integration
 Джерело вимог: 01_TZ_Bridgestone_site.md (п. 4.4)
 ```
 

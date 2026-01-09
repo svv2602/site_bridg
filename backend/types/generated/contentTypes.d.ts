@@ -949,6 +949,16 @@ export interface ApiTyreTyre extends Schema.CollectionType {
       'api::technology.technology'
     >;
     image: Attribute.Media<'images'>;
+    badges: Attribute.Component<'award.badge', true>;
+    keyBenefits: Attribute.JSON;
+    seoTitle: Attribute.String &
+      Attribute.SetMinMaxLength<{
+        maxLength: 70;
+      }>;
+    seoDescription: Attribute.Text &
+      Attribute.SetMinMaxLength<{
+        maxLength: 170;
+      }>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

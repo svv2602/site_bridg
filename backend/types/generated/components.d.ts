@@ -83,12 +83,48 @@ export interface TyreEuLabel extends Schema.Component {
   };
 }
 
+export interface AwardBadge extends Schema.Component {
+  collectionName: 'components_award_badges';
+  info: {
+    displayName: 'Badge';
+    icon: 'trophy';
+    description: 'Award badge from tire tests (ADAC, Auto Bild, etc.)';
+  };
+  attributes: {
+    type: Attribute.Enumeration<
+      ['winner', 'recommended', 'top3', 'best_category', 'eco']
+    > &
+      Attribute.Required;
+    source: Attribute.Enumeration<
+      ['adac', 'autobild', 'tyrereviews', 'tcs', 'eu_label']
+    > &
+      Attribute.Required;
+    year: Attribute.Integer &
+      Attribute.Required &
+      Attribute.SetMinMax<
+        {
+          min: 2020;
+          max: 2030;
+        },
+        number
+      >;
+    testType: Attribute.Enumeration<['summer', 'winter', 'allseason']> &
+      Attribute.Required;
+    label: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
       'tyre.usage': TyreUsage;
       'tyre.size': TyreSize;
       'tyre.eu-label': TyreEuLabel;
+      'award.badge': AwardBadge;
     }
   }
 }

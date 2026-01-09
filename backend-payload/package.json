@@ -1,0 +1,44 @@
+{
+  "name": "backend-payload",
+  "version": "1.0.0",
+  "description": "Bridgestone Ukraine CMS + Content Automation",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "seed": "tsx scripts/seed.ts",
+    "generate:types": "payload generate:types",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "payload",
+    "cms",
+    "bridgestone"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@payloadcms/db-postgres": "^3.70.0",
+    "@payloadcms/next": "^3.70.0",
+    "@payloadcms/richtext-lexical": "^3.70.0",
+    "dotenv": "^17.2.3",
+    "graphql": "^16.12.0",
+    "next": "^15.4.10",
+    "node-cron": "^4.2.1",
+    "payload": "^3.70.0",
+    "puppeteer": "^24.34.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "@types/node-cron": "^3.0.11",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "sass": "^1.89.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

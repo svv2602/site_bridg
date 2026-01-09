@@ -6,139 +6,133 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Official Bridgestone Ukraine website for end consumers. Reference: Goodyear EU site UX adapted for Bridgestone brand. Ukrainian language only (with future multi-language architecture support).
 
-## Commands
-
-All commands run from `frontend/` directory:
+## Quick Start
 
 ```bash
-npm run dev      # Development server at http://localhost:3000
+# Terminal 1: Start backend
+./run_backend.sh
+
+# Terminal 2: Start frontend
+./run_frontend.sh
+```
+
+## Commands
+
+### Frontend (from `frontend/` directory)
+
+```bash
+npm run dev      # Development server at http://localhost:3010
 npm run build    # Production build
 npm run start    # Start production server
 npm run lint     # ESLint check
 ```
 
+### Backend (from `backend-payload/` directory)
+
+```bash
+npm run dev      # Development server at http://localhost:3001
+npm run build    # Production build
+npm run start    # Start production server
+npm run seed     # Seed database with initial data
+npm run seed -- --force  # Reseed (clears existing data)
+```
+
 ## Architecture
 
 ### Tech Stack
-- **Next.js 16** with App Router (React 19)
-- **TypeScript**
-- **Tailwind CSS v4**
-- **Framer Motion** for animations
-- **Lucide React** for icons
+- **Frontend**: Next.js 16 with App Router (React 19), TypeScript, Tailwind CSS v4
+- **Backend**: Payload CMS v3 with PostgreSQL
+- **Content Automation**: Claude AI-powered content generation
 
 ### Directory Structure
 
 ```
-frontend/src/
-├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Homepage with hero, quick search, categories
-│   ├── layout.tsx         # Root layout with header/footer
-│   ├── passenger-tyres/   # Passenger tyres catalog
-│   ├── suv-4x4-tyres/     # SUV tyres catalog
-│   ├── tyre-search/       # Search by size or by car (two modes)
-│   ├── shyny/[slug]/      # Individual tyre model page (dynamic)
-│   ├── dealers/           # Dealer finder with filters
-│   ├── about/             # Brand page
-│   ├── technology/        # Technologies listing
-│   ├── advice/            # Articles list
-│   │   └── [slug]/        # Individual article page
-│   └── contacts/          # Contact form and FAQ
-├── components/
-│   ├── MainHeader.tsx     # Sticky header with burger menu
-│   ├── ThemeToggle.tsx    # Dark/light mode toggle
-│   └── AnimatedMain.tsx   # Page transition wrapper
-└── lib/
-    ├── data.ts            # TypeScript types and mock data
-    └── api/               # API layer (prepared for CMS integration)
-        ├── tyres.ts       # Tyre search functions
-        ├── dealers.ts     # Dealer queries
-        └── articles.ts    # Article queries
+.
+├── frontend/               # Next.js frontend
+│   └── src/
+│       ├── app/           # App Router pages
+│       ├── components/    # React components
+│       └── lib/
+│           ├── api/       # API layer
+│           │   └── payload.ts  # Payload CMS client
+│           └── data.ts    # Types and mock data
+│
+├── backend-payload/        # Payload CMS backend
+│   ├── src/
+│   │   ├── app/           # Next.js App for Admin UI
+│   │   ├── collections/   # Payload collections
+│   │   └── automation/    # Content automation system
+│   ├── scripts/
+│   │   └── seed.ts        # Database seeding
+│   └── payload.config.ts  # Payload configuration
+│
+└── backend/                # Legacy Strapi (deprecated)
 ```
 
-### Data Model (lib/data.ts)
+### Data Model
 
-Core types for the application:
-- `TyreModel` — tyre with sizes, season, vehicle types, EU label, technologies
-- `TyreSize` — width/aspectRatio/diameter/loadIndex/speedIndex
-- `VehicleFitment` — car make/model/year with recommended sizes
-- `Dealer` — dealer with coordinates, contacts, type (official/partner/service)
-- `Article` — blog article with tags, reading time
-- `Technology` — technology linked to tyre models
+Core types in Payload CMS:
+- `Tyres` — tyre models with sizes, season, EU label, technologies, badges, FAQs
+- `Dealers` — dealer locations with coordinates, services
+- `Articles` — blog articles with tags, rich text content
+- `Technologies` — tyre technologies
+- `VehicleFitments` — car make/model/year → recommended sizes
 
-### Key Patterns
+## Backend (Payload CMS)
 
-1. **Search modes**: Tyre search has two tabs — "by size" (width/height/diameter dropdowns) and "by car" (cascading make→model→year dropdowns)
+### Admin Panel
 
-2. **Mock data ready for API**: All data access goes through `lib/api/` functions that currently return mock data but are designed for easy CMS/API replacement
+- URL: http://localhost:3001/admin
+- Default credentials: admin@bridgestone.ua / admin123
 
-3. **Dynamic routes**: Use `generateStaticParams()` for `/shyny/[slug]` and `/advice/[slug]`
+### API Endpoints
 
-4. **Consistent styling**: Dark hero sections with zinc-900 gradient, cards with border-border bg-card, primary color for CTAs
-
-## Current State
-
-**Frontend: 100% complete**
-- All pages implemented
-- Strapi CMS integration with fallback to mock data
-- Google Maps integration for dealers
-- GA4/Meta Pixel analytics
-- Cookies consent banner
-- Schema.org structured data
-
-**Backend/CMS: Strapi v4.25.12**
-- Located in `/backend` directory
-- SQLite database (development)
-- API layer in `frontend/src/lib/api/strapi.ts`
-
-## CMS (Strapi)
-
-### Commands
-
-```bash
-cd backend
-npm run develop   # Development server at http://localhost:1337
-npm run build     # Production build
-npm run start     # Start production server
-```
-
-### Content Types
-
-| Type | API Endpoint | Description |
-|------|--------------|-------------|
-| Tyre | `/api/tyres` | Tyre models with sizes, EU label, usage |
-| Dealer | `/api/dealers` | Dealer locations with coordinates |
-| Article | `/api/articles` | Blog articles/advice |
-| Technology | `/api/technologies` | Tyre technologies |
-| VehicleFitment | `/api/vehicle-fitments` | Car-to-tyre recommendations |
-
-### Components (Tyre)
-
-- `eu-label` — EU label data (wetGrip, fuelEfficiency, noiseDb)
-- `usage` — Usage scenarios (city, highway, offroad, winter)
-- `size` — Tyre dimensions (width, aspectRatio, diameter, loadIndex, speedIndex)
+| Endpoint | Description |
+|----------|-------------|
+| `/api/tyres` | Tyre models |
+| `/api/dealers` | Dealer locations |
+| `/api/articles` | Blog articles |
+| `/api/technologies` | Tyre technologies |
+| `/api/vehicle-fitments` | Car-to-tyre mappings |
+| `/api/seasonal` | Seasonal hero content |
+| `/api/automation/status` | Automation scheduler status |
 
 ### Environment Variables
 
+Backend (`backend-payload/.env`):
+```
+PAYLOAD_SECRET=your-secret-key
+DATABASE_URL=postgresql://user:pass@localhost:5433/bridgestone
+```
+
 Frontend (`frontend/.env.local`):
 ```
-NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
-STRAPI_API_TOKEN=your_api_token_here
+NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3001
 ```
 
-### Seed Data
+## Content Automation
+
+Located in `backend-payload/src/automation/`:
+
+- **scrapers/** — Data collection from external sources
+- **processors/** — AI-powered content generation with Claude
+- **publishers/** — Publishing to Payload CMS
+- **jobs/** — Cron scheduler (runs weekly on Sunday 03:00 Kyiv time)
+
+### Running Automation Manually
 
 ```bash
-cd backend
-node scripts/seed.js   # Requires API token with full access
+cd backend-payload
+npm run dev
+# Then use API: POST /api/automation/run
 ```
 
-### Roles
+## Key Patterns
 
-| Role | Permissions |
-|------|-------------|
-| Super Admin | Full access to all settings and content |
-| Content-editor | CRUD for Tyre, Article, Technology, Dealer (no settings) |
-| Public | Read-only access to published content |
+1. **Search modes**: Tyre search has two tabs — "by size" and "by car"
+2. **API layer**: Frontend uses `lib/api/payload.ts` for all CMS data
+3. **Dynamic routes**: `/shyny/[slug]` and `/advice/[slug]` use `generateStaticParams()`
+4. **Styling**: Dark hero sections (zinc-900), cards with border-border bg-card
 
 ## Language
 
