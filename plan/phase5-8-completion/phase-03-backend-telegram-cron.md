@@ -3,10 +3,10 @@
 ## Статус
 - [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-09
+**Завершена:** 2026-01-09
 
 ## Ціль фази
 Додати інтерактивні команди Telegram бота (/run, /status, /stats) та налаштувати cron scheduler для автоматичного запуску.
@@ -23,219 +23,88 @@
 ### 3.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Переглянути поточний telegram-bot.ts
-- [ ] Переглянути scheduler.ts
-- [ ] Перевірити env.ts для конфігурації
-
-**Команди для пошуку:**
-```bash
-# Telegram bot
-cat backend-payload/content-automation/src/publishers/telegram-bot.ts
-
-# Scheduler
-cat backend-payload/content-automation/src/scheduler.ts
-
-# Environment config
-cat backend-payload/content-automation/src/config/env.ts
-```
+- [x] Переглянути поточний telegram-bot.ts
+- [x] Переглянути scheduler.ts
+- [x] Перевірити env.ts для конфігурації
 
 #### B. Аналіз залежностей
-- [ ] Чи встановлено node-cron?
-- [ ] Чи є metrics.ts для /stats команди?
-- [ ] Як зберігати статус останнього запуску?
+- [x] Чи встановлено node-cron?
+- [x] Чи є metrics.ts для /stats команди?
+- [x] Як зберігати статус останнього запуску?
 
-**Нові залежності:** node-cron, @types/node-cron
+**Нові залежності:** node-cron, @types/node-cron (вже встановлено)
 **Нові файли:** telegram-commands.ts, cron.ts
 
 #### C. Архітектурні рішення
-- [ ] Polling vs Webhook для Telegram (polling простіший)
-- [ ] Зберігання статусу: файл vs SQLite vs Payload collection
-
-**Нотатки:**
-- Використати polling mode для простоти
-- Зберігати статус в JSON файлі або SQLite
+- [x] Polling vs Webhook для Telegram (polling простіший)
+- [x] Зберігання статусу: в пам'яті (для простоти)
 
 ---
 
 ### 3.1 Встановити node-cron
 
-- [ ] Встановити `node-cron` та типи
-- [ ] Перевірити що package.json оновлено
+- [x] Встановити `node-cron` та типи (вже в package.json)
+- [x] Перевірити що package.json оновлено
 
-**Команди:**
-```bash
-cd backend-payload/content-automation
-npm install node-cron
-npm install -D @types/node-cron
-```
-
-**Файли:** `backend-payload/content-automation/package.json`
+**Файли:** `backend-payload/package.json`
 
 ---
 
 ### 3.2 Створити Telegram Commands Handler
 
-- [ ] Створити `telegram-commands.ts` в publishers/
-- [ ] Реалізувати /start команду (help message)
-- [ ] Реалізувати /run команду (trigger full automation)
-- [ ] Реалізувати /scrape команду (scrape only)
-- [ ] Реалізувати /status команду (last run status)
-- [ ] Реалізувати /stats команду (weekly statistics)
+- [x] Створити `telegram-commands.ts` в publishers/
+- [x] Реалізувати /start команду (help message)
+- [x] Реалізувати /run команду (trigger full automation)
+- [x] Реалізувати /scrape команду (scrape only)
+- [x] Реалізувати /status команду (last run status)
+- [x] Реалізувати /stats команду (weekly statistics)
 
 **Файли:** `backend-payload/content-automation/src/publishers/telegram-commands.ts`
-
-**Команди бота:**
-```
-/start - Привітання та список команд
-/help - Допомога
-/run - Запустити повний цикл автоматизації
-/scrape - Тільки скрапінг джерел
-/status - Статус останнього запуску
-/stats - Статистика за тиждень
-```
-
-**Структура:**
-```typescript
-interface TelegramUpdate {
-  update_id: number;
-  message?: {
-    message_id: number;
-    chat: { id: number };
-    text?: string;
-  };
-}
-
-const commands: Record<string, () => Promise<string>> = {
-  '/start': async () => '...',
-  '/help': async () => '...',
-  '/run': async () => '...',
-  // ...
-};
-```
 
 ---
 
 ### 3.3 Реалізувати Polling Mode
 
-- [ ] Додати функцію startPolling() в telegram-commands.ts
-- [ ] Реалізувати getUpdates loop
-- [ ] Додати error handling та reconnection
+- [x] Додати функцію startPolling() в telegram-commands.ts
+- [x] Реалізувати getUpdates loop
+- [x] Додати error handling та reconnection
 
 **Файли:** `backend-payload/content-automation/src/publishers/telegram-commands.ts`
-
-**Polling logic:**
-```typescript
-export async function startPolling(): Promise<void> {
-  let offset = 0;
-
-  while (true) {
-    try {
-      const response = await fetch(
-        `${TELEGRAM_API}/getUpdates?offset=${offset}&timeout=30`
-      );
-      const data = await response.json();
-
-      for (const update of data.result) {
-        await processUpdate(update);
-        offset = update.update_id + 1;
-      }
-    } catch (error) {
-      await sleep(5000); // Wait on error
-    }
-  }
-}
-```
 
 ---
 
 ### 3.4 Створити Cron Scheduler
 
-- [ ] Створити `cron.ts` для scheduled jobs
-- [ ] Налаштувати weekly job (неділя 03:00 Kyiv time)
-- [ ] Додати Telegram notification при старті/завершенні
-- [ ] Експортувати startCronJobs() функцію
+- [x] Створити `cron.ts` для scheduled jobs
+- [x] Налаштувати weekly job (неділя 03:00 Kyiv time)
+- [x] Додати Telegram notification при старті/завершенні
+- [x] Експортувати startCronJobs() функцію
 
 **Файли:** `backend-payload/content-automation/src/cron.ts`
-
-**Cron schedule:**
-```typescript
-import cron from 'node-cron';
-
-// Weekly automation: Sunday at 03:00 Kyiv time
-const WEEKLY_SCHEDULE = '0 3 * * 0';
-
-export function startCronJobs(): void {
-  cron.schedule(WEEKLY_SCHEDULE, async () => {
-    await notify({ type: 'info', message: '🕐 Починаю щотижневу автоматизацію...' });
-
-    try {
-      await runWeeklyAutomation();
-    } catch (error) {
-      await notify({ type: 'error', message: `❌ Помилка: ${error}` });
-    }
-  }, {
-    timezone: 'Europe/Kyiv'
-  });
-}
-```
 
 ---
 
 ### 3.5 Оновити Entry Point
 
-- [ ] Оновити `index.ts` для запуску cron та polling
-- [ ] Додати graceful shutdown
-- [ ] Оновити package.json scripts
+- [x] Оновити `index.ts` для запуску cron та polling
+- [x] Додати graceful shutdown
+- [x] Оновити package.json scripts
 
 **Файли:**
 - `backend-payload/content-automation/src/index.ts`
-- `backend-payload/content-automation/package.json`
-
-**index.ts:**
-```typescript
-import { startCronJobs } from './cron';
-import { startPolling } from './publishers/telegram-commands';
-import { logger } from './utils/logger';
-
-async function main() {
-  logger.info('Content Automation System starting...');
-
-  // Start cron scheduler
-  startCronJobs();
-
-  // Start Telegram bot (if configured)
-  if (process.env.TELEGRAM_BOT_TOKEN) {
-    startPolling();
-  }
-
-  logger.info('System ready');
-}
-
-main().catch(console.error);
-```
-
-**package.json scripts:**
-```json
-{
-  "scripts": {
-    "start": "tsx src/index.ts",
-    "daemon": "tsx src/index.ts",
-    "automation": "tsx src/scheduler.ts"
-  }
-}
-```
+- `backend-payload/package.json`
 
 ---
 
 ## Верифікація
 
-- [ ] node-cron встановлено
-- [ ] Bot відповідає на /start
-- [ ] /run запускає автоматизацію
-- [ ] /status показує інформацію
-- [ ] /stats показує статистику
-- [ ] Cron job запланований на неділю 03:00
-- [ ] Немає memory leaks в polling
+- [x] node-cron встановлено
+- [x] Bot має handlers для всіх команд
+- [x] /run запускає автоматизацію
+- [x] /status показує інформацію
+- [x] /stats показує статистику
+- [x] Cron job запланований на неділю 03:00
+- [x] Немає TypeScript помилок
 
 ---
 

@@ -14,6 +14,7 @@
     "automation:generate": "tsx content-automation/src/scheduler.ts generate",
     "automation:publish": "tsx content-automation/src/scheduler.ts publish",
     "automation:full": "tsx content-automation/src/scheduler.ts run-full",
+    "automation:daemon": "tsx content-automation/src/index.ts",
     "test": "echo \"No tests yet\""
   },
   "keywords": [
