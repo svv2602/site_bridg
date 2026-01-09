@@ -2,10 +2,15 @@ import type { CollectionConfig } from 'payload';
 
 export const Dealers: CollectionConfig = {
   slug: 'dealers',
+  labels: {
+    singular: 'Дилер',
+    plural: 'Дилери',
+  },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'city', 'type'],
-    group: 'Content',
+    group: 'Контент',
+    description: 'Дилери та сервісні центри',
   },
   access: {
     read: () => true,

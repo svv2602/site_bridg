@@ -6,10 +6,15 @@ import { badgeFields } from '../fields/badge';
 
 export const Tyres: CollectionConfig = {
   slug: 'tyres',
+  labels: {
+    singular: 'Шина',
+    plural: 'Шини',
+  },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'season', 'isNew', 'updatedAt'],
-    group: 'Content',
+    group: 'Каталог',
+    description: 'Моделі шин Bridgestone',
   },
   access: {
     read: () => true,

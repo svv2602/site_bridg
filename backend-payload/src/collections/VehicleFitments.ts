@@ -2,10 +2,15 @@ import type { CollectionConfig } from 'payload';
 
 export const VehicleFitments: CollectionConfig = {
   slug: 'vehicle-fitments',
+  labels: {
+    singular: 'Автомобіль',
+    plural: 'Автомобілі',
+  },
   admin: {
     useAsTitle: 'model',
-    defaultColumns: ['make', 'model', 'yearFrom', 'yearTo'],
-    group: 'Content',
+    defaultColumns: ['make', 'model', 'year'],
+    group: 'Каталог',
+    description: 'Підбір шин по авто',
   },
   access: {
     read: () => true,

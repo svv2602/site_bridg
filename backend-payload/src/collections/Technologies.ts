@@ -2,9 +2,14 @@ import type { CollectionConfig } from 'payload';
 
 export const Technologies: CollectionConfig = {
   slug: 'technologies',
+  labels: {
+    singular: 'Технологія',
+    plural: 'Технології',
+  },
   admin: {
     useAsTitle: 'name',
-    group: 'Content',
+    group: 'Каталог',
+    description: 'Технології Bridgestone',
   },
   access: {
     read: () => true,

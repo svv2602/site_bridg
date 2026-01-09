@@ -262,10 +262,17 @@ export async function getSeasonalContent() {
   return response.json();
 }
 
-// Transform Payload data to match existing frontend types
+// Transform Payload data to match existing frontend TyreModel type
 export function transformPayloadTyre(tyre: PayloadTyre) {
+  // Convert usage from numbers (0-100) to booleans (>0 means true)
+  const usage = tyre.usage ? {
+    city: (tyre.usage.city ?? 0) > 0,
+    highway: (tyre.usage.highway ?? 0) > 0,
+    offroad: (tyre.usage.offroad ?? 0) > 0,
+    winter: (tyre.usage.winter ?? 0) > 0,
+  } : {};
+
   return {
-    id: tyre.id,
     slug: tyre.slug,
     name: tyre.name,
     season: tyre.season,
@@ -273,39 +280,28 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     isNew: tyre.isNew,
     isPopular: tyre.isPopular,
     shortDescription: tyre.shortDescription || '',
-    fullDescription: tyre.fullDescription,
     imageUrl: tyre.image ? `${PAYLOAD_URL}${tyre.image.url}` : '/images/tire-placeholder.png',
     euLabel: tyre.euLabel || {},
     sizes: tyre.sizes || [],
-    usage: tyre.usage,
-    technologies: tyre.technologies?.map(t => ({
-      slug: t.slug,
-      name: t.name,
-      description: t.description,
-      icon: t.icon,
-    })) || [],
+    usage,
+    // Technologies as array of slugs to match TyreModel type
+    technologies: tyre.technologies?.map(t => t.slug) || [],
     badges: tyre.badges || [],
     keyBenefits: tyre.keyBenefits?.map(kb => kb.benefit) || [],
-    faqs: tyre.faqs || [],
-    testResults: tyre.testResults || [],
     seoTitle: tyre.seoTitle,
     seoDescription: tyre.seoDescription,
   };
 }
 
+// Transform Payload data to match existing frontend Article type
 export function transformPayloadArticle(article: PayloadArticle) {
   return {
-    id: article.id,
     slug: article.slug,
     title: article.title,
     subtitle: article.subtitle,
     previewText: article.previewText,
-    body: article.body,
-    imageUrl: article.image ? `${PAYLOAD_URL}${article.image.url}` : '/images/article-placeholder.png',
     readingTimeMinutes: article.readingTimeMinutes || 5,
+    publishedAt: article.createdAt, // Use createdAt as publishedAt
     tags: article.tags?.map(t => t.tag) || [],
-    relatedTyres: article.relatedTyres?.map(transformPayloadTyre) || [],
-    seoTitle: article.seoTitle,
-    seoDescription: article.seoDescription,
   };
 }

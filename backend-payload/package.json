@@ -9,6 +9,11 @@
     "start": "next start --port 3001",
     "seed": "tsx scripts/seed.ts",
     "generate:types": "payload generate:types",
+    "automation": "tsx content-automation/src/scheduler.ts",
+    "automation:scrape": "tsx content-automation/src/scheduler.ts scrape",
+    "automation:generate": "tsx content-automation/src/scheduler.ts generate",
+    "automation:publish": "tsx content-automation/src/scheduler.ts publish",
+    "automation:full": "tsx content-automation/src/scheduler.ts run-full",
     "test": "echo \"No tests yet\""
   },
   "keywords": [

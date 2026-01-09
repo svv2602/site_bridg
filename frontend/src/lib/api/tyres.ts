@@ -7,11 +7,10 @@ import {
   type VehicleFitment,
 } from "@/lib/data";
 import {
-  getStrapiTyres,
-  getStrapiTyreBySlug,
-  transformStrapiData,
-  transformStrapiSingle,
-} from "./strapi";
+  getPayloadTyres,
+  getPayloadTyreBySlug,
+  transformPayloadTyre,
+} from "./payload";
 
 /**
  * Параметри пошуку шин за розміром.
@@ -32,100 +31,17 @@ export interface CarSearchParams {
   year: number;
 }
 
-// Strapi URL for media
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-
-// Strapi media format
-interface StrapiMediaFormat {
-  url: string;
-  width?: number;
-  height?: number;
-}
-
-interface StrapiMediaAttributes {
-  url: string;
-  formats?: {
-    thumbnail?: StrapiMediaFormat;
-    small?: StrapiMediaFormat;
-    medium?: StrapiMediaFormat;
-    large?: StrapiMediaFormat;
-  };
-}
-
-// Strapi v4 nested media structure
-interface StrapiMedia {
-  data?: {
-    id: number;
-    attributes: StrapiMediaAttributes;
-  } | null;
-}
-
-// Strapi attribute types
-interface StrapiTyreAttributes {
-  slug: string;
-  name: string;
-  season: Season;
-  vehicleTypes: string[];
-  isNew?: boolean;
-  isPopular?: boolean;
-  shortDescription: string;
-  image?: StrapiMedia;
-  euLabel?: {
-    wetGrip?: string;
-    fuelEfficiency?: string;
-    noiseDb?: number;
-  };
-  sizes?: TyreSize[];
-  usage?: {
-    city?: boolean;
-    highway?: boolean;
-    offroad?: boolean;
-    winter?: boolean;
-  };
-}
-
-function getImageUrl(image?: StrapiMedia): string | undefined {
-  if (!image?.data?.attributes) return undefined;
-
-  const attrs = image.data.attributes;
-  // Use medium format if available, otherwise original
-  const url = attrs.formats?.medium?.url || attrs.formats?.small?.url || attrs.url;
-
-  // If URL is relative, prepend Strapi URL
-  if (url && url.startsWith('/')) {
-    return `${STRAPI_URL}${url}`;
-  }
-  return url;
-}
-
-function transformStrapiTyre(data: StrapiTyreAttributes & { id: number }): TyreModel {
-  return {
-    slug: data.slug,
-    name: data.name,
-    season: data.season,
-    vehicleTypes: data.vehicleTypes as TyreModel["vehicleTypes"],
-    isNew: data.isNew,
-    isPopular: data.isPopular,
-    shortDescription: data.shortDescription,
-    imageUrl: getImageUrl(data.image),
-    euLabel: data.euLabel as TyreModel["euLabel"],
-    sizes: data.sizes || [],
-    usage: data.usage || {},
-  };
-}
-
 /**
- * Повертає всі моделі шин. Спробує отримати з Strapi, якщо недоступний — повертає mock дані.
+ * Повертає всі моделі шин. Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
  */
 export async function getTyreModels(): Promise<TyreModel[]> {
   try {
-    const response = await getStrapiTyres<StrapiTyreAttributes>("*");
-    const data = transformStrapiData<StrapiTyreAttributes>(response);
-    if (data.length > 0) {
-      return data.map(transformStrapiTyre);
+    const tyres = await getPayloadTyres();
+    if (tyres.length > 0) {
+      return tyres.map(tyre => transformPayloadTyre(tyre) as TyreModel);
     }
   } catch (error) {
-    console.warn("Strapi unavailable, using mock data:", error);
+    console.warn("Payload CMS unavailable, using mock data:", error);
   }
   return MOCK_TYRE_MODELS;
 }
@@ -135,13 +51,12 @@ export async function getTyreModels(): Promise<TyreModel[]> {
  */
 export async function getTyreModelBySlug(slug: string): Promise<TyreModel | null> {
   try {
-    const response = await getStrapiTyreBySlug<StrapiTyreAttributes>(slug, "*");
-    const data = transformStrapiSingle<StrapiTyreAttributes>(response);
-    if (data) {
-      return transformStrapiTyre(data);
+    const tyre = await getPayloadTyreBySlug(slug);
+    if (tyre) {
+      return transformPayloadTyre(tyre) as TyreModel;
     }
   } catch (error) {
-    console.warn("Strapi unavailable, using mock data:", error);
+    console.warn("Payload CMS unavailable, using mock data:", error);
   }
   // Fallback to mock data
   const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);

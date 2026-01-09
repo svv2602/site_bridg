@@ -127,6 +127,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Адміністратори системи
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -153,6 +155,8 @@ export interface User {
   password?: string | null;
 }
 /**
+ * Зображення та файли
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -198,6 +202,8 @@ export interface Media {
   };
 }
 /**
+ * Моделі шин Bridgestone
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tyres".
  */
@@ -317,6 +323,8 @@ export interface Tyre {
   createdAt: string;
 }
 /**
+ * Технології Bridgestone
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "technologies".
  */
@@ -334,6 +342,8 @@ export interface Technology {
   createdAt: string;
 }
 /**
+ * Статті та поради
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".
  */
@@ -374,6 +384,8 @@ export interface Article {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Дилери та сервісні центри
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dealers".
  */
@@ -397,6 +409,8 @@ export interface Dealer {
   createdAt: string;
 }
 /**
+ * Підбір шин по авто
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vehicle-fitments".
  */

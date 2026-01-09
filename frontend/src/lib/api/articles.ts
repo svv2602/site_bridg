@@ -1,46 +1,21 @@
 import { MOCK_ARTICLES, type Article } from "@/lib/data";
 import {
-  getStrapiArticles,
-  getStrapiArticleBySlug,
-  transformStrapiData,
-  transformStrapiSingle,
-} from "./strapi";
-
-// Strapi article attributes
-interface StrapiArticleAttributes {
-  slug: string;
-  title: string;
-  subtitle?: string;
-  previewText: string;
-  readingTimeMinutes?: number;
-  publishedAt?: string;
-  tags?: string[];
-}
-
-function transformStrapiArticle(data: StrapiArticleAttributes & { id: number }): Article {
-  return {
-    slug: data.slug,
-    title: data.title,
-    subtitle: data.subtitle,
-    previewText: data.previewText,
-    readingTimeMinutes: data.readingTimeMinutes,
-    publishedAt: data.publishedAt,
-    tags: data.tags,
-  };
-}
+  getPayloadArticles,
+  getPayloadArticleBySlug,
+  transformPayloadArticle,
+} from "./payload";
 
 /**
- * Повертає всі статті / поради. Спробує отримати з Strapi, якщо недоступний — повертає mock дані.
+ * Повертає всі статті / поради. Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
  */
 export async function getArticles(): Promise<Article[]> {
   try {
-    const response = await getStrapiArticles<StrapiArticleAttributes>("*");
-    const data = transformStrapiData<StrapiArticleAttributes>(response);
-    if (data.length > 0) {
-      return data.map(transformStrapiArticle);
+    const articles = await getPayloadArticles();
+    if (articles.length > 0) {
+      return articles.map(article => transformPayloadArticle(article) as Article);
     }
   } catch (error) {
-    console.warn("Strapi unavailable, using mock data:", error);
+    console.warn("Payload CMS unavailable, using mock data:", error);
   }
   return MOCK_ARTICLES;
 }
@@ -50,17 +25,16 @@ export async function getArticles(): Promise<Article[]> {
  */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   try {
-    const response = await getStrapiArticleBySlug<StrapiArticleAttributes>(slug, "*");
-    const data = transformStrapiSingle<StrapiArticleAttributes>(response);
-    if (data) {
-      return transformStrapiArticle(data);
+    const article = await getPayloadArticleBySlug(slug);
+    if (article) {
+      return transformPayloadArticle(article) as Article;
     }
   } catch (error) {
-    console.warn("Strapi unavailable, using mock data:", error);
+    console.warn("Payload CMS unavailable, using mock data:", error);
   }
   // Fallback to mock data
-  const article = MOCK_ARTICLES.find((a) => a.slug === slug);
-  return article ?? null;
+  const mockArticle = MOCK_ARTICLES.find((a) => a.slug === slug);
+  return mockArticle ?? null;
 }
 
 /**

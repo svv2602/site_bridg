@@ -23,10 +23,14 @@ export default buildConfig({
     user: Users.slug,
     meta: {
       titleSuffix: '- Bridgestone Ukraine',
+      description: 'Система управління контентом Bridgestone Україна',
     },
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    theme: 'dark',
+    avatar: 'gravatar',
+    dateFormat: 'dd.MM.yyyy HH:mm',
   },
   collections: [
     Users,
@@ -41,17 +45,12 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
   db: postgresAdapter({
     pool: {
-      host: 'localhost',
-      port: 5433,
-      user: 'snisar',
-      password: 'bridgestone123',
-      database: 'bridgestone',
+      connectionString: process.env.DATABASE_URI || 'postgresql://snisar:bridgestone123@localhost:5433/bridgestone',
     },
   }),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // Localization ready for future
   localization: {
     locales: [
       {
@@ -62,16 +61,14 @@ export default buildConfig({
     defaultLocale: 'uk',
     fallback: true,
   },
-  // CORS for frontend
   cors: [
     'http://localhost:3000',
     'http://localhost:3010',
     process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
   ].filter(Boolean),
-  // Upload config
   upload: {
     limits: {
-      fileSize: 10000000, // 10MB
+      fileSize: 10000000,
     },
   },
 });
