@@ -130,7 +130,7 @@ Located in `backend-payload/content-automation/`:
 
 - **scrapers/** — Data collection from ProKoleso, ADAC, AutoBild
 - **processors/** — AI-powered content generation with Claude API
-- **publishers/** — Publishing to Payload CMS via REST API
+- **publishers/** — Publishing to Payload CMS via REST API, Telegram notifications
 - **config/** — Environment and prompts configuration
 
 ### Running Automation
@@ -146,6 +146,42 @@ npm run automation:scrape   # Scrape tire data
 npm run automation:generate # Generate AI content
 npm run automation:publish  # Publish to CMS
 npm run automation:full     # Run complete pipeline
+
+# Start daemon mode (cron scheduler + Telegram bot)
+npm run automation:daemon
+```
+
+### Telegram Bot Commands
+
+When daemon is running with configured `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`:
+
+| Command | Description |
+|---------|-------------|
+| `/run` | Start full automation cycle |
+| `/scrape` | Scrape data only |
+| `/status` | Last run status |
+| `/stats` | Weekly statistics |
+| `/help` | Show available commands |
+
+### Admin Dashboard
+
+Available at `http://localhost:3010/admin/automation` (requires Basic HTTP Auth).
+
+Features:
+- Stats cards (tyres, articles, badges, costs, errors)
+- Schedule info (last run, next run)
+- Action buttons to trigger automation
+- Recent jobs table
+
+Default credentials: `admin` / `bridgestone2026` (configure via `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars)
+
+### Testing
+
+```bash
+cd backend-payload
+npm run test           # Run all tests
+npm run test:watch     # Watch mode
+npm run test:coverage  # With coverage report
 ```
 
 ## Key Patterns
@@ -159,3 +195,10 @@ npm run automation:full     # Run complete pipeline
 ## Language
 
 All UI text is in Ukrainian. Variable names and code comments in English.
+
+## MCP Tools
+
+Project has configured MCP servers in `.claude/mcp.json`:
+
+- **context7** — Get up-to-date documentation for libraries. Use `resolve-library-id` to find library ID, then `get-library-docs` to fetch docs. Helpful when working with Next.js, Payload CMS, Tailwind CSS, React, etc.
+- **playwright** — Browser automation for testing and screenshots

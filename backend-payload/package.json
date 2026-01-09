@@ -15,7 +15,9 @@
     "automation:publish": "tsx content-automation/src/scheduler.ts publish",
     "automation:full": "tsx content-automation/src/scheduler.ts run-full",
     "automation:daemon": "tsx content-automation/src/index.ts",
-    "test": "echo \"No tests yet\""
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "payload",
@@ -43,8 +45,10 @@
     "@types/node-cron": "^3.0.11",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "@vitest/coverage-v8": "^4.0.16",
     "sass": "^1.89.4",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   }
 }
