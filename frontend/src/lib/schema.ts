@@ -1,6 +1,6 @@
 // Schema.org structured data generators for SEO
 
-import type { TyreModel, Dealer, Article, Season } from "./data";
+import type { TyreModel, Dealer, Article, Season, FAQ } from "./data";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -119,6 +119,26 @@ export function generateBreadcrumbSchema(items: BreadcrumbItem[]) {
       position: index + 1,
       name: item.name,
       item: item.url,
+    })),
+  };
+}
+
+// FAQPage schema for FAQ sections
+export function generateFAQSchema(faqs: FAQ[]) {
+  if (!faqs || faqs.length === 0) {
+    return null;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
     })),
   };
 }

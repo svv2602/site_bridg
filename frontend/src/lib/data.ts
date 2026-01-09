@@ -23,6 +23,23 @@ export interface TyreBadge {
   label: string;
 }
 
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
+export interface TestResult {
+  source: 'adac' | 'autobild' | 'tyrereviews' | 'tcs';
+  testType: 'summer' | 'winter' | 'allseason';
+  year: number;
+  testedSize: string;
+  position: number;
+  totalTested: number;
+  rating: string;
+  ratingNumeric: number;
+  articleSlug?: string;
+}
+
 export interface TyreModel {
   slug: string;
   name: string;
@@ -47,6 +64,8 @@ export interface TyreModel {
   technologies?: string[]; // technology slugs
   badges?: TyreBadge[]; // test result badges
   keyBenefits?: string[];
+  faqs?: FAQ[];
+  testResults?: TestResult[];
   seoTitle?: string;
   seoDescription?: string;
 }

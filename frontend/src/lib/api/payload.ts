@@ -288,6 +288,8 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     technologies: tyre.technologies?.map(t => t.slug) || [],
     badges: tyre.badges || [],
     keyBenefits: tyre.keyBenefits?.map(kb => kb.benefit) || [],
+    faqs: tyre.faqs || [],
+    testResults: tyre.testResults || [],
     seoTitle: tyre.seoTitle,
     seoDescription: tyre.seoDescription,
   };

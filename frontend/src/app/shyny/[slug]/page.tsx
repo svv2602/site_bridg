@@ -7,8 +7,10 @@ import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ArrowLeft, ChevronRigh
 import { type Season, type TyreModel } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
-import { generateProductSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, jsonLdScript } from "@/lib/schema";
 import { EuLabelBadge } from "@/components/ui/EuLabelBadge";
+import { FAQSection } from "@/components/FAQSection";
+import { TestResultsSection } from "@/components/TestResultsSection";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -101,6 +103,7 @@ export default async function TyreModelPage({
     { name: "Каталог шин", url: "https://bridgestone.ua/passenger-tyres" },
     { name: model.name, url: `https://bridgestone.ua/shyny/${model.slug}` },
   ]);
+  const faqSchema = model.faqs && model.faqs.length > 0 ? generateFAQSchema(model.faqs) : null;
 
   return (
     <div className="bg-background text-foreground">
@@ -112,6 +115,12 @@ export default async function TyreModelPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(faqSchema) }}
+        />
+      )}
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -371,6 +380,16 @@ export default async function TyreModelPage({
           </div>
         </div>
       </section>
+
+      {/* Test Results */}
+      {model.testResults && model.testResults.length > 0 && (
+        <TestResultsSection results={model.testResults} tireName={model.name} />
+      )}
+
+      {/* FAQ */}
+      {model.faqs && model.faqs.length > 0 && (
+        <FAQSection faqs={model.faqs} tireName={model.name} />
+      )}
 
       {/* Recommended models */}
       {recommended.length > 0 && (
