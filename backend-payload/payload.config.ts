@@ -31,6 +31,7 @@ export default buildConfig({
     theme: 'dark',
     avatar: 'gravatar',
     dateFormat: 'dd.MM.yyyy HH:mm',
+    suppressHydrationWarning: true,
   },
   collections: [
     Users,
