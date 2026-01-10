@@ -11,6 +11,8 @@ import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, jso
 import { EuLabelBadge } from "@/components/ui/EuLabelBadge";
 import { FAQSection } from "@/components/FAQSection";
 import { TestResultsSection } from "@/components/TestResultsSection";
+import { LexicalRenderer } from "@/components/LexicalRenderer";
+import { KeyBenefits } from "@/components/KeyBenefits";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -70,8 +72,9 @@ export async function generateMetadata({
     };
   }
   return {
-    title: buildTitle(model),
+    title: model.seoTitle || buildTitle(model),
     description:
+      model.seoDescription ||
       model.shortDescription ||
       `Детальна інформація про шини ${model.name} Bridgestone: доступні розміри, індекси навантаження та швидкості, рекомендовані умови використання.`,
   };
@@ -311,6 +314,19 @@ export default async function TyreModelPage({
                     </div>
                   </div>
                 </div>
+              )}
+
+              {/* Full Description */}
+              {model.fullDescription && (
+                <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+                  <h2 className="mb-4 text-xl font-bold">Про модель {model.name}</h2>
+                  <LexicalRenderer content={model.fullDescription} />
+                </div>
+              )}
+
+              {/* Key Benefits */}
+              {model.keyBenefits && model.keyBenefits.length > 0 && (
+                <KeyBenefits benefits={model.keyBenefits} />
               )}
             </div>
 

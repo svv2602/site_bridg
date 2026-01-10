@@ -284,6 +284,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     isNew: tyre.isNew,
     isPopular: tyre.isPopular,
     shortDescription: tyre.shortDescription || '',
+    fullDescription: tyre.fullDescription || null, // Lexical rich text
     imageUrl: tyre.image?.url
       ? (tyre.image.url.startsWith('http') ? tyre.image.url : `${PAYLOAD_URL}${tyre.image.url}`)
       : '/images/tire-placeholder.png',

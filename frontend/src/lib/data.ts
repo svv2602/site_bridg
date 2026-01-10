@@ -48,6 +48,7 @@ export interface TyreModel {
   isNew?: boolean;
   isPopular?: boolean;
   shortDescription: string;
+  fullDescription?: unknown; // Lexical rich text JSON
   imageUrl?: string; // URL to tire product image
   euLabel?: {
     wetGrip?: "A" | "B" | "C" | "D" | "E";
