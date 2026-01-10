@@ -49,9 +49,17 @@ export function QuickSearchForm() {
         Виберіть спосіб пошуку: за розміром або за вашим автомобілем.
       </p>
 
-      <div className="mt-4 flex rounded-full bg-zinc-800 p-1 text-sm font-medium ring-1 ring-zinc-700">
+      <div
+        role="tablist"
+        aria-label="Спосіб пошуку шин"
+        className="mt-4 flex rounded-full bg-zinc-800 p-1 text-sm font-medium ring-1 ring-zinc-700"
+      >
         <button
           type="button"
+          role="tab"
+          id="size-tab"
+          aria-selected={activeTab === 'size'}
+          aria-controls="size-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'size'
               ? 'bg-zinc-50 text-zinc-900'
@@ -63,6 +71,10 @@ export function QuickSearchForm() {
         </button>
         <button
           type="button"
+          role="tab"
+          id="car-tab"
+          aria-selected={activeTab === 'car'}
+          aria-controls="car-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'car'
               ? 'bg-zinc-50 text-zinc-900'
@@ -75,7 +87,13 @@ export function QuickSearchForm() {
       </div>
 
       {activeTab === 'size' ? (
-        <form className="mt-6 space-y-4" onSubmit={handleSizeSearch}>
+        <form
+          id="size-panel"
+          role="tabpanel"
+          aria-labelledby="size-tab"
+          className="mt-6 space-y-4"
+          onSubmit={handleSizeSearch}
+        >
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="mb-1 block text-sm font-medium text-zinc-100">Ширина</label>
@@ -152,7 +170,13 @@ export function QuickSearchForm() {
           </button>
         </form>
       ) : (
-        <form className="mt-6 space-y-4" onSubmit={handleCarSearch}>
+        <form
+          id="car-panel"
+          role="tabpanel"
+          aria-labelledby="car-tab"
+          className="mt-6 space-y-4"
+          onSubmit={handleCarSearch}
+        >
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-100">Марка авто</label>
             <select

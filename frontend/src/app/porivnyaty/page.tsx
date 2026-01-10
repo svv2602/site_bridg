@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight, X, Check, Search, Filter } from "lucide-react";
 import type { TyreModel, Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
+import { Breadcrumb } from "@/components/ui";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні",
@@ -73,6 +74,13 @@ export default function ComparisonSelectionPage() {
       {/* Header */}
       <section className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white py-12">
         <div className="container mx-auto px-4">
+          <Breadcrumb
+            className="mb-4"
+            items={[
+              { label: "Головна", href: "/" },
+              { label: "Порівняння шин" },
+            ]}
+          />
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Порівняння шин
           </h1>
@@ -88,7 +96,11 @@ export default function ComparisonSelectionPage() {
         <div className="sticky top-16 z-40 bg-card border-b border-border shadow-lg">
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-sm font-medium text-muted-foreground">
+              <span
+                className="text-sm font-medium text-muted-foreground"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 Обрано ({selectedTyres.length}/3):
               </span>
               <div className="flex flex-wrap gap-2">
@@ -140,10 +152,11 @@ export default function ComparisonSelectionPage() {
 
             {/* Season Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <div className="flex gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <div className="flex gap-2" role="group" aria-label="Фільтр за сезоном">
                 <button
                   onClick={() => setSeasonFilter("all")}
+                  aria-pressed={seasonFilter === "all"}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     seasonFilter === "all"
                       ? "bg-primary text-primary-foreground"
@@ -157,6 +170,7 @@ export default function ComparisonSelectionPage() {
                     <button
                       key={season}
                       onClick={() => setSeasonFilter(season)}
+                      aria-pressed={seasonFilter === season}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                         seasonFilter === season
                           ? "bg-primary text-primary-foreground"

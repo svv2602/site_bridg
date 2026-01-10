@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Minus, ExternalLink } from "lucide-react";
+import { Check, Minus, ExternalLink } from "lucide-react";
 import type { TyreModel, Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { Breadcrumb } from "@/components/ui";
 
 // Season labels
 const seasonLabels: Record<Season, string> = {
@@ -211,13 +212,14 @@ export default async function ComparisonPage({
         {/* Header */}
         <section className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white py-12">
           <div className="container mx-auto px-4">
-            <Link
-              href="/porivnyaty"
-              className="inline-flex items-center text-zinc-400 hover:text-white transition-colors mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Всі порівняння
-            </Link>
+            <Breadcrumb
+              className="mb-4"
+              items={[
+                { label: "Головна", href: "/" },
+                { label: "Порівняння шин", href: "/porivnyaty" },
+                { label: compareTyres.map((t) => t.name).join(" vs ") },
+              ]}
+            />
 
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               {compareTyres.map((t) => t.name).join(" vs ")}
@@ -270,15 +272,22 @@ export default async function ComparisonPage({
             <h2 className="text-2xl font-bold mb-8">Порівняння характеристик</h2>
 
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              <table
+                className="w-full border-collapse"
+                aria-label={`Порівняння характеристик: ${compareTyres.map((t) => t.name).join(" vs ")}`}
+              >
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
+                    <th
+                      scope="col"
+                      className="text-left py-4 px-4 font-semibold text-muted-foreground"
+                    >
                       Характеристика
                     </th>
                     {compareTyres.map((tyre) => (
                       <th
                         key={tyre.slug}
+                        scope="col"
                         className="text-center py-4 px-4 font-semibold"
                       >
                         {tyre.name}
@@ -299,7 +308,9 @@ export default async function ComparisonPage({
                         key={attr.key}
                         className="border-b border-border hover:bg-muted/50 transition-colors"
                       >
-                        <td className="py-4 px-4 font-medium">{attr.label}</td>
+                        <th scope="row" className="py-4 px-4 font-medium text-left">
+                          {attr.label}
+                        </th>
                         {values.map((val) => (
                           <td
                             key={val.slug}
@@ -308,7 +319,13 @@ export default async function ComparisonPage({
                             <span className="inline-flex items-center gap-2">
                               {val.value}
                               {winner === val.slug && (
-                                <Check className="h-4 w-4" />
+                                <Check
+                                  className="h-4 w-4"
+                                  aria-hidden="true"
+                                />
+                              )}
+                              {winner === val.slug && (
+                                <span className="sr-only">(Краще значення)</span>
                               )}
                             </span>
                           </td>

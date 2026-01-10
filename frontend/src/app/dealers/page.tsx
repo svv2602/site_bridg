@@ -8,6 +8,7 @@ import { getDealers } from "@/lib/api/dealers";
 import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import DealersMap from "@/components/DealersMap";
+import { Breadcrumb } from "@/components/ui";
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
@@ -104,11 +105,13 @@ export default function DealersPage() {
             transition={{ duration: 0.6 }}
             className="mx-auto flex max-w-4xl flex-col gap-4 text-left text-zinc-50 md:gap-5"
           >
-            <nav className="mb-1 text-xs text-zinc-400">
-              <Link href="/" className="hover:text-zinc-100">Головна</Link>
-              <span className="mx-2">/</span>
-              <span className="font-medium text-zinc-100">Дилери / Де купити</span>
-            </nav>
+            <Breadcrumb
+              className="mb-1"
+              items={[
+                { label: "Головна", href: "/" },
+                { label: "Дилери / Де купити" },
+              ]}
+            />
             <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
               Пошук офіційних дилерів Bridgestone
               <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
@@ -131,13 +134,14 @@ export default function DealersPage() {
                 <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row">
                   <div className="flex-1">
-                    <label className="mb-2 block text-sm font-medium text-zinc-100">
+                    <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-zinc-100">
                       Місто або адреса
                     </label>
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" aria-hidden="true" />
                       <input
                         type="text"
+                        id="city-search"
                         placeholder="Наприклад, Київ, Львів..."
                         value={cityQuery}
                         onChange={(e) => setCityQuery(e.target.value)}
@@ -146,10 +150,11 @@ export default function DealersPage() {
                     </div>
                   </div>
                   <div className="sm:w-48">
-                    <label className="mb-2 block text-sm font-medium text-zinc-100">Тип точки</label>
+                    <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-zinc-100">Тип точки</label>
                     <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+                      <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" aria-hidden="true" />
                       <select
+                        id="dealer-type"
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
                         className="w-full appearance-none rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-10 pr-8 text-sm text-zinc-50 outline-none focus:border-primary"
@@ -160,7 +165,7 @@ export default function DealersPage() {
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                      <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" aria-hidden="true" />
                     </div>
                   </div>
                 </div>

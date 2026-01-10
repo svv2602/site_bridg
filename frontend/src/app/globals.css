@@ -264,3 +264,94 @@ body :not(header) .bg-primary\/30 {
 .shine:hover::after {
   transform: rotate(30deg) translate(20%, 20%);
 }
+
+/* ======================================
+   Accessibility: Focus-visible styles
+   ====================================== */
+
+/* Global focus-visible для всіх інтерактивних елементів */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Видалення default outline при mouse focus */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Спеціальні стилі для кнопок та посилань */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Стилі для inputs/selects/textareas */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+  border-color: var(--primary);
+}
+
+/* Стилі для карток (clickable) */
+[role="button"]:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.2);
+}
+
+/* Skip link для keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: 1rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ======================================
+   Accessibility: Reduced Motion
+   ====================================== */
+
+/* Вимкнення анімацій для користувачів, які надають перевагу зменшенню руху */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Framer Motion animations */
+  [data-framer-portal] *,
+  [class*="motion"] * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable scroll effects */
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Disable hover transforms */
+  .hover-lift:hover {
+    transform: none;
+  }
+}

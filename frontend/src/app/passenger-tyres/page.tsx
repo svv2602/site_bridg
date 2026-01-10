@@ -2,6 +2,7 @@ import Link from "next/link";
 import { type TyreModel, type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCard, TyreCardGrid } from "@/components/TyreCard";
+import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star } from "lucide-react";
 
 const seasonLabels: Record<Season, string> = {
@@ -11,9 +12,9 @@ const seasonLabels: Record<Season, string> = {
 };
 
 const seasonIcons: Record<Season, React.ReactNode> = {
-  summer: <Sun className="h-5 w-5" />,
-  winter: <Snowflake className="h-5 w-5" />,
-  allseason: <Cloud className="h-5 w-5" />,
+  summer: <Sun className="h-5 w-5" aria-hidden="true" />,
+  winter: <Snowflake className="h-5 w-5" aria-hidden="true" />,
+  allseason: <Cloud className="h-5 w-5" aria-hidden="true" />,
 };
 
 function groupBySeason(models: TyreModel[]) {
@@ -67,11 +68,13 @@ export default async function PassengerTyresPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="text-zinc-50">
-              <nav className="mb-2 text-xs text-zinc-400">
-                <span className="cursor-pointer hover:text-zinc-100">Головна</span>
-                <span className="mx-2">/</span>
-                <span className="font-medium text-zinc-100">Шини для легкових авто</span>
-              </nav>
+              <Breadcrumb
+                className="mb-2"
+                items={[
+                  { label: "Головна", href: "/" },
+                  { label: "Шини для легкових авто" },
+                ]}
+              />
               <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Легкові шини Bridgestone
                 <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">

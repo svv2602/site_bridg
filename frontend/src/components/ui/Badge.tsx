@@ -35,14 +35,14 @@ const variantStyles: Record<BadgeVariant, string> = {
 };
 
 const variantIcons: Record<BadgeVariant, ReactNode> = {
-  winner: <Trophy className="h-3.5 w-3.5" />,
-  recommended: <CheckCircle className="h-3.5 w-3.5" />,
-  top3: <Medal className="h-3.5 w-3.5" />,
-  category: <Gauge className="h-3.5 w-3.5" />,
-  eco: <Leaf className="h-3.5 w-3.5" />,
-  summer: <Sun className="h-3.5 w-3.5" />,
-  winter: <Snowflake className="h-3.5 w-3.5" />,
-  allseason: <Cloud className="h-3.5 w-3.5" />,
+  winner: <Trophy className="h-3.5 w-3.5" aria-hidden="true" />,
+  recommended: <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />,
+  top3: <Medal className="h-3.5 w-3.5" aria-hidden="true" />,
+  category: <Gauge className="h-3.5 w-3.5" aria-hidden="true" />,
+  eco: <Leaf className="h-3.5 w-3.5" aria-hidden="true" />,
+  summer: <Sun className="h-3.5 w-3.5" aria-hidden="true" />,
+  winter: <Snowflake className="h-3.5 w-3.5" aria-hidden="true" />,
+  allseason: <Cloud className="h-3.5 w-3.5" aria-hidden="true" />,
   default: null,
 };
 

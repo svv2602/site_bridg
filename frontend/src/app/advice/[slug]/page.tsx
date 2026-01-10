@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { Breadcrumb } from "@/components/ui";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -69,19 +70,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       />
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-4xl px-4 md:px-8">
-          <nav className="mb-4 text-xs text-zinc-400">
-            <Link href="/" className="hover:text-zinc-100">
-              Головна
-            </Link>
-            <span className="mx-2">/</span>
-            <Link href="/advice" className="hover:text-zinc-100">
-              Поради
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="font-medium text-zinc-100">
-              {article.title}
-            </span>
-          </nav>
+          <Breadcrumb
+            className="mb-4"
+            items={[
+              { label: "Головна", href: "/" },
+              { label: "Поради", href: "/advice" },
+              { label: article.title },
+            ]}
+          />
           <Link
             href="/advice"
             className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-zinc-200 hover:text-white"

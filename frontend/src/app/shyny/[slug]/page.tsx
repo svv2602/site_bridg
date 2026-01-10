@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type React from "react";
-import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ArrowLeft, ChevronRight, Truck } from "lucide-react";
+import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ChevronRight, Truck } from "lucide-react";
 import { type Season, type TyreModel } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
@@ -13,6 +13,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { TestResultsSection } from "@/components/TestResultsSection";
 import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { KeyBenefits } from "@/components/KeyBenefits";
+import { Breadcrumb } from "@/components/ui";
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -21,9 +22,9 @@ const seasonLabels: Record<Season, string> = {
 };
 
 const seasonIcons: Record<Season, React.ReactNode> = {
-  summer: <Sun className="h-5 w-5" />,
-  winter: <Snowflake className="h-5 w-5" />,
-  allseason: <Cloud className="h-5 w-5" />,
+  summer: <Sun className="h-5 w-5" aria-hidden="true" />,
+  winter: <Snowflake className="h-5 w-5" aria-hidden="true" />,
+  allseason: <Cloud className="h-5 w-5" aria-hidden="true" />,
 };
 
 function formatVehicleTypes(model: TyreModel) {
@@ -129,17 +130,14 @@ export default async function TyreModelPage({
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="text-zinc-50">
-              <nav className="mb-3 flex items-center gap-2 text-xs text-zinc-400">
-                <Link href="/" className="hover:text-zinc-100">
-                  Головна
-                </Link>
-                <span>/</span>
-                <Link href="/passenger-tyres" className="hover:text-zinc-100">
-                  Каталог шин
-                </Link>
-                <span>/</span>
-                <span className="font-medium text-zinc-100">{model.name}</span>
-              </nav>
+              <Breadcrumb
+                className="mb-3"
+                items={[
+                  { label: "Головна", href: "/" },
+                  { label: "Каталог шин", href: "/passenger-tyres" },
+                  { label: model.name },
+                ]}
+              />
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-200 ring-1 ring-zinc-700">
                 <Car className="h-3 w-3" />
                 <span>Модель шини Bridgestone</span>

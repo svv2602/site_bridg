@@ -18,9 +18,9 @@ const seasonLabels: Record<Season, string> = {
 };
 
 const seasonIcons: Record<Season, React.ReactNode> = {
-  summer: <Sun className="h-4 w-4" />,
-  winter: <Snowflake className="h-4 w-4" />,
-  allseason: <Cloud className="h-4 w-4" />,
+  summer: <Sun className="h-4 w-4" aria-hidden="true" />,
+  winter: <Snowflake className="h-4 w-4" aria-hidden="true" />,
+  allseason: <Cloud className="h-4 w-4" aria-hidden="true" />,
 };
 
 const seasonColors: Record<Season, string> = {

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import VehicleTyreSelector from "@/components/VehicleTyreSelector";
 import { TyreCard } from "@/components/TyreCard";
+import { Breadcrumb } from "@/components/ui";
 
 type SearchMode = "size" | "car";
 
@@ -146,11 +147,13 @@ export default function TyreSearchPage() {
             className="mx-auto flex max-w-5xl flex-col gap-6 text-left text-zinc-50 md:flex-row md:items-center md:justify-between"
           >
             <div>
-              <nav className="mb-3 text-xs text-zinc-400">
-                <span className="cursor-pointer hover:text-zinc-100">Головна</span>
-                <span className="mx-2">/</span>
-                <span className="font-medium text-zinc-100">Пошук шин</span>
-              </nav>
+              <Breadcrumb
+                className="mb-3"
+                items={[
+                  { label: "Головна", href: "/" },
+                  { label: "Пошук шин" },
+                ]}
+              />
               <h1 className="mb-3 text-3xl font-semibold tracking-tight md:text-4xl">
                 Технічний підбір шин
                 <span className="block text-base font-normal text-zinc-300 md:text-lg">
@@ -187,9 +190,17 @@ export default function TyreSearchPage() {
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 text-zinc-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="text-2xl font-bold">Оберіть спосіб пошуку</h2>
-                  <div className="inline-flex rounded-full bg-zinc-800 p-1 ring-1 ring-zinc-700">
+                  <div
+                    role="tablist"
+                    aria-label="Спосіб пошуку шин"
+                    className="inline-flex rounded-full bg-zinc-800 p-1 ring-1 ring-zinc-700"
+                  >
                     <button
                       type="button"
+                      role="tab"
+                      id="size-search-tab"
+                      aria-selected={mode === "size"}
+                      aria-controls="size-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "size"
                           ? "bg-zinc-50 text-zinc-900"
@@ -197,11 +208,15 @@ export default function TyreSearchPage() {
                       }`}
                       onClick={() => setMode("size")}
                     >
-                      <Ruler className="h-4 w-4" />
+                      <Ruler className="h-4 w-4" aria-hidden="true" />
                       За розміром
                     </button>
                     <button
                       type="button"
+                      role="tab"
+                      id="car-search-tab"
+                      aria-selected={mode === "car"}
+                      aria-controls="car-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "car"
                           ? "bg-zinc-50 text-zinc-900"
@@ -209,14 +224,20 @@ export default function TyreSearchPage() {
                       }`}
                       onClick={() => setMode("car")}
                     >
-                      <Car className="h-4 w-4" />
+                      <Car className="h-4 w-4" aria-hidden="true" />
                       За авто
                     </button>
                   </div>
                 </div>
 
                 {mode === "size" ? (
-                  <form className="space-y-6" onSubmit={handleSizeSearch}>
+                  <form
+                    id="size-search-panel"
+                    role="tabpanel"
+                    aria-labelledby="size-search-tab"
+                    className="space-y-6"
+                    onSubmit={handleSizeSearch}
+                  >
                     <div className="grid gap-4 sm:grid-cols-3">
                       {/* Ширина */}
                       <div>
@@ -329,9 +350,13 @@ export default function TyreSearchPage() {
 
                     {/* Результати пошуку за розміром - відразу після форми */}
                     {hasSearched && (
-                      <div className="mt-8 border-t border-zinc-700 pt-6">
+                      <div
+                        className="mt-8 border-t border-zinc-700 pt-6"
+                        aria-live="polite"
+                        aria-atomic="true"
+                      >
                         <h3 className="mb-4 text-xl font-bold text-zinc-50">
-                          Результати пошуку
+                          Результати пошуку {results.length > 0 && `(${results.length})`}
                           {searchedSize && (
                             <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-white">
                               {searchedSize}
@@ -363,7 +388,13 @@ export default function TyreSearchPage() {
                     )}
                   </form>
                 ) : (
-                  <VehicleTyreSelector />
+                  <div
+                    id="car-search-panel"
+                    role="tabpanel"
+                    aria-labelledby="car-search-tab"
+                  >
+                    <VehicleTyreSelector />
+                  </div>
                 )}
               </div>
             </div>

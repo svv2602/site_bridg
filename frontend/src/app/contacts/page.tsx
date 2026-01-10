@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import { Breadcrumb } from "@/components/ui";
 
 const contactMethods = [
   {
@@ -121,11 +122,13 @@ export default function ContactsPage() {
             transition={{ duration: 0.6 }}
             className="mx-auto max-w-4xl text-left text-zinc-50"
           >
-            <nav className="mb-2 text-xs text-zinc-400">
-              <Link href="/" className="cursor-pointer hover:text-zinc-100">Головна</Link>
-              <span className="mx-2">/</span>
-              <span className="font-medium text-zinc-100">Контакти</span>
-            </nav>
+            <Breadcrumb
+              className="mb-2"
+              items={[
+                { label: "Головна", href: "/" },
+                { label: "Контакти" },
+              ]}
+            />
             <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Зв'язок з Bridgestone Україна
               <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
@@ -217,9 +220,13 @@ export default function ContactsPage() {
               ) : (
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   {status === 'error' && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
+                    <div
+                      id="form-error"
+                      role="alert"
+                      className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950"
+                    >
                       <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                        <AlertCircle className="h-5 w-5" />
+                        <AlertCircle className="h-5 w-5" aria-hidden="true" />
                         <span>{errorMessage}</span>
                       </div>
                     </div>
@@ -233,6 +240,8 @@ export default function ContactsPage() {
                         id="name"
                         name="name"
                         required
+                        aria-required="true"
+                        aria-describedby={status === 'error' ? 'form-error' : undefined}
                         value={formData.name}
                         onChange={handleChange}
                         disabled={status === 'loading'}
@@ -247,6 +256,7 @@ export default function ContactsPage() {
                         id="phone"
                         name="phone"
                         required
+                        aria-required="true"
                         value={formData.phone}
                         onChange={handleChange}
                         disabled={status === 'loading'}
@@ -262,6 +272,7 @@ export default function ContactsPage() {
                       id="email"
                       name="email"
                       required
+                      aria-required="true"
                       value={formData.email}
                       onChange={handleChange}
                       disabled={status === 'loading'}
@@ -293,6 +304,7 @@ export default function ContactsPage() {
                       name="message"
                       rows={4}
                       required
+                      aria-required="true"
                       value={formData.message}
                       onChange={handleChange}
                       disabled={status === 'loading'}
