@@ -7,14 +7,9 @@ import { ArrowRight, X, Check, Search, Filter } from "lucide-react";
 import type { TyreModel, Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { Breadcrumb } from "@/components/ui";
+import { seasonLabelsShort } from "@/lib/utils/tyres";
 
-const seasonLabels: Record<Season, string> = {
-  summer: "Літні",
-  winter: "Зимові",
-  allseason: "Всесезонні",
-};
-
-const seasonColors: Record<Season, string> = {
+const seasonBadgeColors: Record<Season, string> = {
   summer: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
   winter: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
   allseason:
@@ -177,7 +172,7 @@ export default function ComparisonSelectionPage() {
                           : "bg-muted hover:bg-muted/80"
                       }`}
                     >
-                      {seasonLabels[season]}
+                      {seasonLabelsShort[season]}
                     </button>
                   )
                 )}
@@ -250,9 +245,9 @@ export default function ComparisonSelectionPage() {
                       {tyre.name}
                     </h3>
                     <span
-                      className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${seasonColors[tyre.season]}`}
+                      className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${seasonBadgeColors[tyre.season]}`}
                     >
-                      {seasonLabels[tyre.season]}
+                      {seasonLabelsShort[tyre.season]}
                     </span>
                   </button>
                 );

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { type TyreModel, type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
-import { TyreCard, TyreCardGrid } from "@/components/TyreCard";
+import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, ChevronRight, Star } from "lucide-react";
 import { seasonLabels, SeasonIcons, groupBySeason } from "@/lib/utils/tyres";

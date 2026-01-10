@@ -1,10 +1,10 @@
 # Прогрес виконання
 
 ## Поточний статус
-- **Останнє оновлення:** 2026-01-10 23:30
-- **Поточна фаза:** 4 з 6
+- **Останнє оновлення:** 2026-01-10 23:45
+- **Поточна фаза:** 5 з 6
 - **Статус фази:** не розпочата
-- **Загальний прогрес:** 23/45 задач (51%)
+- **Загальний прогрес:** 31/45 задач (69%)
 
 ## Фази та їх статус
 
@@ -13,13 +13,13 @@
 | 1 | P0 Critical | **Завершена** | 8/8 |
 | 2 | P1 States | **Завершена** | 6/6 |
 | 3 | P1 Accessibility | **Завершена** | 9/9 |
-| 4 | P2 Refactoring | Не розпочата | 0/8 |
+| 4 | P2 Refactoring | **Завершена** | 8/8 |
 | 5 | P2 SEO | Не розпочата | 0/6 |
 | 6 | P3 Improvements | Не розпочата | 0/8 |
 
 ## Як продовжити роботу
 
-1. Відкрий файл поточної фази: `phase-04-p2-refactoring.md`
+1. Відкрий файл поточної фази: `phase-05-p2-seo.md`
 2. Знайди першу незавершену задачу (без [x])
 3. Виконай задачу
 4. Відміть [x] в чекбоксі
@@ -34,9 +34,9 @@ phase-02-p1-states.md      → ✅ ЗАВЕРШЕНО
     ↓
 phase-03-p1-accessibility.md → ✅ ЗАВЕРШЕНО
     ↓
-phase-04-p2-refactoring.md → Рефакторинг (DRY, shared components) (поточна)
+phase-04-p2-refactoring.md → ✅ ЗАВЕРШЕНО
     ↓
-phase-05-p2-seo.md         → SEO (metadata, Schema.org)
+phase-05-p2-seo.md         → SEO (metadata, Schema.org) (поточна)
     ↓
 phase-06-p3-improvements.md → Покращення (i18n, animations)
 ```
@@ -49,6 +49,7 @@ phase-06-p3-improvements.md → Покращення (i18n, animations)
 | 2026-01-10 | **Фаза 1 завершена:** P0 Critical виправлення |
 | 2026-01-10 | **Фаза 2 завершена:** P1 States (loading/error/empty) |
 | 2026-01-10 | **Фаза 3 завершена:** P1 Accessibility (ARIA, keyboard nav, focus) |
+| 2026-01-10 | **Фаза 4 завершена:** P2 Refactoring (shared utilities, DRY) |
 
 ## Деталі виконання Фази 1
 
@@ -125,3 +126,30 @@ phase-06-p3-improvements.md → Покращення (i18n, animations)
 - Глобальні focus-visible стилі для keyboard navigation
 - prefers-reduced-motion для вимкнення анімацій
 - aria-live для динамічного контенту (результати, лічильники)
+
+## Деталі виконання Фази 4
+
+### Нові/оновлені файли:
+1. `frontend/src/lib/utils/tyres.ts` - shared utilities для шин (розширено)
+2. `frontend/src/app/passenger-tyres/page.tsx` - використовує shared utils
+3. `frontend/src/app/suv-4x4-tyres/page.tsx` - використовує shared utils
+4. `frontend/src/app/lcv-tyres/page.tsx` - використовує shared utils
+5. `frontend/src/app/porivnyaty/page.tsx` - використовує seasonLabelsShort
+6. `frontend/src/app/porivnyaty/[slug]/page.tsx` - getSiteUrl(), seasonLabelsShort
+7. `frontend/src/app/shyny/[slug]/page.tsx` - getSiteUrl(), SeasonIcons, formatVehicleTypes
+8. `frontend/.env.example` - додано NEXT_PUBLIC_SITE_URL
+
+### Ключові покращення:
+- Централізовані утиліти в `lib/utils/tyres.ts`:
+  - seasonLabels, seasonLabelsShort (короткі мітки для badges)
+  - SeasonIcons (Sun, Snowflake, Cloud з lucide-react)
+  - seasonColors, seasonTextColors
+  - vehicleTypeLabels
+  - formatSize(), formatSizes()
+  - groupBySeason()
+  - formatVehicleTypes()
+  - getSiteUrl() — для Schema.org URLs
+- Видалено дублювання коду з 6 файлів
+- Schema.org URLs тепер використовують env variable
+- Прибрано unused imports (TyreCard з passenger-tyres)
+- Пропущено опціональні задачі (TyreCatalogTemplate, admin components)

@@ -4,32 +4,7 @@ import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, Mountain, ChevronRight } from "lucide-react";
-
-const seasonLabels: Record<Season, string> = {
-  summer: "Літні шини",
-  winter: "Зимові шини",
-  allseason: "Всесезонні шини",
-};
-
-const seasonIcons: Record<Season, React.ReactNode> = {
-  summer: <Zap className="h-5 w-5" aria-hidden="true" />,
-  winter: <Shield className="h-5 w-5" aria-hidden="true" />,
-  allseason: <Mountain className="h-5 w-5" aria-hidden="true" />,
-};
-
-function groupBySeason(models: TyreModel[]) {
-  return models.reduce(
-    (acc, model) => {
-      acc[model.season].push(model);
-      return acc;
-    },
-    {
-      summer: [] as TyreModel[],
-      winter: [] as TyreModel[],
-      allseason: [] as TyreModel[],
-    },
-  );
-}
+import { seasonLabels, SeasonIcons, groupBySeason } from "@/lib/utils/tyres";
 
 const features = [
   {
@@ -146,7 +121,10 @@ export default async function SuvTyresPage() {
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="rounded-full bg-primary/10 p-2">
-                        {seasonIcons[season]}
+                        {(() => {
+                          const Icon = SeasonIcons[season];
+                          return <Icon className="h-5 w-5" aria-hidden="true" />;
+                        })()}
                       </div>
                       <h3 className="text-xl font-bold">{seasonLabels[season]}</h3>
                     </div>

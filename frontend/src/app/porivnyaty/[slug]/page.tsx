@@ -7,15 +7,9 @@ import type { TyreModel, Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
+import { seasonLabelsShort, getSiteUrl } from "@/lib/utils/tyres";
 
-// Season labels
-const seasonLabels: Record<Season, string> = {
-  summer: "Літня",
-  winter: "Зимова",
-  allseason: "Всесезонна",
-};
-
-// Vehicle type labels
+// Vehicle type labels (extended with sport)
 const vehicleLabels: Record<string, string> = {
   passenger: "Легкові",
   suv: "SUV/Кросовери",
@@ -37,7 +31,7 @@ const comparisonAttributes = [
 function getAttributeValue(tyre: TyreModel, key: string): string {
   switch (key) {
     case "season":
-      return seasonLabels[tyre.season] || tyre.season;
+      return seasonLabelsShort[tyre.season] || tyre.season;
     case "vehicleTypes":
       return tyre.vehicleTypes.map((v) => vehicleLabels[v] || v).join(", ");
     case "fuelEfficiency":
@@ -193,13 +187,14 @@ export default async function ComparisonPage({
     notFound();
   }
 
+  const siteUrl = getSiteUrl();
   const comparisonSchema = generateComparisonSchema(compareTyres);
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Головна", url: "https://bridgestone.ua/" },
-    { name: "Порівняння", url: "https://bridgestone.ua/porivnyaty" },
+    { name: "Головна", url: `${siteUrl}/` },
+    { name: "Порівняння", url: `${siteUrl}/porivnyaty` },
     {
       name: compareTyres.map((t) => t.name).join(" vs "),
-      url: `https://bridgestone.ua/porivnyaty/${slug}`,
+      url: `${siteUrl}/porivnyaty/${slug}`,
     },
   ]);
 
@@ -251,7 +246,7 @@ export default async function ComparisonPage({
                   </div>
                   <h2 className="text-xl font-bold mb-2">{tyre.name}</h2>
                   <p className="text-muted-foreground text-sm mb-4">
-                    {seasonLabels[tyre.season]}
+                    {seasonLabelsShort[tyre.season]}
                   </p>
                   <Link
                     href={`/shyny/${tyre.slug}`}

@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type React from "react";
-import { Car, MapPin, Shield, Zap, Snowflake, Sun, Cloud, ChevronRight, Truck } from "lucide-react";
-import { type Season, type TyreModel } from "@/lib/data";
+import { Car, MapPin, ChevronRight, Truck, ArrowLeft } from "lucide-react";
+import { type TyreModel } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, jsonLdScript } from "@/lib/schema";
@@ -14,32 +13,7 @@ import { TestResultsSection } from "@/components/TestResultsSection";
 import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { KeyBenefits } from "@/components/KeyBenefits";
 import { Breadcrumb } from "@/components/ui";
-
-const seasonLabels: Record<Season, string> = {
-  summer: "Літні шини",
-  winter: "Зимові шини",
-  allseason: "Всесезонні шини",
-};
-
-const seasonIcons: Record<Season, React.ReactNode> = {
-  summer: <Sun className="h-5 w-5" aria-hidden="true" />,
-  winter: <Snowflake className="h-5 w-5" aria-hidden="true" />,
-  allseason: <Cloud className="h-5 w-5" aria-hidden="true" />,
-};
-
-function formatVehicleTypes(model: TyreModel) {
-  const labels: string[] = [];
-  if (model.vehicleTypes.includes("passenger")) {
-    labels.push("Легкові авто");
-  }
-  if (model.vehicleTypes.includes("suv")) {
-    labels.push("SUV / 4x4");
-  }
-  if (model.vehicleTypes.includes("lcv")) {
-    labels.push("Легкі комерційні авто");
-  }
-  return labels.join(" • ");
-}
+import { seasonLabels, SeasonIcons, formatVehicleTypes, getSiteUrl } from "@/lib/utils/tyres";
 
 function formatSize(size: TyreModel["sizes"][number]) {
   const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
@@ -101,11 +75,12 @@ export default async function TyreModelPage({
         m.vehicleTypes.some((type) => model.vehicleTypes.includes(type))),
   ).slice(0, 3);
 
+  const siteUrl = getSiteUrl();
   const productSchema = generateProductSchema(model);
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Головна", url: "https://bridgestone.ua/" },
-    { name: "Каталог шин", url: "https://bridgestone.ua/passenger-tyres" },
-    { name: model.name, url: `https://bridgestone.ua/shyny/${model.slug}` },
+    { name: "Головна", url: `${siteUrl}/` },
+    { name: "Каталог шин", url: `${siteUrl}/passenger-tyres` },
+    { name: model.name, url: `${siteUrl}/shyny/${model.slug}` },
   ]);
   const faqSchema = model.faqs && model.faqs.length > 0 ? generateFAQSchema(model.faqs) : null;
 
@@ -201,7 +176,10 @@ export default async function TyreModelPage({
                   </div>
                 )}
                 <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-zinc-900/90 px-4 py-2 text-sm font-semibold text-zinc-50 ring-1 ring-zinc-600">
-                  {seasonIcons[model.season]}
+                  {(() => {
+                    const Icon = SeasonIcons[model.season];
+                    return <Icon className="h-5 w-5" aria-hidden="true" />;
+                  })()}
                   <span className="ml-1">{seasonLabels[model.season]}</span>
                 </div>
                 {model.isNew && (
