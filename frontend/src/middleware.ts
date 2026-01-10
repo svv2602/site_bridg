@@ -21,8 +21,14 @@ export function middleware(request: NextRequest) {
     const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
     const [username, password] = credentials.split(':');
 
-    const validUsername = process.env.ADMIN_USERNAME || 'admin';
-    const validPassword = process.env.ADMIN_PASSWORD || 'bridgestone2026';
+    const validUsername = process.env.ADMIN_USERNAME;
+    const validPassword = process.env.ADMIN_PASSWORD;
+
+    // Require env vars to be set - no hardcoded defaults for security
+    if (!validUsername || !validPassword) {
+      console.error('ADMIN_USERNAME and ADMIN_PASSWORD must be set in environment variables');
+      return new NextResponse('Server configuration error', { status: 500 });
+    }
 
     if (username !== validUsername || password !== validPassword) {
       return new NextResponse('Invalid credentials', {

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const contactMethods = [
   {
@@ -25,16 +27,16 @@ const contactMethods = [
     title: "Офіційне представництво",
     details: "м. Київ, вул. Прикладна, 10",
     subtitle: "Пн‑Пт 9:00–18:00",
-    action: "Показати на карті",
-    href: "#",
+    action: "Знайти дилера",
+    href: "/dealers",
   },
   {
     icon: Clock,
     title: "Графік роботи",
     details: "Пн‑Пт: 9:00–18:00",
     subtitle: "Сб‑Нд: вихідні",
-    action: "Дізнатися більше",
-    href: "#",
+    action: "Наші контакти",
+    href: "#contact-form",
   },
 ];
 
@@ -57,7 +59,57 @@ const faqs = [
   },
 ];
 
+type FormStatus = 'idle' | 'loading' | 'success' | 'error';
+
+interface FormData {
+  name: string;
+  phone: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 export default function ContactsPage() {
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    phone: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [status, setStatus] = useState<FormStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Помилка відправки');
+      }
+
+      setStatus('success');
+      setFormData({ name: '', phone: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(error instanceof Error ? error.message : 'Щось пішло не так');
+    }
+  };
+
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
@@ -70,12 +122,12 @@ export default function ContactsPage() {
             className="mx-auto max-w-4xl text-left text-zinc-50"
           >
             <nav className="mb-2 text-xs text-zinc-400">
-              <span className="cursor-pointer hover:text-zinc-100">Головна</span>
+              <Link href="/" className="cursor-pointer hover:text-zinc-100">Головна</Link>
               <span className="mx-2">/</span>
               <span className="font-medium text-zinc-100">Контакти</span>
             </nav>
             <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-              Зв’язок з Bridgestone Україна
+              Зв'язок з Bridgestone Україна
               <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
                 технічна підтримка, підбір шин та інформація про дилерів
               </span>
@@ -83,7 +135,7 @@ export default function ContactsPage() {
             <p className="mb-6 max-w-2xl text-sm text-zinc-300 md:text-base">
               Ми готові допомогти з вибором шин, пошуком офіційного дилера або відповісти на технічні
               запитання щодо продукції Bridgestone. Скористайтеся контактами нижче або формою зворотного
-              зв’язку.
+              зв'язку.
             </p>
           </motion.div>
         </div>
@@ -109,12 +161,21 @@ export default function ContactsPage() {
                   {method.details}
                 </p>
                 <p className="mb-4 text-sm text-muted-foreground">{method.subtitle}</p>
-                <a
-                  href={method.href}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                >
-                  {method.action} <Send className="h-4 w-4" />
-                </a>
+                {method.href.startsWith('/') ? (
+                  <Link
+                    href={method.href}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  >
+                    {method.action} <Send className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <a
+                    href={method.href}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  >
+                    {method.action} <Send className="h-4 w-4" />
+                  </a>
+                )}
               </motion.div>
             ))}
           </div>
@@ -122,7 +183,7 @@ export default function ContactsPage() {
       </section>
 
       {/* Form & Info */}
-      <section className="py-12">
+      <section className="py-12" id="contact-form">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Contact Form */}
@@ -134,68 +195,131 @@ export default function ContactsPage() {
             >
               <h2 className="mb-6 text-2xl font-bold">Надішліть нам повідомлення</h2>
               <p className="mb-8 text-muted-foreground">
-                Заповніть форму, і наші фахівці зв’язуться з вами найближчим часом.
+                Заповніть форму, і наші фахівці зв'язуться з вами найближчим часом.
               </p>
-              <form className="space-y-6">
-                <div className="grid gap-4 sm:grid-cols-2">
+
+              {status === 'success' ? (
+                <div className="rounded-xl border border-green-200 bg-green-50 p-6 text-center dark:border-green-900 dark:bg-green-950">
+                  <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                  <h3 className="mt-4 text-xl font-semibold text-green-800 dark:text-green-200">
+                    Дякуємо за звернення!
+                  </h3>
+                  <p className="mt-2 text-green-700 dark:text-green-300">
+                    Ваше повідомлення отримано. Ми зв'яжемося з вами протягом 24 годин.
+                  </p>
+                  <button
+                    onClick={() => setStatus('idle')}
+                    className="mt-4 rounded-full bg-green-600 px-6 py-2 text-white hover:bg-green-700"
+                  >
+                    Надіслати ще одне
+                  </button>
+                </div>
+              ) : (
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  {status === 'error' && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
+                      <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                        <AlertCircle className="h-5 w-5" />
+                        <span>{errorMessage}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="name" className="mb-2 block text-sm font-medium">Ім'я *</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        disabled={status === 'loading'}
+                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                        placeholder="Ваше ім'я"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="mb-2 block text-sm font-medium">Телефон *</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        required
+                        value={formData.phone}
+                        onChange={handleChange}
+                        disabled={status === 'loading'}
+                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                        placeholder="+380 (__) ___ __ __"
+                      />
+                    </div>
+                  </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium">Ім’я *</label>
+                    <label htmlFor="email" className="mb-2 block text-sm font-medium">Електронна пошта *</label>
                     <input
-                      type="text"
+                      type="email"
+                      id="email"
+                      name="email"
                       required
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                      placeholder="Ваше ім'я"
+                      value={formData.email}
+                      onChange={handleChange}
+                      disabled={status === 'loading'}
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                      placeholder="you@example.com"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium">Телефон *</label>
-                    <input
-                      type="tel"
+                    <label htmlFor="subject" className="mb-2 block text-sm font-medium">Тема звернення</label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      disabled={status === 'loading'}
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                    >
+                      <option value="">Оберіть тему</option>
+                      <option value="tyre-selection">Питання щодо вибору шин</option>
+                      <option value="find-dealer">Пошук дилера / де купити</option>
+                      <option value="warranty">Гарантія та сервіс</option>
+                      <option value="other">Інше запитання</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="mb-2 block text-sm font-medium">Повідомлення *</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={4}
                       required
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                      placeholder="+380 (__) ___ __ __"
+                      value={formData.message}
+                      onChange={handleChange}
+                      disabled={status === 'loading'}
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                      placeholder="Опишіть ваше запитання або ситуацію..."
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Електронна пошта *</label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Тема звернення</label>
-                  <select className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary">
-                    <option>Оберіть тему</option>
-                    <option>Питання щодо вибору шин</option>
-                    <option>Пошук дилера / де купити</option>
-                    <option>Гарантія та сервіс</option>
-                    <option>Інше запитання</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Повідомлення *</label>
-                  <textarea
-                    rows={4}
-                    required
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-                    placeholder="Опишіть ваше запитання або ситуацію..."
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span>Ми гарантуємо конфіденційність ваших даних</span>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-primary py-3.5 text-lg font-semibold text-white shadow-lg hover:bg-primary-dark"
-                >
-                  Надіслати запит
-                </button>
-              </form>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span>Ми гарантуємо конфіденційність ваших даних</span>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-lg font-semibold text-white shadow-lg hover:bg-primary-dark disabled:opacity-50"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Надсилаємо...
+                      </>
+                    ) : (
+                      'Надіслати запит'
+                    )}
+                  </button>
+                </form>
+              )}
             </motion.div>
 
             {/* FAQ & Map */}
@@ -218,12 +342,12 @@ export default function ContactsPage() {
                     </div>
                   ))}
                 </div>
-                <a
+                <Link
                   href="/advice"
                   className="mt-6 inline-flex items-center gap-2 text-primary hover:underline"
                 >
                   Перейти до всіх питань <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </motion.div>
 
               <motion.div
@@ -238,11 +362,14 @@ export default function ContactsPage() {
                     <MapPin className="mx-auto h-12 w-12 text-primary" />
                     <p className="mt-4 font-medium">Інтерактивна карта дилерів</p>
                     <p className="text-sm text-muted-foreground">
-                      У фінальній версії тут буде вбудована карта з локаціями дилерів.
+                      Знайдіть найближчого офіційного дилера Bridgestone.
                     </p>
-                    <button className="mt-4 rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-primary/10">
+                    <Link
+                      href="/dealers"
+                      className="mt-4 inline-block rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-primary/10"
+                    >
                       Відкрити карту
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -265,12 +392,21 @@ export default function ContactsPage() {
               Зателефонуйте на гарячу лінію або напишіть у месенджер — ми відповімо протягом 15 хвилин.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <a
+                href="tel:0800123456"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+              >
+                <Phone className="h-4 w-4" />
                 Зателефонувати зараз
-              </button>
-              <button className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
+              </a>
+              <a
+                href="https://t.me/bridgestone_ua"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+              >
                 Написати в Telegram
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>

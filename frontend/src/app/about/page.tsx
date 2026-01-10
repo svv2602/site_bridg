@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Globe, Award, Shield, Users, Target, Zap } from "lucide-react";
+import { Globe, Award, Shield, Users, Target, Zap, Phone } from "lucide-react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -53,7 +54,7 @@ export default function AboutPage() {
             className="mx-auto max-w-4xl text-left text-zinc-50"
           >
             <nav className="mb-2 text-xs text-zinc-400">
-              <span className="cursor-pointer hover:text-zinc-100">Головна</span>
+              <Link href="/" className="hover:text-zinc-100">Головна</Link>
               <span className="mx-2">/</span>
               <span className="font-medium text-zinc-100">Про бренд Bridgestone</span>
             </nav>
@@ -69,12 +70,18 @@ export default function AboutPage() {
               щоб забезпечувати безпеку і комфорт мільйонам водіїв.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="rounded-full bg-zinc-50 px-6 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white">
+              <a
+                href="#mission"
+                className="rounded-full bg-zinc-50 px-6 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white"
+              >
                 Дізнатися більше
-              </button>
-              <button className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
-                Зв’язатися з нами
-              </button>
+              </a>
+              <Link
+                href="/contacts"
+                className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800"
+              >
+                Зв'язатися з нами
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -104,7 +111,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Values */}
-      <section className="py-16">
+      <section id="mission" className="py-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
             <motion.div {...fadeInUp}>
@@ -190,13 +197,13 @@ export default function AboutPage() {
                 ].map((item, idx) => (
                   <div
                     key={item.year}
-                    className={`flex items-center ${idx % 2 === 0 ? "flex-row" : "flex-row-reverse"}`}
+                    className={`flex items-center ${idx % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"} flex-col lg:flex-row`}
                   >
-                    <div className="w-1/2" />
-                    <div className="relative z-10 mx-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lg">
+                    <div className="hidden lg:block lg:w-1/2" />
+                    <div className="relative z-10 mx-4 mb-4 lg:mb-0 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-lg">
                       {item.year}
                     </div>
-                    <div className="w-1/2 text-left">
+                    <div className="lg:w-1/2 text-left">
                       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                         <p className="font-medium">{item.event}</p>
                       </div>
@@ -224,12 +231,19 @@ export default function AboutPage() {
               офіційного дилера Bridgestone в Україні.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <Link
+                href="/dealers"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+              >
                 Знайти дилера
-              </button>
-              <button className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
+              </Link>
+              <a
+                href="tel:+380800123456"
+                className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+              >
+                <Phone className="h-4 w-4" />
                 Зателефонувати
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>

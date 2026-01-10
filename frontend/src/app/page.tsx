@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe } from "lucide-react";
+import Link from "next/link";
+import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone } from "lucide-react";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
 
@@ -12,6 +13,7 @@ const tyreCategories = [
     description: "Для теплої пори року, оптимальні для сухого та мокрого асфальту.",
     icon: Sun,
     color: "from-orange-500 to-yellow-500",
+    href: "/passenger-tyres?season=summer",
   },
   {
     id: "winter",
@@ -19,6 +21,7 @@ const tyreCategories = [
     description: "Максимальне зчеплення на снігу та льоду в зимових умовах.",
     icon: Snowflake,
     color: "from-blue-500 to-cyan-400",
+    href: "/passenger-tyres?season=winter",
   },
   {
     id: "allseason",
@@ -26,24 +29,28 @@ const tyreCategories = [
     description: "Компромісне рішення для помірного клімату без екстремальних умов.",
     icon: Cloud,
     color: "from-gray-500 to-gray-300",
+    href: "/passenger-tyres?season=all-season",
   },
 ];
 
 const featuredTyres = [
   {
     name: "Bridgestone Turanza T005",
+    slug: "turanza-t005",
     tag: "Літня • Легковий авто",
     description: "Комфорт і контроль на мокрій дорозі для щоденних поїздок містом і трасою.",
     rating: 4.8,
   },
   {
     name: "Bridgestone Blizzak LM005",
+    slug: "blizzak-lm005",
     tag: "Зимова • Легковий / SUV",
     description: "Відмінне зчеплення на снігу та мокрому асфальті для безпечної зими.",
     rating: 4.9,
   },
   {
     name: "Bridgestone Weather Control A005",
+    slug: "weather-control-a005",
     tag: "Всесезонна • Легковий авто",
     description: "Цілорічне рішення з акцентом на дощову та змінну погоду.",
     rating: 4.7,
@@ -53,16 +60,19 @@ const featuredTyres = [
 const articles = [
   {
     title: "Як обрати шини для міста та траси",
+    slug: "yak-obraty-shyny-dlya-mista-ta-trasy",
     readingTime: "4 хвилини читання",
     category: "Поради",
   },
   {
     title: "Як читати маркування шин: повний гід",
+    slug: "yak-chytaty-markuvannya-shyn",
     readingTime: "6 хвилин читання",
     category: "Освіта",
   },
   {
     title: "Коли змінювати сезонні шини в Україні",
+    slug: "koly-zminyuvaty-sezonni-shyny",
     readingTime: "3 хвилини читання",
     category: "Сезонність",
   },
@@ -153,9 +163,12 @@ export default function Home() {
                       <h3 className="text-xl font-bold">{cat.name}</h3>
                       <p className="text-sm text-muted-foreground">{cat.description}</p>
                     </div>
-                    <button className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-semibold hover:bg-card">
+                    <Link
+                      href={cat.href}
+                      className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-semibold hover:bg-card"
+                    >
                       Перейти
-                    </button>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -182,12 +195,18 @@ export default function Home() {
                       <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
                       <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
                       <div className="mt-3 flex gap-3">
-                        <button className="rounded-full border border-border bg-transparent px-4 py-1.5 text-sm font-semibold hover:bg-card">
+                        <Link
+                          href={`/shyny/${tyre.slug}`}
+                          className="rounded-full border border-border bg-transparent px-4 py-1.5 text-sm font-semibold hover:bg-card"
+                        >
                           Детальніше
-                        </button>
-                        <button className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark">
+                        </Link>
+                        <Link
+                          href="/dealers"
+                          className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                        >
                           Знайти дилера
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </motion.div>
@@ -224,9 +243,12 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">
                   У цій статті будуть прості пояснення та практичні поради для водіїв в Україні.
                 </p>
-                <button className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                <Link
+                  href={`/advice/${article.slug}`}
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                >
                   Читати статтю <ChevronRight className="h-4 w-4" />
-                </button>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -248,12 +270,19 @@ export default function Home() {
               з урахуванням стилю водіння, умов експлуатації та бюджету.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <Link
+                href="/contacts"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+              >
                 Отримати консультацію
-              </button>
-              <button className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
+              </Link>
+              <a
+                href="tel:+380800123456"
+                className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+              >
+                <Phone className="h-4 w-4" />
                 Зателефонувати
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>

@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { MOCK_DEALERS, type Dealer } from "@/lib/data";
-import { Search, MapPin, Phone, Globe, Clock, Navigation, Filter, ChevronDown } from "lucide-react";
+import { type Dealer } from "@/lib/data";
+import { getDealers } from "@/lib/api/dealers";
+import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import DealersMap from "@/components/DealersMap";
 
@@ -18,22 +20,37 @@ const dealerTypes = [
   { key: "service", label: "Сервісний центр" },
 ];
 
-// Note: Metadata is defined in layout.tsx for client components
-
 export default function DealersPage() {
   const [cityQuery, setCityQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [expandedDealer, setExpandedDealer] = useState<string | null>(null);
+  const [allDealers, setAllDealers] = useState<Dealer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch dealers on mount
+  useEffect(() => {
+    async function fetchDealers() {
+      try {
+        const data = await getDealers();
+        setAllDealers(data);
+      } catch (error) {
+        console.error("Failed to fetch dealers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDealers();
+  }, []);
 
   const normalizedQuery = cityQuery.trim().toLowerCase();
 
   const dealers: FilteredDealer[] = useMemo(
     () =>
-      MOCK_DEALERS.map((d) => ({
+      allDealers.map((d) => ({
         ...d,
         displayAddress: [d.city, d.address].filter(Boolean).join(", "),
       })),
-    [],
+    [allDealers],
   );
 
   const filteredDealers = useMemo(() => {
@@ -51,7 +68,15 @@ export default function DealersPage() {
     return filtered;
   }, [dealers, normalizedQuery, selectedType]);
 
-  const dealerSchemas = MOCK_DEALERS.map((dealer) => generateLocalBusinessSchema(dealer));
+  const buildRouteUrl = (dealer: Dealer) => {
+    if (dealer.latitude && dealer.longitude) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${dealer.latitude},${dealer.longitude}`;
+    }
+    const address = encodeURIComponent(`${dealer.address}, ${dealer.city}, Україна`);
+    return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+  };
+
+  const dealerSchemas = allDealers.map((dealer) => generateLocalBusinessSchema(dealer));
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: "https://bridgestone.ua/" },
     { name: "Де купити", url: "https://bridgestone.ua/dealers" },
@@ -80,7 +105,7 @@ export default function DealersPage() {
             className="mx-auto flex max-w-4xl flex-col gap-4 text-left text-zinc-50 md:gap-5"
           >
             <nav className="mb-1 text-xs text-zinc-400">
-              <span className="cursor-pointer hover:text-zinc-100">Головна</span>
+              <Link href="/" className="hover:text-zinc-100">Головна</Link>
               <span className="mx-2">/</span>
               <span className="font-medium text-zinc-100">Дилери / Де купити</span>
             </nav>
@@ -92,7 +117,6 @@ export default function DealersPage() {
             </h1>
             <p className="max-w-2xl text-sm text-zinc-300 md:text-base">
               Фільтруйте офіційні точки продажу та сервісні партнери Bridgestone по всій Україні.
-              Дизайн секції узгоджений зі сторінкою пошуку шин у більш «технічному» стилі.
             </p>
           </motion.div>
         </div>
@@ -144,7 +168,9 @@ export default function DealersPage() {
                   <div>
                     <p className="text-sm text-zinc-300">
                       Знайдено дилерів:{" "}
-                      <span className="text-2xl font-bold text-zinc-50">{filteredDealers.length}</span>
+                      <span className="text-2xl font-bold text-zinc-50">
+                        {isLoading ? "..." : filteredDealers.length}
+                      </span>
                     </p>
                   </div>
                   <button
@@ -168,7 +194,7 @@ export default function DealersPage() {
               </h3>
               <div className="h-80 overflow-hidden rounded-xl">
                 <DealersMap
-                  dealers={MOCK_DEALERS}
+                  dealers={allDealers}
                   selectedDealerId={expandedDealer}
                   onDealerSelect={(id) => setExpandedDealer(id)}
                 />
@@ -182,7 +208,13 @@ export default function DealersPage() {
       <section className="py-8">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <h2 className="mb-8 text-3xl font-bold">Список дилерів</h2>
-          {filteredDealers.length === 0 ? (
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-3 text-muted-foreground">Завантаження дилерів...</span>
+            </div>
+          ) : filteredDealers.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -280,9 +312,15 @@ export default function DealersPage() {
                       >
                         {expandedDealer === dealer.id ? "Менше" : "Детальніше"}
                       </button>
-                      <button className="flex-1 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
+                      <a
+                        href={buildRouteUrl(dealer)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
+                      >
+                        <Navigation className="h-4 w-4" />
                         Побудувати маршрут
-                      </button>
+                      </a>
                     </div>
 
                     {expandedDealer === dealer.id && (
@@ -323,16 +361,23 @@ export default function DealersPage() {
           >
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>
             <p className="mb-8 text-lg opacity-90">
-              Зв’яжіться з нами напряму — ми допоможемо знайти найближчу точку продажу
+              Зв'яжіться з нами напряму — ми допоможемо знайти найближчу точку продажу
               або організуємо доставку шин у ваше місто.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <a
+                href="tel:+380800123456"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+              >
+                <Phone className="h-4 w-4" />
                 Зателефонувати
-              </button>
-              <button className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">
+              </a>
+              <Link
+                href="/contacts"
+                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+              >
                 Заповнити форму
-              </button>
+              </Link>
             </div>
           </motion.div>
         </div>
