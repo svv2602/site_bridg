@@ -14,6 +14,7 @@ export interface PayloadTyre {
   vehicleTypes: ('passenger' | 'suv' | 'van' | 'sport')[];
   isNew: boolean;
   isPopular: boolean;
+  isPublished: boolean;
   shortDescription?: string;
   fullDescription?: any; // Lexical rich text
   image?: PayloadMedia;
@@ -152,6 +153,9 @@ export async function getPayloadTyres(params?: {
 }): Promise<PayloadTyre[]> {
   const searchParams = new URLSearchParams();
 
+  // Only show published tyres
+  searchParams.set('where[isPublished][equals]', 'true');
+
   if (params?.season) {
     searchParams.set('where[season][equals]', params.season);
   }
@@ -182,7 +186,7 @@ export async function getPayloadTyreBySlug(slug: string): Promise<PayloadTyre | 
 
 export async function getPayloadFeaturedTyres(limit = 4): Promise<PayloadTyre[]> {
   const data = await fetchPayload<PayloadTyre>(
-    `tyres?where[isPopular][equals]=true&limit=${limit}&depth=1`
+    `tyres?where[isPublished][equals]=true&where[isPopular][equals]=true&limit=${limit}&depth=1`
   );
   return data.docs;
 }

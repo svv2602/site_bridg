@@ -216,6 +216,10 @@ export interface Tyre {
   season: 'summer' | 'winter' | 'allseason';
   isNew?: boolean | null;
   isPopular?: boolean | null;
+  /**
+   * Показувати на сайті
+   */
+  isPublished?: boolean | null;
   vehicleTypes: ('passenger' | 'suv' | 'van' | 'sport')[];
   image?: (number | null) | Media;
   shortDescription?: string | null;
@@ -613,6 +617,7 @@ export interface TyresSelect<T extends boolean = true> {
   season?: T;
   isNew?: T;
   isPopular?: T;
+  isPublished?: T;
   vehicleTypes?: T;
   image?: T;
   shortDescription?: T;

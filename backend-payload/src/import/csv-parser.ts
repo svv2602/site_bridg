@@ -24,7 +24,7 @@ export async function* parseCsvStream<T>(
       trim: true,
       quote: false, // Disable quote parsing - CSV has malformed quotes
       relax_column_count: true,
-      on_record: (record) => {
+      on_record: (record: Record<string, string>) => {
         // Clean up values - remove surrounding quotes
         const cleaned: Record<string, string> = {};
         for (const key of Object.keys(record)) {
