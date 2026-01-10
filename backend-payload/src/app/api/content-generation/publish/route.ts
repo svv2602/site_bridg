@@ -8,22 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayloadHMR } from "@payloadcms/next/utilities";
 import configPromise from "@payload-config";
 import { validateAuth, isAdmin, unauthorizedResponse, forbiddenResponse } from "../auth";
-
-// Dynamic import for content-automation functions
-async function getModules() {
-  try {
-    const storageModule = await import(
-      "../../../../content-automation/src/utils/storage.js"
-    );
-    const lexicalModule = await import(
-      "../../../../content-automation/src/utils/markdown-to-lexical.js"
-    );
-    return { storage: storageModule, lexical: lexicalModule };
-  } catch (error) {
-    console.error("Failed to import modules:", error);
-    throw error;
-  }
-}
+import { loadGeneratedContent } from "../storage-helper";
+import { markdownToLexical } from "../../../../../content-automation/src/utils/markdown-to-lexical";
 
 // Fields that can be published
 const PUBLISHABLE_FIELDS = [
@@ -76,13 +62,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Load modules
-    const { storage, lexical } = await getModules();
-
     // Load generated content
-    const generatedContent = await storage.loadFromStorage(
-      `generated/${modelSlug}`
-    );
+    const generatedContent = loadGeneratedContent(modelSlug) as {
+      shortDescription?: string;
+      fullDescription?: string;
+      seoTitle?: string;
+      seoDescription?: string;
+      keyBenefits?: Array<{ benefit: string; icon?: string }>;
+      faqs?: Array<{ question: string; answer: string }>;
+    } | null;
 
     if (!generatedContent) {
       return NextResponse.json(
@@ -136,7 +124,7 @@ export async function POST(request: NextRequest) {
         case "fullDescription":
           if (generatedContent.fullDescription) {
             // Convert Markdown to Lexical
-            const lexicalContent = lexical.markdownToLexical(
+            const lexicalContent = markdownToLexical(
               generatedContent.fullDescription
             );
             updateData.fullDescription = lexicalContent;

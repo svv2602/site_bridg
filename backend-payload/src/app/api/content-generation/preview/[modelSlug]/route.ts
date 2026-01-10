@@ -8,19 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayloadHMR } from "@payloadcms/next/utilities";
 import configPromise from "@payload-config";
 import { validateAuth, unauthorizedResponse } from "../../auth";
-
-// Dynamic import for content-automation functions
-async function getStorageModule() {
-  try {
-    const storageModule = await import(
-      "../../../../../content-automation/src/utils/storage.js"
-    );
-    return storageModule;
-  } catch (error) {
-    console.error("Failed to import storage module:", error);
-    throw error;
-  }
-}
+import { loadGeneratedContent } from "../../storage-helper";
 
 export async function GET(
   request: NextRequest,
@@ -42,11 +30,17 @@ export async function GET(
       );
     }
 
-    // Load storage module
-    const storage = await getStorageModule();
-
     // Load generated content
-    const generatedContent = await storage.loadFromStorage(`generated/${modelSlug}`);
+    const generatedContent = loadGeneratedContent(modelSlug) as {
+      shortDescription?: string;
+      fullDescription?: string;
+      seoTitle?: string;
+      seoDescription?: string;
+      seoKeywords?: string[];
+      keyBenefits?: Array<{ benefit: string; icon?: string }>;
+      faqs?: Array<{ question: string; answer: string }>;
+      metadata?: Record<string, unknown>;
+    } | null;
 
     if (!generatedContent) {
       return NextResponse.json(

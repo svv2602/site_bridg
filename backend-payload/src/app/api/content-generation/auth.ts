@@ -23,7 +23,36 @@ export interface AuthResult {
  */
 export async function validateAuth(request: NextRequest): Promise<AuthResult> {
   try {
-    // Get token from Authorization header
+    // Get Payload instance
+    const payload = await getPayloadHMR({ config: configPromise });
+
+    // Try to get user from cookies first (admin panel)
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader) {
+      // Parse payload-token from cookie
+      const tokenMatch = cookieHeader.match(/payload-token=([^;]+)/);
+      if (tokenMatch) {
+        const token = tokenMatch[1];
+        try {
+          // Use Payload's auth to verify
+          const { user } = await payload.auth({ headers: request.headers });
+          if (user) {
+            return {
+              authenticated: true,
+              user: {
+                id: String(user.id),
+                email: user.email as string,
+                role: (user.role as string) || "user",
+              },
+            };
+          }
+        } catch {
+          // Cookie auth failed, try header
+        }
+      }
+    }
+
+    // Try Authorization header
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return {
@@ -34,26 +63,30 @@ export async function validateAuth(request: NextRequest): Promise<AuthResult> {
 
     const token = authHeader.replace("Bearer ", "");
 
-    // Get Payload instance
-    const payload = await getPayloadHMR({ config: configPromise });
+    // Create a modified headers object with the token as a cookie
+    // This allows Payload to verify the token
+    const modifiedHeaders = new Headers(request.headers);
+    modifiedHeaders.set("cookie", `payload-token=${token}`);
 
-    // Verify token using Payload's JWT verification
-    const { user } = await payload.verifyToken({ token }).catch(() => ({ user: null }));
-
-    if (!user) {
-      return {
-        authenticated: false,
-        error: "Invalid or expired token",
-      };
+    try {
+      const { user } = await payload.auth({ headers: modifiedHeaders });
+      if (user) {
+        return {
+          authenticated: true,
+          user: {
+            id: String(user.id),
+            email: user.email as string,
+            role: (user.role as string) || "user",
+          },
+        };
+      }
+    } catch {
+      // Auth failed
     }
 
     return {
-      authenticated: true,
-      user: {
-        id: user.id as string,
-        email: user.email as string,
-        role: (user.role as string) || "user",
-      },
+      authenticated: false,
+      error: "Invalid or expired token",
     };
   } catch (error) {
     return {

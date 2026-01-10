@@ -8,19 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayloadHMR } from "@payloadcms/next/utilities";
 import configPromise from "@payload-config";
 import { validateAuth, unauthorizedResponse } from "../../auth";
-
-// Dynamic import for content-automation functions
-async function getStorageModule() {
-  try {
-    const storageModule = await import(
-      "../../../../../content-automation/src/utils/storage.js"
-    );
-    return storageModule;
-  } catch (error) {
-    console.error("Failed to import storage module:", error);
-    throw error;
-  }
-}
+import { loadRawContentCollection, loadGeneratedContent } from "../../storage-helper";
 
 export async function GET(
   request: NextRequest,
@@ -42,18 +30,22 @@ export async function GET(
       );
     }
 
-    // Load storage module
-    const storage = await getStorageModule();
-
     // Check for raw data
-    const rawContent = await storage.loadFromStorage(`raw/${modelSlug}`);
-    const hasRawData = Array.isArray(rawContent) && rawContent.length > 0;
-    const rawDataDate = hasRawData && rawContent[0]?.scrapedAt
-      ? rawContent[0].scrapedAt
-      : null;
+    const rawContent = loadRawContentCollection(modelSlug) as {
+      sources?: Array<{ scrapedAt?: string }>;
+      collectedAt?: string;
+    } | null;
+    const hasRawData = !!rawContent;
+    const rawDataDate = rawContent?.collectedAt || rawContent?.sources?.[0]?.scrapedAt || null;
 
     // Check for generated content
-    const generatedContent = await storage.loadFromStorage(`generated/${modelSlug}`);
+    const generatedContent = loadGeneratedContent(modelSlug) as {
+      shortDescription?: string;
+      seoTitle?: string;
+      keyBenefits?: Array<unknown>;
+      faqs?: Array<unknown>;
+      metadata?: { generatedAt?: string; cost?: number };
+    } | null;
     const hasGeneratedContent = !!generatedContent;
     const generatedDate = generatedContent?.metadata?.generatedAt || null;
 
