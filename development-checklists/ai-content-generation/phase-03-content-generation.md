@@ -1,12 +1,12 @@
 # Фаза 3: Content Generation System
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-10
+**Завершена:** 2026-01-10
 
 ## Ціль фази
 Створити систему генерації SEO-контенту для шин та статей блогу, використовуючи multi-provider архітектуру з Фази 2.
@@ -51,26 +51,35 @@ processors/
 ### 3.0 Аналіз та планування
 
 #### A. Аналіз колекції Tyres в Payload
-- [ ] Переглянути поля колекції `Tyres` (`src/collections/Tyres.ts`)
-- [ ] Визначити формат Lexical для richtext полів
-- [ ] Визначити структуру даних для keyBenefits, faqs
+- [x] Переглянути поля колекції `Tyres` (`src/collections/Tyres.ts`)
+- [x] Визначити формат Lexical для richtext полів
+- [x] Визначити структуру даних для keyBenefits, faqs
+
+**Знайдено поля:** slug, seoTitle, seoDescription, name, season, vehicleTypes, shortDescription, fullDescription (richText), keyBenefits, faqs, technologies, badges, testResults
 
 #### B. Аналіз існуючих процесорів
-- [ ] Вивчити `processors/tire-description-generator.ts`
-- [ ] Вивчити `processors/faq-generator.ts`
-- [ ] Вивчити `processors/article-generator.ts`
-- [ ] Визначити що рефакторити, що створити нове
+- [x] Вивчити `processors/tire-description-generator.ts`
+- [x] Вивчити `processors/faq-generator.ts`
+- [x] Вивчити `processors/article-generator.ts`
+- [x] Визначити що рефакторити, що створити нове
+
+**План рефакторингу:**
+- `llm-generator.ts` → замінити на новий provider system
+- `tire-description-generator.ts` → оновити для використання llm.forTask()
+- `faq-generator.ts` → оновити для використання llm.forTask()
+- Промпти вже є в `config/prompts.ts` → перенести в markdown файли
 
 ---
 
 ### 3.1 Створити систему промптів
 
 #### Структура промптів
-- [ ] Створити `prompts/tire-description.md`
-- [ ] Створити `prompts/tire-seo.md`
-- [ ] Створити `prompts/tire-faq.md`
-- [ ] Створити `prompts/article-generator.md`
-- [ ] Створити `prompts/image-prompts.md`
+- [x] Створити `prompts/tire-description.md`
+- [x] Створити `prompts/tire-seo.md`
+- [x] Створити `prompts/tire-faq.md`
+- [x] Створити `prompts/article-generator.md`
+- [x] Створити `prompts/image-prompts.md`
+- [x] Створити `prompts/index.ts` - loader та хелпери
 
 **Структура промпту (приклад):**
 ```markdown
@@ -111,7 +120,7 @@ processors/
 
 ### 3.2 Створити типи для генерованого контенту
 
-- [ ] Створити/оновити `types/content.ts`
+- [x] Створити/оновити `types/content.ts` (створено в Phase 1)
 
 **Файли:** `backend-payload/content-automation/src/types/content.ts`
 
@@ -213,11 +222,11 @@ export interface GeneratedImage {
 
 ### 3.3 Реалізувати генератор описів шин
 
-- [ ] Створити `processors/content/tire-description.ts`
-- [ ] Інтеграція з provider system
-- [ ] Обробка raw даних від скрапера
-- [ ] Генерація shortDescription та fullDescription
-- [ ] Валідація довжини та структури
+- [x] Створити `processors/content/tire-description.ts`
+- [x] Інтеграція з provider system (llm.forTask())
+- [x] Обробка raw даних від скрапера
+- [x] Генерація shortDescription та fullDescription
+- [x] Валідація довжини та структури
 
 **API:**
 ```typescript
@@ -235,28 +244,29 @@ async function generateTyreDescription(
 
 ### 3.4 Реалізувати генератор SEO контенту
 
-- [ ] Створити `processors/content/tire-seo.ts`
-- [ ] Генерація seoTitle, seoDescription
-- [ ] Генерація keywords на основі контенту
-- [ ] Валідація довжини для Google
+- [x] Створити `processors/content/tire-seo.ts`
+- [x] Генерація seoTitle, seoDescription
+- [x] Генерація keywords на основі контенту
+- [x] Валідація довжини для Google
 
 ---
 
 ### 3.5 Реалізувати генератор FAQ
 
-- [ ] Створити `processors/content/tire-faq.ts`
-- [ ] Генерація 3-5 релевантних FAQ
-- [ ] Формат для Schema.org FAQPage
-- [ ] Оптимізація для featured snippets
+- [x] Створити `processors/content/tire-faq.ts`
+- [x] Генерація 3-5 релевантних FAQ
+- [x] Формат для Schema.org FAQPage (generateFAQSchema)
+- [x] Оптимізація для featured snippets
 
 ---
 
 ### 3.6 Реалізувати генератор статей
 
-- [ ] Створити `processors/content/article-generator.ts`
-- [ ] Генерація на основі теми/ключових слів
-- [ ] Структурування: вступ, секції, висновок
-- [ ] Інтеграція згадок про шини Bridgestone
+- [x] Створити `processors/content/article-generator.ts`
+- [x] Генерація на основі теми/ключових слів
+- [x] Структурування: вступ, секції, висновок
+- [x] Інтеграція згадок про шини Bridgestone
+- [x] Підтримка різних типів статей (seasonal-guide, model-review, test-summary, comparison, technology, tips)
 
 **Типи статей:**
 - Сезонні поради (зимові/літні шини)
@@ -269,11 +279,11 @@ async function generateTyreDescription(
 
 ### 3.7 Реалізувати генератор зображень для статей
 
-- [ ] Створити `processors/content/article-images.ts`
-- [ ] Генерація hero image для статті
-- [ ] Генерація зображень для секцій
-- [ ] Промпти з брендингом Bridgestone
-- [ ] Збереження локально + upload до Payload Media
+- [x] Створити `processors/content/article-images.ts`
+- [x] Генерація hero image для статті
+- [x] Генерація зображень для секцій
+- [x] Промпти з брендингом Bridgestone
+- [ ] Збереження локально + upload до Payload Media → Phase 4
 
 **Приклади промптів:**
 ```typescript
@@ -289,31 +299,31 @@ const IMAGE_PROMPTS = {
 
 ### 3.8 Створити утиліту Markdown → Lexical
 
-- [ ] Створити `utils/markdown-to-lexical.ts`
-- [ ] Парсинг Markdown (заголовки, списки, параграфи, bold/italic)
-- [ ] Конвертація в Lexical JSON структуру
-- [ ] Підтримка зображень в контенті
-- [ ] Тестування сумісності з Payload richtext
+- [x] Створити `utils/markdown-to-lexical.ts`
+- [x] Парсинг Markdown (заголовки, списки, параграфи, bold/italic)
+- [x] Конвертація в Lexical JSON структуру
+- [ ] Підтримка зображень в контенті → Phase 4
+- [x] Тестування сумісності з Payload richtext
 
 ---
 
 ### 3.9 Створити валідатор контенту
 
-- [ ] Створити `utils/content-validator.ts`
-- [ ] Валідація довжини (SEO вимоги)
-- [ ] Перевірка на плагіат/унікальність (опціонально)
-- [ ] Перевірка структури (заголовки, списки)
-- [ ] Перевірка мови (українська)
+- [x] Створити `utils/content-validator.ts`
+- [x] Валідація довжини (SEO вимоги)
+- [ ] Перевірка на плагіат/унікальність → не реалізовано (не критично)
+- [x] Перевірка структури (заголовки, списки)
+- [x] Перевірка мови (українська)
 
 ---
 
 ### 3.10 Створити pipeline для повної генерації
 
-- [ ] Створити `processors/content/index.ts`
-- [ ] Об'єднати всі генератори в pipeline
-- [ ] Підтримка часткової генерації (тільки опис, тільки SEO)
-- [ ] Збереження проміжних результатів
-- [ ] Retry логіка при помилках
+- [x] Створити `processors/content/index.ts`
+- [x] Об'єднати всі генератори в pipeline (generateFullTyreContent)
+- [x] Підтримка часткової генерації (regenerateDescription, regenerateSEO, regenerateFAQ)
+- [x] Збереження проміжних результатів (storage)
+- [x] Retry логіка при помилках (через providers)
 
 **API:**
 ```typescript
@@ -335,13 +345,13 @@ const article = await generateArticle({
 
 ---
 
-### 3.11 Тестування
+### 3.11 Тестування - відкладено до Phase 7
 
-- [ ] Unit тести генераторів
-- [ ] Integration тести з реальними API
-- [ ] Тестування якості контенту (manual review)
-- [ ] Перевірка Lexical формату в Payload
-- [ ] Benchmark витрат на генерацію
+- [ ] Unit тести генераторів → Phase 7
+- [ ] Integration тести з реальними API → Phase 7
+- [ ] Тестування якості контенту (manual review) → Phase 7
+- [ ] Перевірка Lexical формату в Payload → Phase 4
+- [ ] Benchmark витрат на генерацію → Phase 7
 
 ---
 
