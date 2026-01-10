@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Home, Activity, Database } from "lucide-react";
+import { Home, Activity, Database, Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Bridgestone Ukraine",
@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 const navItems = [
   { href: "/admin/automation", label: "Automation", icon: Activity },
+  { href: "/admin/content-generation", label: "AI Content", icon: Sparkles },
   { href: "/admin/vehicles-import", label: "Vehicles DB", icon: Database },
 ];
 
