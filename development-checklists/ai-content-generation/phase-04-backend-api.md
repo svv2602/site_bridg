@@ -1,12 +1,12 @@
 # Фаза 4: Backend API
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-10
+**Завершена:** 2026-01-10
 
 ## Ціль фази
 Створити API endpoints для генерації контенту, превью та публікації в Payload CMS.
@@ -22,9 +22,9 @@
 ### 4.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити існуючі API routes в `backend-payload/src/app/api/`
-- [ ] Вивчити патерни автентифікації
-- [ ] Знайти приклади POST/GET endpoints
+- [x] Вивчити існуючі API routes в `backend-payload/src/app/api/`
+- [x] Вивчити патерни автентифікації
+- [x] Знайти приклади POST/GET endpoints
 
 **Команди для пошуку:**
 ```bash
@@ -37,9 +37,9 @@ grep -r "getPayload\|payload.auth" backend-payload/src/app/api/
 ```
 
 #### B. Аналіз залежностей
-- [ ] Чи потрібна автентифікація для endpoints?
-- [ ] Який формат запитів/відповідей?
-- [ ] Чи потрібен rate limiting?
+- [x] Чи потрібна автентифікація для endpoints? - Так, Payload JWT
+- [x] Який формат запитів/відповідей? - JSON
+- [x] Чи потрібен rate limiting? - Не реалізовано (використовується cost limits)
 
 **Автентифікація:** Bearer token (Payload JWT)
 **Формат:** JSON
@@ -59,9 +59,9 @@ grep -r "getPayload\|payload.auth" backend-payload/src/app/api/
 ---
 
 ### 4.1 Створити структуру папок
-- [ ] Створити папку `backend-payload/src/app/api/content-generation/`
-- [ ] Створити файли для кожного endpoint
-- [ ] Додати index.ts для експорту
+- [x] Створити папку `backend-payload/src/app/api/content-generation/`
+- [x] Створити файли для кожного endpoint
+- [x] Додати auth.ts для автентифікації
 
 **Файли:**
 ```
@@ -75,12 +75,12 @@ backend-payload/src/app/api/content-generation/
 ---
 
 ### 4.2 Реалізувати POST /generate endpoint
-- [ ] Приймати `{ modelSlug: string }` в body
-- [ ] Перевіряти автентифікацію (admin role)
-- [ ] Запускати скрапер для збору raw-даних
-- [ ] Запускати AI процесор
-- [ ] Зберігати результат
-- [ ] Повертати статус та ID генерації
+- [x] Приймати `{ modelSlug: string }` в body
+- [x] Перевіряти автентифікацію (admin role)
+- [x] Запускати скрапер для збору raw-даних
+- [x] Запускати AI процесор
+- [x] Зберігати результат
+- [x] Повертати статус та ID генерації
 
 **Файли:** `backend-payload/src/app/api/content-generation/generate/route.ts`
 **Request:**
@@ -101,10 +101,10 @@ backend-payload/src/app/api/content-generation/
 ---
 
 ### 4.3 Реалізувати GET /preview/:modelSlug endpoint
-- [ ] Отримувати modelSlug з URL
-- [ ] Завантажувати згенерований контент з файлу
-- [ ] Повертати JSON з контентом для превью
-- [ ] Включати порівняння з поточним контентом
+- [x] Отримувати modelSlug з URL
+- [x] Завантажувати згенерований контент з файлу
+- [x] Повертати JSON з контентом для превью
+- [x] Включати порівняння з поточним контентом
 
 **Файли:** `backend-payload/src/app/api/content-generation/preview/[modelSlug]/route.ts`
 **Response:**
@@ -130,12 +130,12 @@ backend-payload/src/app/api/content-generation/
 ---
 
 ### 4.4 Реалізувати POST /publish endpoint
-- [ ] Приймати `{ modelSlug: string, fields?: string[] }` в body
-- [ ] Перевіряти автентифікацію (admin role)
-- [ ] Завантажувати згенерований контент
-- [ ] Конвертувати fullDescription в Lexical
-- [ ] Оновлювати документ Tyre в Payload
-- [ ] Логувати публікацію
+- [x] Приймати `{ modelSlug: string, fields?: string[] }` в body
+- [x] Перевіряти автентифікацію (admin role)
+- [x] Завантажувати згенерований контент
+- [x] Конвертувати fullDescription в Lexical
+- [x] Оновлювати документ Tyre в Payload
+- [x] Логувати публікацію
 
 **Файли:** `backend-payload/src/app/api/content-generation/publish/route.ts`
 **Request:**
@@ -158,10 +158,10 @@ backend-payload/src/app/api/content-generation/
 ---
 
 ### 4.5 Реалізувати GET /status/:modelSlug endpoint
-- [ ] Перевіряти наявність raw-даних
-- [ ] Перевіряти наявність згенерованого контенту
-- [ ] Перевіряти чи опубліковано
-- [ ] Повертати повний статус
+- [x] Перевіряти наявність raw-даних
+- [x] Перевіряти наявність згенерованого контенту
+- [x] Перевіряти чи опубліковано
+- [x] Повертати повний статус
 
 **Файли:** `backend-payload/src/app/api/content-generation/status/[modelSlug]/route.ts`
 **Response:**
@@ -183,20 +183,20 @@ backend-payload/src/app/api/content-generation/
 ---
 
 ### 4.6 Додати middleware для автентифікації
-- [ ] Створити helper для перевірки Payload JWT
-- [ ] Перевіряти роль користувача (admin)
-- [ ] Повертати 401/403 при невалідному токені
+- [x] Створити helper для перевірки Payload JWT
+- [x] Перевіряти роль користувача (admin)
+- [x] Повертати 401/403 при невалідному токені
 
 **Файли:** `backend-payload/src/app/api/content-generation/auth.ts`
 **Нотатки:** -
 
 ---
 
-### 4.7 Тестування API
-- [ ] Протестувати всі endpoints з Postman/curl
-- [ ] Перевірити автентифікацію
-- [ ] Перевірити обробку помилок
-- [ ] Перевірити що дані коректно зберігаються/оновлюються
+### 4.7 Тестування API - відкладено до Phase 7
+- [ ] Протестувати всі endpoints з Postman/curl → Phase 7
+- [ ] Перевірити автентифікацію → Phase 7
+- [ ] Перевірити обробку помилок → Phase 7
+- [ ] Перевірити що дані коректно зберігаються/оновлюються → Phase 7
 
 **Команди:**
 ```bash
