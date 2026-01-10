@@ -12,21 +12,41 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: join(__dirname, "../../.env") });
 
 export const ENV = {
-  // LLM
+  // === LLM Providers ===
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || "",
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
+  DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY || "",
+  GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY || "",
+  GROQ_API_KEY: process.env.GROQ_API_KEY || "",
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
+  OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "", // e.g., http://localhost:11434
 
-  // Payload CMS (replaces Strapi)
+  // === Image Providers ===
+  STABILITY_API_KEY: process.env.STABILITY_API_KEY || "",
+  REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN || "",
+  LEONARDO_API_KEY: process.env.LEONARDO_API_KEY || "",
+
+  // === Embedding Providers ===
+  VOYAGE_API_KEY: process.env.VOYAGE_API_KEY || "",
+  COHERE_API_KEY: process.env.COHERE_API_KEY || "",
+
+  // === Cost Limits (USD) ===
+  COST_DAILY_LIMIT: process.env.COST_DAILY_LIMIT || "10",
+  COST_MONTHLY_LIMIT: process.env.COST_MONTHLY_LIMIT || "100",
+  COST_PER_REQUEST_LIMIT: process.env.COST_PER_REQUEST_LIMIT || "1",
+
+  // === Payload CMS ===
   PAYLOAD_URL: process.env.PAYLOAD_URL || "http://localhost:3001",
 
-  // Legacy Strapi (deprecated, keep for backward compatibility)
+  // === Legacy Strapi (deprecated) ===
   STRAPI_URL: process.env.STRAPI_URL || "http://localhost:1337",
   STRAPI_API_TOKEN: process.env.STRAPI_API_TOKEN || "",
 
-  // Telegram notifications
+  // === Telegram notifications ===
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
   TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID || "",
 
-  // Scraping
+  // === Scraping ===
   SCRAPE_DELAY_MS: parseInt(process.env.SCRAPE_DELAY_MS || "2000", 10),
 } as const;
 
