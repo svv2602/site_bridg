@@ -2,10 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, Clock, Tag, ArrowRight, Search, Filter } from "lucide-react";
 import { getArticles } from "@/lib/api/articles";
+import { Breadcrumb } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Корисна інформація та поради — Bridgestone Україна",
   description: "Технічні статті та практичні рекомендації щодо вибору та експлуатації шин Bridgestone для реальних умов в Україні.",
+  openGraph: {
+    title: "Корисна інформація та поради — Bridgestone Україна",
+    description: "Технічні статті та практичні рекомендації щодо вибору та експлуатації шин Bridgestone для реальних умов в Україні.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 
 const categories = [
@@ -24,11 +32,13 @@ export default async function AdvicePage() {
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl text-left text-zinc-50">
-            <nav className="mb-2 text-xs text-zinc-400">
-              <Link href="/" className="hover:text-zinc-100">Головна</Link>
-              <span className="mx-2">/</span>
-              <span className="font-medium text-zinc-100">Корисна інформація та поради</span>
-            </nav>
+            <Breadcrumb
+              className="mb-2"
+              items={[
+                { label: "Головна", href: "/" },
+                { label: "Корисна інформація та поради" },
+              ]}
+            />
             <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Корисна інформація та поради щодо шин Bridgestone
               <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">

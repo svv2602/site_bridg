@@ -23,6 +23,55 @@ export const metadata: Metadata = {
   title: "Bridgestone Україна — офіційний сайт шин",
   description:
     "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні. Пошук шин за розміром, за авто, карта дилерів, поради та технології.",
+  openGraph: {
+    title: "Bridgestone Україна — офіційний сайт шин",
+    description: "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+    url: "https://bridgestone.ua",
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Bridgestone Україна",
+  alternateName: "Bridgestone Ukraine",
+  url: "https://bridgestone.ua",
+  logo: "https://bridgestone.ua/bridgestone-logo-white.svg",
+  description: "Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+380-800-123-456",
+    contactType: "customer service",
+    availableLanguage: "Ukrainian",
+    areaServed: "UA",
+  },
+  sameAs: [
+    "https://www.bridgestone.com",
+    "https://www.facebook.com/BridgestoneUkraine",
+  ],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Bridgestone Україна",
+  url: "https://bridgestone.ua",
+  description: "Офіційний сайт шин Bridgestone в Україні",
+  publisher: {
+    "@type": "Organization",
+    name: "Bridgestone Україна",
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: "https://bridgestone.ua/tyre-search?q={search_term_string}",
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 const mainNav = [
@@ -53,6 +102,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <div className="flex min-h-screen flex-col">
           {/* Top bar */}
           <div className="border-b border-border bg-card text-xs">

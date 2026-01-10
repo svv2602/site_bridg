@@ -3,10 +3,18 @@ import Link from "next/link";
 import { Cpu, Shield, Zap, Droplets, Wind, Gauge, ChevronRight } from "lucide-react";
 import { getTechnologies } from "@/lib/api/technologies";
 import { getTyreModels } from "@/lib/api/tyres";
+import { Breadcrumb } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Технології Bridgestone — інновації для безпеки та комфорту",
   description: "Дізнайтеся про технології Bridgestone: Run-Flat, Nano Pro-Tech, зниження шуму та інші інновації для безпеки, комфорту та ефективності.",
+  openGraph: {
+    title: "Технології Bridgestone — інновації для безпеки та комфорту",
+    description: "Дізнайтеся про технології Bridgestone: Run-Flat, Nano Pro-Tech та інші інновації.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 
 const techIcons: Record<string, React.ReactNode> = {
@@ -46,18 +54,45 @@ export default async function TechnologyPage() {
     getTyreModels(),
   ]);
 
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Технології Bridgestone",
+    description: "Інноваційні технології шин Bridgestone для безпеки, комфорту та ефективності",
+    numberOfItems: technologies.length,
+    itemListElement: technologies.map((tech, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "TechArticle",
+        name: tech.name,
+        description: tech.description,
+        about: {
+          "@type": "Thing",
+          name: "Автомобільні шини",
+        },
+      },
+    })),
+  };
+
   return (
     <div className="bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="text-zinc-50">
-              <nav className="mb-2 text-xs text-zinc-400">
-                <Link href="/" className="hover:text-zinc-100">Головна</Link>
-                <span className="mx-2">/</span>
-                <span className="font-medium text-zinc-100">Технології та інновації</span>
-              </nav>
+              <Breadcrumb
+                className="mb-2"
+                items={[
+                  { label: "Головна", href: "/" },
+                  { label: "Технології та інновації" },
+                ]}
+              />
               <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Технології Bridgestone
                 <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
