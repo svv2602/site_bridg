@@ -1,5 +1,5 @@
 import { execute, ensureDatabase, getVehiclesPool } from './vehicles-db';
-import { parseCsvStream, mapSizeType, mapAxle, toSqlValue, CSV_FILES } from './csv-parser';
+import { parseCsvStream, mapSizeType, mapAxle, toSqlValue, isValidName, CSV_FILES } from './csv-parser';
 import type {
   ImportProgress,
   ImportStats,
@@ -120,18 +120,28 @@ async function createIndexes(): Promise<void> {
 /**
  * Імпорт марок автомобілів
  */
-async function importBrands(): Promise<void> {
+async function importBrands(): Promise<Set<number>> {
   importProgress.stage = 'brands';
   importProgress.currentTable = 'car_brands';
   importProgress.processedRows = 0;
 
   const BATCH_SIZE = 500;
   let batch: string[] = [];
+  const validBrandIds = new Set<number>();
+  let skipped = 0;
 
   for await (const row of parseCsvStream<CsvBrand>(CSV_FILES.brands)) {
+    importProgress.processedRows++;
+
+    // Skip brands with invalid names (empty or control characters)
+    if (!isValidName(row.name)) {
+      skipped++;
+      continue;
+    }
+
+    validBrandIds.add(parseInt(row.id));
     const name = toSqlValue(row.name, 'string');
     batch.push(`(${row.id}, ${name})`);
-    importProgress.processedRows++;
     importProgress.stats.brands++;
 
     if (batch.length >= BATCH_SIZE) {
@@ -146,13 +156,14 @@ async function importBrands(): Promise<void> {
     await execute(`INSERT INTO car_brands (id, name) VALUES ${batch.join(',')}`);
   }
 
-  console.log(`Imported ${importProgress.stats.brands} brands`);
+  console.log(`Imported ${importProgress.stats.brands} brands (skipped ${skipped} invalid)`);
+  return validBrandIds;
 }
 
 /**
  * Імпорт моделей автомобілів
  */
-async function importModels(): Promise<Set<number>> {
+async function importModels(validBrandIds: Set<number>): Promise<Set<number>> {
   importProgress.stage = 'models';
   importProgress.currentTable = 'car_models';
   importProgress.processedRows = 0;
@@ -160,12 +171,15 @@ async function importModels(): Promise<Set<number>> {
   const BATCH_SIZE = 1000;
   let batch: string[] = [];
   const validModelIds = new Set<number>();
+  let skipped = 0;
 
   for await (const row of parseCsvStream<CsvModel>(CSV_FILES.models)) {
     importProgress.processedRows++;
+    const brandId = parseInt(row.brand);
 
-    // Skip rows with empty name
-    if (!row.name || row.name.trim() === '') {
+    // Skip models with invalid names or belonging to invalid brands
+    if (!isValidName(row.name) || !validBrandIds.has(brandId)) {
+      skipped++;
       continue;
     }
 
@@ -188,7 +202,7 @@ async function importModels(): Promise<Set<number>> {
     );
   }
 
-  console.log(`Imported ${importProgress.stats.models} models`);
+  console.log(`Imported ${importProgress.stats.models} models (skipped ${skipped} invalid)`);
   return validModelIds;
 }
 
@@ -347,11 +361,11 @@ export async function runImport(
     // Переконуємось що БД існує
     await ensureDatabase();
 
-    // 1. Імпорт марок
-    await importBrands();
+    // 1. Імпорт марок (з фільтрацією невалідних назв)
+    const validBrandIds = await importBrands();
 
-    // 2. Імпорт моделей
-    const validModelIds = await importModels();
+    // 2. Імпорт моделей (з фільтрацією по бренду та невалідних назв)
+    const validModelIds = await importModels(validBrandIds);
 
     // 3. Імпорт комплектацій (з фільтрацією по році та валідних моделях)
     const validKitIds = await importKits(minYear, validModelIds);

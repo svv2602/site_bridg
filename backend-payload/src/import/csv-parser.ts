@@ -76,6 +76,23 @@ export function mapAxle(axle: string): AxleType {
 }
 
 /**
+ * Перевірка чи рядок містить лише валідні символи (без control chars)
+ * Повертає true якщо рядок валідний для використання в БД
+ */
+export function isValidName(str: string | null | undefined): boolean {
+  if (!str || str.trim() === '') return false;
+  // Check for control characters (0x00-0x1F) except common whitespace
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    // Allow printable ASCII (0x20-0x7E), tab (0x09), and extended Latin/Unicode (>= 0x80)
+    if (code < 0x20 && code !== 0x09) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Екранування рядка для SQL
  */
 export function escapeSql(str: string | null | undefined): string {
