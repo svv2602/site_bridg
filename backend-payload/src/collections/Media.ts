@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { removeBackgroundHook } from '../hooks/removeBackground';
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -40,7 +41,29 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'removeBackground',
+      type: 'checkbox',
+      label: 'Видалити фон',
+      defaultValue: false,
+      admin: {
+        description: 'Автоматично видалити білий фон (для фото шин)',
+      },
+    },
+    {
+      name: 'backgroundRemoved',
+      type: 'checkbox',
+      label: 'Фон видалено',
+      defaultValue: false,
+      admin: {
+        readOnly: true,
+        description: 'Встановлюється автоматично після обробки',
+      },
+    },
   ],
+  hooks: {
+    afterChange: [removeBackgroundHook],
+  },
   access: {
     read: () => true,
   },

@@ -1,19 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone', // Required for Docker deployment
   images: {
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '1337',
-        pathname: '/uploads/**',
+        port: '3001',
+        pathname: '/api/media/**',
       },
       {
         protocol: 'http',
-        hostname: '127.0.0.1',
-        port: '1337',
-        pathname: '/uploads/**',
+        hostname: 'backend',
+        port: '3001',
+        pathname: '/api/media/**',
       },
       {
         protocol: 'https',

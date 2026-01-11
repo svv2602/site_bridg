@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bridgestone
+      POSTGRES_PASSWORD: bridgestone
+      POSTGRES_DB: bridgestone
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bridgestone"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend-payload
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URI: postgresql://bridgestone:bridgestone@postgres:5432/bridgestone
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:-change-me-in-production-min-32-chars}
+      PAYLOAD_PUBLIC_SERVER_URL: ${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3001}
+      NODE_ENV: production
+    volumes:
+      - media_data:/app/media
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_PAYLOAD_URL: http://backend:3001
+    ports:
+      - "3010:3010"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  media_data:
