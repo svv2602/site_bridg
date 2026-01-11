@@ -25,7 +25,7 @@ const fullNav = [
   { href: "/contacts", label: "Контакти" },
 ];
 
-export default function MainHeader() {
+export function MainHeader() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +66,7 @@ export default function MainHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-stone-300 transition-colors hover:bg-stone-800 hover:text-stone-100"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-stone-300 transition-colors hover:bg-stone-800 hover:text-stone-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-stone-900"
             >
               {item.label}
             </Link>
@@ -78,7 +78,7 @@ export default function MainHeader() {
           {/* Пошук шин CTA */}
           <Link
             href="/tyre-search"
-            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg sm:flex"
+            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-stone-900"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Пошук шин</span>

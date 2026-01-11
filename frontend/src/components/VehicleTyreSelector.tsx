@@ -433,7 +433,7 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
   );
 }
 
-export default function VehicleTyreSelector() {
+export function VehicleTyreSelector() {
   // Стан вибору
   const [brandId, setBrandId] = useState("");
   const [modelId, setModelId] = useState("");

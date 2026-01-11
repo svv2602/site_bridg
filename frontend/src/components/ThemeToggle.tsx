@@ -5,7 +5,7 @@ import { Sun, Moon } from "lucide-react";
 
 type Theme = "light" | "dark";
 
-export default function ThemeToggle() {
+export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
@@ -38,7 +38,7 @@ export default function ThemeToggle() {
     return (
       <button
         type="button"
-        className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-card/80"
+        className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-card/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         aria-label="Завантаження..."
       >
         <span className="h-4 w-4" />
@@ -51,7 +51,7 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-card/80"
+      className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-card/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       aria-label={isDark ? "Увімкнути світлу тему" : "Увімкнути темну тему"}
     >
       {isDark ? (

@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { Search, MapPin, Phone, ChevronRight } from "lucide-react";
-import AnimatedMain from "@/components/AnimatedMain";
-import ThemeToggle from "@/components/ThemeToggle";
-import MainHeader from "@/components/MainHeader";
-import CookiesBanner from "@/components/CookiesBanner";
-import Analytics from "@/components/Analytics";
+import { MapPin, Phone, ChevronRight } from "lucide-react";
+import { AnimatedMain } from "@/components/AnimatedMain";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { MainHeader } from "@/components/MainHeader";
+import { CookiesBanner } from "@/components/CookiesBanner";
+import { Analytics } from "@/components/Analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

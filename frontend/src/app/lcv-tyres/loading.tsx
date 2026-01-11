@@ -1,5 +1,3 @@
-import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
-
 export default function Loading() {
   return (
     <div className="bg-background text-foreground">

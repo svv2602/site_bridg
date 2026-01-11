@@ -6,7 +6,7 @@ import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
 import { LexicalRenderer } from "@/components/LexicalRenderer";
-import ShareButtons from "@/components/ShareButtons";
+import { ShareButtons } from "@/components/ShareButtons";
 import { getSiteUrl } from "@/lib/utils/tyres";
 
 interface ArticlePageProps {

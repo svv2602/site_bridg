@@ -45,7 +45,7 @@ export function useCookiesConsent() {
   };
 }
 
-export default function CookiesBanner() {
+export function CookiesBanner() {
   const { consent, isLoaded, accept, reject, hasDecided } = useCookiesConsent();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -85,7 +85,7 @@ export default function CookiesBanner() {
               </div>
               <button
                 onClick={reject}
-                className="rounded-full p-1 hover:bg-card"
+                className="rounded-full p-1 hover:bg-card focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label="Закрити"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
@@ -101,13 +101,13 @@ export default function CookiesBanner() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={accept}
-                className="flex-1 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                className="flex-1 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Прийняти всі
               </button>
               <button
                 onClick={reject}
-                className="flex-1 rounded-full border border-border bg-transparent px-6 py-2.5 text-sm font-semibold hover:bg-card"
+                className="flex-1 rounded-full border border-border bg-transparent px-6 py-2.5 text-sm font-semibold hover:bg-card focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Тільки необхідні
               </button>

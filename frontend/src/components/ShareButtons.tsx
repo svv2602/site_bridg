@@ -21,7 +21,7 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function ShareButtons({ title, url, className = "" }: ShareButtonsProps) {
+export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);

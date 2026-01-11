@@ -5,7 +5,7 @@ import Script from "next/script";
 
 const STORAGE_KEY = "bridgestone_cookies_consent";
 
-export default function Analytics() {
+export function Analytics() {
   const [consent, setConsent] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 

@@ -7,7 +7,7 @@ import { type Dealer } from "@/lib/data";
 import { getDealers } from "@/lib/api/dealers";
 import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
-import DealersMap from "@/components/DealersMap";
+import { DealersMap } from "@/components/DealersMap";
 import { Breadcrumb, ErrorState } from "@/components/ui";
 
 type FilteredDealer = Dealer & {

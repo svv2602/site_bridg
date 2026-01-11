@@ -9,6 +9,7 @@ import {
 import {
   getPayloadTyres,
   getPayloadTyreBySlug,
+  getPayloadVehicleFitmentByCarParams,
   transformPayloadTyre,
 } from "./payload";
 

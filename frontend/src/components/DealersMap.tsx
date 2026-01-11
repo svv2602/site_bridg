@@ -100,7 +100,7 @@ function DealerInfoContent({ dealer }: { dealer: Dealer }) {
   );
 }
 
-export default function DealersMap({
+export function DealersMap({
   dealers,
   selectedDealerId,
   onDealerSelect,

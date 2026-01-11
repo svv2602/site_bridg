@@ -19,7 +19,7 @@ import {
   Database,
   Loader2,
 } from "lucide-react";
-import VehicleTyreSelector from "@/components/VehicleTyreSelector";
+import { VehicleTyreSelector } from "@/components/VehicleTyreSelector";
 import { TyreCard } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 
