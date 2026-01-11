@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Star, Car, Shield, MapPin, Zap, Sun, Snowflake } from 'lucide-react';
 import { getSeasonalContent } from '@/lib/api/payload';
+import { t } from '@/lib/i18n';
 
 interface SeasonalData {
   heroTitle: string;
@@ -64,12 +65,12 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
               {seasonalData.featuredSeason ? (
                 <>
                   <SeasonIcon className="h-4 w-4 text-zinc-100" />
-                  {seasonalData.featuredSeason === 'summer' ? 'Сезон літніх шин' : 'Сезон зимових шин'}
+                  {seasonalData.featuredSeason === 'summer' ? t('hero.summerSeason') : t('hero.winterSeason')}
                 </>
               ) : (
                 <>
                   <Star className="h-4 w-4 text-zinc-100" />
-                  Офіційний сайт шин Bridgestone в Україні
+                  {t('hero.officialSite')}
                 </>
               )}
             </div>
@@ -104,25 +105,25 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
                 <div className="mt-1 rounded-full bg-zinc-800 p-1">
                   <Car className="h-3 w-3 text-zinc-200" />
                 </div>
-                <span>Пошук шин за розміром та маркою авто</span>
+                <span>{t('hero.searchBySize')}</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-1 rounded-full bg-zinc-800 p-1">
                   <Shield className="h-3 w-3 text-zinc-200" />
                 </div>
-                <span>Каталог літніх, зимових та всесезонних шин</span>
+                <span>{t('hero.catalogDescription')}</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-1 rounded-full bg-zinc-800 p-1">
                   <MapPin className="h-3 w-3 text-zinc-200" />
                 </div>
-                <span>Карта офіційних дилерів та партнерів</span>
+                <span>{t('hero.dealersMap')}</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-1 rounded-full bg-zinc-800 p-1">
                   <Zap className="h-3 w-3 text-zinc-200" />
                 </div>
-                <span>Поради щодо вибору та експлуатації шин</span>
+                <span>{t('hero.tyreAdvice')}</span>
               </li>
             </ul>
 
@@ -157,17 +158,17 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
               <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
                 <h3 className="text-xl font-semibold text-zinc-50">
                   {seasonalData.featuredSeason === 'summer'
-                    ? 'Готові до літнього сезону'
+                    ? t('hero.readyForSummer')
                     : seasonalData.featuredSeason === 'winter'
-                    ? 'Готові до зимового сезону'
-                    : 'Готові до будь-якої погоди'}
+                    ? t('hero.readyForWinter')
+                    : t('hero.readyForAny')}
                 </h3>
                 <p className="text-sm text-zinc-100">
                   {seasonalData.featuredSeason === 'summer'
-                    ? 'Літні шини для комфортних поїздок містом та трасою.'
+                    ? t('hero.summerDescription')
                     : seasonalData.featuredSeason === 'winter'
-                    ? 'Зимові шини для надійного зчеплення на снігу та льоду.'
-                    : 'Місто, траса чи зима — оберіть шини під свої маршрути.'}
+                    ? t('hero.winterDescription')
+                    : t('hero.anyWeatherDescription')}
                 </p>
               </div>
             </div>

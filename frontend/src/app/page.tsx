@@ -5,6 +5,7 @@ import { QuickSearchForm } from "@/components/QuickSearchForm";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { getTyreModels } from "@/lib/api/tyres";
 import { getLatestArticles } from "@/lib/api/articles";
+import { t } from "@/lib/i18n";
 
 const tyreCategories = [
   {
@@ -102,9 +103,9 @@ export default async function Home() {
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Чому обирають Bridgestone</h2>
+            <h2 className="mb-4 text-3xl font-bold">{t('home.whyBridgestone')}</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Поєднання інновацій, безпеки та довіри мільйонів водіїв по всьому світу.
+              {t('home.whyBridgestoneDescription')}
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -130,9 +131,9 @@ export default async function Home() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
-              <h2 className="mb-6 text-3xl font-bold">Шини за сезоном</h2>
+              <h2 className="mb-6 text-3xl font-bold">{t('home.tyresBySeason')}</h2>
               <p className="mb-8 text-lg text-muted-foreground">
-                Оберіть тип шин, який відповідає умовам експлуатації вашого авто.
+                {t('home.tyresBySeasonDescription')}
               </p>
               <div className="space-y-4">
                 {tyreCategories.map((cat, idx) => (
@@ -160,9 +161,9 @@ export default async function Home() {
               </div>
             </div>
             <div>
-              <h2 className="mb-6 text-3xl font-bold">Популярні моделі шин</h2>
+              <h2 className="mb-6 text-3xl font-bold">{t('home.popularModels')}</h2>
               <p className="mb-8 text-lg text-muted-foreground">
-                Обрані моделі Bridgestone для найпоширеніших сценаріїв водіння.
+                {t('home.popularModelsDescription')}
               </p>
               <div className="space-y-6">
                 {featuredTyres.length > 0 ? (
@@ -198,7 +199,7 @@ export default async function Home() {
                     </AnimatedCardX>
                   ))
                 ) : (
-                  <p className="text-muted-foreground">Завантаження популярних моделей...</p>
+                  <p className="text-muted-foreground">{t('home.loadingPopularModels')}</p>
                 )}
               </div>
             </div>
@@ -210,9 +211,9 @@ export default async function Home() {
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Корисна інформація та поради</h2>
+            <h2 className="mb-4 text-3xl font-bold">{t('home.adviceTitle')}</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Розбираємося, як правильно обирати, використовувати та обслуговувати шини Bridgestone.
+              {t('home.adviceDescription')}
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
