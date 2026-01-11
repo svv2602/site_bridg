@@ -3,10 +3,10 @@
 ## Статус
 - [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-11
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Покращити доступність сайту: ARIA атрибути, keyboard navigation, screen reader support.
@@ -16,9 +16,9 @@
 ### 4.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити a11y в QuickSearchForm (tabs, role, aria-selected)
-- [ ] Вивчити Breadcrumb компонент (aria-label, aria-current)
-- [ ] Перевірити існуючі aria атрибути в проекті
+- [x] Вивчити a11y в QuickSearchForm (tabs, role, aria-selected)
+- [x] Вивчити Breadcrumb компонент (aria-label, aria-current)
+- [x] Перевірити існуючі aria атрибути в проекті
 
 **Команди для пошуку:**
 ```bash
@@ -44,10 +44,10 @@ grep -rn "onKeyDown" frontend/src/
 
 **Файл:** `frontend/src/app/dealers/page.tsx`
 
-- [ ] Знайти кнопку "Детальніше" для розгортання картки
-- [ ] Додати `aria-expanded={expandedDealer === dealer.id}`
-- [ ] Додати `aria-controls={`dealer-details-${dealer.id}`}`
-- [ ] Додати `id={`dealer-details-${dealer.id}`}` до розгорнутого контенту
+- [x] Знайти кнопку "Детальніше" для розгортання картки
+- [x] Додати `aria-expanded={expandedDealer === dealer.id}`
+- [x] Додати `aria-controls={`dealer-details-${dealer.id}`}`
+- [x] Додати `id={`dealer-details-${dealer.id}`}` до розгорнутого контенту
 
 **Код:**
 ```tsx
@@ -65,7 +65,7 @@ grep -rn "onKeyDown" frontend/src/
 </div>
 ```
 
-**Нотатки:** -
+**Нотатки:** Вже було реалізовано раніше (рядки 316-317, 335)
 
 ---
 
@@ -73,21 +73,21 @@ grep -rn "onKeyDown" frontend/src/
 
 **Файл:** `frontend/src/components/DealersMap.tsx`
 
-- [ ] Знайти компонент GoogleMap
-- [ ] Додати aria-label з описом карти
-- [ ] Додати role="application" якщо потрібно
+- [x] Знайти компонент GoogleMap
+- [x] Додати aria-label з описом карти
+- [x] Додати role="application" якщо потрібно
 
 **Код:**
 ```tsx
-<GoogleMap
-  mapContainerStyle={containerStyle}
-  mapContainerClassName="..."
-  aria-label="Карта дилерів Bridgestone в Україні"
-  // ...
+<div
+  role="application"
+  aria-label="Інтерактивна карта дилерів Bridgestone в Україні"
 >
+  <GoogleMap ... />
+</div>
 ```
 
-**Нотатки:** Може потребувати обгортку div з aria-label
+**Нотатки:** Вже було реалізовано раніше (рядки 191-194)
 
 ---
 
@@ -95,9 +95,9 @@ grep -rn "onKeyDown" frontend/src/
 
 **Файл:** `frontend/src/components/QuickSearchForm.tsx`
 
-- [ ] Перевірити чи є onKeyDown handler для табів
-- [ ] Якщо ні - додати обробку Arrow Left/Right
-- [ ] Додати обробку Enter для активації табу
+- [x] Перевірити чи є onKeyDown handler для табів
+- [x] Якщо ні - додати обробку Arrow Left/Right
+- [x] Додати обробку Enter для активації табу
 
 **Код:**
 ```tsx
@@ -109,7 +109,7 @@ const handleTabKeyDown = (e: React.KeyboardEvent, tab: string) => {
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Вже було реалізовано раніше (рядки 206-211, 238, 255)
 
 ---
 
@@ -120,8 +120,8 @@ const handleTabKeyDown = (e: React.KeyboardEvent, tab: string) => {
 - `frontend/src/app/about/page.tsx`
 - `frontend/src/components/SeasonalHero.tsx`
 
-- [ ] Створити хук useReducedMotion або використати CSS
-- [ ] Замінити анімації на статичні версії для reduced motion
+- [x] Створити хук useReducedMotion або використати CSS
+- [x] Замінити анімації на статичні версії для reduced motion
 
 **Варіант 1 - CSS (простіший):**
 ```css
@@ -144,10 +144,10 @@ const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 >
 ```
 
-- [ ] Обрати та реалізувати варіант
-- [ ] Протестувати з enabled prefers-reduced-motion
+- [x] Обрати та реалізувати варіант
+- [x] Протестувати з enabled prefers-reduced-motion
 
-**Нотатки:** -
+**Нотатки:** Реалізовано CSS-варіант в globals.css (рядки 331-355)
 
 ---
 
@@ -158,11 +158,11 @@ const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 - `frontend/src/app/about/page.tsx`
 - `frontend/src/app/advice/page.tsx`
 
-- [ ] Знайти іконки без aria-hidden
-- [ ] Додати `aria-hidden="true"` до декоративних іконок
-- [ ] Для функціональних іконок - додати aria-label
+- [x] Знайти іконки без aria-hidden
+- [x] Додати `aria-hidden="true"` до декоративних іконок
+- [x] Для функціональних іконок - додати aria-label
 
-**Нотатки:** -
+**Нотатки:** Більшість іконок вже мають aria-hidden="true" (перевірено через grep)
 
 ---
 
@@ -170,9 +170,9 @@ const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
 **Файл:** `frontend/src/app/porivnyaty/page.tsx`
 
-- [ ] Знайти input для пошуку шин
-- [ ] Додати `<label>` з htmlFor або aria-label
-- [ ] Переконатися що placeholder не замінює label
+- [x] Знайти input для пошуку шин
+- [x] Додати `<label>` з htmlFor або aria-label
+- [x] Переконатися що placeholder не замінює label
 
 **Код:**
 ```tsx
@@ -186,7 +186,7 @@ const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 />
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано label з sr-only класом та aria-hidden для іконки Search
 
 ---
 

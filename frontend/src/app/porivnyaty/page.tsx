@@ -135,9 +135,13 @@ export default function ComparisonSelectionPage() {
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <label htmlFor="search-tyres" className="sr-only">
+                Пошук шин за назвою
+              </label>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <input
                 type="text"
+                id="search-tyres"
                 placeholder="Пошук за назвою..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
