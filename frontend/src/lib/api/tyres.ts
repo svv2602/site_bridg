@@ -86,11 +86,29 @@ export async function searchTyresBySize(params: SizeSearchParams): Promise<TyreM
 
 /**
  * Знаходить фітмент авто (рекомендовані розміри) за маркою, моделлю та роком випуску.
+ * Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
  */
 export async function getVehicleFitment(
   params: CarSearchParams,
 ): Promise<VehicleFitment | null> {
   const { make, model, year } = params;
+
+  try {
+    const payloadFitment = await getPayloadVehicleFitmentByCarParams(make, model, year);
+    if (payloadFitment) {
+      return {
+        make: payloadFitment.make,
+        model: payloadFitment.model,
+        yearFrom: payloadFitment.yearFrom ?? payloadFitment.year ?? year,
+        yearTo: payloadFitment.yearTo,
+        recommendedSizes: payloadFitment.recommendedSizes ?? [],
+      };
+    }
+  } catch (error) {
+    console.warn("Payload CMS unavailable for vehicle fitments, using mock data:", error);
+  }
+
+  // Fallback to mock data
   const fitment = MOCK_VEHICLE_FITMENTS.find(
     (v) =>
       v.make === make &&
