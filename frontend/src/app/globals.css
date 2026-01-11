@@ -64,6 +64,23 @@
   --shadow-2xl: 0 24px 64px rgba(var(--shadow-color), 0.18);
   --shadow-glow: 0 0 40px rgba(227, 6, 19, 0.3);
   --shadow-glow-lg: 0 0 60px rgba(227, 6, 19, 0.4);
+
+  /* REDESIGN: Typography scale */
+  --text-xs: 0.875rem;    /* 14px - minimum readable */
+  --text-sm: 1rem;        /* 16px */
+  --text-base: 1.125rem;  /* 18px */
+  --text-lg: 1.25rem;     /* 20px */
+  --text-xl: 1.5rem;      /* 24px */
+  --text-2xl: 1.875rem;   /* 30px */
+  --text-3xl: 2.25rem;    /* 36px */
+  --text-4xl: 3rem;       /* 48px */
+  --text-5xl: 3.75rem;    /* 60px */
+
+  /* REDESIGN: Line heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
 }
 
 /* REDESIGN: Dark theme with warm stone colors */
@@ -322,6 +339,109 @@ body :not(header) .bg-primary\/20 {
 
 body :not(header) .bg-primary\/30 {
   background-color: rgba(28, 25, 23, 0.24);
+}
+
+/* ======================================
+   REDESIGN 2026: Design System Utilities
+   ====================================== */
+
+/* Container with larger max-width */
+.container-redesign {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container-redesign {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-redesign {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+/* Section spacing with responsive rhythm */
+.section-spacing {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Transition utilities */
+.transition-fast {
+  transition: all 0.15s ease-out;
+}
+
+.transition-normal {
+  transition: all 0.3s ease-out;
+}
+
+.transition-slow {
+  transition: all 0.5s ease-out;
+}
+
+.transition-spring {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Glass morphism effects */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(28, 25, 23, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(250, 250, 249, 0.08);
+}
+
+/* Hero glow effect */
+.hero-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(227, 6, 19, 0.15) 0%, transparent 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grid pattern overlay for hero */
+.hero-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 
 /* Gradient text */
