@@ -125,7 +125,7 @@ export default async function AdvicePage() {
                   </div>
                   <div className="flex flex-1 flex-col p-6">
                     <div className="mb-3 flex items-center gap-2 text-xs text-muted">
-                      <Clock className="h-3 w-3" />
+                      <Clock className="h-3 w-3" aria-hidden="true" />
                       <span>{article.readingTimeMinutes} хвилин читання</span>
                     </div>
                     <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">

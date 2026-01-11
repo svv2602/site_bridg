@@ -64,7 +64,7 @@ export function ModelSelector({
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className="flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-left transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+        className="flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-left transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-800 dark:hover:bg-stone-700"
       >
         <div>
           {selectedTyre ? (
@@ -86,7 +86,7 @@ export function ModelSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-white shadow-lg dark:bg-zinc-800">
+        <div className="absolute z-10 mt-2 max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-white shadow-lg dark:bg-stone-800">
           {filteredTyres.length === 0 ? (
             <div className="px-4 py-3 text-center text-muted-foreground">
               Немає моделей
@@ -105,15 +105,15 @@ export function ModelSelector({
                         onSelect(tyre.slug);
                         setIsOpen(false);
                       }}
-                      className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700 ${
-                        isSelected ? "bg-zinc-100 dark:bg-zinc-700" : ""
+                      className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-stone-50 dark:hover:bg-stone-700 ${
+                        isSelected ? "bg-stone-100 dark:bg-stone-700" : ""
                       }`}
                     >
                       {/* Status indicator */}
                       {hasContent ? (
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                       ) : (
-                        <Circle className="h-4 w-4 text-zinc-300" />
+                        <Circle className="h-4 w-4 text-stone-300" />
                       )}
 
                       {/* Tyre info */}

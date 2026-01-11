@@ -85,7 +85,7 @@ export function FAQEditor({
           onDragStart={() => handleDragStart(index)}
           onDragOver={(e) => handleDragOver(e, index)}
           onDragEnd={handleDragEnd}
-          className={`rounded-lg border border-border bg-white p-4 dark:bg-zinc-800 ${
+          className={`rounded-lg border border-border bg-white p-4 dark:bg-stone-800 ${
             draggedIndex === index ? "opacity-50" : ""
           } ${!readOnly ? "cursor-move" : ""}`}
         >
@@ -114,7 +114,7 @@ export function FAQEditor({
                       handleChange(index, "question", e.target.value)
                     }
                     placeholder="Введіть питання..."
-                    className="w-full rounded-lg border border-border bg-zinc-50 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-zinc-900"
+                    className="w-full rounded-lg border border-border bg-stone-50 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-stone-900"
                   />
                 )}
               </div>
@@ -134,7 +134,7 @@ export function FAQEditor({
                     }
                     placeholder="Введіть відповідь..."
                     rows={3}
-                    className="w-full resize-none rounded-lg border border-border bg-zinc-50 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-zinc-900"
+                    className="w-full resize-none rounded-lg border border-border bg-stone-50 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-stone-900"
                   />
                 )}
               </div>

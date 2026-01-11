@@ -63,14 +63,14 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
 export function HeroSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="h-4 w-32 rounded bg-zinc-700 mb-4" />
-      <div className="h-10 w-3/4 rounded bg-zinc-700 mb-2" />
-      <div className="h-6 w-1/2 rounded bg-zinc-700 mb-6" />
-      <div className="h-4 w-full rounded bg-zinc-700 mb-2" />
-      <div className="h-4 w-4/5 rounded bg-zinc-700 mb-6" />
+      <div className="h-4 w-32 rounded bg-stone-700 mb-4" />
+      <div className="h-10 w-3/4 rounded bg-stone-700 mb-2" />
+      <div className="h-6 w-1/2 rounded bg-stone-700 mb-6" />
+      <div className="h-4 w-full rounded bg-stone-700 mb-2" />
+      <div className="h-4 w-4/5 rounded bg-stone-700 mb-6" />
       <div className="flex gap-4">
-        <div className="h-12 w-40 rounded-full bg-zinc-700" />
-        <div className="h-12 w-40 rounded-full bg-zinc-700" />
+        <div className="h-12 w-40 rounded-full bg-stone-700" />
+        <div className="h-12 w-40 rounded-full bg-stone-700" />
       </div>
     </div>
   );

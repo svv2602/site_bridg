@@ -30,7 +30,7 @@ const testTypeLabels: Record<string, string> = {
 function getRatingColor(ratingNumeric: number): string {
   if (ratingNumeric <= 2.0) return 'bg-green-500 text-white';
   if (ratingNumeric <= 2.5) return 'bg-lime-500 text-white';
-  return 'bg-zinc-400 text-white';
+  return 'bg-stone-400 text-white';
 }
 
 function getRatingLabel(ratingNumeric: number): string {
@@ -41,7 +41,7 @@ function getRatingLabel(ratingNumeric: number): string {
 
 function getPositionIcon(position: number) {
   if (position === 1) return <Trophy className="h-4 w-4 text-yellow-500" />;
-  if (position === 2) return <Award className="h-4 w-4 text-zinc-400" />;
+  if (position === 2) return <Award className="h-4 w-4 text-stone-400" />;
   if (position === 3) return <Medal className="h-4 w-4 text-amber-600" />;
   return null;
 }

@@ -151,15 +151,15 @@ export default function DealersMap({
   // Show placeholder if no API key
   if (!apiKey) {
     return (
-      <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-xl bg-zinc-100 p-4 text-center dark:bg-zinc-800">
-        <Navigation className="mb-4 h-12 w-12 text-zinc-400" />
-        <p className="font-medium text-zinc-600 dark:text-zinc-300">
+      <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-xl bg-stone-100 p-4 text-center dark:bg-stone-800">
+        <Navigation className="mb-4 h-12 w-12 text-stone-400" />
+        <p className="font-medium text-stone-600 dark:text-stone-300">
           Карта дилерів Bridgestone
         </p>
-        <p className="mt-2 text-sm text-zinc-500">
+        <p className="mt-2 text-sm text-stone-500">
           Для відображення карти необхідний Google Maps API ключ.
         </p>
-        <p className="mt-1 text-xs text-zinc-400">
+        <p className="mt-1 text-xs text-stone-400">
           Додайте NEXT_PUBLIC_GOOGLE_MAPS_API_KEY в .env.local
         </p>
       </div>
@@ -178,9 +178,9 @@ export default function DealersMap({
 
   if (!isLoaded) {
     return (
-      <div className="flex h-full min-h-[300px] items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
-        <div className="flex items-center gap-2 text-zinc-500">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
+      <div className="flex h-full min-h-[300px] items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
+        <div className="flex items-center gap-2 text-stone-500">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-stone-600" />
           <span>Завантаження карти...</span>
         </div>
       </div>

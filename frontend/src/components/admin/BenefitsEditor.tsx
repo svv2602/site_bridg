@@ -83,7 +83,7 @@ export function BenefitsEditor({
           onDragStart={() => handleDragStart(index)}
           onDragOver={(e) => handleDragOver(e, index)}
           onDragEnd={handleDragEnd}
-          className={`flex items-center gap-2 rounded-lg border border-border bg-white p-3 dark:bg-zinc-800 ${
+          className={`flex items-center gap-2 rounded-lg border border-border bg-white p-3 dark:bg-stone-800 ${
             draggedIndex === index ? "opacity-50" : ""
           } ${!readOnly ? "cursor-move" : ""}`}
         >
@@ -108,7 +108,7 @@ export function BenefitsEditor({
               value={item.benefit}
               onChange={(e) => handleChange(index, e.target.value)}
               placeholder={`Перевага ${index + 1}...`}
-              className="flex-1 rounded-lg border border-border bg-zinc-50 px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-zinc-900"
+              className="flex-1 rounded-lg border border-border bg-stone-50 px-3 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:bg-stone-900"
             />
           )}
 

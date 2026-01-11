@@ -172,7 +172,7 @@ export function LexicalRenderer({ content, className = "" }: LexicalRendererProp
   }
 
   return (
-    <div className={`prose prose-zinc dark:prose-invert max-w-none ${className}`}>
+    <div className={`prose prose-stone dark:prose-invert max-w-none ${className}`}>
       {renderChildren(content.root.children, "lexical")}
     </div>
   );

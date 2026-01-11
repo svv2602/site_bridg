@@ -138,7 +138,7 @@ export function ContentPreview({
           return (
             <div className="space-y-2 text-sm">
               {generated.faqs.map((faq, i) => (
-                <div key={i} className="rounded bg-zinc-50 p-2 dark:bg-zinc-900">
+                <div key={i} className="rounded bg-stone-50 p-2 dark:bg-stone-900">
                   <p className="font-medium">{faq.question}</p>
                   <p className="text-muted-foreground">{faq.answer}</p>
                 </div>
@@ -184,7 +184,7 @@ export function ContentPreview({
               className={`rounded-lg border ${
                 isChanged
                   ? "border-amber-200 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-900/10"
-                  : "border-border bg-white dark:bg-zinc-800"
+                  : "border-border bg-white dark:bg-stone-800"
               }`}
             >
               {/* Header */}
@@ -202,7 +202,7 @@ export function ContentPreview({
                     className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                       isSelected
                         ? "border-primary bg-primary text-white"
-                        : "border-border bg-white dark:bg-zinc-700"
+                        : "border-border bg-white dark:bg-stone-700"
                     }`}
                   >
                     {isSelected && <Check className="h-3 w-3" />}
@@ -233,7 +233,7 @@ export function ContentPreview({
                     <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
                       Поточний контент
                     </p>
-                    <div className="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-900">
+                    <div className="rounded-lg bg-stone-50 p-3 dark:bg-stone-900">
                       {renderFieldContent(key, current, false)}
                     </div>
                   </div>
@@ -256,13 +256,13 @@ export function ContentPreview({
 
       {/* SEO Keywords */}
       {generated.seoKeywords?.length > 0 && (
-        <div className="rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-4 dark:bg-stone-800">
           <p className="mb-2 text-sm font-medium">SEO ключові слова</p>
           <div className="flex flex-wrap gap-2">
             {generated.seoKeywords.map((keyword, i) => (
               <span
                 key={i}
-                className="rounded-full bg-zinc-100 px-3 py-1 text-xs dark:bg-zinc-700"
+                className="rounded-full bg-stone-100 px-3 py-1 text-xs dark:bg-stone-700"
               >
                 {keyword}
               </span>

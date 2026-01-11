@@ -52,9 +52,9 @@ export default function MainHeader() {
             className="rounded-full border border-stone-700 p-2 hover:bg-stone-800"
           >
             <span className="sr-only">Меню</span>
-            <div className="h-0.5 w-5 bg-zinc-100" />
-            <div className="mt-1 h-0.5 w-5 bg-zinc-100" />
-            <div className="mt-1 h-0.5 w-5 bg-zinc-100" />
+            <div className="h-0.5 w-5 bg-stone-100" />
+            <div className="mt-1 h-0.5 w-5 bg-stone-100" />
+            <div className="mt-1 h-0.5 w-5 bg-stone-100" />
           </button>
         </div>
 

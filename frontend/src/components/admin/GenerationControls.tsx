@@ -59,7 +59,7 @@ export function GenerationControls({
         <button
           onClick={onRegenerate}
           disabled={isDisabled || isGenerating}
-          className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+          className="inline-flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-2.5 text-sm font-medium text-stone-900 transition-colors hover:bg-stone-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-700 dark:text-stone-100 dark:hover:bg-stone-600"
         >
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -74,7 +74,7 @@ export function GenerationControls({
       <button
         onClick={onPreview}
         disabled={isDisabled || !status?.hasGeneratedContent}
-        className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+        className="inline-flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-2.5 text-sm font-medium text-stone-900 transition-colors hover:bg-stone-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-700 dark:text-stone-100 dark:hover:bg-stone-600"
       >
         <Eye className="h-4 w-4" />
         Переглянути
