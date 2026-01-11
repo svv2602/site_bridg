@@ -113,6 +113,35 @@ export interface PayloadMedia {
   height?: number;
 }
 
+export interface PayloadVehicleFitment {
+  id: string;
+  make: string;
+  model: string;
+  yearFrom?: number;
+  yearTo?: number;
+  year?: number;
+  recommendedSizes?: {
+    width: number;
+    aspectRatio: number;
+    diameter: number;
+  }[];
+}
+
+export interface PayloadSeasonalContent {
+  id: string;
+  name: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+  featuredSeason: 'winter' | 'summer' | 'allseason';
+  heroTitle: string;
+  heroSubtitle?: string;
+  ctaText: string;
+  ctaLink: string;
+  gradient?: string;
+  promoText?: string;
+}
+
 interface PayloadResponse<T> {
   docs: T[];
   totalDocs: number;
@@ -191,6 +220,64 @@ export async function getPayloadFeaturedTyres(limit = 4): Promise<PayloadTyre[]>
   return data.docs;
 }
 
+// Server-side tyre search with filters
+export async function searchPayloadTyres(params: {
+  season?: 'summer' | 'winter' | 'allseason';
+  vehicleType?: string;
+  width?: number;
+  aspectRatio?: number;
+  diameter?: number;
+  limit?: number;
+  page?: number;
+}): Promise<{ tyres: PayloadTyre[]; total: number }> {
+  const searchParams = new URLSearchParams();
+
+  // Only show published tyres
+  searchParams.set('where[isPublished][equals]', 'true');
+
+  if (params.season) {
+    searchParams.set('where[season][equals]', params.season);
+  }
+  if (params.vehicleType) {
+    searchParams.set('where[vehicleTypes][contains]', params.vehicleType);
+  }
+
+  // For size filtering, we need to check if any size in the sizes array matches
+  // Payload CMS doesn't directly support array element queries via REST,
+  // so we fetch and filter on the client side for now
+  // In production, consider using a custom endpoint or Payload Local API
+
+  if (params.limit) {
+    searchParams.set('limit', String(params.limit));
+  }
+  if (params.page) {
+    searchParams.set('page', String(params.page));
+  }
+
+  searchParams.set('depth', '1');
+
+  const query = searchParams.toString();
+  const data = await fetchPayload<PayloadTyre>(`tyres?${query}`);
+
+  // Filter by size if specified
+  let filteredDocs = data.docs;
+  if (params.width || params.aspectRatio || params.diameter) {
+    filteredDocs = data.docs.filter((tyre) =>
+      tyre.sizes?.some(
+        (size) =>
+          (!params.width || size.width === params.width) &&
+          (!params.aspectRatio || size.aspectRatio === params.aspectRatio) &&
+          (!params.diameter || size.diameter === params.diameter)
+      )
+    );
+  }
+
+  return {
+    tyres: filteredDocs,
+    total: filteredDocs.length,
+  };
+}
+
 // Articles API
 export async function getPayloadArticles(params?: {
   limit?: number;
@@ -245,17 +332,75 @@ export async function getPayloadTechnologies(): Promise<PayloadTechnology[]> {
   return data.docs;
 }
 
+// Vehicle Fitments API
+export async function getPayloadVehicleFitments(params?: {
+  make?: string;
+  model?: string;
+  year?: number;
+}): Promise<PayloadVehicleFitment[]> {
+  const searchParams = new URLSearchParams();
+
+  if (params?.make) {
+    searchParams.set('where[make][equals]', params.make);
+  }
+  if (params?.model) {
+    searchParams.set('where[model][equals]', params.model);
+  }
+  if (params?.year) {
+    // Support both yearFrom/yearTo range and single year field
+    searchParams.set('where[or][0][and][0][yearFrom][less_than_equal]', String(params.year));
+    searchParams.set('where[or][0][and][1][yearTo][greater_than_equal]', String(params.year));
+    searchParams.set('where[or][1][year][equals]', String(params.year));
+  }
+
+  searchParams.set('limit', '100');
+
+  const query = searchParams.toString();
+  const data = await fetchPayload<PayloadVehicleFitment>(`vehicle-fitments${query ? `?${query}` : ''}`);
+  return data.docs;
+}
+
+export async function getPayloadVehicleFitmentByCarParams(
+  make: string,
+  model: string,
+  year: number
+): Promise<PayloadVehicleFitment | null> {
+  const fitments = await getPayloadVehicleFitments({ make, model, year });
+  return fitments[0] || null;
+}
+
 // Seasonal content
-// Note: This returns static defaults since /api/seasonal endpoint is not implemented yet
 export async function getSeasonalContent() {
-  // Determine season based on current month
+  try {
+    // Try to get active seasonal content from CMS
+    const data = await fetchPayload<PayloadSeasonalContent>(
+      'seasonal-content?where[isActive][equals]=true&limit=1'
+    );
+
+    if (data.docs.length > 0) {
+      const content = data.docs[0];
+      return {
+        heroTitle: content.heroTitle,
+        heroSubtitle: content.heroSubtitle || 'Офіційний представник в Україні',
+        featuredSeason: content.featuredSeason,
+        gradient: content.gradient || 'from-stone-800 to-stone-900',
+        ctaText: content.ctaText,
+        ctaLink: content.ctaLink,
+        promoText: content.promoText,
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to fetch seasonal content from CMS, using defaults:', error);
+  }
+
+  // Fallback: Determine season based on current month
   const month = new Date().getMonth();
   const isWinter = month >= 9 || month <= 2; // Oct-Feb = winter season
 
   return {
     heroTitle: isWinter ? 'Зимові шини Bridgestone' : 'Шини Bridgestone',
     heroSubtitle: 'Офіційний представник в Україні',
-    featuredSeason: isWinter ? 'winter' : 'summer',
+    featuredSeason: isWinter ? ('winter' as const) : ('summer' as const),
     gradient: 'from-stone-800 to-stone-900',
     ctaText: isWinter ? 'Зимові моделі' : 'Переглянути каталог',
     ctaLink: isWinter ? '/passenger-tyres?season=winter' : '/passenger-tyres',
@@ -283,7 +428,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     fullDescription: tyre.fullDescription || null, // Lexical rich text
     imageUrl: tyre.image?.url
       ? (tyre.image.url.startsWith('http') ? tyre.image.url : `${PAYLOAD_URL}${tyre.image.url}`)
-      : '/images/tire-placeholder.png',
+      : '/images/tire-placeholder.svg',
     euLabel: tyre.euLabel || {},
     sizes: tyre.sizes || [],
     usage,
