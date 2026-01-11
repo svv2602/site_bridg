@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 type SearchTab = 'size' | 'car';
 
@@ -51,6 +52,9 @@ export function QuickSearchForm() {
   const [loadingBrands, setLoadingBrands] = useState(true);
   const [loadingModels, setLoadingModels] = useState(false);
   const [loadingYears, setLoadingYears] = useState(false);
+
+  // Search loading state
+  const [isSearching, setIsSearching] = useState(false);
 
   // Fetch widths on mount
   useEffect(() => {
@@ -180,6 +184,7 @@ export function QuickSearchForm() {
 
   const handleSizeSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSearching(true);
     const params = new URLSearchParams();
     if (width) params.set('width', width);
     if (aspectRatio) params.set('aspectRatio', aspectRatio);
@@ -190,6 +195,7 @@ export function QuickSearchForm() {
 
   const handleCarSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSearching(true);
     const params = new URLSearchParams();
     const selectedBrand = brands.find(b => b.id === parseInt(brandId));
     const selectedModel = models.find(m => m.id === parseInt(modelId));
@@ -202,6 +208,13 @@ export function QuickSearchForm() {
   };
 
   const selectClasses = "w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-50 outline-none focus:border-primary disabled:opacity-50";
+
+  const handleTabKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      setActiveTab(prev => prev === 'size' ? 'car' : 'size');
+    }
+  };
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 text-zinc-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
@@ -219,6 +232,7 @@ export function QuickSearchForm() {
           type="button"
           role="tab"
           id="size-tab"
+          tabIndex={activeTab === 'size' ? 0 : -1}
           aria-selected={activeTab === 'size'}
           aria-controls="size-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
@@ -227,6 +241,7 @@ export function QuickSearchForm() {
               : 'text-zinc-300 hover:text-zinc-50'
           }`}
           onClick={() => setActiveTab('size')}
+          onKeyDown={handleTabKeyDown}
         >
           За розміром
         </button>
@@ -234,6 +249,7 @@ export function QuickSearchForm() {
           type="button"
           role="tab"
           id="car-tab"
+          tabIndex={activeTab === 'car' ? 0 : -1}
           aria-selected={activeTab === 'car'}
           aria-controls="car-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
@@ -242,6 +258,7 @@ export function QuickSearchForm() {
               : 'text-zinc-300 hover:text-zinc-50'
           }`}
           onClick={() => setActiveTab('car')}
+          onKeyDown={handleTabKeyDown}
         >
           За авто
         </button>
@@ -321,9 +338,17 @@ export function QuickSearchForm() {
           </div>
           <button
             type="submit"
-            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white"
+            disabled={isSearching}
+            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Знайти шини
+            {isSearching ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Пошук...
+              </>
+            ) : (
+              'Знайти шини'
+            )}
           </button>
         </form>
       ) : (
@@ -400,9 +425,17 @@ export function QuickSearchForm() {
           </div>
           <button
             type="submit"
-            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white"
+            disabled={isSearching}
+            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Підібрати шини
+            {isSearching ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Пошук...
+              </>
+            ) : (
+              'Підібрати шини'
+            )}
           </button>
         </form>
       )}

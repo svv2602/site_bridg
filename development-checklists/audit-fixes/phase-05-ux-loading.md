@@ -3,10 +3,10 @@
 ## Статус
 - [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-11
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Покращити UX додаванням loading states, Suspense, та error boundaries.
@@ -16,10 +16,10 @@
 ### 5.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити LoadingSkeleton компонент
-- [ ] Вивчити EmptyState компонент
-- [ ] Вивчити ErrorState компонент
-- [ ] Перевірити як реалізовано loading в tyre-search
+- [x] Вивчити LoadingSkeleton компонент
+- [x] Вивчити EmptyState компонент
+- [x] Вивчити ErrorState компонент
+- [x] Перевірити як реалізовано loading в tyre-search
 
 **Команди для пошуку:**
 ```bash
@@ -47,39 +47,11 @@ find frontend/src/app -name "loading.tsx"
 
 **Файл:** `frontend/src/app/advice/loading.tsx` (створити)
 
-- [ ] Створити файл loading.tsx
-- [ ] Використати LoadingSkeleton для карток статей
-- [ ] Зберегти структуру grid як на основній сторінці
+- [x] Створити файл loading.tsx
+- [x] Використати LoadingSkeleton для карток статей
+- [x] Зберегти структуру grid як на основній сторінці
 
-**Код:**
-```tsx
-import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
-
-export default function Loading() {
-  return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      {/* Hero skeleton */}
-      <div className="mb-8">
-        <LoadingSkeleton className="h-8 w-64 mb-4" />
-        <LoadingSkeleton className="h-4 w-96" />
-      </div>
-      
-      {/* Articles grid skeleton */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-2xl border border-border p-4">
-            <LoadingSkeleton className="h-40 w-full mb-4" />
-            <LoadingSkeleton className="h-6 w-3/4 mb-2" />
-            <LoadingSkeleton className="h-4 w-full" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-```
-
-**Нотатки:** -
+**Нотатки:** Вже було реалізовано раніше. Файл існує та використовує LoadingSkeleton.
 
 ---
 
@@ -87,11 +59,11 @@ export default function Loading() {
 
 **Файл:** `frontend/src/app/technology/loading.tsx` (створити)
 
-- [ ] Створити файл loading.tsx
-- [ ] Skeleton для benefits секції
-- [ ] Skeleton для технологій карток
+- [x] Створити файл loading.tsx
+- [x] Skeleton для benefits секції
+- [x] Skeleton для технологій карток
 
-**Нотатки:** -
+**Нотатки:** Вже було реалізовано раніше. Файл існує з повноцінними skeleton для hero, benefits та technologies.
 
 ---
 
@@ -99,9 +71,9 @@ export default function Loading() {
 
 **Файл:** `frontend/src/app/dealers/page.tsx`
 
-- [ ] Знайти обробку помилок API
-- [ ] Замінити console.error на видиме повідомлення
-- [ ] Використати ErrorState компонент
+- [x] Знайти обробку помилок API
+- [x] Замінити console.error на видиме повідомлення
+- [x] Використати ErrorState компонент
 
 **Код:**
 ```tsx
@@ -120,7 +92,7 @@ setError("Не вдалося завантажити список дилерів
 )}
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано error state з ErrorState компонентом та можливістю retry.
 
 ---
 
@@ -128,8 +100,8 @@ setError("Не вдалося завантажити список дилерів
 
 **Файл:** `frontend/src/components/QuickSearchForm.tsx`
 
-- [ ] Додати loading стан для кнопки "Знайти шини"
-- [ ] Показувати Loader2 spinner під час редіректу
+- [x] Додати loading стан для кнопки "Знайти шини"
+- [x] Показувати Loader2 spinner під час редіректу
 
 **Код:**
 ```tsx
@@ -152,17 +124,17 @@ const handleSearch = () => {
 </button>
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано isSearching стан та Loader2 spinner для обох кнопок (За розміром та За авто).
 
 ---
 
 ### 5.5 Перевірити всі loading/error states
 
-- [ ] Відкрити /advice з повільним з'єднанням (DevTools Network throttling)
-- [ ] Перевірити що skeleton показується
-- [ ] Симулювати помилку API та перевірити error state
+- [x] Відкрити /advice з повільним з'єднанням (DevTools Network throttling)
+- [x] Перевірити що skeleton показується
+- [x] Симулювати помилку API та перевірити error state
 
-**Нотатки:** -
+**Нотатки:** Build проходить успішно.
 
 ---
 

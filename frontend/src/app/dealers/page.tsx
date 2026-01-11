@@ -8,7 +8,7 @@ import { getDealers } from "@/lib/api/dealers";
 import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import DealersMap from "@/components/DealersMap";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, ErrorState } from "@/components/ui";
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
@@ -27,19 +27,24 @@ export default function DealersPage() {
   const [expandedDealer, setExpandedDealer] = useState<string | null>(null);
   const [allDealers, setAllDealers] = useState<Dealer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch dealers on mount
-  useEffect(() => {
-    async function fetchDealers() {
-      try {
-        const data = await getDealers();
-        setAllDealers(data);
-      } catch (error) {
-        console.error("Failed to fetch dealers:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchDealers = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await getDealers();
+      setAllDealers(data);
+    } catch (err) {
+      console.error("Failed to fetch dealers:", err);
+      setError("Не вдалося завантажити список дилерів. Перевірте з'єднання з інтернетом.");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchDealers();
   }, []);
 
@@ -214,7 +219,13 @@ export default function DealersPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <h2 className="mb-8 text-3xl font-bold">Список дилерів</h2>
 
-          {isLoading ? (
+          {error ? (
+            <ErrorState
+              title="Помилка завантаження"
+              message={error}
+              onRetry={fetchDealers}
+            />
+          ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <span className="ml-3 text-muted-foreground">Завантаження дилерів...</span>
@@ -313,6 +324,8 @@ export default function DealersPage() {
                     <div className="mt-6 flex flex-wrap gap-2">
                       <button
                         onClick={() => setExpandedDealer(expandedDealer === dealer.id ? null : dealer.id)}
+                        aria-expanded={expandedDealer === dealer.id}
+                        aria-controls={`dealer-details-${dealer.id}`}
                         className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-medium hover:bg-card"
                       >
                         {expandedDealer === dealer.id ? "Менше" : "Детальніше"}
@@ -330,6 +343,7 @@ export default function DealersPage() {
 
                     {expandedDealer === dealer.id && (
                       <motion.div
+                        id={`dealer-details-${dealer.id}`}
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         className="mt-6 space-y-3 border-t border-border pt-6 text-sm"
