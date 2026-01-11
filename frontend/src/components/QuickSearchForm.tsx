@@ -207,8 +207,6 @@ export function QuickSearchForm() {
     router.push(`/tyre-search?${params.toString()}`);
   };
 
-  const selectClasses = "w-full rounded-xl border border-stone-700 bg-stone-900 px-3 py-2 text-sm text-stone-50 outline-none focus:border-primary disabled:opacity-50";
-
   const handleTabKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
@@ -217,16 +215,16 @@ export function QuickSearchForm() {
   };
 
   return (
-    <div className="rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-      <h2 className="text-xl font-semibold">Швидкий пошук шин</h2>
-      <p className="mt-1 text-sm text-stone-300">
+    <div className="hero-card p-6">
+      <h2 className="text-xl font-semibold text-hero-foreground">Швидкий пошук шин</h2>
+      <p className="mt-1 text-sm text-hero-muted">
         Виберіть спосіб пошуку: за розміром або за вашим автомобілем.
       </p>
 
       <div
         role="tablist"
         aria-label="Спосіб пошуку шин"
-        className="mt-4 flex rounded-full bg-stone-800 p-1 text-sm font-medium ring-1 ring-stone-700"
+        className="mt-4 flex rounded-full bg-hero-accent p-1 text-sm font-medium"
       >
         <button
           type="button"
@@ -237,8 +235,8 @@ export function QuickSearchForm() {
           aria-controls="size-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'size'
-              ? 'bg-stone-50 text-stone-900'
-              : 'text-stone-300 hover:text-stone-50'
+              ? 'bg-white text-stone-900'
+              : 'text-hero-muted hover:text-hero-foreground'
           }`}
           onClick={() => setActiveTab('size')}
           onKeyDown={handleTabKeyDown}
@@ -254,8 +252,8 @@ export function QuickSearchForm() {
           aria-controls="car-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'car'
-              ? 'bg-stone-50 text-stone-900'
-              : 'text-stone-300 hover:text-stone-50'
+              ? 'bg-white text-stone-900'
+              : 'text-hero-muted hover:text-hero-foreground'
           }`}
           onClick={() => setActiveTab('car')}
           onKeyDown={handleTabKeyDown}
@@ -274,7 +272,7 @@ export function QuickSearchForm() {
         >
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Ширина</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Ширина</label>
               <select
                 value={width}
                 onChange={(e) => {
@@ -283,7 +281,7 @@ export function QuickSearchForm() {
                   setDiameter('');
                 }}
                 disabled={loadingWidths}
-                className={selectClasses}
+                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
                 <option value="">{loadingWidths ? 'Завантаження...' : 'Оберіть'}</option>
                 {widths.map((w) => (
@@ -292,7 +290,7 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Висота профілю</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Висота профілю</label>
               <select
                 value={aspectRatio}
                 onChange={(e) => {
@@ -300,7 +298,7 @@ export function QuickSearchForm() {
                   setDiameter('');
                 }}
                 disabled={!width || loadingHeights}
-                className={selectClasses}
+                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
                 <option value="">{loadingHeights ? 'Завантаження...' : 'Оберіть'}</option>
                 {heights.map((h) => (
@@ -309,12 +307,12 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Діаметр</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Діаметр</label>
               <select
                 value={diameter}
                 onChange={(e) => setDiameter(e.target.value)}
                 disabled={!aspectRatio || loadingDiameters}
-                className={selectClasses}
+                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
                 <option value="">{loadingDiameters ? 'Завантаження...' : 'Оберіть'}</option>
                 {diameters.map((d) => (
@@ -324,11 +322,11 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-300">Сезонність</label>
+            <label className="mb-1 block text-sm font-medium text-hero-muted">Сезонність</label>
             <select
               value={season}
               onChange={(e) => setSeason(e.target.value)}
-              className={selectClasses}
+              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
             >
               <option value="">Не важливо</option>
               <option value="summer">Літні</option>
@@ -339,7 +337,7 @@ export function QuickSearchForm() {
           <button
             type="submit"
             disabled={isSearching}
-            className="mt-2 w-full rounded-full bg-stone-50 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="hero-btn-primary mt-2 w-full flex items-center justify-center gap-2"
           >
             {isSearching ? (
               <>
@@ -360,7 +358,7 @@ export function QuickSearchForm() {
           onSubmit={handleCarSearch}
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-300">Марка авто</label>
+            <label className="mb-1 block text-sm font-medium text-hero-muted">Марка авто</label>
             <select
               value={brandId}
               onChange={(e) => {
@@ -369,7 +367,7 @@ export function QuickSearchForm() {
                 setYear('');
               }}
               disabled={loadingBrands}
-              className={selectClasses}
+              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
             >
               <option value="">{loadingBrands ? 'Завантаження...' : 'Оберіть марку'}</option>
               {brands.map((brand) => (
@@ -379,7 +377,7 @@ export function QuickSearchForm() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Модель</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Модель</label>
               <select
                 value={modelId}
                 onChange={(e) => {
@@ -387,7 +385,7 @@ export function QuickSearchForm() {
                   setYear('');
                 }}
                 disabled={!brandId || loadingModels}
-                className={selectClasses}
+                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
                 <option value="">{loadingModels ? 'Завантаження...' : 'Оберіть модель'}</option>
                 {models.map((model) => (
@@ -396,12 +394,12 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Рік випуску</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Рік випуску</label>
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 disabled={!modelId || loadingYears}
-                className={selectClasses}
+                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
                 <option value="">{loadingYears ? 'Завантаження...' : 'Рік'}</option>
                 {years.map((y) => (
@@ -411,11 +409,11 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-300">Тип шини</label>
+            <label className="mb-1 block text-sm font-medium text-hero-muted">Тип шини</label>
             <select
               value={carSeason}
               onChange={(e) => setCarSeason(e.target.value)}
-              className={selectClasses}
+              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
             >
               <option value="">Не важливо</option>
               <option value="summer">Літня</option>
@@ -426,7 +424,7 @@ export function QuickSearchForm() {
           <button
             type="submit"
             disabled={isSearching}
-            className="mt-2 w-full rounded-full bg-stone-50 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="hero-btn-primary mt-2 w-full flex items-center justify-center gap-2"
           >
             {isSearching ? (
               <>

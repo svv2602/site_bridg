@@ -153,18 +153,18 @@ function SelectField({
     // Звичайний select для невеликих списків
     return (
       <div>
-        <label className="mb-2 block text-sm font-medium text-stone-100">
+        <label className="mb-2 block text-sm font-medium text-foreground">
           {label}
         </label>
         <div className="relative">
-          <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+          <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           {loading ? (
-            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
-              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <select
-              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full appearance-none rounded-xl border border-border bg-card py-3 pl-10 pr-8 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
               value={value}
               onChange={(e) => onChange(e.target.value)}
               disabled={disabled || options.length === 0}
@@ -177,7 +177,7 @@ function SelectField({
               ))}
             </select>
           )}
-          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
         </div>
       </div>
     );
@@ -186,20 +186,20 @@ function SelectField({
   // Searchable dropdown для великих списків
   return (
     <div className="relative" ref={containerRef}>
-      <label className="mb-2 block text-sm font-medium text-stone-100">
-        {label} <span className="text-xs text-stone-500">({options.length})</span>
+      <label className="mb-2 block text-sm font-medium text-foreground">
+        {label} <span className="text-xs text-muted-foreground">({options.length})</span>
       </label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 z-10" />
+        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground z-10" />
         {loading ? (
-          <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
-            <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+          <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <>
             <input
               type="text"
-              className="w-full rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-8 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={value ? selectedLabel : placeholder}
               value={isOpen ? search : (value ? selectedLabel : "")}
               onChange={(e) => {
@@ -210,13 +210,13 @@ function SelectField({
               disabled={disabled || options.length === 0}
             />
             <ChevronRight
-              className={`absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 transition-transform ${isOpen ? "rotate-90" : ""}`}
+              className={`absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`}
             />
 
             {isOpen && !disabled && (
-              <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-stone-700 bg-stone-900 py-1 shadow-xl">
+              <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-border bg-card py-1 shadow-xl">
                 {displayOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-stone-500">
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
                     Нічого не знайдено
                   </div>
                 ) : (
@@ -225,10 +225,10 @@ function SelectField({
                       <button
                         key={opt.value}
                         type="button"
-                        className={`w-full px-3 py-2 text-left text-sm hover:bg-stone-800 ${
+                        className={`w-full px-3 py-2 text-left text-sm hover:bg-muted ${
                           opt.value === value
-                            ? "bg-stone-800 text-primary"
-                            : "text-stone-100"
+                            ? "bg-muted text-primary"
+                            : "text-foreground"
                         }`}
                         onClick={() => {
                           onChange(opt.value);
@@ -240,7 +240,7 @@ function SelectField({
                       </button>
                     ))}
                     {hasMore && (
-                      <div className="px-3 py-2 text-xs text-stone-500 border-t border-stone-800">
+                      <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border">
                         Показано {displayOptions.length} з {filteredOptions.length}. Введіть текст для пошуку.
                       </div>
                     )}
@@ -267,18 +267,18 @@ function SelectFieldSimple({
 }: Omit<SelectFieldProps, "searchable">) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-stone-100">
+      <label className="mb-2 block text-sm font-medium text-foreground">
         {label}
       </label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         {loading ? (
-          <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
-            <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+          <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <select
-            className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full appearance-none rounded-xl border border-border bg-card py-3 pl-10 pr-8 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled || options.length === 0}
@@ -291,7 +291,7 @@ function SelectFieldSimple({
             ))}
           </select>
         )}
-        <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+        <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
       </div>
     </div>
   );
@@ -320,7 +320,7 @@ function SizeBadge({
       className={`rounded-full border px-3 py-1 text-sm font-medium transition-all ${
         isSelected
           ? "border-primary bg-primary text-white shadow-lg shadow-primary/30"
-          : "border-stone-600 bg-stone-800 text-stone-100 hover:border-stone-500 hover:bg-stone-700"
+          : "border-border bg-muted text-foreground hover:border-muted-foreground hover:bg-muted/80"
       }`}
     >
       {label}
@@ -336,24 +336,24 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
     <div
       className={`rounded-xl border p-4 ${
         isOEM
-          ? "border-green-800 bg-green-950/30"
-          : "border-stone-700 bg-stone-800/30"
+          ? "border-success/50 bg-success/10"
+          : "border-border bg-card/30"
       }`}
     >
       <div className="mb-3 flex items-center gap-2">
         {isOEM ? (
-          <CheckCircle className="h-5 w-5 text-green-500" />
+          <CheckCircle className="h-5 w-5 text-success" />
         ) : (
-          <Info className="h-5 w-5 text-stone-400" />
+          <Info className="h-5 w-5 text-muted-foreground" />
         )}
         <span
           className={`text-sm font-semibold ${
-            isOEM ? "text-green-400" : "text-stone-300"
+            isOEM ? "text-success" : "text-foreground"
           }`}
         >
           {isOEM ? "Заводські розміри (OEM)" : "Допустимі заміни"}
         </span>
-        <span className="text-xs text-stone-500">(натисніть для фільтру)</span>
+        <span className="text-xs text-muted-foreground">(натисніть для фільтру)</span>
       </div>
 
       <div className="space-y-2">
@@ -368,11 +368,11 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
             return (
               <div
                 key={axleGroup ?? "default"}
-                className="rounded-lg bg-stone-900/50 p-3"
+                className="rounded-lg bg-muted/50 p-3"
               >
                 {frontSizes.length > 0 && (
                   <div className="mb-2">
-                    <span className="text-xs text-stone-500">Передня вісь:</span>
+                    <span className="text-xs text-muted-foreground">Передня вісь:</span>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {frontSizes.map((size) => {
                         const label = formatTyreSize(size);
@@ -390,7 +390,7 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
                 )}
                 {rearSizes.length > 0 && (
                   <div>
-                    <span className="text-xs text-stone-500">Задня вісь:</span>
+                    <span className="text-xs text-muted-foreground">Задня вісь:</span>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {rearSizes.map((size) => {
                         const label = formatTyreSize(size);
@@ -600,30 +600,30 @@ export default function VehicleTyreSelector() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl border border-stone-700 bg-stone-800/50 p-4"
+            className="rounded-xl border border-border bg-card/50 p-4"
           >
-            <h4 className="mb-2 text-sm font-semibold text-stone-200">
+            <h4 className="mb-2 text-sm font-semibold text-foreground">
               Параметри кріплення коліс
             </h4>
-            <div className="flex flex-wrap gap-4 text-sm text-stone-400">
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               {selectedKit.pcd && (
                 <span>
-                  PCD: <strong className="text-stone-200">{selectedKit.pcd}</strong>
+                  PCD: <strong className="text-foreground">{selectedKit.pcd}</strong>
                 </span>
               )}
               {selectedKit.boltCount && (
                 <span>
-                  Болтів: <strong className="text-stone-200">{selectedKit.boltCount}</strong>
+                  Болтів: <strong className="text-foreground">{selectedKit.boltCount}</strong>
                 </span>
               )}
               {selectedKit.dia && (
                 <span>
-                  DIA: <strong className="text-stone-200">{selectedKit.dia}</strong>
+                  DIA: <strong className="text-foreground">{selectedKit.dia}</strong>
                 </span>
               )}
               {selectedKit.boltSize && (
                 <span>
-                  Болт: <strong className="text-stone-200">{selectedKit.boltSize}</strong>
+                  Болт: <strong className="text-foreground">{selectedKit.boltSize}</strong>
                 </span>
               )}
             </div>
@@ -637,7 +637,7 @@ export default function VehicleTyreSelector() {
           type="button"
           onClick={handleSearch}
           disabled={!kitId || searching}
-          className="flex-1 rounded-full bg-stone-50 py-3 text-base font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 transition-all hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-8"
+          className="flex-1 rounded-full bg-primary py-3 text-base font-semibold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-8"
         >
           {searching ? (
             <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
@@ -647,15 +647,15 @@ export default function VehicleTyreSelector() {
           Підібрати шини Bridgestone
         </button>
 
-        <div className="hidden items-center gap-2 text-sm text-stone-400 sm:flex">
-          <CheckCircle className="h-4 w-4 text-green-500" />
+        <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
+          <CheckCircle className="h-4 w-4 text-success" />
           <span>База даних 300,000+ комплектацій</span>
         </div>
       </div>
 
       {/* Помилка */}
       {searchError && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-800 bg-red-950/30 p-4 text-red-400">
+        <div className="flex items-center gap-2 rounded-xl border border-error/50 bg-error/10 p-4 text-error">
           <AlertCircle className="h-5 w-5" />
           <span>{searchError}</span>
         </div>
@@ -671,11 +671,11 @@ export default function VehicleTyreSelector() {
             className="space-y-6"
           >
             {/* Інформація про авто */}
-            <div className="rounded-xl border border-stone-700 bg-stone-900 p-6">
-              <h3 className="mb-4 text-xl font-bold text-stone-50">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h3 className="mb-4 text-xl font-bold text-foreground">
                 {searchResult.vehicle.brand} {searchResult.vehicle.model}{" "}
                 {searchResult.vehicle.year}
-                <span className="ml-2 text-base font-normal text-stone-400">
+                <span className="ml-2 text-base font-normal text-muted-foreground">
                   {searchResult.vehicle.kit}
                 </span>
               </h3>
@@ -702,15 +702,15 @@ export default function VehicleTyreSelector() {
 
               {/* Фільтр по розміру */}
               {selectedSize && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-stone-400">Фільтр:</span>
-                  <span className="rounded-full bg-primary px-3 py-1 font-medium text-white">
+                <div className="flex items-center gap-2 text-sm mt-4">
+                  <span className="text-muted-foreground">Фільтр:</span>
+                  <span className="rounded-full bg-primary px-3 py-1 font-medium text-primary-foreground">
                     {selectedSize}
                   </span>
                   <button
                     type="button"
                     onClick={() => setSelectedSize(null)}
-                    className="text-stone-400 hover:text-stone-200"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     ✕ скинути
                   </button>
@@ -728,10 +728,10 @@ export default function VehicleTyreSelector() {
 
               return filteredTyres.length > 0 ? (
               <div>
-                <h3 className="mb-4 text-xl font-bold text-stone-50">
+                <h3 className="mb-4 text-xl font-bold text-foreground">
                   Шини Bridgestone для вашого авто
                   {selectedSize && (
-                    <span className="ml-2 text-base font-normal text-stone-400">
+                    <span className="ml-2 text-base font-normal text-muted-foreground">
                       ({filteredTyres.length} моделей для {selectedSize})
                     </span>
                   )}
@@ -743,9 +743,9 @@ export default function VehicleTyreSelector() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="group overflow-hidden rounded-xl border border-stone-700 bg-stone-800/50 transition-all hover:border-stone-600 hover:shadow-xl"
+                      className="group overflow-hidden rounded-xl border border-border bg-card/50 transition-all hover:border-muted-foreground hover:shadow-xl"
                     >
-                      <div className="relative h-32 bg-gradient-to-br from-stone-800 to-stone-900">
+                      <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50">
                         {tyre.imageUrl ? (
                           <img
                             src={tyre.imageUrl}
@@ -754,10 +754,10 @@ export default function VehicleTyreSelector() {
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center">
-                            <Car className="h-16 w-16 text-stone-700" />
+                            <Car className="h-16 w-16 text-muted-foreground/50" />
                           </div>
                         )}
-                        <div className="absolute left-3 top-3 rounded-full bg-stone-900/90 px-2 py-0.5 text-xs font-semibold text-stone-100">
+                        <div className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-0.5 text-xs font-semibold text-foreground">
                           {tyre.season === "summer"
                             ? "Літні"
                             : tyre.season === "winter"
@@ -766,14 +766,14 @@ export default function VehicleTyreSelector() {
                         </div>
                       </div>
                       <div className="p-4">
-                        <h4 className="font-bold text-stone-100 transition-colors group-hover:text-primary">
+                        <h4 className="font-bold text-foreground transition-colors group-hover:text-primary">
                           {tyre.name}
                         </h4>
                         <div className="mt-2 flex flex-wrap gap-1">
                           {tyre.matchingSizes.map((size) => (
                             <span
                               key={size}
-                              className="rounded bg-stone-700 px-2 py-0.5 text-xs text-stone-300"
+                              className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground"
                             >
                               {size}
                             </span>
@@ -782,13 +782,13 @@ export default function VehicleTyreSelector() {
                         <div className="mt-4 flex gap-2">
                           <Link
                             href={`/shyny/${tyre.slug}`}
-                            className="flex-1 rounded-full border border-stone-600 px-3 py-1.5 text-center text-sm font-semibold text-stone-100 transition-colors hover:bg-stone-700"
+                            className="flex-1 rounded-full border border-border px-3 py-1.5 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted"
                           >
                             Детальніше
                           </Link>
                           <Link
                             href="/dealers"
-                            className="flex items-center gap-1 rounded-full bg-stone-50 px-3 py-1.5 text-sm font-semibold text-stone-900 transition-colors hover:bg-white"
+                            className="flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                           >
                             <MapPin className="h-4 w-4" />
                             Купити
@@ -800,12 +800,12 @@ export default function VehicleTyreSelector() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-stone-700 bg-stone-800/30 p-8 text-center">
-                <AlertCircle className="mx-auto h-12 w-12 text-stone-500" />
-                <h3 className="mt-4 text-lg font-semibold text-stone-200">
+              <div className="rounded-xl border border-border bg-card/30 p-8 text-center">
+                <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
                   Шин Bridgestone для цих розмірів наразі немає в каталозі
                 </h3>
-                <p className="mt-2 text-sm text-stone-400">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Зверніться до наших дилерів — вони допоможуть підібрати
                   альтернативу або замовити потрібний розмір.
                 </p>

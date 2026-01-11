@@ -29,36 +29,36 @@ export default async function AdvicePage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
+      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mx-auto max-w-4xl text-left text-stone-50">
+          <div className="mx-auto max-w-4xl text-left">
             <Breadcrumb
-              className="mb-2"
+              className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Корисна інформація та поради" },
               ]}
             />
-            <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Корисна інформація та поради щодо шин Bridgestone
-              <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
+              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                 технічні статті та практичні рекомендації для реальних умов експлуатації в Україні
               </span>
             </h1>
-            <p className="mb-6 max-w-2xl text-sm text-stone-300 md:text-base">
+            <p className="hero-text mb-6 max-w-2xl text-sm md:text-base">
               У цьому розділі зібрані матеріали, які допоможуть обрати шини, правильно їх експлуатувати та
               обслуговувати. Стиль оформлення узгоджений з технічними сторінками пошуку шин і дилерів.
             </p>
             <div className="flex flex-wrap gap-4">
               <a
                 href="#articles"
-                className="rounded-full bg-stone-50 px-6 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white"
+                className="hero-btn-primary"
               >
                 Популярні статті
               </a>
               <a
                 href="#categories"
-                className="rounded-full border border-stone-500 bg-transparent px-6 py-3 text-sm font-semibold text-stone-100 hover:bg-stone-800"
+                className="hero-btn-secondary"
               >
                 Всі категорії
               </a>

@@ -102,28 +102,28 @@ export default function DealersPage() {
         />
       ))}
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
+      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto flex max-w-4xl flex-col gap-4 text-left text-stone-50 md:gap-5"
+            className="mx-auto flex max-w-4xl flex-col gap-4 text-left md:gap-5"
           >
             <Breadcrumb
-              className="mb-1"
+              className="mb-1 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Дилери / Де купити" },
               ]}
             />
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="hero-title text-3xl font-semibold tracking-tight md:text-4xl">
               Пошук офіційних дилерів Bridgestone
-              <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
+              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                 використовуйте технічний пошук за містом, адресою та типом точки
               </span>
             </h1>
-            <p className="max-w-2xl text-sm text-stone-300 md:text-base">
+            <p className="hero-text max-w-2xl text-sm md:text-base">
               Фільтруйте офіційні точки продажу та сервісні партнери Bridgestone по всій Україні.
             </p>
           </motion.div>
@@ -135,34 +135,34 @@ export default function DealersPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
                 <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row">
                   <div className="flex-1">
-                    <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-stone-100">
+                    <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">
                       Місто або адреса
                     </label>
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" aria-hidden="true" />
+                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                       <input
                         type="text"
                         id="city-search"
                         placeholder="Наприклад, Київ, Львів..."
                         value={cityQuery}
                         onChange={(e) => setCityQuery(e.target.value)}
-                        className="w-full rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-4 text-sm text-stone-50 outline-none focus:border-primary"
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary"
                       />
                     </div>
                   </div>
                   <div className="sm:w-48">
-                    <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-stone-100">Тип точки</label>
+                    <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-foreground">Тип точки</label>
                     <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" aria-hidden="true" />
+                      <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                       <select
                         id="dealer-type"
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary"
+                        className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary"
                       >
                         {dealerTypes.map((type) => (
                           <option key={type.key} value={type.key}>
@@ -170,15 +170,15 @@ export default function DealersPage() {
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" aria-hidden="true" />
+                      <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm text-stone-300">
+                    <p className="text-sm text-muted-foreground">
                       Знайдено дилерів:{" "}
-                      <span className="text-2xl font-bold text-stone-50">
+                      <span className="text-2xl font-bold text-foreground">
                         {isLoading ? "..." : filteredDealers.length}
                       </span>
                     </p>
@@ -188,7 +188,7 @@ export default function DealersPage() {
                       setCityQuery("");
                       setSelectedType("all");
                     }}
-                    className="rounded-full border border-stone-400 bg-transparent px-5 py-2 text-sm font-semibold text-stone-100 hover:bg-stone-800"
+                    className="rounded-full border border-border bg-transparent px-5 py-2 text-sm font-semibold text-foreground hover:bg-muted"
                   >
                     Скинути фільтри
                   </button>

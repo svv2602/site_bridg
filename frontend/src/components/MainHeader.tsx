@@ -1,10 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 
-const mainNav = [
+// Основні пункти меню для горизонтальної навігації на десктопі
+const primaryNav = [
+  { href: "/passenger-tyres", label: "Легкові" },
+  { href: "/suv-4x4-tyres", label: "SUV" },
+  { href: "/lcv-tyres", label: "Комерційні" },
+  { href: "/dealers", label: "Дилери" },
+  { href: "/advice", label: "Поради" },
+];
+
+// Повне меню для мобільних та бургера
+const fullNav = [
   { href: "/passenger-tyres", label: "Легкові шини" },
   { href: "/suv-4x4-tyres", label: "Шини для SUV" },
   { href: "/lcv-tyres", label: "Комерційні шини" },
@@ -17,10 +27,25 @@ const mainNav = [
 
 export default function MainHeader() {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Закриття меню при кліку поза ним
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-stone-900/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-stone-800 bg-stone-900/95 backdrop-blur-sm">
       <div className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
+        {/* Logo */}
         <Link href="/" className="group flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-white shadow-lg transition-transform group-hover:scale-105">
             B
@@ -29,51 +54,70 @@ export default function MainHeader() {
             <span className="text-sm font-semibold uppercase tracking-tight text-stone-100 md:text-base">
               Bridgestone
             </span>
-            <span className="text-[11px] text-stone-400">
+            <span className="hidden text-[11px] text-stone-400 sm:block">
               Офіційний сайт в Україні
             </span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
-          {/* Єдина червона CTA в навігації */}
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-1 lg:flex">
+          {primaryNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-stone-300 transition-colors hover:bg-stone-800 hover:text-stone-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          {/* Пошук шин CTA */}
           <Link
             href="/tyre-search"
-            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-primary-dark sm:flex"
+            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg sm:flex"
           >
             <Search className="h-4 w-4" />
-            Пошук шин
+            <span className="hidden md:inline">Пошук шин</span>
           </Link>
 
-          {/* Бургер-меню для всіх інших розділів */}
-          <button
-            type="button"
-            onClick={() => setOpen((prev) => !prev)}
-            className="rounded-full border border-stone-700 p-2 hover:bg-stone-800"
-          >
-            <span className="sr-only">Меню</span>
-            <div className="h-0.5 w-5 bg-stone-100" />
-            <div className="mt-1 h-0.5 w-5 bg-stone-100" />
-            <div className="mt-1 h-0.5 w-5 bg-stone-100" />
-          </button>
-        </div>
+          {/* Бургер-меню (мобільний + додаткові пункти на десктопі) */}
+          <div ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              className="rounded-full border border-stone-700 p-2 transition-colors hover:bg-stone-800 lg:border-transparent"
+              aria-expanded={open}
+              aria-label={open ? "Закрити меню" : "Відкрити меню"}
+            >
+              {open ? (
+                <X className="h-5 w-5 text-stone-100" />
+              ) : (
+                <Menu className="h-5 w-5 text-stone-100" />
+              )}
+            </button>
 
-        {open && (
-          <div className="absolute right-4 top-full mt-2 w-64 rounded-2xl border border-stone-800 bg-stone-900/95 p-2 text-sm shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-            <nav className="flex flex-col divide-y divide-stone-800">
-              {mainNav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="px-4 py-2.5 text-stone-100 hover:bg-stone-800 hover:text-stone-50"
-                  onClick={() => setOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            {open && (
+              <div className="absolute right-4 top-full mt-2 w-64 rounded-2xl border border-stone-800 bg-stone-900/98 p-2 text-sm shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+                <nav className="flex flex-col">
+                  {fullNav.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-lg px-4 py-2.5 text-stone-100 transition-colors hover:bg-stone-800 hover:text-white"
+                      onClick={() => setOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

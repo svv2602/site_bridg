@@ -32,6 +32,23 @@
   --emerald-tech: #10b981;
   --sky-trust: #0ea5e9;
 
+  /* Semantic status colors */
+  --error: #dc2626;
+  --error-foreground: #fef2f2;
+  --success: #16a34a;
+  --success-foreground: #f0fdf4;
+  --warning: #d97706;
+  --warning-foreground: #fffbeb;
+  --info: #2563eb;
+  --info-foreground: #eff6ff;
+
+  /* Hero section tokens (always dark background) */
+  --hero-background: var(--stone-950);
+  --hero-foreground: #ffffff;
+  --hero-muted: rgba(255, 255, 255, 0.7);
+  --hero-border: rgba(255, 255, 255, 0.1);
+  --hero-accent: rgba(255, 255, 255, 0.1);
+
   /* Light theme (default) - REDESIGN: warm stone colors */
   --background: var(--stone-50);
   --foreground: var(--stone-900);
@@ -99,6 +116,16 @@
   --card: var(--stone-900);
   --card-foreground: var(--stone-50);
   --border: var(--stone-700);
+
+  /* Status colors in dark mode */
+  --error: #f87171;
+  --error-foreground: #450a0a;
+  --success: #4ade80;
+  --success-foreground: #052e16;
+  --warning: #fbbf24;
+  --warning-foreground: #451a03;
+  --info: #60a5fa;
+  --info-foreground: #1e3a5f;
 }
 
 /* REDESIGN: Extended theme configuration for Tailwind v4 */
@@ -116,6 +143,23 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-border: var(--border);
+
+  /* Status colors */
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Hero section colors - direct values for guaranteed contrast */
+  --color-hero-background: #0c0a09;
+  --color-hero-foreground: #ffffff;
+  --color-hero-muted: rgba(255, 255, 255, 0.7);
+  --color-hero-border: rgba(255, 255, 255, 0.1);
+  --color-hero-accent: rgba(255, 255, 255, 0.1);
 
   /* Stone palette for direct use */
   --color-stone-50: var(--stone-50);
@@ -294,51 +338,99 @@ html {
   border-radius: var(--radius-xl); /* 24px */
 }
 
-/* REDESIGN: Primary buttons - dark by default, red on hover
-   Header CTA stays brand red */
-button.bg-primary {
-  background-color: var(--stone-900);
+/* ======================================
+   UNIFIED DESIGN SYSTEM: Hero Sections
+   Always dark background, white text
+   ====================================== */
+
+.hero-dark {
+  /* Direct hex values guarantee dark background in ALL themes */
+  background: linear-gradient(to bottom right, #0c0a09, #1c1917, #292524) !important;
+  color: #ffffff !important;
+}
+
+.hero-dark * {
+  /* Ensure all text in hero is light colored */
+  --tw-text-opacity: 1;
+}
+
+/* Hero section element styles - using direct colors for guaranteed contrast */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.hero-title {
+  color: #ffffff !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 400;
+}
+
+.hero-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1.5rem;
+}
+
+.hero-input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.hero-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.hero-input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* Hero buttons - guaranteed colors */
+.hero-btn-primary {
+  background: #ffffff !important;
+  color: #1c1917 !important;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
   transition: all 0.2s ease-out;
 }
 
-button.bg-primary:hover {
-  background-color: var(--bridgestone-red);
+.hero-btn-primary:hover {
+  background: #f5f5f4 !important;
   transform: scale(1.02);
 }
 
-button.bg-primary:active {
-  transform: scale(0.98);
+.hero-btn-secondary {
+  background: transparent !important;
+  color: #ffffff !important;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.2s ease-out;
 }
 
-/* Header CTA stays brand red */
-header button.bg-primary {
-  background-color: var(--bridgestone-red);
-}
-
-header button.bg-primary:hover {
-  background-color: var(--bridgestone-red-dark);
-}
-
-/* REDESIGN: Muted primary colors for non-header elements */
-body :not(header) .text-primary {
-  color: var(--stone-600);
-}
-
-body :not(header) .bg-primary,
-body :not(header) .bg-primary\/90 {
-  background-color: var(--stone-900);
-}
-
-body :not(header) .bg-primary\/10 {
-  background-color: rgba(28, 25, 23, 0.08);
-}
-
-body :not(header) .bg-primary\/20 {
-  background-color: rgba(28, 25, 23, 0.16);
-}
-
-body :not(header) .bg-primary\/30 {
-  background-color: rgba(28, 25, 23, 0.24);
+.hero-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* ======================================

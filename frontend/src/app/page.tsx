@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone } from "lucide-react";
+import Image from "next/image";
+import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone, Award } from "lucide-react";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
@@ -236,6 +237,72 @@ export default async function Home() {
                 </Link>
               </AnimatedCard>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Indicators */}
+      <section className="border-y border-border bg-stone-50 py-12 dark:bg-stone-900/50">
+        <div className="container mx-auto max-w-7xl px-4 md:px-8">
+          <div className="mb-8 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <Award className="h-4 w-4" />
+              Незалежні тести
+            </div>
+            <h2 className="text-2xl font-bold md:text-3xl">Підтверджена якість</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              Шини Bridgestone регулярно отримують високі оцінки від провідних європейських тестових організацій
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <div className="group flex flex-col items-center gap-2">
+              <div className="flex h-16 w-28 items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-shadow group-hover:shadow-md dark:bg-stone-800">
+                <Image
+                  src="/images/logos/adac.svg"
+                  alt="ADAC"
+                  width={80}
+                  height={40}
+                  className="h-8 w-auto object-contain opacity-70 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">Німеччина</span>
+            </div>
+            <div className="group flex flex-col items-center gap-2">
+              <div className="flex h-16 w-28 items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-shadow group-hover:shadow-md dark:bg-stone-800">
+                <Image
+                  src="/images/logos/autobild.svg"
+                  alt="Auto Bild"
+                  width={80}
+                  height={40}
+                  className="h-8 w-auto object-contain opacity-70 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">Німеччина</span>
+            </div>
+            <div className="group flex flex-col items-center gap-2">
+              <div className="flex h-16 w-28 items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-shadow group-hover:shadow-md dark:bg-stone-800">
+                <Image
+                  src="/images/logos/tcs.svg"
+                  alt="TCS"
+                  width={80}
+                  height={40}
+                  className="h-8 w-auto object-contain opacity-70 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">Швейцарія</span>
+            </div>
+            <div className="group flex flex-col items-center gap-2">
+              <div className="flex h-16 w-28 items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-shadow group-hover:shadow-md dark:bg-stone-800">
+                <Image
+                  src="/images/logos/tyrereviews.svg"
+                  alt="Tyre Reviews"
+                  width={80}
+                  height={40}
+                  className="h-8 w-auto object-contain opacity-70 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">Великобританія</span>
+            </div>
           </div>
         </div>
       </section>

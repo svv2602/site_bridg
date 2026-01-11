@@ -45,29 +45,28 @@ export default function AboutPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-12 md:py-16">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-5" />
+      <section className="hero-dark relative overflow-hidden border-b border-hero-border py-12 md:py-16 hero-grid-pattern">
         <div className="container relative mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto max-w-4xl text-left text-stone-50"
+            className="mx-auto max-w-4xl text-left"
           >
             <Breadcrumb
-              className="mb-2"
+              className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Про бренд Bridgestone" },
               ]}
             />
-            <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
+            <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
               Bridgestone — світовий виробник шин
-              <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
+              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                 технічний лідер з глобальною присутністю у більш ніж 150 країнах світу
               </span>
             </h1>
-            <p className="mb-6 max-w-2xl text-sm text-stone-300 md:text-base">
+            <p className="hero-text mb-6 max-w-2xl text-sm md:text-base">
               Від перших заводів у Японії до сучасних дослідницьких центрів у різних регіонах —
               Bridgestone поєднує інженерний досвід, інновації та суворі стандарти якості,
               щоб забезпечувати безпеку і комфорт мільйонам водіїв.
@@ -75,13 +74,13 @@ export default function AboutPage() {
             <div className="flex flex-wrap gap-4">
               <a
                 href="#mission"
-                className="rounded-full bg-stone-50 px-6 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white"
+                className="hero-btn-primary"
               >
                 Дізнатися більше
               </a>
               <Link
                 href="/contacts"
-                className="rounded-full border border-stone-500 bg-transparent px-6 py-3 text-sm font-semibold text-stone-100 hover:bg-stone-800"
+                className="hero-btn-secondary"
               >
                 Зв'язатися з нами
               </Link>

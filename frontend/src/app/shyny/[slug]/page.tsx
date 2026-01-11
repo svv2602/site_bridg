@@ -101,40 +101,40 @@ export default async function TyreModelPage({
         />
       )}
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
+      <section className="hero-dark border-b border-hero-border py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
-            <div className="text-stone-50">
+            <div>
               <Breadcrumb
-                className="mb-3"
+                className="mb-3 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Каталог шин", href: "/passenger-tyres" },
                   { label: model.name },
                 ]}
               />
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-stone-800 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-200 ring-1 ring-stone-700">
+              <div className="hero-badge mb-3 text-[11px] uppercase tracking-wide">
                 <Car className="h-3 w-3" />
                 <span>Модель шини Bridgestone</span>
               </div>
-              <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.7rem]">
+              <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.7rem]">
                 {model.name}
-                <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
+                <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                   {seasonLabels[model.season]} для {formatVehicleTypes(model)}
                 </span>
               </h1>
-              <p className="mb-6 max-w-xl text-sm text-stone-300 md:text-base">
+              <p className="hero-text mb-6 max-w-xl text-sm md:text-base">
                 {model.shortDescription}
               </p>
               <div className="mb-6 flex flex-wrap gap-3 text-xs">
-                <span className="rounded-full bg-stone-800 px-3 py-1 text-stone-100">
+                <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
                   Сезонність: {seasonLabels[model.season]}
                 </span>
-                <span className="rounded-full bg-stone-800 px-3 py-1 text-stone-100">
+                <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
                   Тип авто: {formatVehicleTypes(model)}
                 </span>
                 {model.technologies && model.technologies.length > 0 && (
-                  <span className="rounded-full bg-stone-800 px-3 py-1 text-stone-100">
+                  <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
                     Технології: {model.technologies.length}
                   </span>
                 )}
@@ -142,21 +142,21 @@ export default async function TyreModelPage({
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/dealers"
-                  className="inline-flex items-center gap-2 rounded-full bg-stone-50 px-6 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white"
+                  className="hero-btn-primary inline-flex items-center gap-2"
                 >
                   <MapPin className="h-4 w-4" />
                   Знайти дилера
                 </Link>
                 <Link
                   href="/tyre-search"
-                  className="inline-flex items-center gap-2 rounded-full border border-stone-500 bg-transparent px-6 py-3 text-sm font-semibold text-stone-100 hover:bg-stone-800"
+                  className="hero-btn-secondary inline-flex items-center gap-2"
                 >
                   Підібрати розмір
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="relative aspect-square min-h-[400px] overflow-hidden rounded-3xl border border-stone-800 bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800 lg:min-h-[500px]">
+              <div className="hero-card relative aspect-square min-h-[400px] overflow-hidden bg-gradient-to-br from-muted/50 to-muted lg:min-h-[500px]">
                 {model.imageUrl ? (
                   <Image
                     src={model.imageUrl}
@@ -175,7 +175,7 @@ export default async function TyreModelPage({
                     )}
                   </div>
                 )}
-                <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-stone-900/90 px-4 py-2 text-sm font-semibold text-stone-50 ring-1 ring-stone-600">
+                <div className={`absolute top-4 left-4 flex items-center gap-2 rounded-lg badge-${model.season} px-4 py-2 text-sm font-semibold shadow-lg`}>
                   {(() => {
                     const Icon = SeasonIcons[model.season];
                     return <Icon className="h-5 w-5" aria-hidden="true" />;
@@ -188,9 +188,9 @@ export default async function TyreModelPage({
                   </div>
                 )}
                 {!model.imageUrl && (
-                  <div className="absolute bottom-0 left-0 right-0 border-t border-stone-800 bg-stone-900/95 p-6">
-                    <h3 className="text-lg font-semibold text-stone-50">Фото незабаром</h3>
-                    <p className="text-sm text-stone-300">
+                  <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
+                    <h3 className="text-lg font-semibold text-hero-foreground">Фото незабаром</h3>
+                    <p className="text-sm text-hero-muted">
                       Зображення моделі {model.name} буде додано найближчим часом.
                     </p>
                   </div>

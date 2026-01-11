@@ -52,57 +52,57 @@ export default async function SuvTyresPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
+      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
-            <div className="text-stone-50">
+            <div>
               <Breadcrumb
-                className="mb-2"
+                className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Шини для SUV та 4x4" },
                 ]}
               />
-              <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
+              <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Шини Bridgestone для SUV та 4x4
-                <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
+                <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                   технічний підбір для важчих авто, позашляховиків та кросоверів
                 </span>
               </h1>
-              <p className="mb-6 max-w-xl text-sm text-stone-300 md:text-base">
+              <p className="hero-text mb-6 max-w-xl text-sm md:text-base">
                 Підкорюйте бездоріжжя, гірські серпантини чи міські бордюри — оберіть шини Bridgestone,
                 розроблені для стабільності та зчеплення потужних автомобілів у різних умовах.
               </p>
-              <ul className="mb-8 space-y-3 text-sm text-stone-200">
+              <ul className="mb-8 space-y-3 text-sm text-hero-foreground">
                 {features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-stone-800 p-1.5">
-                      <feat.icon className="h-4 w-4 text-stone-200" />
+                    <div className="mt-1 rounded-full bg-hero-accent p-1.5">
+                      <feat.icon className="h-4 w-4 text-hero-foreground" />
                     </div>
                     <div>
                       <p className="font-medium">{feat.title}</p>
-                      <p className="text-xs text-stone-400 md:text-sm">{feat.description}</p>
+                      <p className="text-xs text-hero-muted md:text-sm">{feat.description}</p>
                     </div>
                   </li>
                 ))}
               </ul>
               <div className="flex flex-wrap gap-4">
-                <Link href="/tyre-search" className="rounded-full bg-stone-50 px-6 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white">
+                <Link href="/tyre-search" className="hero-btn-primary">
                   Підібрати шини
                 </Link>
-                <Link href="#catalog" className="rounded-full border border-stone-500 bg-transparent px-6 py-3 text-sm font-semibold text-stone-100 hover:bg-stone-800">
+                <Link href="#catalog" className="hero-btn-secondary">
                   Переглянути каталог
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="relative h-80 overflow-hidden rounded-3xl border border-stone-800 bg-gradient-to-br from-stone-900 to-stone-800 lg:h-full">
+              <div className="hero-card relative h-80 overflow-hidden lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Car className="h-40 w-40 text-stone-700" />
+                  <Car className="h-40 w-40 text-white/10" />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-800 bg-stone-900/95 p-6">
-                  <h3 className="text-xl font-semibold text-stone-50">SUV та 4x4 з Bridgestone</h3>
-                  <p className="text-sm text-stone-300">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
+                  <h3 className="text-xl font-semibold text-hero-foreground">SUV та 4x4 з Bridgestone</h3>
+                  <p className="text-sm text-hero-muted">
                     Демонстраційний візуал, який буде замінений на офіційні фото в фінальній версії.
                   </p>
                 </div>
