@@ -1,67 +1,143 @@
 @import "tailwindcss";
 
+/* ============================================
+   REDESIGN 2026: Warm Stone Palette
+   Замінено холодні zinc кольори на теплі stone
+   ============================================ */
+
 :root {
   color-scheme: light;
 
-  /* Brand tokens Bridgestone / FirstStop */
+  /* Brand tokens Bridgestone */
   --bridgestone-red: #e30613;
-  --bridgestone-red-dark: #c1000f;
-  --bridgestone-black: #111111;
-  --bridgestone-gray-100: #f4f4f5;
-  --bridgestone-gray-200: #e5e7eb;
-  --bridgestone-gray-500: #6b7280;
-  --bridgestone-gray-700: #4b5563;
+  --bridgestone-red-dark: #b8050f;
+  --bridgestone-red-light: #ff3344;
+  --bridgestone-black: #1c1917;
 
-  /* Light theme (default) */
-  --background: var(--bridgestone-gray-100);
-  --foreground: #111827;
+  /* REDESIGN: Stone palette (warm neutrals) */
+  --stone-50: #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-300: #d6d3d1;
+  --stone-400: #a8a29e;
+  --stone-500: #78716c;
+  --stone-600: #57534e;
+  --stone-700: #44403c;
+  --stone-800: #292524;
+  --stone-900: #1c1917;
+  --stone-950: #0c0a09;
+
+  /* Accent colors */
+  --amber-warm: #f59e0b;
+  --emerald-tech: #10b981;
+  --sky-trust: #0ea5e9;
+
+  /* Light theme (default) - REDESIGN: warm stone colors */
+  --background: var(--stone-50);
+  --foreground: var(--stone-900);
   --primary: var(--bridgestone-red);
   --primary-dark: var(--bridgestone-red-dark);
+  --primary-light: var(--bridgestone-red-light);
   --secondary: var(--bridgestone-black);
-  --accent: var(--bridgestone-gray-700);
-  --muted: var(--bridgestone-gray-500);
+  --accent: var(--stone-600);
+  --muted: var(--stone-500);
+  --muted-foreground: var(--stone-600);
   --card: #ffffff;
-  --border: var(--bridgestone-gray-200);
+  --card-foreground: var(--stone-900);
+  --border: var(--stone-200);
 
+  /* REDESIGN: Updated border-radius system */
   --radius: 0.75rem;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.16), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  --radius-sm: 6px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+
+  /* REDESIGN: Warm shadows with stone tint */
+  --shadow-color: 28, 25, 23;
+  --shadow-sm: 0 1px 2px rgba(var(--shadow-color), 0.05);
+  --shadow: 0 2px 8px rgba(var(--shadow-color), 0.08);
+  --shadow-md: 0 4px 16px rgba(var(--shadow-color), 0.1);
+  --shadow-lg: 0 8px 32px rgba(var(--shadow-color), 0.12);
+  --shadow-xl: 0 16px 48px rgba(var(--shadow-color), 0.15);
+  --shadow-2xl: 0 24px 64px rgba(var(--shadow-color), 0.18);
+  --shadow-glow: 0 0 40px rgba(227, 6, 19, 0.3);
+  --shadow-glow-lg: 0 0 60px rgba(227, 6, 19, 0.4);
 }
 
-/* Explicit тёмная тема через data-theme на <html> */
+/* REDESIGN: Dark theme with warm stone colors */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --background: #0b0b0c;
-  --foreground: #f9fafb;
+  --background: var(--stone-950);
+  --foreground: var(--stone-50);
   --primary: var(--bridgestone-red);
   --primary-dark: var(--bridgestone-red-dark);
-  --secondary: #e5e7eb;
-  --accent: #a1a1aa;
-  --muted: #a1a1aa;           /* zinc-400 для кращого контрасту (було #9ca3af) */
-  --muted-foreground: #a1a1aa;
-  /* більш нейтральна сіра поверхня */
-  --card: #1c1c1f;            /* трохи світліший для кращого контрасту (було #18181b) */
-  --border: #3f3f46;          /* zinc-700 для кращої видимості (було #27272a) */
+  --primary-light: var(--bridgestone-red-light);
+  --secondary: var(--stone-200);
+  --accent: var(--stone-400);
+  --muted: var(--stone-400);
+  --muted-foreground: var(--stone-300);
+  --card: var(--stone-900);
+  --card-foreground: var(--stone-50);
+  --border: var(--stone-700);
 }
 
+/* REDESIGN: Extended theme configuration for Tailwind v4 */
 @theme inline {
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 0.25rem);
-  --radius-sm: calc(var(--radius) - 0.5rem);
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
   --color-border: var(--border);
+
+  /* Stone palette for direct use */
+  --color-stone-50: var(--stone-50);
+  --color-stone-100: var(--stone-100);
+  --color-stone-200: var(--stone-200);
+  --color-stone-300: var(--stone-300);
+  --color-stone-400: var(--stone-400);
+  --color-stone-500: var(--stone-500);
+  --color-stone-600: var(--stone-600);
+  --color-stone-700: var(--stone-700);
+  --color-stone-800: var(--stone-800);
+  --color-stone-900: var(--stone-900);
+  --color-stone-950: var(--stone-950);
+
+  /* Accent colors */
+  --color-amber-warm: var(--amber-warm);
+  --color-emerald-tech: var(--emerald-tech);
+  --color-sky-trust: var(--sky-trust);
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* REDESIGN: Border radius system */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  /* REDESIGN: Shadow system with warm tint */
+  --shadow-sm: var(--shadow-sm);
   --shadow-default: var(--shadow);
-  --shadow-large: var(--shadow-lg);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-glow: var(--shadow-glow);
+  --shadow-glow-lg: var(--shadow-glow-lg);
 }
 
 body {
@@ -173,36 +249,51 @@ html {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Hover effects */
+/* REDESIGN: Hover effects with warm shadows */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
 }
 
 .hover-lift:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
-/* Sharper card corners (closer to official Bridgestone style) */
+/* REDESIGN: Glow hover effect */
+.hover-glow {
+  transition: box-shadow 0.3s ease-out;
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow);
+}
+
+/* REDESIGN: Modern border-radius (larger, softer) */
 .rounded-2xl {
-  border-radius: 0.5rem; /* вместо сильно скруглённых 1rem+ */
+  border-radius: var(--radius-lg); /* 20px */
 }
 
 .rounded-3xl {
-  border-radius: 0.75rem; /* чуть более мягко, но без «пілюль» */
+  border-radius: var(--radius-xl); /* 24px */
 }
 
-/* Primary buttons: по умолчанию тёмные, при hover — красные.
-   В навигации (header) кнопка «Пошук шин» остаётся червоною. */
+/* REDESIGN: Primary buttons - dark by default, red on hover
+   Header CTA stays brand red */
 button.bg-primary {
-  background-color: var(--bridgestone-black);
+  background-color: var(--stone-900);
+  transition: all 0.2s ease-out;
 }
 
 button.bg-primary:hover {
   background-color: var(--bridgestone-red);
+  transform: scale(1.02);
 }
 
-/* Header CTA остаётся брендовым червоним */
+button.bg-primary:active {
+  transform: scale(0.98);
+}
+
+/* Header CTA stays brand red */
 header button.bg-primary {
   background-color: var(--bridgestone-red);
 }
@@ -211,26 +302,26 @@ header button.bg-primary:hover {
   background-color: var(--bridgestone-red-dark);
 }
 
-/* Убираем красный из чипов, иконок и блоков вне хедера */
+/* REDESIGN: Muted primary colors for non-header elements */
 body :not(header) .text-primary {
-  color: var(--bridgestone-gray-700);
+  color: var(--stone-600);
 }
 
 body :not(header) .bg-primary,
 body :not(header) .bg-primary\/90 {
-  background-color: #18181b; /* тёмно‑серый блок вместо красного */
+  background-color: var(--stone-900);
 }
 
 body :not(header) .bg-primary\/10 {
-  background-color: rgba(24, 24, 27, 0.08); /* мягкий серый акцент */
+  background-color: rgba(28, 25, 23, 0.08);
 }
 
 body :not(header) .bg-primary\/20 {
-  background-color: rgba(24, 24, 27, 0.16);
+  background-color: rgba(28, 25, 23, 0.16);
 }
 
 body :not(header) .bg-primary\/30 {
-  background-color: rgba(24, 24, 27, 0.24);
+  background-color: rgba(28, 25, 23, 0.24);
 }
 
 /* Gradient text */
