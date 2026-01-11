@@ -200,8 +200,14 @@ export default async function ComparisonPage({
 
   return (
     <>
-      {jsonLdScript(comparisonSchema)}
-      {jsonLdScript(breadcrumbSchema)}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(comparisonSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
+      />
 
       <main className="min-h-screen bg-background">
         {/* Header */}
