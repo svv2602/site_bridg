@@ -246,24 +246,20 @@ export async function getPayloadTechnologies(): Promise<PayloadTechnology[]> {
 }
 
 // Seasonal content
+// Note: This returns static defaults since /api/seasonal endpoint is not implemented yet
 export async function getSeasonalContent() {
-  const response = await fetch(`${PAYLOAD_URL}/api/seasonal`, {
-    next: { revalidate: 3600 }, // 1 hour cache
-  });
+  // Determine season based on current month
+  const month = new Date().getMonth();
+  const isWinter = month >= 9 || month <= 2; // Oct-Feb = winter season
 
-  if (!response.ok) {
-    // Return default
-    return {
-      heroTitle: 'Шини Bridgestone',
-      heroSubtitle: 'Офіційний представник в Україні',
-      featuredSeason: null,
-      gradient: 'from-zinc-800 to-zinc-900',
-      ctaText: 'Переглянути каталог',
-      ctaLink: '/passenger-tyres',
-    };
-  }
-
-  return response.json();
+  return {
+    heroTitle: isWinter ? 'Зимові шини Bridgestone' : 'Шини Bridgestone',
+    heroSubtitle: 'Офіційний представник в Україні',
+    featuredSeason: isWinter ? 'winter' : 'summer',
+    gradient: 'from-stone-800 to-stone-900',
+    ctaText: isWinter ? 'Зимові моделі' : 'Переглянути каталог',
+    ctaLink: isWinter ? '/passenger-tyres?season=winter' : '/passenger-tyres',
+  };
 }
 
 // Transform Payload data to match existing frontend TyreModel type
