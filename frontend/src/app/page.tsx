@@ -1,10 +1,10 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone } from "lucide-react";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
+import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
+import { getTyreModels } from "@/lib/api/tyres";
+import { getLatestArticles } from "@/lib/api/articles";
 
 const tyreCategories = [
   {
@@ -33,51 +33,6 @@ const tyreCategories = [
   },
 ];
 
-const featuredTyres = [
-  {
-    name: "Bridgestone Turanza T005",
-    slug: "turanza-t005",
-    tag: "Літня • Легковий авто",
-    description: "Комфорт і контроль на мокрій дорозі для щоденних поїздок містом і трасою.",
-    rating: 4.8,
-  },
-  {
-    name: "Bridgestone Blizzak LM005",
-    slug: "blizzak-lm005",
-    tag: "Зимова • Легковий / SUV",
-    description: "Відмінне зчеплення на снігу та мокрому асфальті для безпечної зими.",
-    rating: 4.9,
-  },
-  {
-    name: "Bridgestone Weather Control A005",
-    slug: "weather-control-a005",
-    tag: "Всесезонна • Легковий авто",
-    description: "Цілорічне рішення з акцентом на дощову та змінну погоду.",
-    rating: 4.7,
-  },
-];
-
-const articles = [
-  {
-    title: "Як обрати шини для міста та траси",
-    slug: "yak-obraty-shyny-dlya-mista-ta-trasy",
-    readingTime: "4 хвилини читання",
-    category: "Поради",
-  },
-  {
-    title: "Як читати маркування шин: повний гід",
-    slug: "yak-chytaty-markuvannya-shyn",
-    readingTime: "6 хвилин читання",
-    category: "Освіта",
-  },
-  {
-    title: "Коли змінювати сезонні шини в Україні",
-    slug: "koly-zminyuvaty-sezonni-shyny",
-    readingTime: "3 хвилини читання",
-    category: "Сезонність",
-  },
-];
-
 const features = [
   {
     icon: Shield,
@@ -101,7 +56,41 @@ const features = [
   },
 ];
 
-export default function Home() {
+const seasonLabels: Record<string, string> = {
+  summer: "Літня",
+  winter: "Зимова",
+  allseason: "Всесезонна",
+};
+
+const vehicleLabels: Record<string, string> = {
+  passenger: "Легковий авто",
+  suv: "SUV/Кросовер",
+  lcv: "Комерційний",
+};
+
+export default async function Home() {
+  // Fetch popular tyres from API
+  const allTyres = await getTyreModels();
+  const featuredTyres = allTyres
+    .filter(t => t.isPopular)
+    .slice(0, 3)
+    .map(t => ({
+      name: `Bridgestone ${t.name}`,
+      slug: t.slug,
+      tag: `${seasonLabels[t.season] || t.season} • ${t.vehicleTypes.map(v => vehicleLabels[v] || v).join(' / ')}`,
+      description: t.shortDescription || '',
+      rating: 4.8,
+    }));
+
+  // Fetch latest articles from API
+  const latestArticles = await getLatestArticles(3);
+  const articles = latestArticles.map(a => ({
+    title: a.title,
+    slug: a.slug,
+    readingTime: a.readingTimeMinutes ? `${a.readingTimeMinutes} хвилин читання` : '5 хвилин читання',
+    category: a.tags?.[0] || 'Поради',
+  }));
+
   return (
     <div className="bg-background text-foreground">
       {/* Hero with Seasonal Content */}
@@ -120,11 +109,9 @@ export default function Home() {
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feat, idx) => (
-              <motion.div
+              <AnimatedCard
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                delay={idx * 0.1}
                 className="rounded-2xl border border-border bg-card p-6 text-center shadow-lg"
               >
                 <div className="mx-auto mb-4 inline-flex rounded-full bg-primary/10 p-3">
@@ -132,7 +119,7 @@ export default function Home() {
                 </div>
                 <h3 className="mb-2 text-xl font-bold">{feat.title}</h3>
                 <p className="text-sm text-muted-foreground">{feat.description}</p>
-              </motion.div>
+              </AnimatedCard>
             ))}
           </div>
         </div>
@@ -149,11 +136,10 @@ export default function Home() {
               </p>
               <div className="space-y-4">
                 {tyreCategories.map((cat, idx) => (
-                  <motion.div
+                  <AnimatedCardX
                     key={cat.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.1 }}
+                    delay={idx * 0.1}
+                    direction="left"
                     className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
                   >
                     <div className={`rounded-full bg-gradient-to-br ${cat.color} p-3`}>
@@ -169,7 +155,7 @@ export default function Home() {
                     >
                       Перейти
                     </Link>
-                  </motion.div>
+                  </AnimatedCardX>
                 ))}
               </div>
             </div>
@@ -179,38 +165,41 @@ export default function Home() {
                 Обрані моделі Bridgestone для найпоширеніших сценаріїв водіння.
               </p>
               <div className="space-y-6">
-                {featuredTyres.map((tyre, idx) => (
-                  <motion.div
-                    key={tyre.name}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.1 }}
-                    className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
-                  >
-                    <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Star className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold">{tyre.name}</h3>
-                      <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
-                      <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
-                      <div className="mt-3 flex gap-3">
-                        <Link
-                          href={`/shyny/${tyre.slug}`}
-                          className="rounded-full border border-border bg-transparent px-4 py-1.5 text-sm font-semibold hover:bg-card"
-                        >
-                          Детальніше
-                        </Link>
-                        <Link
-                          href="/dealers"
-                          className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark"
-                        >
-                          Знайти дилера
-                        </Link>
+                {featuredTyres.length > 0 ? (
+                  featuredTyres.map((tyre, idx) => (
+                    <AnimatedCardX
+                      key={tyre.slug}
+                      delay={idx * 0.1}
+                      direction="right"
+                      className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
+                    >
+                      <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Star className="h-6 w-6 text-primary" />
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold">{tyre.name}</h3>
+                        <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
+                        <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
+                        <div className="mt-3 flex gap-3">
+                          <Link
+                            href={`/shyny/${tyre.slug}`}
+                            className="rounded-full border border-border bg-transparent px-4 py-1.5 text-sm font-semibold hover:bg-card"
+                          >
+                            Детальніше
+                          </Link>
+                          <Link
+                            href="/dealers"
+                            className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                          >
+                            Знайти дилера
+                          </Link>
+                        </div>
+                      </div>
+                    </AnimatedCardX>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">Завантаження популярних моделей...</p>
+                )}
               </div>
             </div>
           </div>
@@ -228,11 +217,9 @@ export default function Home() {
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {articles.map((article, idx) => (
-              <motion.div
-                key={article.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              <AnimatedCard
+                key={article.slug}
+                delay={idx * 0.1}
                 className="rounded-2xl border border-border bg-card p-6 shadow-lg"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -240,16 +227,13 @@ export default function Home() {
                 </div>
                 <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
                 <p className="mb-4 text-sm text-muted-foreground">{article.readingTime}</p>
-                <p className="text-sm text-muted-foreground">
-                  У цій статті будуть прості пояснення та практичні поради для водіїв в Україні.
-                </p>
                 <Link
                   href={`/advice/${article.slug}`}
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                 >
                   Читати статтю <ChevronRight className="h-4 w-4" />
                 </Link>
-              </motion.div>
+              </AnimatedCard>
             ))}
           </div>
         </div>
@@ -258,12 +242,7 @@ export default function Home() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-primary p-10 text-white shadow-2xl"
-          >
+          <AnimatedCard className="rounded-3xl bg-primary p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини для вашого автомобіля
@@ -284,7 +263,7 @@ export default function Home() {
                 Зателефонувати
               </a>
             </div>
-          </motion.div>
+          </AnimatedCard>
         </div>
       </section>
     </div>

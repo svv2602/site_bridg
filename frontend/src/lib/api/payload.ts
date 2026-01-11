@@ -309,6 +309,7 @@ export function transformPayloadArticle(article: PayloadArticle) {
     title: article.title,
     subtitle: article.subtitle,
     previewText: article.previewText,
+    content: article.body, // Lexical rich text content
     readingTimeMinutes: article.readingTimeMinutes || 5,
     publishedAt: article.createdAt, // Use createdAt as publishedAt
     tags: article.tags?.map(t => t.tag) || [],

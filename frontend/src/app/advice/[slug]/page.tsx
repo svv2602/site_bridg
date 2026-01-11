@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
+import { LexicalRenderer } from "@/components/LexicalRenderer";
 import ShareButtons from "@/components/ShareButtons";
 import { getSiteUrl } from "@/lib/utils/tyres";
 
@@ -125,15 +126,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <section className="py-10">
         <div className="container mx-auto max-w-4xl px-4 md:px-8">
           <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-a:text-primary">
-            <p className="text-sm text-muted-foreground">
-              {article.previewText}
-            </p>
-            <p className="mt-6 text-[13px] text-muted-foreground">
-              Повний текст статті, структуровані підзаголовки та ілюстрації
-              будуть підтягуватися з headless CMS відповідно до моделі контенту
-              Article (див. CMS_CONTENT_MODEL.md). У цьому прототипі
-              використовується короткий текст‑тизер.
-            </p>
+            {article.content ? (
+              <LexicalRenderer content={article.content as Parameters<typeof LexicalRenderer>[0]['content']} />
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {article.previewText}
+                </p>
+                <p className="mt-6 text-[13px] text-muted-foreground">
+                  Повний текст статті буде підтягуватися з CMS.
+                </p>
+              </>
+            )}
           </article>
         </div>
       </section>

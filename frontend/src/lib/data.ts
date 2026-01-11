@@ -100,6 +100,7 @@ export interface Article {
   title: string;
   subtitle?: string;
   previewText: string;
+  content?: unknown; // Lexical rich text content from CMS
   readingTimeMinutes?: number;
   publishedAt?: string; // ISO date
   tags?: string[];

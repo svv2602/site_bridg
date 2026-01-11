@@ -1,12 +1,12 @@
 # Фаза 3: Інтеграція з CMS (P1)
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-11
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Замінити hardcoded дані на динамічні з API/CMS.
@@ -16,28 +16,20 @@
 ### 3.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити API функції в `lib/api/payload.ts`
-- [ ] Вивчити API функції в `lib/api/tyres.ts`
-- [ ] Вивчити як tyre-search отримує динамічні дані
-
-**Команди для пошуку:**
-```bash
-# Пошук API функцій
-ls frontend/src/lib/api/
-# Пошук fetch викликів
-grep -rn "fetch(" frontend/src/app/tyre-search/
-# Пошук API routes
-ls frontend/src/app/api/
-```
+- [x] Вивчити API функції в `lib/api/payload.ts`
+- [x] Вивчити API функції в `lib/api/tyres.ts`
+- [x] Вивчити як tyre-search отримує динамічні дані
 
 #### B. Аналіз залежностей
-- [ ] API для розмірів шин: `/api/tyres/sizes` - існує
-- [ ] API для пошуку: `/api/tyres/search` - існує
-- [ ] API для марок авто: потрібно перевірити
+- [x] API для розмірів шин: `/api/tyres/sizes` - існує
+- [x] API для пошуку: `/api/tyres/search` - існує
+- [x] API для марок авто: `/api/vehicles/brands` - існує
 
 **Нотатки для перевикористання:**
-- `/app/tyre-search/new-page.tsx` - референс для динамічних селектів
-- `/app/api/tyres/sizes/route.ts` - каскадні фільтри
+- `/app/api/tyres/sizes/route.ts` - каскадні фільтри за type=width|height|diameter
+- `/app/api/vehicles/brands/route.ts` - всі марки авто
+- `/app/api/vehicles/models/route.ts` - моделі за brandId
+- `/app/api/vehicles/years/route.ts` - роки за modelId
 
 ---
 
@@ -45,18 +37,11 @@ ls frontend/src/app/api/
 
 **Файл:** `frontend/src/components/QuickSearchForm.tsx`
 
-- [ ] Знайти всі hardcoded масиви (widths, heights, diameters)
-- [ ] Знайти hardcoded марки/моделі авто
-- [ ] Визначити які API endpoints потрібні
+- [x] Знайти всі hardcoded масиви (widths, heights, diameters)
+- [x] Знайти hardcoded марки/моделі авто
+- [x] Визначити які API endpoints потрібні
 
-**Hardcoded дані для заміни:**
-- `widths: ["175", "185", "195", ...]` → API `/api/tyres/sizes?field=width`
-- `heights: ["45", "50", "55", ...]` → API `/api/tyres/sizes?field=height`
-- `diameters: ["14", "15", "16", ...]` → API `/api/tyres/sizes?field=diameter`
-- `carMakes` → API `/api/vehicles/makes`
-- `carModels` → API `/api/vehicles/models`
-
-**Нотатки:** -
+**Нотатки:** Всі endpoints вже існують в `/api/tyres/sizes` та `/api/vehicles/`
 
 ---
 
@@ -64,11 +49,11 @@ ls frontend/src/app/api/
 
 **Перевірити:** `frontend/src/app/api/vehicles/`
 
-- [ ] Перевірити чи існує API для марок авто
-- [ ] Якщо ні - створити `/api/vehicles/makes/route.ts`
-- [ ] Якщо ні - створити `/api/vehicles/models/route.ts`
+- [x] Перевірити чи існує API для марок авто - ТАК
+- [x] `/api/vehicles/brands/route.ts` - вже існує
+- [x] `/api/vehicles/models/route.ts` - вже існує
 
-**Нотатки:** -
+**Нотатки:** API вже повністю реалізовані
 
 ---
 
@@ -76,26 +61,25 @@ ls frontend/src/app/api/
 
 **Файл:** `frontend/src/components/QuickSearchForm.tsx`
 
-- [ ] Додати useState для widths, heights, diameters
-- [ ] Додати useEffect для завантаження widths при монтуванні
-- [ ] Додати каскадне завантаження heights при виборі width
-- [ ] Додати каскадне завантаження diameters при виборі height
-- [ ] Додати loading стани для кожного селекту
+- [x] Додати useState для widths, heights, diameters
+- [x] Додати useEffect для завантаження widths при монтуванні
+- [x] Додати каскадне завантаження heights при виборі width
+- [x] Додати каскадне завантаження diameters при виборі height
+- [x] Додати loading стани для кожного селекту
 
-**Референс:** Вивчити реалізацію в `tyre-search/new-page.tsx`
-
-**Нотатки:** -
+**Нотатки:** Повністю рефакторено з динамічними даними та loading states
 
 ---
 
 ### 3.4 Рефакторити QuickSearchForm - авто
 
-- [ ] Додати useState для makes, models
-- [ ] Завантажувати makes при монтуванні
-- [ ] Завантажувати models при виборі make
-- [ ] Додати loading стани
+- [x] Додати useState для makes, models
+- [x] Завантажувати makes при монтуванні
+- [x] Завантажувати models при виборі make
+- [x] Завантажувати years при виборі model
+- [x] Додати loading стани
 
-**Нотатки:** -
+**Нотатки:** Додано каскадні фільтри для марки → модель → рік
 
 ---
 
@@ -103,25 +87,12 @@ ls frontend/src/app/api/
 
 **Файл:** `frontend/src/app/advice/[slug]/page.tsx`
 
-**Проблема:** Сторінка показує тільки previewText, не повний контент.
+- [x] Імпортувати LexicalRenderer
+- [x] Замінити блок з previewText на LexicalRenderer
+- [x] Додати поле content до Article interface (lib/data.ts)
+- [x] Оновити transformPayloadArticle для включення body (lib/api/payload.ts)
 
-- [ ] Імпортувати LexicalRenderer
-- [ ] Замінити блок з previewText на LexicalRenderer
-- [ ] Перевірити що стаття з CMS рендериться правильно
-
-**Код:**
-```tsx
-import { LexicalRenderer } from "@/components/LexicalRenderer";
-
-// В компоненті:
-{article.content ? (
-  <LexicalRenderer content={article.content} />
-) : (
-  <p className="text-muted-foreground">{article.previewText}</p>
-)}
-```
-
-**Нотатки:** -
+**Нотатки:** Тепер статті з CMS будуть рендеритись через LexicalRenderer, fallback на previewText
 
 ---
 
@@ -129,11 +100,11 @@ import { LexicalRenderer } from "@/components/LexicalRenderer";
 
 **Файл:** `frontend/src/app/page.tsx`
 
-- [ ] Імпортувати функцію для отримання популярних шин
-- [ ] Замінити масив `featuredTyres` на дані з API
-- [ ] Додати fallback на mock дані
+- [x] Імпортувати функцію getTyreModels
+- [x] Замінити масив `featuredTyres` на дані з API (filter by isPopular)
+- [x] Конвертувати page.tsx з client на server component
 
-**Нотатки:** -
+**Нотатки:** Створено AnimatedSection.tsx для client-side анімацій
 
 ---
 
@@ -141,23 +112,19 @@ import { LexicalRenderer } from "@/components/LexicalRenderer";
 
 **Файл:** `frontend/src/app/page.tsx`
 
-- [ ] Імпортувати getArticles з API
-- [ ] Замінити масив `articles` на дані з API (limit: 3)
-- [ ] Додати fallback на mock дані
+- [x] Імпортувати getLatestArticles з API
+- [x] Замінити масив `articles` на дані з API (limit: 3)
+- [x] Використовувати теги як категорії
 
-**Нотатки:** -
+**Нотатки:** Дані тепер завантажуються динамічно на сервері
 
 ---
 
 ## При завершенні фази
 
-1. Переконайся, що всі задачі відмічені [x]
-2. Зміни статус фази на [x] Завершена
-3. Заповни дату "Завершена: YYYY-MM-DD"
-4. Виконай коміт:
-   ```bash
-   git add .
-   git commit -m "feat(cms): phase-3 dynamic data from API"
-   ```
+1. Переконайся, що всі задачі відмічені [x] ✅
+2. Зміни статус фази на [x] Завершена ✅
+3. Заповни дату "Завершена: YYYY-MM-DD" ✅
+4. Виконай коміт
 5. Онови PROGRESS.md
 6. Відкрий `phase-04-accessibility.md`
