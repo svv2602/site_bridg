@@ -138,13 +138,13 @@ export default function TyreSearchPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
+      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mx-auto flex max-w-5xl flex-col gap-6 text-left text-zinc-50 md:flex-row md:items-center md:justify-between"
+            className="mx-auto flex max-w-5xl flex-col gap-6 text-left text-stone-50 md:flex-row md:items-center md:justify-between"
           >
             <div>
               <Breadcrumb
@@ -156,24 +156,24 @@ export default function TyreSearchPage() {
               />
               <h1 className="mb-3 text-3xl font-semibold tracking-tight md:text-4xl">
                 Технічний підбір шин
-                <span className="block text-base font-normal text-zinc-300 md:text-lg">
+                <span className="block text-base font-normal text-stone-300 md:text-lg">
                   за розміром або за вашим автомобілем
                 </span>
               </h1>
-              <p className="max-w-xl text-sm text-zinc-300 md:text-base">
+              <p className="max-w-xl text-sm text-stone-300 md:text-base">
                 Введіть параметри, а ми підберемо відповідні моделі шин Bridgestone з демонстраційної бази.
                 Інтерфейс оформлений у більш «технічному» стилі на основі референсів Goodyear.
               </p>
             </div>
-            <div className="hidden gap-3 rounded-2xl border border-zinc-700 bg-zinc-900/60 p-4 text-xs text-zinc-300 shadow-lg md:flex md:flex-col">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+            <div className="hidden gap-3 rounded-2xl border border-stone-700 bg-stone-900/60 p-4 text-xs text-stone-300 shadow-lg md:flex md:flex-col">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">
                 Режим підбору
               </span>
               <p>
                 Оберіть пошук за <span className="font-semibold">типорозміром</span> або
                 <span className="font-semibold"> за авто</span>, заповніть поля й запустіть пошук.
               </p>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-stone-500">
                 У продакшн‑версії форми будуть підключені до повного каталогу шин та бази авто.
               </p>
             </div>
@@ -187,13 +187,13 @@ export default function TyreSearchPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Search Panel */}
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 text-zinc-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
+              <div className="rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="text-2xl font-bold">Оберіть спосіб пошуку</h2>
                   <div
                     role="tablist"
                     aria-label="Спосіб пошуку шин"
-                    className="inline-flex rounded-full bg-zinc-800 p-1 ring-1 ring-zinc-700"
+                    className="inline-flex rounded-full bg-stone-800 p-1 ring-1 ring-stone-700"
                   >
                     <button
                       type="button"
@@ -203,8 +203,8 @@ export default function TyreSearchPage() {
                       aria-controls="size-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "size"
-                          ? "bg-zinc-50 text-zinc-900"
-                          : "text-zinc-300 hover:text-zinc-50"
+                          ? "bg-stone-50 text-stone-900"
+                          : "text-stone-300 hover:text-stone-50"
                       }`}
                       onClick={() => setMode("size")}
                     >
@@ -219,8 +219,8 @@ export default function TyreSearchPage() {
                       aria-controls="car-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "car"
-                          ? "bg-zinc-50 text-zinc-900"
-                          : "text-zinc-300 hover:text-zinc-50"
+                          ? "bg-stone-50 text-stone-900"
+                          : "text-stone-300 hover:text-stone-50"
                       }`}
                       onClick={() => setMode("car")}
                     >
@@ -241,18 +241,18 @@ export default function TyreSearchPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                       {/* Ширина */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-zinc-100">
-                          Ширина {widthOptions.length > 0 && <span className="text-zinc-500">({widthOptions.length})</span>}
+                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                          Ширина {widthOptions.length > 0 && <span className="text-stone-500">({widthOptions.length})</span>}
                         </label>
                         <div className="relative">
-                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingWidths ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-10 pr-8 text-sm text-zinc-50 outline-none focus:border-primary"
+                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary"
                               value={width}
                               onChange={(e) => setWidth(e.target.value)}
                               required
@@ -271,18 +271,18 @@ export default function TyreSearchPage() {
 
                       {/* Висота профілю */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-zinc-100">
-                          Висота профілю {aspectOptions.length > 0 && <span className="text-zinc-500">({aspectOptions.length})</span>}
+                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                          Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500">({aspectOptions.length})</span>}
                         </label>
                         <div className="relative">
-                          <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+                          <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingAspects ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-10 pr-8 text-sm text-zinc-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                               value={aspectRatio}
                               onChange={(e) => setAspectRatio(e.target.value)}
                               disabled={!width}
@@ -302,18 +302,18 @@ export default function TyreSearchPage() {
 
                       {/* Діаметр */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-zinc-100">
-                          Діаметр {diameterOptions.length > 0 && <span className="text-zinc-500">({diameterOptions.length})</span>}
+                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                          Діаметр {diameterOptions.length > 0 && <span className="text-stone-500">({diameterOptions.length})</span>}
                         </label>
                         <div className="relative">
-                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingDiameters ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-10 pr-8 text-sm text-zinc-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                               value={diameter}
                               onChange={(e) => setDiameter(e.target.value)}
                               disabled={!aspectRatio}
@@ -338,7 +338,7 @@ export default function TyreSearchPage() {
                     <button
                       type="submit"
                       disabled={!width || !aspectRatio || !diameter || searching}
-                      className="w-full rounded-full bg-zinc-50 py-3 text-base font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full rounded-full bg-stone-50 py-3 text-base font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {searching ? (
                         <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
@@ -351,11 +351,11 @@ export default function TyreSearchPage() {
                     {/* Результати пошуку за розміром - відразу після форми */}
                     {hasSearched && (
                       <div
-                        className="mt-8 border-t border-zinc-700 pt-6"
+                        className="mt-8 border-t border-stone-700 pt-6"
                         aria-live="polite"
                         aria-atomic="true"
                       >
-                        <h3 className="mb-4 text-xl font-bold text-zinc-50">
+                        <h3 className="mb-4 text-xl font-bold text-stone-50">
                           Результати пошуку {results.length > 0 && `(${results.length})`}
                           {searchedSize && (
                             <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-white">
@@ -364,9 +364,9 @@ export default function TyreSearchPage() {
                           )}
                         </h3>
                         {results.length === 0 ? (
-                          <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-6 text-center">
-                            <Search className="mx-auto h-10 w-10 text-zinc-500" />
-                            <p className="mt-3 text-zinc-400">
+                          <div className="rounded-xl border border-stone-700 bg-stone-800/50 p-6 text-center">
+                            <Search className="mx-auto h-10 w-10 text-stone-500" />
+                            <p className="mt-3 text-stone-400">
                               Шин Bridgestone для розміру {searchedSize} не знайдено в каталозі.
                             </p>
                             <Link
@@ -402,30 +402,30 @@ export default function TyreSearchPage() {
             {/* Tips */}
             <div className="space-y-6">
               {mode === "car" ? (
-                <div className="rounded-2xl border border-zinc-700 bg-zinc-800/50 p-6">
-                  <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-zinc-100">
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
                     <Database className="h-5 w-5 text-primary" />
                     База даних авто
                   </h3>
-                  <ul className="space-y-3 text-sm text-zinc-400">
+                  <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-green-500" />
-                      <span><strong className="text-zinc-200">227 марок</strong> автомобілів</span>
+                      <span><strong className="text-foreground">227 марок</strong> автомобілів</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-green-500" />
-                      <span><strong className="text-zinc-200">5,900+ моделей</strong> від 1990 до 2024 року</span>
+                      <span><strong className="text-foreground">5,900+ моделей</strong> від 1990 до 2024 року</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-green-500" />
-                      <span><strong className="text-zinc-200">300,000+ комплектацій</strong> з розмірами</span>
+                      <span><strong className="text-foreground">300,000+ комплектацій</strong> з розмірами</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-green-500" />
-                      <span><strong className="text-zinc-200">OEM та альтернативні</strong> розміри шин</span>
+                      <span><strong className="text-foreground">OEM та альтернативні</strong> розміри шин</span>
                     </li>
                   </ul>
-                  <p className="mt-4 text-xs text-zinc-500">
+                  <p className="mt-4 text-xs text-muted-foreground">
                     Дані включають заводські розміри та допустимі заміни з урахуванням різних осей.
                   </p>
                 </div>

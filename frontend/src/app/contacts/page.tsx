@@ -114,13 +114,13 @@ export default function ContactsPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
+      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto max-w-4xl text-left text-zinc-50"
+            className="mx-auto max-w-4xl text-left text-stone-50"
           >
             <Breadcrumb
               className="mb-2"
@@ -131,11 +131,11 @@ export default function ContactsPage() {
             />
             <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Зв'язок з Bridgestone Україна
-              <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
+              <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
                 технічна підтримка, підбір шин та інформація про дилерів
               </span>
             </h1>
-            <p className="mb-6 max-w-2xl text-sm text-zinc-300 md:text-base">
+            <p className="mb-6 max-w-2xl text-sm text-stone-300 md:text-base">
               Ми готові допомогти з вибором шин, пошуком офіційного дилера або відповісти на технічні
               запитання щодо продукції Bridgestone. Скористайтеся контактами нижче або формою зворотного
               зв'язку.

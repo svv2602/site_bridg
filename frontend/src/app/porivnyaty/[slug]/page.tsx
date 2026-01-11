@@ -211,7 +211,7 @@ export default async function ComparisonPage({
 
       <main className="min-h-screen bg-background">
         {/* Header */}
-        <section className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white py-12">
+        <section className="bg-gradient-to-br from-stone-900 to-stone-800 text-white py-12">
           <div className="container mx-auto px-4">
             <Breadcrumb
               className="mb-4"
@@ -225,7 +225,7 @@ export default async function ComparisonPage({
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               {compareTyres.map((t) => t.name).join(" vs ")}
             </h1>
-            <p className="text-zinc-300 text-lg">
+            <p className="text-stone-300 text-lg">
               Порівняння характеристик шин Bridgestone
             </p>
           </div>
@@ -242,7 +242,7 @@ export default async function ComparisonPage({
                   key={tyre.slug}
                   className="bg-card border border-border rounded-xl p-6 text-center"
                 >
-                  <div className="aspect-square relative mb-4 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden">
+                  <div className="aspect-square relative mb-4 bg-stone-100 dark:bg-stone-800 rounded-lg overflow-hidden">
                     <Image
                       src={tyre.imageUrl || "/placeholder-tyre.png"}
                       alt={tyre.name}

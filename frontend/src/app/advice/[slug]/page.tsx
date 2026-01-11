@@ -74,7 +74,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
       />
-      <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
+      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-4xl px-4 md:px-8">
           <Breadcrumb
             className="mb-4"
@@ -86,20 +86,20 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           />
           <Link
             href="/advice"
-            className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-zinc-200 hover:text-white"
+            className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-stone-200 hover:text-white"
           >
             <ArrowLeft className="h-3 w-3" />
             До всіх статей
           </Link>
-          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
+          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-stone-50 md:text-4xl">
             {article.title}
           </h1>
           {article.subtitle && (
-            <p className="mb-3 text-sm text-zinc-300 md:text-base">
+            <p className="mb-3 text-sm text-stone-300 md:text-base">
               {article.subtitle}
             </p>
           )}
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-400">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-stone-400">
             <div className="flex flex-wrap items-center gap-3">
               {article.readingTimeMinutes && (
                 <span className="inline-flex items-center gap-1">
@@ -117,7 +117,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <ShareButtons
               title={article.title}
               url={articleUrl}
-              className="text-zinc-400"
+              className="text-stone-400"
             />
           </div>
         </div>

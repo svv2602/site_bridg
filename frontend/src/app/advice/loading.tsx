@@ -4,17 +4,17 @@ export default function Loading() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero skeleton */}
-      <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
+      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl animate-pulse">
-            <div className="h-3 w-40 rounded bg-zinc-700 mb-4" />
-            <div className="h-10 w-3/4 rounded bg-zinc-700 mb-2" />
-            <div className="h-5 w-1/2 rounded bg-zinc-700 mb-6" />
-            <div className="h-4 w-full rounded bg-zinc-700 mb-2" />
-            <div className="h-4 w-4/5 rounded bg-zinc-700 mb-6" />
+            <div className="h-3 w-40 rounded bg-stone-700 mb-4" />
+            <div className="h-10 w-3/4 rounded bg-stone-700 mb-2" />
+            <div className="h-5 w-1/2 rounded bg-stone-700 mb-6" />
+            <div className="h-4 w-full rounded bg-stone-700 mb-2" />
+            <div className="h-4 w-4/5 rounded bg-stone-700 mb-6" />
             <div className="flex gap-4">
-              <div className="h-12 w-40 rounded-full bg-zinc-700" />
-              <div className="h-12 w-36 rounded-full bg-zinc-700" />
+              <div className="h-12 w-40 rounded-full bg-stone-700" />
+              <div className="h-12 w-36 rounded-full bg-stone-700" />
             </div>
           </div>
         </div>

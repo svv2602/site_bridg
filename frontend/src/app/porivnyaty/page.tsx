@@ -67,7 +67,7 @@ export default function ComparisonSelectionPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
-      <section className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white py-12">
+      <section className="bg-gradient-to-br from-stone-900 to-stone-800 text-white py-12">
         <div className="container mx-auto px-4">
           <Breadcrumb
             className="mb-4"
@@ -79,7 +79,7 @@ export default function ComparisonSelectionPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Порівняння шин
           </h1>
-          <p className="text-zinc-300 text-lg max-w-2xl">
+          <p className="text-stone-300 text-lg max-w-2xl">
             Оберіть 2-3 моделі шин для порівняння характеристик, EU-маркування
             та технологій.
           </p>
@@ -235,7 +235,7 @@ export default function ComparisonSelectionPage() {
                     )}
 
                     {/* Image */}
-                    <div className="aspect-square relative mb-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg overflow-hidden">
+                    <div className="aspect-square relative mb-3 bg-stone-100 dark:bg-stone-800 rounded-lg overflow-hidden">
                       <Image
                         src={tyre.imageUrl || "/placeholder-tyre.png"}
                         alt={tyre.name}
