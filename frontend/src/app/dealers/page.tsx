@@ -380,13 +380,13 @@ export default function DealersPage() {
           >
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>
             <p className="mb-8 text-lg opacity-90">
-              Зв'яжіться з нами напряму — ми допоможемо знайти найближчу точку продажу
+              Зв&apos;яжіться з нами напряму — ми допоможемо знайти найближчу точку продажу
               або організуємо доставку шин у ваше місто.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="tel:+380800123456"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />
                 Зателефонувати

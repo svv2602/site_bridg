@@ -82,7 +82,7 @@ export default function AboutPage() {
                 href="/contacts"
                 className="hero-btn-secondary"
               >
-                Зв'язатися з нами
+                Зв&apos;язатися з нами
               </Link>
             </div>
           </motion.div>
@@ -239,7 +239,7 @@ export default function AboutPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/dealers"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
               >
                 Знайти дилера
               </Link>

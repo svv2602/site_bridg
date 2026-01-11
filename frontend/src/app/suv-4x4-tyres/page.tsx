@@ -204,7 +204,7 @@ export default async function SuvTyresPage() {
               з урахуванням стилю водіння, умов експлуатації та бюджету.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/contacts" className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100">
+              <Link href="/contacts" className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100">
                 Отримати консультацію
               </Link>
               <Link href="/dealers" className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">

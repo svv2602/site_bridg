@@ -130,7 +130,7 @@ export default function ContactsPage() {
               ]}
             />
             <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
-              Зв'язок з Bridgestone Україна
+              Зв&apos;язок з Bridgestone Україна
               <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
                 технічна підтримка, підбір шин та інформація про дилерів
               </span>
@@ -138,7 +138,7 @@ export default function ContactsPage() {
             <p className="hero-text mb-6 max-w-2xl text-sm md:text-base">
               Ми готові допомогти з вибором шин, пошуком офіційного дилера або відповісти на технічні
               запитання щодо продукції Bridgestone. Скористайтеся контактами нижче або формою зворотного
-              зв'язку.
+              зв&apos;язку.
             </p>
           </motion.div>
         </div>
@@ -198,7 +198,7 @@ export default function ContactsPage() {
             >
               <h2 className="mb-6 text-2xl font-bold">Надішліть нам повідомлення</h2>
               <p className="mb-8 text-muted-foreground">
-                Заповніть форму, і наші фахівці зв'язуться з вами найближчим часом.
+                Заповніть форму, і наші фахівці зв&apos;язуться з вами найближчим часом.
               </p>
 
               {status === 'success' ? (
@@ -208,7 +208,7 @@ export default function ContactsPage() {
                     Дякуємо за звернення!
                   </h3>
                   <p className="mt-2 text-green-700 dark:text-green-300">
-                    Ваше повідомлення отримано. Ми зв'яжемося з вами протягом 24 годин.
+                    Ваше повідомлення отримано. Ми зв&apos;яжемося з вами протягом 24 годин.
                   </p>
                   <button
                     onClick={() => setStatus('idle')}
@@ -234,7 +234,7 @@ export default function ContactsPage() {
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="name" className="mb-2 block text-sm font-medium">Ім'я *</label>
+                      <label htmlFor="name" className="mb-2 block text-sm font-medium">Ім&apos;я *</label>
                       <input
                         type="text"
                         id="name"
@@ -406,7 +406,7 @@ export default function ContactsPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="tel:0800123456"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />
                 Зателефонувати зараз

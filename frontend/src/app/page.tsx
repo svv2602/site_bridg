@@ -319,7 +319,7 @@ export default async function Home() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-gray-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
               >
                 Отримати консультацію
               </Link>
