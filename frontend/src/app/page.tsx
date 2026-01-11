@@ -182,16 +182,16 @@ export default async function Home() {
                         <h3 className="text-xl font-bold">{tyre.name}</h3>
                         <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
                         <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
-                        <div className="mt-3 flex gap-3">
+                        <div className="mt-3 flex flex-wrap gap-2">
                           <Link
                             href={`/shyny/${tyre.slug}`}
-                            className="rounded-full border border-border bg-transparent px-4 py-1.5 text-sm font-semibold hover:bg-card"
+                            className="rounded-full border border-border bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold hover:bg-card"
                           >
                             Детальніше
                           </Link>
                           <Link
                             href="/dealers"
-                            className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                            className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-primary-dark"
                           >
                             Знайти дилера
                           </Link>

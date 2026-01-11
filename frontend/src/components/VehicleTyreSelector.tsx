@@ -765,12 +765,12 @@ export default function VehicleTyreSelector() {
                               : "Всесезонні"}
                         </div>
                       </div>
-                      <div className="p-4">
-                        <h4 className="font-bold text-foreground transition-colors group-hover:text-primary">
+                      <div className="flex flex-col p-4">
+                        <h4 className="font-bold text-foreground transition-colors group-hover:text-primary line-clamp-2">
                           {tyre.name}
                         </h4>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {tyre.matchingSizes.map((size) => (
+                        <div className="mt-2 flex flex-wrap gap-1 min-h-[1.5rem]">
+                          {tyre.matchingSizes.slice(0, 3).map((size) => (
                             <span
                               key={size}
                               className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground"
@@ -778,19 +778,24 @@ export default function VehicleTyreSelector() {
                               {size}
                             </span>
                           ))}
+                          {tyre.matchingSizes.length > 3 && (
+                            <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                              +{tyre.matchingSizes.length - 3}
+                            </span>
+                          )}
                         </div>
-                        <div className="mt-4 flex gap-2">
+                        <div className="mt-auto pt-4 flex flex-wrap gap-2">
                           <Link
                             href={`/shyny/${tyre.slug}`}
-                            className="flex-1 rounded-full border border-border px-3 py-1.5 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                            className="flex-1 min-w-[80px] rounded-full border border-border px-3 py-1.5 text-center text-xs sm:text-sm font-semibold text-foreground transition-colors hover:bg-muted"
                           >
                             Детальніше
                           </Link>
                           <Link
                             href="/dealers"
-                            className="flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                            className="flex-1 min-w-[80px] flex items-center justify-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                           >
-                            <MapPin className="h-4 w-4" />
+                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
                             Купити
                           </Link>
                         </div>
