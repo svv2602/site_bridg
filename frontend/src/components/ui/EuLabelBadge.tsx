@@ -33,9 +33,9 @@ const typeIcons: Record<EuLabelType, React.ReactNode> = {
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
-  sm: "px-1.5 py-0.5 text-[10px] gap-0.5",
-  md: "px-2 py-1 text-xs gap-1",
-  lg: "px-2.5 py-1.5 text-sm gap-1.5",
+  sm: "px-2 py-1 text-xs gap-1",
+  md: "px-2.5 py-1.5 text-sm gap-1",
+  lg: "px-3 py-2 text-base gap-1.5",
 };
 
 const iconSizes: Record<BadgeSize, string> = {
@@ -55,7 +55,7 @@ export function EuLabelBadge({
   if (type === "noise" && typeof value === "number") {
     return (
       <span
-        className={`inline-flex items-center rounded-md bg-zinc-100 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
+        className={`inline-flex items-center rounded-lg bg-stone-100 font-medium text-stone-700 dark:bg-stone-800 dark:text-stone-300 ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
       >
         {typeIcons[type]}
         {showLabel && <span className="uppercase opacity-70">{typeLabels[type]}</span>}
@@ -70,7 +70,7 @@ export function EuLabelBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded-md font-medium ${colorClass} ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
+      className={`inline-flex items-center rounded-lg font-medium ${colorClass} ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
     >
       {typeIcons[type]}
       {showLabel && <span className="uppercase opacity-80">{typeLabels[type]}</span>}

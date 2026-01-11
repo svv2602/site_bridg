@@ -26,12 +26,12 @@ const variantStyles: Record<BadgeVariant, string> = {
   winner: "bg-amber-500 text-amber-950 border-amber-600",
   recommended: "bg-green-500 text-green-950 border-green-600",
   top3: "bg-blue-500 text-blue-950 border-blue-600",
-  category: "bg-zinc-200 text-zinc-800 border-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:border-zinc-600",
+  category: "bg-stone-200 text-stone-800 border-stone-300 dark:bg-stone-700 dark:text-stone-100 dark:border-stone-600",
   eco: "bg-emerald-500 text-emerald-950 border-emerald-600",
   summer: "bg-gradient-to-r from-orange-500 to-yellow-500 text-white border-orange-600",
   winter: "bg-gradient-to-r from-blue-500 to-cyan-400 text-white border-blue-600",
   allseason: "bg-gradient-to-r from-emerald-500 to-teal-400 text-white border-emerald-600",
-  default: "bg-zinc-100 text-zinc-800 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700",
+  default: "bg-stone-100 text-stone-800 border-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:border-stone-700",
 };
 
 const variantIcons: Record<BadgeVariant, ReactNode> = {
@@ -47,9 +47,9 @@ const variantIcons: Record<BadgeVariant, ReactNode> = {
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
-  sm: "px-2 py-0.5 text-xs gap-1",
-  md: "px-2.5 py-1 text-xs gap-1.5",
-  lg: "px-3 py-1.5 text-sm gap-2",
+  sm: "px-2.5 py-1 text-xs gap-1",
+  md: "px-3 py-1.5 text-sm gap-1.5",
+  lg: "px-4 py-2 text-base gap-2",
 };
 
 const iconSizes: Record<BadgeSize, string> = {

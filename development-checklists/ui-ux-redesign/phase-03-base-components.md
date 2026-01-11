@@ -3,10 +3,10 @@
 ## Статус
 - [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-11
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Оновити базові UI компоненти: кнопки, inputs, badges відповідно до нової системи дизайну.
@@ -16,10 +16,10 @@
 ### 3.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Знайти всі кнопки в проекті
-- [ ] Знайти всі inputs та selects
-- [ ] Переглянути `frontend/src/components/ui/Badge.tsx`
-- [ ] Переглянути `frontend/src/components/ui/EuLabelBadge.tsx`
+- [x] Знайти всі кнопки в проекті
+- [x] Знайти всі inputs та selects
+- [x] Переглянути `frontend/src/components/ui/Badge.tsx`
+- [x] Переглянути `frontend/src/components/ui/EuLabelBadge.tsx`
 
 **Команди для пошуку:**
 ```bash
@@ -32,25 +32,25 @@ ls frontend/src/components/ui/
 ```
 
 #### B. Аналіз залежностей
-- [ ] Які компоненти використовують кнопки?
-- [ ] Які форми використовують inputs?
+- [x] Які компоненти використовують кнопки?
+- [x] Які форми використовують inputs?
 
-**Компоненти з кнопками:** -
-**Форми з inputs:** -
+**Компоненти з кнопками:** 32 файли
+**Форми з inputs:** 4 файли (QuickSearchForm, VehicleTyreSelector, FuelCalculator, LoadingSkeleton)
 
 #### C. Перевірка дизайну
-- [ ] Вивчити `plan/result_audit/03-recommendations.md` — Button стилі
-- [ ] Вивчити `plan/result_audit/03-recommendations.md` — Input стилі
+- [x] Вивчити `plan/result_audit/03-recommendations.md` — Button стилі
+- [x] Вивчити `plan/result_audit/03-recommendations.md` — Input стилі
 
 **Референс-документ:** `plan/result_audit/03-recommendations.md`
 
-**Нотатки для перевикористання:** -
+**Нотатки для перевикористання:** Створено CSS утиліти .btn-primary, .btn-secondary, .btn-ghost, .input, .select замість заміни всіх класів
 
 ---
 
 ### 3.1 Оновлення Primary Button стилів
 
-- [ ] Оновити globals.css з новими button стилями:
+- [x] Оновити globals.css з новими button стилями:
   ```css
   .btn-primary {
     display: inline-flex;
@@ -78,13 +78,13 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .btn-primary з hover та active станами
 
 ---
 
 ### 3.2 Оновлення Secondary Button стилів
 
-- [ ] Додати secondary button:
+- [x] Додати secondary button:
   ```css
   .btn-secondary {
     display: inline-flex;
@@ -108,13 +108,13 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .btn-secondary з border та hover
 
 ---
 
 ### 3.3 Оновлення Ghost Button стилів
 
-- [ ] Додати ghost button:
+- [x] Додати ghost button:
   ```css
   .btn-ghost {
     display: inline-flex;
@@ -136,13 +136,13 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .btn-ghost з напівпрозорим hover
 
 ---
 
 ### 3.4 Оновлення Input стилів
 
-- [ ] Додати/оновити input стилі:
+- [x] Додати/оновити input стилі:
   ```css
   .input {
     width: 100%;
@@ -174,13 +174,13 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .input з focus станом та dark mode підтримкою
 
 ---
 
 ### 3.5 Оновлення Select стилів
 
-- [ ] Додати select стилі:
+- [x] Додати select стилі:
   ```css
   .select {
     appearance: none;
@@ -207,40 +207,40 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .select з SVG стрілкою та focus станом
 
 ---
 
 ### 3.6 Оновлення Badge.tsx
 
-- [ ] Відкрити `frontend/src/components/ui/Badge.tsx`
-- [ ] Оновити базові стилі:
+- [x] Відкрити `frontend/src/components/ui/Badge.tsx`
+- [x] Оновити базові стилі:
   - border-radius з `rounded-md` на `rounded-lg` (12px)
   - padding з `px-2 py-1` на `px-3 py-1.5`
   - font-size мінімум `text-sm` (14px)
 
 **Файли:** `frontend/src/components/ui/Badge.tsx`
-**Нотатки:** -
+**Нотатки:** Оновлено: zinc → stone, збільшено padding та font-size
 
 ---
 
 ### 3.7 Оновлення EuLabelBadge.tsx
 
-- [ ] Відкрити `frontend/src/components/ui/EuLabelBadge.tsx`
-- [ ] Збільшити мінімальний розмір:
+- [x] Відкрити `frontend/src/components/ui/EuLabelBadge.tsx`
+- [x] Збільшити мінімальний розмір:
   - `sm` variant: `px-2 py-1 text-xs` (мінімум 12px)
   - `md` variant: `px-2.5 py-1.5 text-sm`
   - `lg` variant: `px-3 py-2 text-base`
-- [ ] Оновити border-radius на `rounded-lg`
+- [x] Оновити border-radius на `rounded-lg`
 
 **Файли:** `frontend/src/components/ui/EuLabelBadge.tsx`
-**Нотатки:** -
+**Нотатки:** Оновлено: zinc → stone, text-[10px] → text-xs, rounded-md → rounded-lg
 
 ---
 
 ### 3.8 Оновлення сезонних badge стилів
 
-- [ ] Додати/оновити сезонні badge в globals.css:
+- [x] Додати/оновити сезонні badge в globals.css:
   ```css
   .badge-summer {
     background: linear-gradient(135deg, #fb923c, #ea580c);
@@ -271,16 +271,16 @@ ls frontend/src/components/ui/
   ```
 
 **Файли:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Додано .badge-summer, .badge-winter, .badge-allseason з градієнтами
 
 ---
 
 ### 3.9 Перевірка та тестування
 
-- [ ] Запустити `npm run build`
-- [ ] Візуально перевірити кнопки на різних сторінках
-- [ ] Перевірити inputs в QuickSearchForm
-- [ ] Перевірити badges на TyreCard
+- [x] Запустити `npm run build`
+- [x] Візуально перевірити кнопки на різних сторінках
+- [x] Перевірити inputs в QuickSearchForm
+- [x] Перевірити badges на TyreCard
 
 **Команди:**
 ```bash
@@ -288,7 +288,7 @@ cd frontend && npm run build && npm run dev
 ```
 
 **Файли:** -
-**Нотатки:** -
+**Нотатки:** Build успішний! 55 сторінок згенеровано без помилок
 
 ---
 
