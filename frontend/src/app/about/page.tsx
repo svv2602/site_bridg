@@ -103,7 +103,7 @@ export default function AboutPage() {
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <stat.icon className="h-6 w-6 text-primary" />
+                  <stat.icon className="h-6 w-6 text-primary" aria-hidden="true" />
                 </div>
                 <div className="text-3xl font-bold text-secondary">{stat.value}</div>
                 <div className="mt-2 text-sm text-muted-foreground">{stat.label}</div>
@@ -127,7 +127,7 @@ export default function AboutPage() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="mt-1 rounded-full bg-primary/10 p-2">
-                    <Target className="h-5 w-5 text-primary" />
+                    <Target className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Інновації для безпеки</h4>
@@ -139,7 +139,7 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="mt-1 rounded-full bg-primary/10 p-2">
-                    <Globe className="h-5 w-5 text-primary" />
+                    <Globe className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Відповідальність перед планетою</h4>
@@ -160,7 +160,7 @@ export default function AboutPage() {
                     className="rounded-xl border border-border bg-card p-5 transition-colors hover:bg-primary/5"
                   >
                     <div className="mb-3 inline-flex rounded-full bg-primary/10 p-2">
-                      <value.icon className="h-5 w-5 text-primary" />
+                      <value.icon className="h-5 w-5 text-primary" aria-hidden="true" />
                     </div>
                     <h4 className="mb-2 font-semibold">{value.title}</h4>
                     <p className="text-sm text-muted-foreground">{value.description}</p>
@@ -248,7 +248,7 @@ export default function AboutPage() {
                 href="tel:+380800123456"
                 className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
               >
-                <Phone className="h-4 w-4" />
+                <Phone className="h-4 w-4" aria-hidden="true" />
                 Зателефонувати
               </a>
             </div>

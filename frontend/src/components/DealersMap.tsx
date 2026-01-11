@@ -188,18 +188,22 @@ export default function DealersMap({
   }
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={center}
-      zoom={selectedDealerId ? 12 : 6}
-      options={{
-        disableDefaultUI: false,
-        zoomControl: true,
-        streetViewControl: false,
-        mapTypeControl: false,
-        fullscreenControl: true,
-      }}
+    <div
+      role="application"
+      aria-label="Інтерактивна карта дилерів Bridgestone в Україні"
     >
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        zoom={selectedDealerId ? 12 : 6}
+        options={{
+          disableDefaultUI: false,
+          zoomControl: true,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: true,
+        }}
+      >
       {dealersWithCoords.map((dealer) => (
         <Marker
           key={dealer.id}
@@ -224,6 +228,7 @@ export default function DealersMap({
           <DealerInfoContent dealer={infoWindowDealer} />
         </InfoWindow>
       )}
-    </GoogleMap>
+      </GoogleMap>
+    </div>
   );
 }

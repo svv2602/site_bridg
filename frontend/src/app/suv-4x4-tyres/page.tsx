@@ -52,10 +52,10 @@ export default async function SuvTyresPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 py-8 md:py-12">
+      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
-            <div className="text-zinc-50">
+            <div className="text-stone-50">
               <Breadcrumb
                 className="mb-2"
                 items={[
@@ -65,44 +65,44 @@ export default async function SuvTyresPage() {
               />
               <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Шини Bridgestone для SUV та 4x4
-                <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
+                <span className="mt-1 block text-base font-normal text-stone-300 md:text-lg">
                   технічний підбір для важчих авто, позашляховиків та кросоверів
                 </span>
               </h1>
-              <p className="mb-6 max-w-xl text-sm text-zinc-300 md:text-base">
+              <p className="mb-6 max-w-xl text-sm text-stone-300 md:text-base">
                 Підкорюйте бездоріжжя, гірські серпантини чи міські бордюри — оберіть шини Bridgestone,
                 розроблені для стабільності та зчеплення потужних автомобілів у різних умовах.
               </p>
-              <ul className="mb-8 space-y-3 text-sm text-zinc-200">
+              <ul className="mb-8 space-y-3 text-sm text-stone-200">
                 {features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-zinc-800 p-1.5">
-                      <feat.icon className="h-4 w-4 text-zinc-200" />
+                    <div className="mt-1 rounded-full bg-stone-800 p-1.5">
+                      <feat.icon className="h-4 w-4 text-stone-200" />
                     </div>
                     <div>
                       <p className="font-medium">{feat.title}</p>
-                      <p className="text-xs text-zinc-400 md:text-sm">{feat.description}</p>
+                      <p className="text-xs text-stone-400 md:text-sm">{feat.description}</p>
                     </div>
                   </li>
                 ))}
               </ul>
               <div className="flex flex-wrap gap-4">
-                <Link href="/tyre-search" className="rounded-full bg-zinc-50 px-6 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white">
+                <Link href="/tyre-search" className="rounded-full bg-stone-50 px-6 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white">
                   Підібрати шини
                 </Link>
-                <Link href="#catalog" className="rounded-full border border-zinc-500 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-800">
+                <Link href="#catalog" className="rounded-full border border-stone-500 bg-transparent px-6 py-3 text-sm font-semibold text-stone-100 hover:bg-stone-800">
                   Переглянути каталог
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="relative h-80 overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-800 lg:h-full">
+              <div className="relative h-80 overflow-hidden rounded-3xl border border-stone-800 bg-gradient-to-br from-stone-900 to-stone-800 lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Car className="h-40 w-40 text-zinc-700" />
+                  <Car className="h-40 w-40 text-stone-700" />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
-                  <h3 className="text-xl font-semibold text-zinc-50">SUV та 4x4 з Bridgestone</h3>
-                  <p className="text-sm text-zinc-300">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-800 bg-stone-900/95 p-6">
+                  <h3 className="text-xl font-semibold text-stone-50">SUV та 4x4 з Bridgestone</h3>
+                  <p className="text-sm text-stone-300">
                     Демонстраційний візуал, який буде замінений на офіційні фото в фінальній версії.
                   </p>
                 </div>

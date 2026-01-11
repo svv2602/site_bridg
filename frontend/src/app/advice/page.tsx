@@ -79,12 +79,12 @@ export default async function AdvicePage() {
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg hover:border-primary/30"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <cat.icon className="h-6 w-6 text-primary" />
+                  <cat.icon className="h-6 w-6 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">{cat.label}</h3>
                 <p className="text-sm text-muted-foreground">{cat.count} статей</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  Перейти <ArrowRight className="h-4 w-4" />
+                  Перейти <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </Link>
             ))}
@@ -105,7 +105,7 @@ export default async function AdvicePage() {
           </div>
           {articles.length === 0 ? (
             <div className="text-center py-12">
-              <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+              <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" aria-hidden="true" />
               <p className="text-muted-foreground">Статті поки відсутні</p>
             </div>
           ) : (
@@ -117,7 +117,7 @@ export default async function AdvicePage() {
                 >
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <BookOpen className="h-16 w-16 text-primary/40" />
+                      <BookOpen className="h-16 w-16 text-primary/40" aria-hidden="true" />
                     </div>
                     <div className="absolute top-4 left-4 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-white">
                       Стаття

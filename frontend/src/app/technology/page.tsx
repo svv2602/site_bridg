@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 };
 
 const techIcons: Record<string, React.ReactNode> = {
-  "run-flat": <Shield className="h-6 w-6" />,
-  "silica": <Droplets className="h-6 w-6" />,
-  "noise-cancelling": <Wind className="h-6 w-6" />,
-  "fuel-efficiency": <Gauge className="h-6 w-6" />,
-  "default": <Cpu className="h-6 w-6" />,
+  "run-flat": <Shield className="h-6 w-6" aria-hidden="true" />,
+  "silica": <Droplets className="h-6 w-6" aria-hidden="true" />,
+  "noise-cancelling": <Wind className="h-6 w-6" aria-hidden="true" />,
+  "fuel-efficiency": <Gauge className="h-6 w-6" aria-hidden="true" />,
+  "default": <Cpu className="h-6 w-6" aria-hidden="true" />,
 };
 
 const benefits = [
@@ -121,7 +121,7 @@ export default async function TechnologyPage() {
             <div className="relative">
               <div className="relative h-80 overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-800 lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Cpu className="h-40 w-40 text-zinc-700" />
+                  <Cpu className="h-40 w-40 text-zinc-700" aria-hidden="true" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-900/95 p-6">
                   <h3 className="text-xl font-semibold text-zinc-50">Технології у дії</h3>
@@ -146,7 +146,7 @@ export default async function TechnologyPage() {
                 className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <benefit.icon className="h-6 w-6 text-primary" />
+                  <benefit.icon className="h-6 w-6 text-primary" aria-hidden="true" />
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground">{benefit.description}</p>
@@ -162,7 +162,7 @@ export default async function TechnologyPage() {
           <h2 className="mb-10 text-3xl font-bold">Технології Bridgestone</h2>
           {technologies.length === 0 ? (
             <div className="text-center py-12">
-              <Cpu className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+              <Cpu className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" aria-hidden="true" />
               <p className="text-muted-foreground">Інформація про технології завантажується</p>
             </div>
           ) : (
@@ -225,7 +225,7 @@ export default async function TechnologyPage() {
                                   href={`/shyny/${tyre.slug}`}
                                   className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                                 >
-                                  Детальніше <ChevronRight className="h-4 w-4" />
+                                  Детальніше <ChevronRight className="h-4 w-4" aria-hidden="true" />
                                 </Link>
                               </div>
                             ))}
