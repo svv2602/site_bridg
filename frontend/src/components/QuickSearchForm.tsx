@@ -207,7 +207,7 @@ export function QuickSearchForm() {
     router.push(`/tyre-search?${params.toString()}`);
   };
 
-  const selectClasses = "w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-50 outline-none focus:border-primary disabled:opacity-50";
+  const selectClasses = "w-full rounded-xl border border-stone-700 bg-stone-900 px-3 py-2 text-sm text-stone-50 outline-none focus:border-primary disabled:opacity-50";
 
   const handleTabKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -217,16 +217,16 @@ export function QuickSearchForm() {
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/95 p-6 text-zinc-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+    <div className="rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
       <h2 className="text-xl font-semibold">Швидкий пошук шин</h2>
-      <p className="mt-1 text-sm text-zinc-100">
+      <p className="mt-1 text-sm text-stone-300">
         Виберіть спосіб пошуку: за розміром або за вашим автомобілем.
       </p>
 
       <div
         role="tablist"
         aria-label="Спосіб пошуку шин"
-        className="mt-4 flex rounded-full bg-zinc-800 p-1 text-sm font-medium ring-1 ring-zinc-700"
+        className="mt-4 flex rounded-full bg-stone-800 p-1 text-sm font-medium ring-1 ring-stone-700"
       >
         <button
           type="button"
@@ -237,8 +237,8 @@ export function QuickSearchForm() {
           aria-controls="size-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'size'
-              ? 'bg-zinc-50 text-zinc-900'
-              : 'text-zinc-300 hover:text-zinc-50'
+              ? 'bg-stone-50 text-stone-900'
+              : 'text-stone-300 hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('size')}
           onKeyDown={handleTabKeyDown}
@@ -254,8 +254,8 @@ export function QuickSearchForm() {
           aria-controls="car-panel"
           className={`flex-1 rounded-full px-4 py-2 transition-colors ${
             activeTab === 'car'
-              ? 'bg-zinc-50 text-zinc-900'
-              : 'text-zinc-300 hover:text-zinc-50'
+              ? 'bg-stone-50 text-stone-900'
+              : 'text-stone-300 hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('car')}
           onKeyDown={handleTabKeyDown}
@@ -274,7 +274,7 @@ export function QuickSearchForm() {
         >
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-100">Ширина</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Ширина</label>
               <select
                 value={width}
                 onChange={(e) => {
@@ -292,7 +292,7 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-100">Висота профілю</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Висота профілю</label>
               <select
                 value={aspectRatio}
                 onChange={(e) => {
@@ -309,7 +309,7 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-100">Діаметр</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Діаметр</label>
               <select
                 value={diameter}
                 onChange={(e) => setDiameter(e.target.value)}
@@ -324,7 +324,7 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-100">Сезонність</label>
+            <label className="mb-1 block text-sm font-medium text-stone-300">Сезонність</label>
             <select
               value={season}
               onChange={(e) => setSeason(e.target.value)}
@@ -339,7 +339,7 @@ export function QuickSearchForm() {
           <button
             type="submit"
             disabled={isSearching}
-            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="mt-2 w-full rounded-full bg-stone-50 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSearching ? (
               <>
@@ -360,7 +360,7 @@ export function QuickSearchForm() {
           onSubmit={handleCarSearch}
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-100">Марка авто</label>
+            <label className="mb-1 block text-sm font-medium text-stone-300">Марка авто</label>
             <select
               value={brandId}
               onChange={(e) => {
@@ -379,7 +379,7 @@ export function QuickSearchForm() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-100">Модель</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Модель</label>
               <select
                 value={modelId}
                 onChange={(e) => {
@@ -396,7 +396,7 @@ export function QuickSearchForm() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-100">Рік випуску</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Рік випуску</label>
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
@@ -411,7 +411,7 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-100">Тип шини</label>
+            <label className="mb-1 block text-sm font-medium text-stone-300">Тип шини</label>
             <select
               value={carSeason}
               onChange={(e) => setCarSeason(e.target.value)}
@@ -426,7 +426,7 @@ export function QuickSearchForm() {
           <button
             type="submit"
             disabled={isSearching}
-            className="mt-2 w-full rounded-full bg-zinc-50 py-3 text-sm font-semibold text-zinc-900 shadow-lg ring-2 ring-zinc-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="mt-2 w-full rounded-full bg-stone-50 py-3 text-sm font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSearching ? (
               <>
