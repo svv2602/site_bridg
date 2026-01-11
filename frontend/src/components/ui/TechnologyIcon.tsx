@@ -101,8 +101,8 @@ const techConfigs: Record<TechnologySlug, TechConfig> = {
   },
   default: {
     icon: Target,
-    color: "text-zinc-500",
-    bg: "bg-zinc-500/10",
+    color: "text-stone-500",
+    bg: "bg-stone-500/10",
     label: "Technology",
   },
 };
@@ -214,7 +214,7 @@ export function TechnologyGroup({
         />
       ))}
       {remaining > 0 && (
-        <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-1 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+        <span className="inline-flex items-center rounded-full bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-400">
           +{remaining}
         </span>
       )}

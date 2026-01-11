@@ -24,9 +24,9 @@ const seasonIcons: Record<Season, React.ReactNode> = {
 };
 
 const seasonColors: Record<Season, string> = {
-  summer: "bg-amber-500",
-  winter: "bg-sky-500",
-  allseason: "bg-emerald-500",
+  summer: "badge-summer",
+  winter: "badge-winter",
+  allseason: "badge-allseason",
 };
 
 // Badge priority for displaying top badge
@@ -78,16 +78,16 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
   return (
     <Link
       href={`/shyny/${tyre.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-xl"
+      className="group flex flex-col overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800 bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
     >
       {/* Image Section - Large and prominent */}
-      <div className={`relative ${imageHeight} overflow-hidden bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800`}>
+      <div className={`relative ${imageHeight} overflow-hidden bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800`}>
         {tyre.imageUrl ? (
           <Image
             src={tyre.imageUrl}
             alt={`Шина ${tyre.name}`}
             fill
-            className="object-contain p-6 transition-transform duration-500 group-hover:scale-110"
+            className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
@@ -95,7 +95,7 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
         )}
 
         {/* Season Badge */}
-        <div className={`absolute top-4 left-4 flex items-center gap-1.5 rounded-full ${seasonColors[tyre.season]} px-3 py-1.5 text-xs font-semibold text-white shadow-lg`}>
+        <div className={`absolute top-4 left-4 flex items-center gap-1.5 rounded-lg ${seasonColors[tyre.season]} px-3 py-1.5 text-sm font-semibold text-white shadow-lg`}>
           {seasonIcons[tyre.season]}
           <span>{seasonLabels[tyre.season]}</span>
         </div>
@@ -118,7 +118,7 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
 
         {/* Quick View Button on Hover */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <span className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-zinc-900 shadow-xl">
+          <span className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-stone-900 shadow-xl">
             Детальніше
             <ChevronRight className="h-4 w-4" />
           </span>
