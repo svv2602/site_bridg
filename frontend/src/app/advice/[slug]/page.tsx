@@ -5,6 +5,8 @@ import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
+import ShareButtons from "@/components/ShareButtons";
+import { getSiteUrl } from "@/lib/utils/tyres";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -51,11 +53,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 
+  const siteUrl = getSiteUrl();
+  const articleUrl = `${siteUrl}/advice/${article.slug}`;
+
   const articleSchema = generateArticleSchema(article);
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Головна", url: "https://bridgestone.ua/" },
-    { name: "Поради", url: "https://bridgestone.ua/advice" },
-    { name: article.title, url: `https://bridgestone.ua/advice/${article.slug}` },
+    { name: "Головна", url: `${siteUrl}/` },
+    { name: "Поради", url: `${siteUrl}/advice` },
+    { name: article.title, url: articleUrl },
   ]);
 
   return (
@@ -93,19 +98,26 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {article.subtitle}
             </p>
           )}
-          <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
-            {article.readingTimeMinutes && (
-              <span className="inline-flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {article.readingTimeMinutes} хвилин читання
-              </span>
-            )}
-            {article.tags && article.tags.length > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <Tag className="h-3 w-3" />
-                {article.tags.join(", ")}
-              </span>
-            )}
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-400">
+            <div className="flex flex-wrap items-center gap-3">
+              {article.readingTimeMinutes && (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {article.readingTimeMinutes} хвилин читання
+                </span>
+              )}
+              {article.tags && article.tags.length > 0 && (
+                <span className="inline-flex items-center gap-1">
+                  <Tag className="h-3 w-3" />
+                  {article.tags.join(", ")}
+                </span>
+              )}
+            </div>
+            <ShareButtons
+              title={article.title}
+              url={articleUrl}
+              className="text-zinc-400"
+            />
           </div>
         </div>
       </section>

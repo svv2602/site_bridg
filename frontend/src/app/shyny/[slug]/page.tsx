@@ -293,12 +293,13 @@ export default async function TyreModelPage({
               )}
 
               {/* Full Description */}
-              {model.fullDescription && (
+              {model.fullDescription ? (
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                   <h2 className="mb-4 text-xl font-bold">Про модель {model.name}</h2>
-                  <LexicalRenderer content={model.fullDescription} />
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <LexicalRenderer content={model.fullDescription as any} />
                 </div>
-              )}
+              ) : null}
 
               {/* Key Benefits */}
               {model.keyBenefits && model.keyBenefits.length > 0 && (

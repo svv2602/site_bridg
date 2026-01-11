@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Globe, Award, Shield, Users, Target, Zap, Phone } from "lucide-react";
+import { Breadcrumb } from "@/components/ui";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -53,11 +54,13 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
             className="mx-auto max-w-4xl text-left text-zinc-50"
           >
-            <nav className="mb-2 text-xs text-zinc-400">
-              <Link href="/" className="hover:text-zinc-100">Головна</Link>
-              <span className="mx-2">/</span>
-              <span className="font-medium text-zinc-100">Про бренд Bridgestone</span>
-            </nav>
+            <Breadcrumb
+              className="mb-2"
+              items={[
+                { label: "Головна", href: "/" },
+                { label: "Про бренд Bridgestone" },
+              ]}
+            />
             <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
               Bridgestone — світовий виробник шин
               <span className="mt-1 block text-base font-normal text-zinc-300 md:text-lg">
@@ -186,7 +189,8 @@ export default function AboutPage() {
               континентів.
             </p>
             <div className="relative">
-              <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-primary/30" />
+              {/* Timeline line: left on mobile, center on desktop */}
+              <div className="absolute left-6 top-0 h-full w-0.5 bg-primary/30 lg:left-1/2 lg:-translate-x-1/2" />
               <div className="relative grid gap-8">
                 {[
                   { year: "1931", event: "Заснування компанії в місті Куробе, Японія." },
@@ -197,13 +201,16 @@ export default function AboutPage() {
                 ].map((item, idx) => (
                   <div
                     key={item.year}
-                    className={`flex items-center ${idx % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"} flex-col lg:flex-row`}
+                    className={`flex items-start lg:items-center ${idx % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"}`}
                   >
+                    {/* Desktop: empty spacer for alternating layout */}
                     <div className="hidden lg:block lg:w-1/2" />
-                    <div className="relative z-10 mx-4 mb-4 lg:mb-0 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-lg">
+                    {/* Year badge: left-aligned on mobile, centered on desktop */}
+                    <div className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-lg lg:mx-4">
                       {item.year}
                     </div>
-                    <div className="lg:w-1/2 text-left">
+                    {/* Event card: with left margin on mobile */}
+                    <div className="ml-4 flex-1 lg:ml-0 lg:w-1/2">
                       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                         <p className="font-medium">{item.event}</p>
                       </div>

@@ -129,7 +129,7 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
         );
 
       case "heading":
-        const HeadingTag = child.tag as keyof JSX.IntrinsicElements;
+        const HeadingTag = child.tag;
         const headingClasses = {
           h1: "text-3xl font-bold mb-4",
           h2: "text-2xl font-bold mb-3",

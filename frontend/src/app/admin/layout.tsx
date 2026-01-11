@@ -1,11 +1,9 @@
-import { Metadata } from "next";
-import Link from "next/link";
-import { Home, Activity, Database, Sparkles } from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard | Bridgestone Ukraine",
-  description: "Content automation dashboard",
-};
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Activity, Database, Sparkles, Menu, X } from "lucide-react";
 
 const navItems = [
   { href: "/admin/automation", label: "Automation", icon: Activity },
@@ -18,6 +16,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => pathname === href;
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Header */}
@@ -31,12 +34,18 @@ export default function AdminLayout({
               <span className="font-semibold">Admin Dashboard</span>
             </Link>
           </div>
-          <nav className="flex items-center gap-6">
+
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-6 lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                className={`flex items-center gap-2 text-sm transition-colors ${
+                  isActive(item.href)
+                    ? "font-medium text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
@@ -50,7 +59,54 @@ export default function AdminLayout({
               Main Site
             </Link>
           </nav>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className="rounded-md p-2 text-muted-foreground hover:bg-zinc-100 hover:text-foreground lg:hidden dark:hover:bg-zinc-700"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? "Закрити меню" : "Відкрити меню"}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
         </div>
+
+        {/* Mobile navigation */}
+        {mobileMenuOpen && (
+          <nav className="border-t border-border bg-white px-4 py-4 lg:hidden dark:bg-zinc-800">
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    isActive(item.href)
+                      ? "bg-primary/10 font-medium text-primary"
+                      : "text-muted-foreground hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              ))}
+              <div className="my-2 border-t border-border" />
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-700"
+              >
+                <Home className="h-5 w-5" />
+                Main Site
+              </Link>
+            </div>
+          </nav>
+        )}
       </header>
 
       {/* Main content */}

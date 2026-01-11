@@ -3,10 +3,10 @@
 ## Статус
 - [ ] Не розпочата
 - [ ] В процесі
-- [ ] Завершена
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-10
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Реалізувати додаткові покращення, які підвищать якість UX:
@@ -21,11 +21,11 @@
 ### 6.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз пріоритетів
-- [ ] Оцінити важливість i18n для проекту
-- [ ] Оцінити важливість mobile navigation в адмінці
-- [ ] Визначити scope покращень
+- [x] Оцінити важливість i18n для проекту
+- [x] Оцінити важливість mobile navigation в адмінці
+- [x] Визначити scope покращень
 
-**Нотатки:** -
+**Нотатки:** i18n — висока пріоритетність для майбутньої локалізації. Задачі 6.7, 6.8 (CSRF, rate limiting) можуть бути відкладені, оскільки автентифікація вже реалізована через HTTP Basic Auth.
 
 ---
 
@@ -35,11 +35,11 @@
 
 Створити файл з усіма UI текстами для майбутньої локалізації:
 
-- [ ] Створити `frontend/src/lib/i18n/uk.ts`
-- [ ] Винести тексти з головної сторінки
-- [ ] Винести тексти з форм пошуку
-- [ ] Винести тексти з CTA блоків
-- [ ] Створити helper функцію `t(key)`
+- [x] Створити `frontend/src/lib/i18n/uk.ts`
+- [x] Винести тексти з головної сторінки
+- [x] Винести тексти з форм пошуку
+- [x] Винести тексти з CTA блоків
+- [x] Створити helper функцію `t(key)`
 
 **Структура файлу:**
 ```tsx
@@ -99,10 +99,10 @@ export function t(key: string): string {
 
 **Джерело:** `plan/result_audit/06-admin.md`
 
-- [ ] Додати hamburger menu кнопку на mobile
-- [ ] Створити mobile drawer/sidebar
-- [ ] Зберегти desktop navigation для великих екранів
-- [ ] Додати animation для drawer
+- [x] Додати hamburger menu кнопку на mobile
+- [x] Створити mobile drawer/sidebar
+- [x] Зберегти desktop navigation для великих екранів
+- [x] Додати animation для drawer
 
 **Файл:** `frontend/src/app/admin/layout.tsx`
 
@@ -153,9 +153,9 @@ export default function AdminLayout({ children }) {
 
 **Джерело:** `plan/result_audit/04-content.md`
 
-- [ ] Виправити alternating layout на mobile
-- [ ] Зробити вертикальний timeline для всіх екранів < lg
-- [ ] Зберегти alternating pattern тільки для desktop
+- [x] Виправити alternating layout на mobile
+- [x] Зробити вертикальний timeline для всіх екранів < lg
+- [x] Зберегти alternating pattern тільки для desktop
 
 **Файл:** `frontend/src/app/about/page.tsx`
 
@@ -165,11 +165,13 @@ export default function AdminLayout({ children }) {
 
 **Джерело:** `plan/result_audit/04-content.md`
 
-- [ ] Додати кнопки share (Facebook, Twitter/X, LinkedIn, Telegram)
-- [ ] Використовувати Web Share API на mobile
-- [ ] Fallback на share URLs для desktop
+- [x] Додати кнопки share (Facebook, Twitter/X, LinkedIn, Telegram)
+- [x] Використовувати Web Share API на mobile
+- [x] Fallback на share URLs для desktop
 
-**Файл:** `frontend/src/app/advice/[slug]/page.tsx`
+**Файли:**
+- `frontend/src/components/ShareButtons.tsx` (новий)
+- `frontend/src/app/advice/[slug]/page.tsx`
 
 **Приклад:**
 ```tsx
