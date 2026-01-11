@@ -193,13 +193,49 @@ async function importModels(): Promise<Set<number>> {
 }
 
 /**
- * Імпорт комплектацій з фільтрацією по році та валідних моделях
+ * Перший прохід: знаходимо максимальний рік для кожної моделі
+ */
+async function findModelMaxYears(): Promise<Map<number, number>> {
+  console.log('Scanning kits to find max year per model...');
+  const modelMaxYears = new Map<number, number>();
+
+  for await (const row of parseCsvStream<CsvKit>(CSV_FILES.kits)) {
+    const year = parseInt(row.year);
+    const modelId = parseInt(row.model);
+
+    if (!isNaN(year) && !isNaN(modelId)) {
+      const currentMax = modelMaxYears.get(modelId) || 0;
+      if (year > currentMax) {
+        modelMaxYears.set(modelId, year);
+      }
+    }
+  }
+
+  console.log(`Found max years for ${modelMaxYears.size} models`);
+  return modelMaxYears;
+}
+
+/**
+ * Імпорт комплектацій з фільтрацією по моделях, що актуальні (max year >= minYear)
  */
 async function importKits(minYear: number, validModelIds: Set<number>): Promise<Set<number>> {
   importProgress.stage = 'kits';
   importProgress.currentTable = 'car_kits';
   importProgress.processedRows = 0;
 
+  // Перший прохід: знаходимо max year для кожної моделі
+  const modelMaxYears = await findModelMaxYears();
+
+  // Визначаємо які моделі актуальні (max year >= minYear)
+  const relevantModelIds = new Set<number>();
+  for (const [modelId, maxYear] of modelMaxYears) {
+    if (maxYear >= minYear && validModelIds.has(modelId)) {
+      relevantModelIds.add(modelId);
+    }
+  }
+  console.log(`${relevantModelIds.size} models have max year >= ${minYear}`);
+
+  // Другий прохід: імпортуємо комплектації для актуальних моделей (тільки роки >= minYear)
   const BATCH_SIZE = 5000;
   let batch: string[] = [];
   const validKitIds = new Set<number>();
@@ -210,8 +246,8 @@ async function importKits(minYear: number, validModelIds: Set<number>): Promise<
     importProgress.processedRows++;
     importProgress.stats.kits++;
 
-    // Filter by year and valid model
-    if (year >= minYear && validModelIds.has(modelId)) {
+    // Імпортуємо тільки роки >= minYear для актуальних моделей
+    if (relevantModelIds.has(modelId) && year >= minYear) {
       validKitIds.add(parseInt(row.id));
 
       const name = toSqlValue(row.name, 'string');

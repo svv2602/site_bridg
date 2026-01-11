@@ -19,11 +19,15 @@ import { getTyreModels } from './tyres';
 // ============================================================================
 
 /**
- * Отримати всі марки автомобілів
+ * Отримати всі марки автомобілів (тільки ті, що мають моделі з комплектаціями)
  */
 export async function getCarBrands(): Promise<CarBrand[]> {
   const rows = await query<{ id: number; name: string }>(
-    'SELECT id, name FROM car_brands ORDER BY name'
+    `SELECT DISTINCT cb.id, cb.name
+     FROM car_brands cb
+     INNER JOIN car_models cm ON cm.brand_id = cb.id
+     INNER JOIN car_kits ck ON ck.model_id = cm.id
+     ORDER BY cb.name`
   );
 
   return rows.map((row) => ({
@@ -33,11 +37,15 @@ export async function getCarBrands(): Promise<CarBrand[]> {
 }
 
 /**
- * Отримати моделі для марки
+ * Отримати моделі для марки (тільки ті, що мають комплектації)
  */
 export async function getCarModels(brandId: number): Promise<CarModel[]> {
   const rows = await query<{ id: number; brand_id: number; name: string }>(
-    'SELECT id, brand_id, name FROM car_models WHERE brand_id = $1 ORDER BY name',
+    `SELECT DISTINCT cm.id, cm.brand_id, cm.name
+     FROM car_models cm
+     INNER JOIN car_kits ck ON ck.model_id = cm.id
+     WHERE cm.brand_id = $1
+     ORDER BY cm.name`,
     [brandId]
   );
 
