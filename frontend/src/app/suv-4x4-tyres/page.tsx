@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { type TyreModel, type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
@@ -5,6 +6,18 @@ import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, Mountain, ChevronRight } from "lucide-react";
 import { seasonLabels, SeasonIcons, groupBySeason } from "@/lib/utils/tyres";
+
+export const metadata: Metadata = {
+  title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
+  description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення на будь-якому покритті. Літні, зимові та всесезонні моделі.",
+  openGraph: {
+    title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
+    description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
+};
 
 const features = [
   {

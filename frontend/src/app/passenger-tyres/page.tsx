@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { type TyreModel, type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
@@ -5,6 +6,18 @@ import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, ChevronRight, Star } from "lucide-react";
 import { seasonLabels, SeasonIcons, groupBySeason } from "@/lib/utils/tyres";
+
+export const metadata: Metadata = {
+  title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
+  description: "Широкий вибір легкових шин Bridgestone для вашого автомобіля. Літні, зимові та всесезонні моделі з гарантією якості для комфортної та безпечної їзди.",
+  openGraph: {
+    title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
+    description: "Широкий вибір легкових шин Bridgestone. Літні, зимові та всесезонні моделі.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
+};
 
 const features = [
   {

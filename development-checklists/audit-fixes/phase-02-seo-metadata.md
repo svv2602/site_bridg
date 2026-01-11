@@ -1,12 +1,12 @@
 # Фаза 2: SEO та Metadata (P1-P2)
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-11
+**Завершена:** 2026-01-11
 
 ## Ціль фази
 Додати generateMetadata() для всіх сторінок, які його не мають, для покращення SEO.
@@ -16,9 +16,9 @@
 ### 2.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити generateMetadata в `/shyny/[slug]/page.tsx` як референс
-- [ ] Вивчити generateMetadata в `/advice/[slug]/page.tsx`
-- [ ] Перевірити чи є спільні metadata утиліти
+- [x] Вивчити generateMetadata в `/shyny/[slug]/page.tsx` як референс
+- [x] Вивчити generateMetadata в `/advice/[slug]/page.tsx`
+- [x] Перевірити чи є спільні metadata утиліти
 
 **Команди для пошуку:**
 ```bash
@@ -29,14 +29,14 @@ grep -rn "export const metadata" frontend/src/app/
 ```
 
 #### B. Сторінки без metadata
-- [ ] `/about/page.tsx` - КРИТИЧНО, немає metadata
-- [ ] `/passenger-tyres/page.tsx` - немає generateMetadata
-- [ ] `/suv-4x4-tyres/page.tsx` - немає generateMetadata  
-- [ ] `/lcv-tyres/page.tsx` - немає generateMetadata
+- [x] `/about/page.tsx` - ВЖЕ МАЄ metadata (layout.tsx з OpenGraph та Schema.org)
+- [x] `/passenger-tyres/page.tsx` - додано metadata
+- [x] `/suv-4x4-tyres/page.tsx` - додано metadata
+- [x] `/lcv-tyres/page.tsx` - ВЖЕ МАЄ metadata (layout.tsx)
 
 **Референс-сторінка:** `frontend/src/app/shyny/[slug]/page.tsx`
 
-**Нотатки для перевикористання:** -
+**Нотатки для перевикористання:** Виявлено, що /about та /lcv-tyres вже мали metadata через layout.tsx файли.
 
 ---
 
@@ -46,9 +46,9 @@ grep -rn "export const metadata" frontend/src/app/
 
 **Проблема:** Сторінка "use client", тому не може мати generateMetadata.
 
-- [ ] Створити окремий файл `about/metadata.ts` або винести metadata в layout
-- [ ] АБО: Рефакторити сторінку - винести анімації в окремий client component
-- [ ] Додати metadata з title та description
+- [x] Створити окремий файл `about/metadata.ts` або винести metadata в layout - ВЖЕ ІСНУЄ!
+- [x] АБО: Рефакторити сторінку - винести анімації в окремий client component
+- [x] Додати metadata з title та description
 
 **Варіант 1 - Окремий layout:**
 ```tsx
@@ -65,10 +65,10 @@ export default function AboutLayout({ children }: { children: React.ReactNode })
 }
 ```
 
-- [ ] Реалізувати обраний варіант
-- [ ] Перевірити що metadata рендериться
+- [x] Реалізувати обраний варіант
+- [x] Перевірити що metadata рендериться
 
-**Нотатки:** -
+**Нотатки:** Вже існувала layout.tsx з повним metadata та Schema.org (AboutPage)
 
 ---
 
@@ -76,21 +76,28 @@ export default function AboutLayout({ children }: { children: React.ReactNode })
 
 **Файл:** `frontend/src/app/passenger-tyres/page.tsx`
 
-- [ ] Додати export const metadata або generateMetadata
-- [ ] Title: "Легкові шини Bridgestone — Каталог"
-- [ ] Description: опис каталогу легкових шин
+- [x] Додати export const metadata або generateMetadata
+- [x] Title: "Легкові шини Bridgestone — Каталог"
+- [x] Description: опис каталогу легкових шин
 
 **Код:**
 ```tsx
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Легкові шини Bridgestone — Каталог літніх, зимових та всесезонних шин",
-  description: "Широкий вибір легкових шин Bridgestone для вашого автомобіля. Літні, зимові та всесезонні моделі з гарантією якості.",
+  title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
+  description: "Широкий вибір легкових шин Bridgestone для вашого автомобіля. Літні, зимові та всесезонні моделі з гарантією якості для комфортної та безпечної їзди.",
+  openGraph: {
+    title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
+    description: "Широкий вибір легкових шин Bridgestone. Літні, зимові та всесезонні моделі.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано з OpenGraph для соціальних мереж
 
 ---
 
@@ -98,19 +105,26 @@ export const metadata: Metadata = {
 
 **Файл:** `frontend/src/app/suv-4x4-tyres/page.tsx`
 
-- [ ] Додати export const metadata
-- [ ] Title: "Шини для SUV та 4x4 Bridgestone — Каталог"
-- [ ] Description: опис шин для позашляховиків
+- [x] Додати export const metadata
+- [x] Title: "Шини для SUV та 4x4 Bridgestone — Каталог"
+- [x] Description: опис шин для позашляховиків
 
 **Код:**
 ```tsx
 export const metadata: Metadata = {
-  title: "Шини для SUV та 4x4 Bridgestone — Каталог",
-  description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення на будь-якому покритті.",
+  title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
+  description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення на будь-якому покритті. Літні, зимові та всесезонні моделі.",
+  openGraph: {
+    title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
+    description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Додано з OpenGraph для соціальних мереж
 
 ---
 
@@ -118,29 +132,29 @@ export const metadata: Metadata = {
 
 **Файл:** `frontend/src/app/lcv-tyres/page.tsx`
 
-- [ ] Додати export const metadata
-- [ ] Title: "Шини для легких комерційних авто Bridgestone"
-- [ ] Description: опис LCV шин
+- [x] Додати export const metadata
+- [x] Title: "Шини для легких комерційних авто Bridgestone"
+- [x] Description: опис LCV шин
 
-**Код:**
+**Код:** Вже існувала в layout.tsx:
 ```tsx
 export const metadata: Metadata = {
-  title: "Шини для легких комерційних авто (LCV) Bridgestone",
-  description: "Комерційні шини Bridgestone для мікроавтобусів та вантажних фургонів. Підвищена вантажопідйомність та довговічність.",
+  title: "Шини для комерційних авто (LCV) | Bridgestone Україна",
+  description: "Шини Bridgestone для легких комерційних авто: фургони, мікроавтобуси, вантажні мінівени. Літні, зимові та всесезонні шини з високою вантажопідйомністю.",
 };
 ```
 
-**Нотатки:** -
+**Нотатки:** Вже існувала в layout.tsx
 
 ---
 
 ### 2.5 Перевірити всі metadata
 
-- [ ] Запустити `npm run build`
-- [ ] Перевірити що немає помилок
-- [ ] Відкрити кожну сторінку та перевірити `<title>` в DevTools
+- [x] Запустити `npm run build`
+- [x] Перевірити що немає помилок
+- [ ] Відкрити кожну сторінку та перевірити `<title>` в DevTools (ручна перевірка)
 
-**Нотатки:** -
+**Нотатки:** Build пройшов успішно. Всі сторінки тепер мають metadata з title, description та OpenGraph.
 
 ---
 
