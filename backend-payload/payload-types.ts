@@ -74,6 +74,8 @@ export interface Config {
     dealers: Dealer;
     technologies: Technology;
     'vehicle-fitments': VehicleFitment;
+    'contact-submissions': ContactSubmission;
+    'seasonal-content': SeasonalContent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +90,8 @@ export interface Config {
     dealers: DealersSelect<false> | DealersSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     'vehicle-fitments': VehicleFitmentsSelect<false> | VehicleFitmentsSelect<true>;
+    'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
+    'seasonal-content': SeasonalContentSelect<false> | SeasonalContentSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -444,6 +448,70 @@ export interface VehicleFitment {
   createdAt: string;
 }
 /**
+ * Звернення з форми зворотнього зв'язку
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-submissions".
+ */
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  status?: ('new' | 'in-progress' | 'resolved') | null;
+  phone: string;
+  email: string;
+  subject: 'tyre-selection' | 'find-dealer' | 'warranty' | 'other';
+  message: string;
+  /**
+   * Внутрішні нотатки (не видно клієнту)
+   */
+  adminNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Керування сезонним контентом на головній сторінці
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seasonal-content".
+ */
+export interface SeasonalContent {
+  id: number;
+  /**
+   * Наприклад: winter-2025, summer-2025
+   */
+  name: string;
+  /**
+   * Тільки один сезонний контент може бути активним
+   */
+  isActive?: boolean | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  featuredSeason: 'winter' | 'summer' | 'allseason';
+  /**
+   * Основний заголовок на головній сторінці
+   */
+  heroTitle: string;
+  /**
+   * Додатковий текст під заголовком
+   */
+  heroSubtitle?: string | null;
+  ctaText: string;
+  /**
+   * Наприклад: /passenger-tyres?season=winter
+   */
+  ctaLink: string;
+  /**
+   * Tailwind CSS градієнт класи
+   */
+  gradient?: string | null;
+  /**
+   * Додатковий промо-текст для сезонної кампанії
+   */
+  promoText?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -494,6 +562,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'vehicle-fitments';
         value: number | VehicleFitment;
+      } | null)
+    | ({
+        relationTo: 'contact-submissions';
+        value: number | ContactSubmission;
+      } | null)
+    | ({
+        relationTo: 'seasonal-content';
+        value: number | SeasonalContent;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -774,6 +850,40 @@ export interface VehicleFitmentsSelect<T extends boolean = true> {
         diameter?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-submissions_select".
+ */
+export interface ContactSubmissionsSelect<T extends boolean = true> {
+  name?: T;
+  status?: T;
+  phone?: T;
+  email?: T;
+  subject?: T;
+  message?: T;
+  adminNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seasonal-content_select".
+ */
+export interface SeasonalContentSelect<T extends boolean = true> {
+  name?: T;
+  isActive?: T;
+  startDate?: T;
+  endDate?: T;
+  featuredSeason?: T;
+  heroTitle?: T;
+  heroSubtitle?: T;
+  ctaText?: T;
+  ctaLink?: T;
+  gradient?: T;
+  promoText?: T;
   updatedAt?: T;
   createdAt?: T;
 }

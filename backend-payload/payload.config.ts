@@ -12,6 +12,8 @@ import {
   Dealers,
   Technologies,
   VehicleFitments,
+  ContactSubmissions,
+  SeasonalContent,
 } from './src/collections';
 
 const filename = fileURLToPath(import.meta.url);
@@ -41,6 +43,8 @@ export default buildConfig({
     Dealers,
     Technologies,
     VehicleFitments,
+    ContactSubmissions,
+    SeasonalContent,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',

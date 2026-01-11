@@ -5,3 +5,5 @@ export { Articles } from './Articles';
 export { Dealers } from './Dealers';
 export { Technologies } from './Technologies';
 export { VehicleFitments } from './VehicleFitments';
+export { ContactSubmissions } from './ContactSubmissions';
+export { SeasonalContent } from './SeasonalContent';
