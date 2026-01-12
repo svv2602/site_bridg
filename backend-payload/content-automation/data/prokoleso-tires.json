@@ -1,0 +1,2601 @@
+[
+  {
+    "name": "BLIZZAK LM005",
+    "sourceSlug": "blizzak-lm005",
+    "canonicalSlug": "blizzak-lm005",
+    "season": "winter",
+    "sizes": [
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 20
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 195,
+        "aspectRatio": 50,
+        "diameter": 16
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 175,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 185,
+        "aspectRatio": 55,
+        "diameter": 15
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 50,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 70,
+        "diameter": 15
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 315,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 155,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 165,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 165,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 175,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 175,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 22
+      }
+    ],
+    "description": "Bridgestone Blizzak LM005 – флагманські зимові шини для безпечного руху містом і трасою\n\nBridgestone Blizzak LM005 – це преміальні зимові шини для легкових авто, універсалів і компактних кросоверів. Модель розроблена для стабільності на мокрій дорозі, впевненого зчеплення на снігу та максимального контролю в зимових міських і трасових умовах. LM005 стала однією з найпопулярніших шин у Європі завдяки високим показникам у незалежних випробуваннях Auto Bild та TyreReviews.\n\n\nОсобливості та технології Bridgestone Blizzak LM005\n\nBlizzak LM005 поєднує асиметричний протектор, інноваційну гумову суміш та посилену конструкцію, що забезпечує відмінне зчеплення в холодну пору року.\n\nАсиметричний малюнок протектора\n\nBridgestone LM005 має асиметричний дизайн протектора, який забезпечує оптимальний баланс між зчепленням, керованістю та ефективним водовідведенням. Ключові елементи:\n\n\n\tМає направлений (directional) малюнок протектора, щоб ефективно відводити воду, сльоту й сніг\n\tВелика щільність ламелей (sipes) у поєднанні з технологією гумової суміші NanoPro-Tech™, що дозволяє шині залишатись гнучкою при низьких температурах і забезпечувати зчеплення на снігу/льоду.\n\tБічні плечові канавки (lateral grooves) спеціально для «захоплення» снігу й покращення зчеплення в плечових ділянках.\n\tЦентральна зона з більшим «вільним простором» (void), щоб покращити дренаж води і поглинання снігу.\n\n\nУ тестах Auto Bild LM005 неодноразово отримувала найвищі оцінки за гальмування на мокрій дорозі – одна з найкращих у своєму класі.\n\n\n\nГумова суміш із технологією NanoPro-Tech™\n\nУ складі використано суміш з високим вмістом силіки та технологію NanoPro-Tech™, яка покращує еластичність гуми в мороз і забезпечує:\n\n\n\tкороткий гальмівний шлях на мокрому покритті;\n\tстабільне зчеплення при низьких температурах;\n\tзменшення тепловтрат та енергоефективність.\n\n\nТакий склад дозволяє шині залишатися м’якою навіть під час різких температурних перепадів.\n\nКомфорт і рівень шуму\n\nBridgestone Blizzak LM005 демонструє низький рівень шуму 70–72 дБ залежно від розміру, що підтверджено європейським маркуванням EU Label.\n\nОптимізована жорсткість блоків і продумана геометрія протектора роблять їзду плавною та комфортною, особливо під час руху по міських дорогах і трасі.\n\n\nПереваги та можливі обмеження\n\nПереваги LM005:\n\n\n\t✅ Одні з найкращих показників на мокрій дорозі серед зимових шин\n\t✅ Висока ефективність гальмування на снігу й мокрому покритті\n\t✅ Асиметричний протектор для стабільної керованості\n\t✅ Технологія NanoPro-Tech™ для еластичності в мороз\n\t✅ Комфортна й тиха робота (70–72 дБ)\n\t✅ Сертифікація 3PMSF та M+S – повна придатність до зими\n\n\nМожливі обмеження:\n\n\n\t❌ На глибокому снігу поступається шинам з агресивнішим зимовим протектором\n\t❌ Не підходить для бездоріжжя та екстремальних умов\n\t❌ Ціна вища, ніж у бюджетних моделей\n\n\n\nРозміри та сумісність\n\nBridgestone Blizzak LM005 виробляється у понад 100 типорозмірах – від 14 до 21 дюйма, підходить для більшості легкових авто та компактних кросоверів.\n\n\n\tПриклади доступних розмірів Bridgestone Blizzak LM005\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tАвто\n\t\t\n\t\t\n\t\t\t195/65 R15 91T\n\t\t\tB / C / 71 дБ\n\t\t\tVolkswagen Golf, Skoda Octavia\n\t\t\n\t\t\n\t\t\t205/55 R16 91H\n\t\t\tA / B / 72 дБ\n\t\t\tToyota Corolla, Hyundai i30, Ford Focus\n\t\t\n\t\t\n\t\t\t215/60 R16 95H\n\t\t\tB / B / 72 дБ\n\t\t\tNissan Qashqai, Opel Astra\n\t\t\n\t\t\n\t\t\t225/45 R17 94V XL\n\t\t\tB / C / 72 дБ\n\t\t\tAudi A4, BMW 3 Series\n\t\t\n\t\t\n\t\t\t235/50 R18 101V XL\n\t\t\tB / C / 72 дБ\n\t\t\tMazda CX-5, Mercedes GLC, Skoda Kodiaq\n\t\t\n\t\n\n\n* Повний перелік доступний у картці товару.\n\n\nЧому варто купити Bridgestone Blizzak LM005 в Prokoleso.ua\n\n\n\t✔ Оригінальна продукція з офіційною гарантією\n\t✔ Великий вибір розмірів у наявності\n\t✔ Швидка доставка по всій Україні\n\t✔ Професійний підбір шин під ваше авто\n\t✔ Регулярні акції та вигідні пропозиції\n\n\nЗамовляйте Bridgestone Blizzak LM005 – надійні зимові шини з відмінним зчепленням та високим рівнем безпеки у складних умовах.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/blizzak-lm005/",
+    "scrapedAt": "2026-01-12T00:34:14.379Z"
+  },
+  {
+    "name": "Blizzak 6 ENLITEN",
+    "sourceSlug": "blizzak-6",
+    "canonicalSlug": "blizzak-6-enliten",
+    "season": "winter",
+    "sizes": [
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 80,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 20
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 295,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 305,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 20
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 305,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 315,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 35,
+        "diameter": 22
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 22
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 22
+      },
+      {
+        "width": 285,
+        "aspectRatio": 35,
+        "diameter": 22
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 22
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 22
+      },
+      {
+        "width": 315,
+        "aspectRatio": 30,
+        "diameter": 22
+      },
+      {
+        "width": 325,
+        "aspectRatio": 35,
+        "diameter": 22
+      }
+    ],
+    "description": "Bridgestone Blizzak 6: огляд, особливості та основні переваги\n\nBridgestone Blizzak 6 — це сучасні зимові шини преміум-класу, створені для стабільного зчеплення та впевненого керування в холодний сезон. Модель належить до нового покоління лінійки Blizzak та розроблена з урахуванням потреб водіїв, які часто стикаються зі снігом, льодом та змінними погодними умовами.\n\n\nОсновні переваги Bridgestone Blizzak 6\n\nBlizzak 6 отримали низку покращень у порівнянні з попередніми моделями серії, забезпечуючи підвищену стабільність та надійність взимку. Серед ключових особливостей:\n\n\n\tВпевнене зчеплення на снігу та льоду — оптимізована гумова суміш та сучасна конструкція ламелей допомагають утримувати автомобіль навіть на слизьких покриттях.\n\tПокращена поведінка на мокрій дорозі — ефективна система канавок сприяє швидкому відведенню води та снігової каші.\n\tКомфорт під час руху — шумопоглинальний дизайн протектора зменшує вібрації та робить поїздки тихішими.\n\tСтійкість до зношування — посилена формула гуми забезпечує довший термін експлуатації.\n\tСтабільність у різних зимових умовах — збалансовані характеристики дозволяють шинам адаптуватися до температурних змін.\n\n\n\nКлючові технологічні рішення\n\nУ моделі Bridgestone Blizzak 6 використано сучасні інженерні підходи, спрямовані на покращення зчеплення, гальмування та керованості. Основний акцент зроблено на:\n\n\n\t✅оновленій формулі зимової гумової суміші, яка зберігає еластичність за мінусових температур;\n\t✅модернізованій системі ламелей для підвищення кількості зчепних крайок;\n\t✅поліпшеному дизайні дренажних канавок, що сприяють стабільності на мокрих та сльотавих дорогах.\n\n\nЦі рішення забезпечують збалансовані характеристики без використання агресивних або вузькоспеціалізованих технологій, що часто застосовуються у скандинавських моделях.\n\n\nДизайн протектора\n\nПротектор Bridgestone Blizzak 6 створено з урахуванням найпоширеніших зимових сценаріїв. Він включає:\n\n\n\n\n\tспрямований малюнок протектора для кращого зчеплення на снігу;\n\tвелику кількість ламелей, що формують додаткові зчепні кромки;\n\tпоглиблені дренажні канавки для ефективного відведення води;\n\tпосилену боковину для підвищеної стійкості до механічних впливів.\n\n\n\nДоступні розміри та сумісність\n\nBridgestone Blizzak 6 випускається у широкому діапазоні типорозмірів, що підходять для більшості легкових автомобілів та кросоверів. Перед купівлею рекомендуємо перевірити сумісність із конкретною моделлю авто.\n\nПопулярні розміри: 205/55 R16, 225/50 R17, 235/45 R18, 255/40 R19 та інші.\n\n\nТести та відгуки\n\nОскільки Bridgestone Blizzak 6 — новинка останнього сезону, інформація про незалежні тести оновлюється. Відомо, що модель отримує високі оцінки за зчеплення на снігу та стабільність керування, а також демонструє збалансовані результати у різних зимових умовах.\n\n👉 Читайте докладний огляд моделі у нашій статті.\n\nВодії відзначають передбачувану поведінку, стабільність при гальмуванні та комфортний рівень шуму.\n\n\nДе купити Bridgestone Blizzak 6 в Україні?\n\nProKoleso.ua пропонує широкий асортимент зимових шин Bridgestone за вигідними цінами. Доступна доставка по всій Україні: Київ, Львів, Дніпро, Харків, Одеса та інші міста.\n\nСпособи оплати: готівкою, карткою або безготівковим розрахунком.\n\n\nBridgestone Blizzak 6 — це сучасні, надійні та збалансовані зимові шини, що поєднують впевнене зчеплення, оптимізований протектор та довговічність. Вони стануть чудовим вибором для тих, хто цінує безпеку та комфорт взимку.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/blizzak-6/",
+    "scrapedAt": "2026-01-12T00:34:18.439Z"
+  },
+  {
+    "name": "Turanza T005",
+    "sourceSlug": "turanza-t005",
+    "canonicalSlug": "turanza-t005",
+    "season": "summer",
+    "sizes": [
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20
+      }
+    ],
+    "description": "BRIDGESTONE TURANZA T005 – комфорт і безпека щодня\n\nBridgestone Turanza T005 — це літня шина преміум-класу, створена для максимальної стабільності та ефективності на дорозі. Вона поєднує інноваційну гумову суміш, продуманий асиметричний протектор і покращену конструкцію каркаса, щоб забезпечити впевнене керування у дощову погоду, низький рівень шуму й економію пального.\n\nЦя модель підходить для широкого спектра легкових автомобілів — від міських хетчбеків до седанів середнього класу. Завдяки оптимальному балансу характеристик, шина ідеальна як для поїздок містом, так і для далеких подорожей. Результати незалежного turanza t005 тест від TÜV SÜD підтверджують: ця шина має кращу ефективність гальмування на мокрій дорозі, ніж більшість конкурентів.\n\n\n\t\n\tКлючові характеристики гуми Туранза т005\n\t\n\t\n\t\t\n\t\t\tТип\n\t\t\tЛітня шина для легкових авто\n\t\t\n\t\t\n\t\t\tПротектор\n\t\t\tАсиметричний малюнок з посиленими зовнішніми блоками\n\t\t\n\t\t\n\t\t\tСуміш\n\t\t\tNanoPro-Tech™ з підвищеним вмістом силіки\n\t\t\n\t\t\n\t\t\tЗчеплення на мокрому\n\t\t\tКлас A (європейське маркування)\n\t\t\n\t\t\n\t\t\tОпір коченню\n\t\t\tКлас B–C залежно від розміру\n\t\t\n\t\t\n\t\t\tРівень шуму\n\t\t\t68–71 дБ\n\t\t\n\t\t\n\t\t\tПопулярні розміри\n\t\t\t205/55 R16, 195/65 R15, 215/55 R18 95H\n\t\t\n\t\n\n\nТехнології що використовуються в turanza\n\n\n\tNanoPro-Tech™ Compound: гумова суміш з покращеним зчепленням завдяки здатності поглинати вологу з поверхні дороги.\n\tКонструкція каркаса: армування сталевими й поліестеровими шарами для підвищеної жорсткості та стабільності на швидкості.\n\tОптимізовані дренажні канали: забезпечують ефективне відведення води й мінімізують ризик аквапланування.\n\tАсиметричний протектор: сприяє рівномірному зносу та покращеному зчепленню при маневруванні.\n\n\n\n\nПереваги моделі Bridgestone Turanza T005\n\n\n\t✔️Підвищена ефективність гальмування на мокрій дорозі (перевірено TÜV SÜD)\n\t✔️Комфортна й тиха поїздка навіть на нерівному асфальті\n\t✔️Висока зносостійкість порівняно з попередником Turanza T001 EVO\n\t✔️Стабільне зчеплення у складних погодних умовах\n\t✔️Економія пального завдяки зниженому опору коченню\n\n\nШина Turanza T005 входить до переліку найпопулярніших рішень у преміальному сегменті літніх шин — про це свідчать результати незалежних тестів. На практиці це підтверджують і bridgestone turanza t005 відгуки: водії високо оцінюють тишу під час їзди, стійкість та заощадливість моделі.\n\nПорівняння шин Turanza T005 з іншими моделями\n\n\n\t\n\tTuranza T005 vs Turanza 6 vs Michelin Primacy 4\n\t\n\t\n\t\t\n\t\t\tМодель\n\t\t\tПризначення\n\t\t\tСильна сторона\n\t\t\tДля яких авто\n\t\t\tДоступні розміри\n\t\t\tЦіна, грн\n\t\t\n\t\t\n\t\t\tTuranza T005\n\t\t\tМісто + траса\n\t\t\tГальмування на мокрому\n\t\t\tКомпактні та середні авто\n\t\t\t205/55 R16, 195/65 R15\n\t\t\tвід 1872\n\t\t\n\t\t\n\t\t\tTuranza 6\n\t\t\tПокращений комфорт\n\t\t\tПоглинання шуму\n\t\t\tПреміальні седани, кросовери\n\t\t\t215/60 R16\n\t\t\tвід 3597\n\t\t\n\t\t\n\t\t\tMichelin Primacy 4\n\t\t\tТривалі подорожі\n\t\t\tЗносостійкість\n\t\t\tБізнес-клас, універсали\n\t\t\t205/55 R16\n\t\t\tвід 2748\n\t\t\n\t\n\n\nДетальний огляд та висновки дивіться у нашій статті: Turanza T005 vs Turanza 6\n\nДе купити Bridgestone Turanza T005 в Україні?\n\nШину bridgestone turanza t005 купити можна в інтернет-магазині Prokoleso. В наявності популярні розміри, серед яких bridgestone turanza t005 205x55 r16, bridgestone turanza t005 195x65 r15 та t005a 215/55 r18 95h. Оперативна доставка по Україні, офіційна гарантія та консультація експертів — усе для безпечного вибору.\n\n\nFAQ Поширені питання про Bridgestone Turanza T005\n\n\n❓Яка гарантія на шини Bridgestone Turanza T005?\n\n\nВиробник надає офіційну гарантію строком 3 роки від дати покупки або до повного зносу протектора (що настане раніше). Проколесо є офіційним представником Bridgestone в Україні, тому Ви отримуєте оригінальний товар з підтвердженою якістю та повноцінною гарантійною підтримкою.\n\n\n\n\n❓Хто виробник шин Bridgestone Turanza T005?\n\n\nT005 виготовляють на заводах компанії в Польщі, Іспанії, Туреччині та Японії, залежно від конкретного розміру й серії. Усі виробничі майданчики Bridgestone проходять суворий контроль якості та сертифіковані за міжнародними стандартами, що гарантує високу надійність продукції незалежно від країни виробництва.\n\n\n\n\nЗАМОВЛЯЙТЕ ЗАРАЗ — І ВПЕВНЕНО ПОДОРОЖУЙТЕ\n\nВибір bridgestone t005 — це інвестиція в щоденну безпеку, комфорт і довговічність. Замовляйте онлайн на Prokoleso — офіційному магазині шин Bridgestone з доставкою по Україні.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/turanza-t005/",
+    "scrapedAt": "2026-01-12T00:34:22.394Z"
+  },
+  {
+    "name": "Potenza Sport",
+    "sourceSlug": "potenza-sport",
+    "canonicalSlug": "potenza-sport",
+    "season": "summer",
+    "sizes": [
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 22
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 22
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 17
+      }
+    ],
+    "description": "Bridgestone Potenza Sport — літні шини для спортивних авто\n\nBridgestone Potenza Sport — це інноваційні літні шини, розроблені для власників спортивних автомобілів, потужних седанів і преміальних купе.\n\nМодель вирізняється ультрасучасними рішеннями для забезпечення максимальної керованості й безпеки при швидкісному русі.\n\nВиробник Bridgestone входить до складу одного з найбільших шинних концернів у світі — Bridgestone Corporation, що гарантує високий стандарт якості.\n\n\nОсновні характеристики та технології\n\nPotenza Sport — це сукупність передових розробок Bridgestone, які забезпечують чудові характеристики зчеплення, контроль у поворотах та стоматичну стійкість як на мокрій, так і на сухій дорозі.\n\nМодель створена для максимально ефективного реагування на будь-які дії водія навіть у найекстремальніших умовах.\n\nМалюнок протектора\n\nМалюнок протектора асиметричний, з вираженою спортивною спрямованістю. Зовнішня плечова зона оснащена масивними жорсткими блоками, що підсилюють зчеплення при проходженні віражів і зменшують деформацію на високих швидкостях, а також підвищують точність керування.\n\nТри жорстких поздовжніх ребра у центральній частині гарантують стабільну курсову стійкість, особливо важливу під час прискорень та гальмування.\n\nПродумані широкі водовідвідні канали швидко відводять воду із плями контакту, що суттєво зменшує ризик аквапланування.\n\nУ дизайні протектора використана фірмова технологія Bridgestone Cornering Macro-block, яка підвищує ефективність шини під максимальними навантаженнями.\n\n\n\nСклад гуми\n\nДо складу суміші Potenza Sport входить збалансована комбінація новітніх полімерів, підвищений вміст силіки й унікальна резинова матриця. Завдяки технології Bridgestone NanoPro-Tech, молекулярна структура гуми оптимізована для підтримки еластичності протектора в діапазоні літніх температур, що забезпечує міцне зчеплення та подовжує строк служби шини.\n\nТакий склад знижує опір коченню, сприяючи економії пального та запобігаючи передчасному зносу навіть у спортивному режимі їзди.\n\nКомфорт і шумність\n\nШумність Bridgestone Potenza Sport згідно з маркуванням EU Label становить 71–73 дБ залежно від типорозміру, що вважається низьким показником для ультрасучасних спортивних шин.\n\nКонструкція каркасу поглинає вібрації та зменшує сторонній шум, дозволяючи зберігати оптимальний рівень комфорту навіть на твердому асфальті.\n\n\nПереваги та недоліки\n\nКупити Potenza Sport — це вибір для тих, хто цінує максимально точне керування:\n\n\n\t✅ Максимальне зчеплення в поворотах — безпечний контроль автомобіля навіть при агресивному стилі їзди\n\t✅ Ефективність на мокрій дорозі — завдяки сучасному складові гуми та потужним каналам протектора\n\t✅ Миттєва реакція на повороти керма — ультраспортивна геометрія малюнка забезпечує чіткість управління\n\t✅ Підвищена стійкість до зносу — ресурсоощадна формула суміші з NanoPro-Tech для довгого строку експлуатації\n\t✅ Зниження шуму та вібрацій — інженерна конструкція сприяє комфорту у салоні при високих навантаженнях\n\n\nМожливі обмеження:\n\n\n\t❌ Відчутна жорсткість на ділянках із великими нерівностями — пріоритет надається спортивній стабільності\n\t❌ Висока ціна — властива шині преміум-класу із сучасними технологіями\n\t❌ Модель оптимізована для асфальту — на грунтових чи піщаних дорогах зчеплення може бути недостатнім\n\n\n\nРозміри та застосування\n\nBridgestone Potenza Sport розраховані на сучасні спорткари, динамічні седани, потужні кросовери й купе.\n\n\n\tДоступні розміри Bridgestone Potenza Sport\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tПриклади авто\n\t\t\n\t\t\n\t\t\t225/40 R18 92Y XL\n\t\t\tA / C / 72 дБ\n\t\t\tAudi A3, BMW 1 Series\n\t\t\n\t\t\n\t\t\t245/40 R19 98Y XL\n\t\t\tA / C / 72 дБ\n\t\t\tMercedes-Benz E-Class, Lexus IS\n\t\t\n\t\t\n\t\t\t255/35 R19 96Y XL\n\t\t\tA / C / 73 дБ\n\t\t\tAudi S5, BMW 4 Series\n\t\t\n\t\t\n\t\t\t275/35 R20 102Y XL\n\t\t\tA / C / 73 дБ\n\t\t\tBMW 5 Series, Porsche Cayman\n\t\t\n\t\t\n\t\t\t295/35 R21 107Y XL\n\t\t\tA / C / 73 дБ\n\t\t\tPorsche Cayenne, BMW X6\n\t\t\n\t\n\n\n👉 Залишайте свої відгуки про шини Bridgestone Potenza Sport — ваш досвід важливий для інших автовласників!\n\n\nЧому варто купити Bridgestone Potenza Sport в Prokoleso.ua\n\n\n\tШвидка доставка шин по Україні\n\tВеликий асортимент моделей преміум-класу\n\tМожливість підібрати колісні диски\n\tРегулярні знижки та спеціальні акції\n\tПрофесійні консультації та допомога у виборі\n\n\n\nЗамовляйте шини Bridgestone Potenza Sport вже зараз – оберіть свій розмір та оформіть доставку.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/potenza-sport/",
+    "scrapedAt": "2026-01-12T00:34:26.257Z"
+  },
+  {
+    "name": "Turanza 6",
+    "sourceSlug": "turanza-6",
+    "canonicalSlug": "turanza-6",
+    "season": "summer",
+    "sizes": [
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 275,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 315,
+        "aspectRatio": 40,
+        "diameter": 21
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 35,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 285,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 60,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 285,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 22
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 22
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 22
+      },
+      {
+        "width": 315,
+        "aspectRatio": 30,
+        "diameter": 22
+      }
+    ],
+    "description": "Bridgestone Turanza 6: Огляд, характеристики та переваги\n\nBridgestone Turanza 6 — це преміальні літні шини, розроблені для максимального комфорту та безпеки на дорогах. Ця модель прийшла на зміну популярній Bridgestone Turanza T005, отримавши низку покращень у керованості, зчепленні та довговічності.\nTuranza 6 — ідеальний вибір для водіїв, яким важливі надійність, паливна економічність і комфорт під час поїздок містом і трасою.\n\n\n1. Основні особливості та переваги\n\nBridgestone Turanza 6 розроблені з використанням передових технологій, забезпечуючи високу продуктивність за будь-яких літніх погодних умов. Ключові переваги моделі:\n\n\n\t✔️ Відмінне зчеплення на мокрій дорозі – технологія ENLITEN та інноваційна гумова суміш гарантують впевненість під час руху по калюжах і в дощ.\n\t✔️ Покращена керованість – оптимізований протектор та посилені боковини підвищують стійкість у поворотах та на високій швидкості.\n\t✔️ Економія пального – знижений опір коченню допомагає зменшити витрати пального та викиди CO₂.\n\t✔️ Підвищений комфорт – інноваційна конструкція протектора знижує рівень шуму, роблячи поїздку плавною та тихою.\n\t✔️ Довговічність – покращена зносостійкість продовжує термін служби шини.\n\n\n\n2. Технології Turanza 6\n\nЛітні шини Bridgestone Turanza 6 створені на основі передових розробок бренду, що робить їх одними з найкращих у своєму класі. Інженери Bridgestone застосували інноваційні технології, які забезпечують покращену ефективність, безпеку та комфорт у щоденній експлуатації:\n\n\n\tТехнологія ENLITEN – знижує вагу шини без втрати продуктивності, що зменшує витрати пального.\n\tNanoPro-Tech™ – інноваційний склад гумової суміші покращує зчеплення та довговічність.\n\tOptimum Contact Patch – збільшена площа контакту покращує стійкість автомобіля на мокрому покритті.\n\tNoise Reduction Technology – знижує рівень шуму в салоні завдяки оптимізованому розташуванню блоків протектора.\n\n\n\n3. Дизайн протектора\n\nПротектор Bridgestone Turanza 6 розроблений із акцентом на безпеку та комфорт:\n\n\n\tАсиметричний рисунок протектора – покращує зчеплення на мокрій та сухій дорозі.\n\tГлибокі дренажні канавки – ефективно відводять воду, запобігаючи акваплануванню.\n\tЖорсткі плечові зони – покращують стабільність у поворотах та підвищують зносостійкість.\n\tСпеціальні 3D-ламелі – збільшують зчеплення на мокрому покритті та забезпечують рівномірне зношування.\n\n\n\n\n\n4. Доступні розміри та сумісність\n\nЦіна Bridgestone Turanza 6 залежить від типорозміру та індексів навантаження, але завжди відповідає преміальній якості й інноваційним технологіям цієї моделі. Шина випускається в різних розмірах і підходить для легкових автомобілів, кросоверів і преміальних седанів, як-от:\n\n\n\t\n\t\t\n\t\t\tАвтомобіль\n\t\t\tСумісні розміри шин\n\t\t\n\t\t\n\t\t\tRenault Duster\n\t\t\t215/60 R17, 225/55 R18\n\t\t\n\t\t\n\t\t\tToyota RAV4\n\t\t\t225/60 R18, 235/55 R19\n\t\t\n\t\t\n\t\t\tVolkswagen Passat\n\t\t\t215/55 R17, 235/45 R18\n\t\t\n\t\t\n\t\t\tKia Sportage\n\t\t\t225/60 R17, 235/55 R18\n\t\t\n\t\t\n\t\t\tHyundai Tucson\n\t\t\t225/60 R17, 235/50 R19\n\t\t\n\t\t\n\t\t\tSkoda Octavia\n\t\t\t205/55 R16, 225/45 R17\n\t\t\n\t\t\n\t\t\tMazda CX-5\n\t\t\t225/65 R17, 225/55 R19\n\t\t\n\t\t\n\t\t\tNissan Qashqai\n\t\t\t215/60 R17, 225/45 R19\n\t\t\n\t\n\n\n\n5. Тести та відгуки\n\nВідгуки водіїв відзначають тиху та м’яку їзду, відмінне зчеплення в дощ і плавність ходу.\n\nBridgestone Turanza 6 вже отримала високі оцінки у незалежних тестах:\n\n\n\tAuto Bild (2023) – 1-ше місце за зчепленням на мокрому покритті.\n\tTyre Reviews (2023) – «Найкраща шина для комфорту та стійкості на трасі».\n\tADAC (2023) – висока оцінка за економічність і довговічність.\n\n\nБільше про порівняння популярних моделей та відповіді на питання які шини краще для літа 2025 — читайте в нашій статті з тестами літніх шин 2025 року.\n\n\n6. Де купити Bridgestone Turanza 6 в Україні?\n\nІнтернет-магазин ProKoleso.ua пропонує широкий асортимент шин Bridgestone за вигідними цінами.\n\nДоставка по всій Україні: Київ, Дніпро, Харків, Львів та інші міста.\n\nРізні способи оплати: готівкою, карткою або безготівковим розрахунком.\n\nЗамовляйте Bridgestone Turanza 6 просто зараз насолоджуйтеся безпечною і комфортною їздою!\n\n\nВисновок\n\nBridgestone Turanza 6 – це поєднання безпеки, комфорту та інноваційних технологій. Ці шини ідеально підійдуть для водіїв, які цінують стабільність на мокрій дорозі, плавність ходу та економію пального.\n\nЯкщо ви хочете купити надійні літні шини, Turanza 6 – чудовий вибір!\n\nFAQ Поширені питання про Bridgestone Turanza 6\n\n\n\n❓Чим відрізняються Turanza 6 від T005?\n\n\nУ порівнянні з T005, нові Bridgestone Turanza 6 мають поліпшене зчеплення на мокрій дорозі, нижчий рівень шуму, кращу зносостійкість і оновлений склад гумової суміші з технологією ENLITEN. Це означає більший комфорт, довший ресурс і менші витрати пального. Детальний огляд дивіться в нашій статті.\n\n\n\n\n❓Чи підходять шини Turanza 6 для кросоверів?\n\n\nТак, Bridgestone Turanza 6 доступні в типорозмірах, які ідеально підходять для сучасних кросоверів. Наприклад: 225/60 R18, 235/55 R19 тощо. Вони забезпечують чудову стійкість, тишу в салоні та зменшене споживання пального — ідеальний варіант для комфортної їзди на кросовері.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/turanza-6/",
+    "scrapedAt": "2026-01-12T00:34:30.251Z"
+  },
+  {
+    "name": "Dueler A/T 002",
+    "sourceSlug": "dueler-a-t-002",
+    "canonicalSlug": "dueler-at-002",
+    "season": "allseason",
+    "sizes": [
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 70,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 17
+      },
+      {
+        "width": 255,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 265,
+        "aspectRatio": 70,
+        "diameter": 17
+      },
+      {
+        "width": 275,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 285,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 80,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 255,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 265,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 265,
+        "aspectRatio": 75,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 285,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 195,
+        "aspectRatio": 80,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 70,
+        "diameter": 15
+      },
+      {
+        "width": 255,
+        "aspectRatio": 70,
+        "diameter": 15,
+        "speedIndex": "C"
+      }
+    ],
+    "description": "Bridgestone Dueler A/T 002 – шини для SUV з акцентом на прохідність та міцність\n\nBridgestone Dueler A/T 002 – сучасна всесезонна шина класу All-Terrain (A/T) для SUV, пікапів і позашляховиків. Модель поєднує універсальність, комфорт і впевнене керування як на асфальті, так і на легкому та середньому бездоріжжі.\n\nDueler A/T 002 представляє нове покоління популярної позашляхової серії Bridgestone та вирізняється підвищеною міцністю, покращеним зчепленням і стабільністю у складних умовах.\n\n\nОсновні характеристики та технології\n\nBridgestone Dueler A/T 002 має зимову сертифікацію 3PMSF, що підтверджує її ефективність на снігу та сльоті та дозволяє використовувати шину цілий рік.\n\nМалюнок протектора\n\nВ основі – симетричний A/T-протектор із великими блоками, глибокими дренажними каналами та посиленими плечовими зонами. Така конструкція забезпечує стабільне зчеплення на грунтових дорогах, мокрому асфальті, траві та укатаному снігу.\n\nБагаторівнева геометрія блоків та різноспрямовані ламелі сприяють самоочищенню та зменшують ризик пробуксовки на піску чи в багнюці.\n\nЦентральне ребро підвищує курсову стійкість на трасі та забезпечує прогнозовану реакцію на кермо.\n\n\n\nСклад гуми\n\nСпеціальний всесезонний компаунд розроблений для оптимальної керованості на асфальті та збереження еластичності при низьких температурах. Міцні полімери підвищують стійкість шини до порізів, проколів і зносу під час їзди пересіченою місцевістю.\n\nКомфорт і шумність\n\nЗавдяки оптимізованій конструкції протектора та вдосконаленій формі блоків знижено рівень шуму (71–73 дБ залежно від розміру). Модель стала комфортнішою у порівнянні з попередніми поколіннями A/T-серії та добре підходить для щоденних поїздок і далеких подорожей.\n\n➡️ Точні характеристики (зчеплення, шум, індекси, ресурс) залежать від конкретного розміру. Перегляньте вкладку «Характеристики» для детальної інформації.\n\n\nПереваги та недоліки\n\nКупівля Bridgestone Dueler A/T 002 – це:\n\n\n\t✅ Висока прохідність на різних типах покриття\n\t✅ Посилений захист від механічних пошкоджень\n\t✅ Повна всесезонність завдяки маркуванню 3PMSF\n\t✅ Прогнозована керованість на сухій, мокрій та сніговій дорозі\n\t✅ Довговічність і рівномірний знос\n\t✅ Комфортний рівень шуму для A/T-класу\n\n\nМожливі обмеження:\n\n\n\t❌ На льоду поступається спеціалізованим зимовим шинам\n\t❌ Витрата пального вища, ніж у дорожніх HT-моделей\n\t❌ На ідеально гладкому асфальті шумніша за літні шосейні шини\n\n\n\nРозміри та застосування\n\nBridgestone Dueler A/T 002 доступна у популярних розмірах для SUV, пікапів та рамних позашляховиків.\n\n\n\tДоступні розміри Bridgestone Dueler A/T 002\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tПриклади авто\n\t\t\n\t\t\n\t\t\t245/70 R16 111T\n\t\t\tC / C / 71 дБ\n\t\t\tToyota Hilux, Mitsubishi Pajero, Nissan Navara\n\t\t\n\t\t\n\t\t\t265/65 R17 112T\n\t\t\tC / C / 72 дБ\n\t\t\tFord Ranger, Isuzu D-Max, VW Amarok\n\t\t\n\t\t\n\t\t\t255/60 R18 112T\n\t\t\tC / C / 73 дБ\n\t\t\tVW Touareg, Mercedes GLE, Volvo XC90\n\t\t\n\t\t\n\t\t\t265/70 R16 112T\n\t\t\tC / C / 72 дБ\n\t\t\tToyota Land Cruiser, Jeep Cherokee\n\t\t\n\t\t\n\t\t\t225/75 R16 115/112R\n\t\t\tC / C / 71 дБ\n\t\t\tIsuzu D-Max, Mercedes X-Class\n\t\t\n\t\n\n\n\nЧому варто купити Bridgestone Dueler A/T 002 в Prokoleso.ua\n\n\n\tОригінальна продукція Bridgestone з офіційною гарантією\n\tПостійна наявність популярних розмірів\n\tАктуальні ціни та швидка доставка по Україні\n\tМожливість замовити диски, літні або зимові шини до комплекту\n\tАкції та спеціальні пропозиції\n\n\nЗамовляйте Bridgestone Dueler A/T 002 – оберіть свій типорозмір та оформіть доставку в кілька кліків.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/dueler-a-t-002/",
+    "scrapedAt": "2026-01-12T00:34:34.149Z"
+  },
+  {
+    "name": "Ecopia EP150",
+    "sourceSlug": "ecopia-ep150",
+    "canonicalSlug": "ecopia-ep150",
+    "season": "summer",
+    "sizes": [
+      {
+        "width": 165,
+        "aspectRatio": 70,
+        "diameter": 13
+      },
+      {
+        "width": 175,
+        "aspectRatio": 70,
+        "diameter": 13
+      },
+      {
+        "width": 185,
+        "aspectRatio": 70,
+        "diameter": 13
+      },
+      {
+        "width": 165,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 165,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 175,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 175,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 195,
+        "aspectRatio": 70,
+        "diameter": 14
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 15
+      },
+      {
+        "width": 205,
+        "aspectRatio": 70,
+        "diameter": 15
+      }
+    ],
+    "description": "Bridgestone Ecopia EP150\n \n\n\t Нова літня шина Bridgestone Ecopia EP150 c симетричним малюнком протектора серії Ecopia від Bridgestone. Модель EP150 призначена для легкових автомобілів компакт і стандарт класів. У порівнянні з попередньою моделлю серії - EP100, шина Bridgestone EP150 отримала ряд удосконалень, які відображаються в високого ступеня комфорту даної моделі і, звичайно ж, низькому опорі коченню - ключовому перевазі шин серії Ecopia.\n\n \nПереваги:\n \n\n\t\n\tГарне поглинання вібрацій шиною \n\t\n\tНизький рівень шуму \n\t\n\tНизький опір коченню \n\n \nВигоди:\n \n\n\t\n\tТиша в салоні автомобіля \n\t\n\tКомфорт при їзді \n\t\n\tЕкономія пального",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/ecopia-ep150/",
+    "scrapedAt": "2026-01-12T00:34:38.077Z"
+  },
+  {
+    "name": "Potenza S001",
+    "sourceSlug": "potenza-s001",
+    "canonicalSlug": "potenza-s001",
+    "season": "summer",
+    "sizes": [
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 285,
+        "aspectRatio": 35,
+        "diameter": 19
+      },
+      {
+        "width": 295,
+        "aspectRatio": 30,
+        "diameter": 19
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16
+      }
+    ],
+    "description": "Bridgestone Potenza S001 — літні шини для швидкісних авто\n\nBridgestone Potenza S001 — це літня модель шин преміум-класу для легкових автомобілів та спортивних купе.\n\nМодель орієнтована на поціновувачів активного водіння, гарантує високий рівень безпеки та стабільності на високих швидкостях.\n\nШини Bridgestone Potenza S001 входять до лінійки японської компанії Bridgestone, ключового бренду в глобальному шинному концерні Bridgestone Corporation.\n\n\nОсновні характеристики та технології\n\nBridgestone Potenza S001 забезпечує точну реакцію на кермо, оптимальне зчеплення на сухих і мокрих дорогах, а також підвищену довговічність.\n\nМалюнок протектора\n\nУ Potenza S001 використовується асиметричний протектор. Зовнішня зона має масивні тверді блоки для оптимальної стабільності під час маневрів та забезпечує упевнене зчеплення на сухій поверхні. Центральна частина має цільний реберний елемент, який відповідає за курсову стійкість на високих швидкостях.\n\nШирокі подовжні канали ефективно відводять воду з контактної зони — це підвищує стійкість до аквапланування.\n\nДрібні ламелі покращують гальмівні властивості на мокрому асфальті.\n\nТехнологія Bridgestone 3D M-Shape Sipes зменшує деформації блоків під навантаженням.\n\n\n\nСклад гуми\n\nГумова суміш для Potenza S001 містить сучасні полімери та має високий вміст силіки. Такий склад забезпечує міцне зчеплення з дорогою навіть у спеку, підвищує зносостійкість і допомагає економити пальне.\n\nВикористання нанотехнології NanoPro-Tech сприяє збереженню еластичності протектора при різних температурах, покращуючи реакцію шини на кермо та подовжуючи її ресурс.\n\nКомфорт і шумність\n\nРівень шуму згідно з EU Label знаходиться в діапазоні 70–73 дБ. Шина сконструйована так, щоб мінімізувати вібрації та сторонній шум, забезпечуючи плавний та комфортний рух навіть на нерівних дорогах.\n\nЗгідно з відгуками користувачів, Potenza S001 надійно згладжує нерівності та утримує курсову стабільність на швидкісних трасах, що підтверджують і результати незалежних тестів (наприклад, Auto Bild).\n\n➡️ Характеристики та ціна шин Bridgestone Potenza S001 залежать від типорозміру, авто і частоти експлуатації. Для точних даних дивіться вкладку «Характеристики».\n\n\nПереваги та недоліки\n\nКупити Potenza S001 — це вибір для поціновувачів динаміки та контролю:\n\n\n\t✅ Відмінна керованість на великих швидкостях — підвищена безпека і точність у поворотах\n\t✅ Стійкість до аквапланування — широкі канали ефективно відводять воду, зменшуючи ризик втрати контролю на мокрій дорозі\n\t✅ Збалансована жорсткість протектора — сприяє рівномірному зносу та подовжує термін служби\n\t✅ Зменшений рівень шуму — комфортний рух навіть на високій швидкості\n\t✅ Використання фірмових технологій NanoPro-Tech та 3D M-Shape Sipes — підвищує еластичність та покращує зчеплення\n\n\nМожливі обмеження:\n\n\n\t❌ Жорстке бічне ребро — може додавати відчуття жорсткості на дуже нерівних дорогах\n\t❌ Менш виражена прохідність на ґрунті — модель оптимізована для асфальту\n\t❌ Вища ціна у порівнянні з бюджетними альтернативами\n\n\n\nРозміри та застосування\n\nBridgestone Potenza S001 — універсальні літні шини для сучасних легкових автомобілів, спортивних купе та преміум-сегменту.\n\n\n\tДоступні розміри Bridgestone Potenza S001\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tПриклади авто\n\t\t\n\t\t\n\t\t\t225/45 R17 91Y\n\t\t\tB / C / 72 дБ\n\t\t\tBMW 3 Series, Audi A4\n\t\t\n\t\t\n\t\t\t245/40 R18 97Y XL\n\t\t\tB / C / 72 дБ\n\t\t\tMercedes-Benz C-Class, Lexus IS\n\t\t\n\t\t\n\t\t\t255/35 R19 96Y XL\n\t\t\tB / C / 73 дБ\n\t\t\tAudi S5, BMW 4 Series\n\t\t\n\t\t\n\t\t\t275/35 R19 100Y XL\n\t\t\tB / C / 73 дБ\n\t\t\tPorsche 911, Jaguar F-Type\n\t\t\n\t\t\n\t\t\t245/35 R20 95Y XL\n\t\t\tB / C / 73 дБ\n\t\t\tBMW 5 Series, Maserati Ghibli\n\t\t\n\t\n\n\n👉 Залишайте свої відгуки про шини Bridgestone Potenza S001, це допоможе іншим покупцям зробити обґрунтований вибір!\n\n\nЧому варто купити Bridgestone Potenza S001 в Prokoleso.ua\n\n\n\tОфіційна гарантія від виробника\n\tОперативна доставка по всій Україні\n\tШирокий вибір шин різних типорозмірів\n\tДіючі акції й спеціальні умови для постійних клієнтів\n\tПрофесійна підтримка та консультації з підбору потрібної моделі\n\n\n\nЗамовляйте шини Bridgestone Potenza S001 вже зараз – оберіть свій розмір та оформіть доставку.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/potenza-s001/",
+    "scrapedAt": "2026-01-12T00:34:42.052Z"
+  },
+  {
+    "name": "Turanza All Season 6 ENLITEN",
+    "sourceSlug": "turanza-all-season-6",
+    "canonicalSlug": "turanza-all-season-6-enliten",
+    "season": "allseason",
+    "sizes": [
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 16
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20
+      }
+    ],
+    "description": "Bridgestone Turanza All Season 6 – всесезонні шини з V-подібним спрямованим протектором\n\nBridgestone Turanza All Season 6 – це сучасні всесезонні шини, створені для легкових автомобілів і компактних кросоверів. Модель розроблена з урахуванням кліматичних умов Європи та України: часті дощі, слизькі дороги, зимова сльота та періодичний сніг. Завдяки збалансованому дизайну Turanza All Season 6 забезпечує надійне зчеплення цілий рік.\n\n\nКлючові особливості та технології\n\nМодель отримала новітні технології Bridgestone, включно з ENLITEN та NanoPro-Tech™, що підвищують ефективність і довговічність шин. Turanza All Season 6 має сертифікацію 3PMSF, що підтверджує придатність до зимової експлуатації.\n\nСпрямований V-подібний малюнок протектора\n\nЦя модель отримала V-подібний спрямований протектор нового покоління. Такий дизайн забезпечує:\n\n\n\tефективне відведення води та сльоти завдяки глибоким каналам, що зменшують ризик аквапланування;\n\tпокращене зчеплення на снігу за рахунок численних ламелей та гострих крайок блоків;\n\tстабільну керованість у поворотах та на високій швидкості.\n\n\n\n\nСклад гуми NanoPro-Tech™\n\nГумова суміш, розроблена за технологією NanoPro-Tech™, зменшує внутрішнє тертя та тепловтрати. Це забезпечує:\n\n\n\tстабільне зчеплення в широкому діапазоні температур;\n\tплавну поведінку на мокрому асфальті;\n\tзниження опору коченню та економію пального.\n\n\nТехнологія ENLITEN\n\nTuranza All Season 6 створена з використанням ENLITEN – фірмової технології Bridgestone, яка робить шину:\n\n\n\tлегшою та міцнішою одночасно;\n\tстійкішою до зношування;\n\tбільш економічною завдяки зменшеному опору коченню.\n\n\nКомфорт і низький рівень шуму\n\nНовий протекторний дизайн та оптимізована структура каркасу зменшують шумність під час руху. Залежно від типорозміру, рівень шуму становить 70–72 дБ, що відповідає високому класу комфорту.\n\nЗа результатами тестів Auto Bild (2023–2024), Turanza All Season 6 увійшла до ТОП-5 збалансованих всесезонних моделей і отримала високу оцінку за зчеплення на сухій та мокрій дорозі.\n\n\nПереваги та недоліки Bridgestone Turanza All Season 6\n\nПереваги:\n\n\n\t✅ Спрямований V-подібний протектор для ефективного водовідведення\n\t✅ Відмінна керованість на мокрій дорозі\n\t✅ Сертифіковані для зими (3PMSF)\n\t✅ Технології NanoPro-Tech™ та ENLITEN для довговічності й економічності\n\t✅ Збалансований всесезонний характер – без різких компромісів\n\t✅ Один із лідерів тестів Auto Bild у своєму сегменті\n\n\nНедоліки:\n\n\n\t❌ Вища ціна порівняно з бюджетними брендами\n\t❌ У дуже складних зимових умовах (глибокий сніг, ожеледиця) поступається спеціалізованим зимовим шинам\n\n\n\nДоступні розміри та застосування\n\nBridgestone Turanza All Season 6 доступна у популярних типорозмірах для легкових авто, компактних SUV та кросоверів.\n\n\n\tДоступні розміри Bridgestone Turanza All Season 6\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tПриклади авто\n\t\t\n\t\t\n\t\t\t195/65 R15 91H\n\t\t\tB / B / 71 дБ\n\t\t\tVW Golf, Skoda Octavia, Toyota Auris\n\t\t\n\t\t\n\t\t\t205/55 R16 91V\n\t\t\tB / B / 72 дБ\n\t\t\tToyota Corolla, Hyundai Elantra, Kia Ceed\n\t\t\n\t\t\n\t\t\t225/45 R17 94Y XL\n\t\t\tB / C / 72 дБ\n\t\t\tAudi A4, BMW 3 Series, VW Passat\n\t\t\n\t\t\n\t\t\t235/55 R18 104V XL\n\t\t\tB / C / 73 дБ\n\t\t\tHyundai Tucson, Honda CR-V, Kia Sportage\n\t\t\n\t\n\n\n* Повний перелік типорозмірів доступний у картці товару.\n\n\nЧому варто купити Turanza All Season 6 на Prokoleso.ua\n\n\n\t✔ Оригінальні шини з офіційною гарантією\n\t✔ Швидка доставка по Україні\n\t✔ Професійна консультація щодо підбору шин\n\t✔ Регулярні акції та знижки\n\n\nЗамовляйте Bridgestone Turanza All Season 6 – надійні всесезонні шини, які забезпечать комфорт і стабільність у будь-яку погоду.",
+    "imageUrl": "https://prokoleso.ua/storage/settings/5/image/logo.svg",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/turanza-all-season-6/",
+    "scrapedAt": "2026-01-12T00:34:46.026Z"
+  }
+]

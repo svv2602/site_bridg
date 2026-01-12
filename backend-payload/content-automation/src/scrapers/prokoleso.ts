@@ -1,7 +1,8 @@
 /**
  * ProKoleso.ua Scraper for Bridgestone Tires
  *
- * Scrapes tire data from https://prokoleso.ua/shiny/bridgestone/
+ * Scrapes tire data from model pages like https://prokoleso.ua/shiny/bridgestone/blizzak-6/
+ * Combined approach: collects model URLs from catalog, then scrapes each model page for full data
  */
 
 import puppeteer, { type Browser, type Page } from "puppeteer";
@@ -23,8 +24,9 @@ export interface ScrapedTireSize {
 }
 
 export interface ScrapedTire {
-  name: string;
-  slug: string;
+  name: string;              // Model name from page (e.g., "Blizzak 6 ENLITEN")
+  sourceSlug: string;        // Slug from URL (e.g., "blizzak-6")
+  canonicalSlug: string;     // Generated slug (e.g., "blizzak-6-enliten")
   season: "summer" | "winter" | "allseason";
   sizes: ScrapedTireSize[];
   description: string;
@@ -35,52 +37,234 @@ export interface ScrapedTire {
 
 // Config
 const BASE_URL = "https://prokoleso.ua";
-const BRIDGESTONE_URL = `${BASE_URL}/shiny/bridgestone/`;
+const MAX_CATALOG_PAGES = 5; // Pages per catalog
+
+// All catalogs to scan for Bridgestone models
+const BRIDGESTONE_CATALOGS = [
+  `${BASE_URL}/shiny/bridgestone/`,             // Main Bridgestone catalog
+  `${BASE_URL}/shiny/letnie/bridgestone/`,      // Summer
+  `${BASE_URL}/shiny/zimnie/bridgestone/`,      // Winter
+  `${BASE_URL}/shiny/vsesezonie/bridgestone/`,  // All-season
+];
+
+// Model pages that exist but aren't linked from catalogs
+const ADDITIONAL_MODEL_URLS = [
+  `${BASE_URL}/ua/shiny/bridgestone/turanza-all-season-6/`,
+  `${BASE_URL}/ua/shiny/bridgestone/weather-control-a005-evo/`,
+];
 
 // Helpers
-function determineSeason(text: string): ScrapedTire["season"] {
-  const lower = text.toLowerCase();
-  if (lower.includes("зимов") || lower.includes("winter") || lower.includes("blizzak")) {
-    return "winter";
-  }
-  if (lower.includes("всесезон") || lower.includes("all season") || lower.includes("weather control")) {
+function determineSeason(text: string, modelName: string): ScrapedTire["season"] {
+  const lower = (text + " " + modelName).toLowerCase();
+
+  // All-season indicators (check first, as some may contain winter-related words)
+  if (lower.includes("всесезон") || lower.includes("all season") || lower.includes("all-season") ||
+      lower.includes("weather control") || lower.includes("a/t ") || lower.includes("a/t-") ||
+      lower.includes("all terrain") || lower.includes("dueler a/t") || lower.includes("a/t 00")) {
     return "allseason";
   }
+
+  // Winter indicators
+  if (lower.includes("зимов") || lower.includes("зимні") || lower.includes("winter") ||
+      lower.includes("blizzak") || lower.includes("ice")) {
+    return "winter";
+  }
+
   return "summer";
 }
 
 function createSlug(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9а-яіїєґ\s-]/gi, "")
+    .replace(/[^a-z0-9\s-]/gi, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();
 }
 
-function parseSizeString(sizeStr: string): ScrapedTireSize | null {
-  // Common patterns: "205/55 R16", "225/45R17 94W", "255/50 R19 XL"
-  const match = sizeStr.match(/(\d{3})\/(\d{2,3})\s*R(\d{2})/i);
+function extractSourceSlug(url: string): string {
+  // Extract slug from URL like /shiny/bridgestone/blizzak-6/
+  const match = url.match(/\/shiny\/bridgestone\/([a-z0-9-]+)\/?$/i);
+  return match?.[1] || "";
+}
+
+function parseSizeFromUrl(url: string): ScrapedTireSize | null {
+  // Parse from URL like bridgestone-blizzak-6-205-55r17-95v.html
+  const match = url.match(/(\d{3})-(\d{2,3})r(\d{2})-(\d{2,3})([a-z])/i);
   if (!match) return null;
 
-  const [, width, aspectRatio, diameter] = match;
-
-  // Try to extract load/speed index
-  const indexMatch = sizeStr.match(/R\d{2}\s+(\d{2,3})([A-Z])/i);
-
   return {
-    width: parseInt(width, 10),
-    aspectRatio: parseInt(aspectRatio, 10),
-    diameter: parseInt(diameter, 10),
-    loadIndex: indexMatch?.[1],
-    speedIndex: indexMatch?.[2],
+    width: parseInt(match[1], 10),
+    aspectRatio: parseInt(match[2], 10),
+    diameter: parseInt(match[3], 10),
+    loadIndex: match[4],
+    speedIndex: match[5].toUpperCase(),
   };
 }
 
-// Main scraper
+function parseSizeFromText(text: string): ScrapedTireSize | null {
+  // Parse from text like "205/55 R17 95V"
+  const match = text.match(/(\d{3})\/(\d{2,3})\s*R(\d{2})\s*(\d{2,3})?\s*([A-Z])?/i);
+  if (!match) return null;
+
+  return {
+    width: parseInt(match[1], 10),
+    aspectRatio: parseInt(match[2], 10),
+    diameter: parseInt(match[3], 10),
+    loadIndex: match[4],
+    speedIndex: match[5]?.toUpperCase(),
+  };
+}
+
+/**
+ * Find all model page URLs from seasonal catalogs
+ */
+async function findModelUrls(page: Page): Promise<string[]> {
+  const modelUrls = new Set<string>();
+
+  for (const catalogBase of BRIDGESTONE_CATALOGS) {
+    console.log(`\n  Scanning catalog: ${catalogBase}`);
+
+    for (let pageNum = 1; pageNum <= MAX_CATALOG_PAGES; pageNum++) {
+      const catalogUrl = pageNum === 1 ? catalogBase : `${catalogBase}?page=${pageNum}`;
+      console.log(`    Page ${pageNum}: ${catalogUrl}`);
+
+      try {
+        await page.goto(catalogUrl, { waitUntil: "networkidle2", timeout: 30000 });
+
+        const urls = await page.evaluate(() => {
+          const links = document.querySelectorAll('a[href*="/shiny/bridgestone/"]');
+          const found: string[] = [];
+
+          links.forEach((link) => {
+            const href = (link as HTMLAnchorElement).href;
+            // Model pages: /shiny/bridgestone/model-name/ (ends with /, no .html)
+            if (href.match(/\/shiny\/bridgestone\/[a-z0-9-]+\/?$/i) && !href.includes(".html")) {
+              found.push(href.replace(/\/?$/, "/")); // Normalize trailing slash
+            }
+          });
+
+          return found;
+        });
+
+        urls.forEach((url) => {
+          // Normalize: prefer /ua/ version
+          const normalized = url.includes("/ua/") ? url : url.replace("/shiny/", "/ua/shiny/");
+          modelUrls.add(normalized);
+        });
+
+        console.log(`      Found ${urls.length} model links`);
+
+        // Check for next page
+        const hasNext = await page.evaluate((current: number) => {
+          return !!document.querySelector(`a[href*="page=${current + 1}"]`);
+        }, pageNum);
+
+        if (!hasNext) break;
+
+        await new Promise((r) => setTimeout(r, 300));
+      } catch (error) {
+        console.log(`      Error loading page: ${error}`);
+        break;
+      }
+    }
+  }
+
+  // Add additional model URLs that aren't found in catalogs
+  console.log(`\n  Adding ${ADDITIONAL_MODEL_URLS.length} additional model URLs...`);
+  ADDITIONAL_MODEL_URLS.forEach((url) => modelUrls.add(url));
+
+  return Array.from(modelUrls);
+}
+
+/**
+ * Scrape a single model page
+ */
+async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTire | null> {
+  try {
+    await page.goto(modelUrl, { waitUntil: "networkidle2", timeout: 30000 });
+
+    // Scroll to load lazy content
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await new Promise((r) => setTimeout(r, 500));
+
+    const data = await page.evaluate(() => {
+      // Model name from h1
+      const modelSpan = document.querySelector("h1 .product-model, h1");
+      let modelName = modelSpan?.textContent?.trim() || "";
+      modelName = modelName.replace(/^Bridgestone\s+/i, "").trim();
+
+      // Description from .text-formatted
+      const descEl = document.querySelector(".text-formatted");
+      const description = descEl?.textContent?.trim() || "";
+
+      // Image
+      const img = document.querySelector(".product-block picture img, picture img");
+      const imageUrl = img?.getAttribute("src") || "";
+
+      // Collect all size URLs and texts
+      const sizeLinks = document.querySelectorAll('a[href*=".html"]');
+      const sizes: Array<{ url: string; text: string }> = [];
+
+      sizeLinks.forEach((link) => {
+        const href = (link as HTMLAnchorElement).href;
+        const text = link.textContent?.trim() || "";
+
+        // Filter for tire product pages
+        if (href.includes("bridgestone") && href.includes(".html") && text.match(/\d{3}\/\d{2}/)) {
+          sizes.push({ url: href, text });
+        }
+      });
+
+      return { modelName, description, imageUrl, sizes };
+    });
+
+    if (!data.modelName) {
+      console.log(`  Warning: Could not extract model name from ${modelUrl}`);
+      return null;
+    }
+
+    // Parse sizes
+    const parsedSizes: ScrapedTireSize[] = [];
+    const seenSizes = new Set<string>();
+
+    for (const { url, text } of data.sizes) {
+      const size = parseSizeFromText(text) || parseSizeFromUrl(url);
+      if (size) {
+        const key = `${size.width}-${size.aspectRatio}-${size.diameter}`;
+        if (!seenSizes.has(key)) {
+          seenSizes.add(key);
+          parsedSizes.push(size);
+        }
+      }
+    }
+
+    const sourceSlug = extractSourceSlug(modelUrl);
+    const season = determineSeason(data.description, data.modelName);
+
+    return {
+      name: data.modelName,
+      sourceSlug,
+      canonicalSlug: createSlug(data.modelName),
+      season,
+      sizes: parsedSizes,
+      description: data.description,
+      imageUrl: data.imageUrl,
+      sourceUrl: modelUrl,
+      scrapedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error(`  Error scraping ${modelUrl}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Main scraper - scrapes model pages for full data
+ */
 async function scrapeProkoleso(): Promise<ScrapedTire[]> {
-  console.log("Starting ProKoleso scraper...");
-  console.log(`Target URL: ${BRIDGESTONE_URL}`);
+  console.log("Starting ProKoleso Model Page Scraper...");
+  console.log(`Catalogs: ${BRIDGESTONE_CATALOGS.join(", ")}`);
 
   let browser: Browser | null = null;
 
@@ -95,93 +279,32 @@ async function scrapeProkoleso(): Promise<ScrapedTire[]> {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
 
-    console.log("Navigating to Bridgestone catalog...");
-    await page.goto(BRIDGESTONE_URL, { waitUntil: "networkidle2", timeout: 30000 });
+    // Step 1: Find all model URLs
+    console.log("\n[Step 1] Finding model URLs from catalog...");
+    const modelUrls = await findModelUrls(page);
+    console.log(`Found ${modelUrls.length} model pages`);
+    modelUrls.forEach((url) => console.log(`  - ${url}`));
 
-    // Wait for product cards to load
-    await page.waitForSelector(".product-card, .catalog-item, [data-product]", { timeout: 10000 }).catch(() => {
-      console.log("Warning: Could not find product cards with expected selectors");
-    });
+    // Step 2: Scrape each model page
+    console.log("\n[Step 2] Scraping model pages...");
+    const scrapedTires: ScrapedTire[] = [];
 
-    // Extract tire data from the page
-    const tires = await page.evaluate(() => {
-      const results: Array<{
-        name: string;
-        imageUrl: string;
-        sourceUrl: string;
-        description: string;
-        sizes: string[];
-      }> = [];
+    for (const modelUrl of modelUrls) {
+      console.log(`\nScraping: ${modelUrl}`);
+      const tire = await scrapeModelPage(page, modelUrl);
 
-      // Try multiple selectors for product cards
-      const selectors = [
-        ".product-card",
-        ".catalog-item",
-        "[data-product]",
-        ".product-list-item",
-        ".product",
-      ];
-
-      let productElements: Element[] = [];
-      for (const selector of selectors) {
-        const elements = document.querySelectorAll(selector);
-        if (elements.length > 0) {
-          productElements = Array.from(elements);
-          console.log(`Found ${elements.length} products with selector: ${selector}`);
-          break;
-        }
+      if (tire) {
+        scrapedTires.push(tire);
+        console.log(`  ✓ ${tire.name} (${tire.season}, ${tire.sizes.length} sizes)`);
+        console.log(`    sourceSlug: ${tire.sourceSlug}`);
+        console.log(`    canonicalSlug: ${tire.canonicalSlug}`);
       }
 
-      for (const product of productElements) {
-        // Extract name
-        const nameEl = product.querySelector("h2, h3, .product-name, .product-title, [itemprop='name']");
-        const name = nameEl?.textContent?.trim() || "";
+      // Delay between requests
+      await new Promise((r) => setTimeout(r, 500));
+    }
 
-        if (!name || !name.toLowerCase().includes("bridgestone")) {
-          continue;
-        }
-
-        // Extract image
-        const imgEl = product.querySelector("img");
-        const imageUrl = imgEl?.src || imgEl?.getAttribute("data-src") || "";
-
-        // Extract link
-        const linkEl = product.querySelector("a");
-        const sourceUrl = linkEl?.href || "";
-
-        // Extract description
-        const descEl = product.querySelector(".description, .product-description, p");
-        const description = descEl?.textContent?.trim() || "";
-
-        // Extract sizes if available on listing page
-        const sizeEls = product.querySelectorAll(".size, .product-size, [data-size]");
-        const sizes = Array.from(sizeEls).map((el) => el.textContent?.trim() || "");
-
-        results.push({
-          name,
-          imageUrl,
-          sourceUrl,
-          description,
-          sizes: sizes.filter(Boolean),
-        });
-      }
-
-      return results;
-    });
-
-    console.log(`Found ${tires.length} Bridgestone tire models`);
-
-    // Process and enrich tire data
-    const scrapedTires: ScrapedTire[] = tires.map((tire) => ({
-      name: tire.name.replace(/^Bridgestone\s+/i, "").trim(),
-      slug: createSlug(tire.name.replace(/^Bridgestone\s+/i, "")),
-      season: determineSeason(tire.name + " " + tire.description),
-      sizes: tire.sizes.map(parseSizeString).filter((s): s is ScrapedTireSize => s !== null),
-      description: tire.description,
-      imageUrl: tire.imageUrl,
-      sourceUrl: tire.sourceUrl,
-      scrapedAt: new Date().toISOString(),
-    }));
+    console.log(`\n[Done] Scraped ${scrapedTires.length} tire models`);
 
     return scrapedTires;
   } catch (error) {
@@ -202,7 +325,7 @@ function saveResults(tires: ScrapedTire[]): void {
 }
 
 /**
- * Scrape detailed content for a single tire model page
+ * Scrape detailed content for a single tire model page (for content generation)
  */
 export async function scrapeModelDescription(
   pageUrl: string,
@@ -226,129 +349,55 @@ export async function scrapeModelDescription(
     console.log(`Scraping content from: ${pageUrl}`);
     await page.goto(pageUrl, { waitUntil: "networkidle2", timeout: 30000 });
 
-    // Wait for content to load
-    await page.waitForSelector("body", { timeout: 10000 });
+    // Scroll to load content
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await new Promise((r) => setTimeout(r, 500));
 
-    // Extract content from page
     const content = await page.evaluate(() => {
-      // Extract model name from title or h1
-      const titleEl = document.querySelector("h1, .product-title, [itemprop='name']");
-      const rawTitle = titleEl?.textContent?.trim().replace(/\s+/g, " ") || "";
-      const modelName = rawTitle
-        .replace(/^Bridgestone\s+/i, "")
-        .replace(/\s+\d{3}\/\d{2,3}\s*R\d{2}.*$/i, "") // Remove size from name
-        .trim();
+      // Model name
+      const modelSpan = document.querySelector("h1 .product-model, h1");
+      let modelName = modelSpan?.textContent?.trim() || "";
+      modelName = modelName.replace(/^Bridgestone\s+/i, "").trim();
 
-      // Extract full description
-      // Look for description in various places
-      const descriptionSelectors = [
-        ".product-description",
-        ".description",
-        "[itemprop='description']",
-        ".js-tab-content",
-        ".product-info",
-        ".about-product",
-      ];
+      // Full description
+      const descEl = document.querySelector(".text-formatted");
+      const fullDescription = descEl?.textContent?.trim() || "";
 
-      let fullDescription = "";
-      for (const selector of descriptionSelectors) {
-        const el = document.querySelector(selector);
-        if (el) {
-          const text = el.textContent?.trim().replace(/\s+/g, " ") || "";
-          if (text.length > fullDescription.length) {
-            fullDescription = text;
-          }
-        }
-      }
-
-      // Extract advantages/features from lists
+      // Extract advantages from description paragraphs
       const advantages: string[] = [];
-      // Navigation/menu patterns to exclude
-      const excludePatterns = [
-        "Головна", "Каталог", "Кошик", "Шини Шини", "Диски Диски",
-        "Вантажні шини", "За сезоном", "За типорозміром", "За діаметром",
-        "За брендом", "Підібрати", "Детальніше", "Оплата", "Доставка",
-        "Купити", "В кошик", "Порівняти", "Контакти", "Про нас"
-      ];
-      const featureLists = document.querySelectorAll("ul li");
-      featureLists.forEach((li) => {
-        const text = li.textContent?.trim().replace(/\s+/g, " ") || "";
-        // Filter out navigation items, keep product-related content
-        const isNavigationItem = excludePatterns.some(pattern => text.includes(pattern));
-        if (
-          text.length > 15 &&
-          text.length < 300 &&
-          !isNavigationItem
-        ) {
+      const paragraphs = descEl?.querySelectorAll("p, li") || [];
+      paragraphs.forEach((p) => {
+        const text = p.textContent?.trim();
+        if (text && text.length > 20 && text.length < 300) {
           advantages.push(text);
         }
       });
 
-      // Extract specifications from table
-      const specifications: Record<string, string> = {};
-      const specRows = document.querySelectorAll("table tr, .specs-row, .characteristic");
-      specRows.forEach((row) => {
-        const cells = row.querySelectorAll("td, th, .spec-name, .spec-value");
-        if (cells.length >= 2) {
-          const key = cells[0].textContent?.trim().replace(/\s+/g, " ") || "";
-          const value = cells[1].textContent?.trim().replace(/\s+/g, " ") || "";
-          if (key && value) {
-            specifications[key] = value;
-          }
-        }
-      });
-
-      // Try to extract from JSON-LD
-      const jsonLdScript = document.querySelector('script[type="application/ld+json"]');
-      let jsonLdData: any = null;
-      if (jsonLdScript) {
-        try {
-          jsonLdData = JSON.parse(jsonLdScript.textContent || "{}");
-        } catch {
-          // Ignore parse errors
-        }
-      }
-
-      // Extract season from content
+      // Season detection
       const pageText = document.body.textContent?.toLowerCase() || "";
       let season: "summer" | "winter" | "allseason" | undefined;
-      if (pageText.includes("зимов") || pageText.includes("winter") || pageText.includes("blizzak")) {
+      if (pageText.includes("зимов") || pageText.includes("зимні") || pageText.includes("blizzak")) {
         season = "winter";
       } else if (pageText.includes("всесезон") || pageText.includes("all season")) {
         season = "allseason";
-      } else if (pageText.includes("літн") || pageText.includes("summer") || pageText.includes("turanza")) {
+      } else {
         season = "summer";
       }
 
-      return {
-        modelName,
-        fullDescription,
-        advantages: advantages.slice(0, 10), // Limit to 10 items
-        specifications,
-        season,
-        jsonLdDescription: jsonLdData?.description,
-      };
+      return { modelName, fullDescription, advantages, season };
     });
 
-    // Create slug from model name
-    const modelSlug = content.modelName
-      .toLowerCase()
-      .replace(/[^a-z0-9а-яіїєґ\s-]/gi, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-
-    // Combine descriptions
-    const fullDescription = content.fullDescription || content.jsonLdDescription || "";
+    const sourceSlug = extractSourceSlug(pageUrl);
+    const modelSlug = createSlug(content.modelName);
 
     const result: RawTyreContent = {
       source: "prokoleso",
       modelSlug,
       modelName: content.modelName,
-      fullDescription,
+      fullDescription: content.fullDescription,
       features: [],
-      advantages: content.advantages,
-      specifications: content.specifications,
+      advantages: content.advantages.slice(0, 10),
+      specifications: {},
       season: content.season,
       scrapedAt: new Date().toISOString(),
       sourceUrl: pageUrl,
@@ -373,7 +422,7 @@ export async function scrapeModelDescription(
 }
 
 /**
- * Find all Bridgestone tire URLs from catalog page
+ * Find all Bridgestone tire model URLs from catalog
  */
 export async function findBridgestoneTireUrls(browser?: Browser): Promise<string[]> {
   const shouldCloseBrowser = !browser;
@@ -391,23 +440,7 @@ export async function findBridgestoneTireUrls(browser?: Browser): Promise<string
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
 
-    console.log(`Finding tire URLs from: ${BRIDGESTONE_URL}`);
-    await page.goto(BRIDGESTONE_URL, { waitUntil: "networkidle2", timeout: 30000 });
-
-    const urls = await page.evaluate(() => {
-      const links = document.querySelectorAll('a[href*="bridgestone"]');
-      const uniqueUrls = new Set<string>();
-
-      links.forEach((link) => {
-        const href = (link as HTMLAnchorElement).href;
-        // Filter for product pages (contain .html and bridgestone)
-        if (href.includes(".html") && href.includes("bridgestone")) {
-          uniqueUrls.add(href);
-        }
-      });
-
-      return Array.from(uniqueUrls);
-    });
+    const urls = await findModelUrls(page);
 
     await page.close();
 
@@ -415,7 +448,6 @@ export async function findBridgestoneTireUrls(browser?: Browser): Promise<string
       await browser.close();
     }
 
-    console.log(`Found ${urls.length} tire URLs`);
     return urls;
   } catch (error) {
     console.error("Failed to find tire URLs:", error);
@@ -430,16 +462,24 @@ export async function findBridgestoneTireUrls(browser?: Browser): Promise<string
 async function main() {
   try {
     const tires = await scrapeProkoleso();
-    console.log(`\nScraped ${tires.length} tire models:`);
+
+    console.log(`\n${"=".repeat(50)}`);
+    console.log(`SUMMARY: Scraped ${tires.length} tire models`);
+    console.log(`${"=".repeat(50)}`);
+
     tires.forEach((tire) => {
-      console.log(`  - ${tire.name} (${tire.season}, ${tire.sizes.length} sizes)`);
+      console.log(`\n${tire.name}`);
+      console.log(`  Season: ${tire.season}`);
+      console.log(`  Sizes: ${tire.sizes.length}`);
+      console.log(`  Source slug: ${tire.sourceSlug}`);
+      console.log(`  Canonical slug: ${tire.canonicalSlug}`);
+      console.log(`  Description: ${tire.description.substring(0, 100)}...`);
     });
 
     if (tires.length > 0) {
       saveResults(tires);
     } else {
       console.log("\nNo tires found. The website structure may have changed.");
-      console.log("Please check the selectors in the scraper.");
     }
   } catch (error) {
     console.error("Failed to scrape:", error);
