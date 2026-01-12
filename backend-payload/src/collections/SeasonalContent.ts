@@ -149,6 +149,9 @@ export const SeasonalContent: CollectionConfig = {
           type: 'textarea',
           admin: {
             description: 'Додатковий промо-текст для сезонної кампанії',
+            components: {
+              Field: '/src/fields/CKEditorField',
+            },
           },
         },
       ],

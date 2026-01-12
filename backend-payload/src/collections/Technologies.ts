@@ -29,6 +29,12 @@ export const Technologies: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      label: 'Опис технології',
+      admin: {
+        components: {
+          Field: '/src/fields/CKEditorField',
+        },
+      },
     },
     {
       name: 'icon',

@@ -77,7 +77,13 @@ export const Articles: CollectionConfig = {
     },
     {
       name: 'body',
-      type: 'richText',
+      type: 'textarea',
+      label: 'Контент статті',
+      admin: {
+        components: {
+          Field: '/src/fields/CKEditorField',
+        },
+      },
     },
     {
       name: 'tags',

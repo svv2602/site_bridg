@@ -191,6 +191,11 @@ export const Tyres: CollectionConfig = {
           name: 'answer',
           type: 'textarea',
           required: true,
+          admin: {
+            components: {
+              Field: '/src/fields/CKEditorField',
+            },
+          },
         },
       ],
     },
