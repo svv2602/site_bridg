@@ -6,15 +6,16 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+// Path to rembg CLI in virtual environment
+const REMBG_CLI = path.resolve(process.cwd(), '.venv/bin/rembg');
+
 /**
  * Hook to automatically remove background from images using rembg (Python).
  * Triggered when 'removeBackground' checkbox is enabled on Media upload.
  *
  * Requirements:
+ *   cd backend-payload && python3 -m venv .venv && source .venv/bin/activate
  *   pip install "rembg[cpu]" pillow
- *
- * In Docker, rembg is installed in /opt/venv (see Dockerfile).
- * Locally, ensure rembg is available in PATH or activate venv first.
  */
 export const removeBackgroundHook: CollectionAfterChangeHook = async ({
   doc,
@@ -43,19 +44,19 @@ export const removeBackgroundHook: CollectionAfterChangeHook = async ({
   req.payload.logger.info(`Removing background from: ${filename}`);
 
   try {
-    // Check if rembg is available
+    // Check if rembg CLI is available
     try {
-      await execAsync('python3 -c "import rembg"');
+      await fs.access(REMBG_CLI);
     } catch {
       req.payload.logger.error(
-        'rembg not installed. Run: pip install rembg pillow'
+        'rembg not installed. Run: cd backend-payload && python3 -m venv .venv && .venv/bin/pip install "rembg[cpu,cli]"'
       );
       return doc;
     }
 
     // Use rembg CLI to process the image
-    const command = `python3 -m rembg i "${filePath}" "${newFilePath}"`;
-    await execAsync(command, { timeout: 60000 }); // 60 second timeout
+    const command = `"${REMBG_CLI}" i "${filePath}" "${newFilePath}"`;
+    await execAsync(command, { timeout: 120000 }); // 2 minute timeout
 
     // Verify output file was created
     try {
