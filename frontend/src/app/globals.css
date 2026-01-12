@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind v4: dark mode via data-theme attribute */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ============================================
    REDESIGN 2026: Warm Stone Palette
    Замінено холодні zinc кольори на теплі stone
@@ -58,7 +61,7 @@
   --secondary: var(--bridgestone-black);
   --accent: var(--stone-600);
   --muted: var(--stone-500);
-  --muted-foreground: var(--stone-600);
+  --muted-foreground: var(--stone-700);
   --card: #ffffff;
   --card-foreground: var(--stone-900);
   --border: var(--stone-200);
