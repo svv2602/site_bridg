@@ -23,12 +23,20 @@ export interface ScrapedTireSize {
   country?: string;
 }
 
+export interface EuLabel {
+  fuelEfficiency?: string;
+  wetGrip?: string;
+  noiseClass?: string;
+  noiseDb?: number;
+}
+
 export interface ScrapedTire {
   name: string;              // Model name from page (e.g., "Blizzak 6 ENLITEN")
   sourceSlug: string;        // Slug from URL (e.g., "blizzak-6")
   canonicalSlug: string;     // Generated slug (e.g., "blizzak-6-enliten")
   season: "summer" | "winter" | "allseason";
   sizes: ScrapedTireSize[];
+  euLabel?: EuLabel;         // EU label from first available size
   description: string;
   imageUrl: string;
   sourceUrl: string;
@@ -88,32 +96,84 @@ function extractSourceSlug(url: string): string {
   return match?.[1] || "";
 }
 
-function parseSizeFromUrl(url: string): ScrapedTireSize | null {
-  // Parse from URL like bridgestone-blizzak-6-205-55r17-95v.html
-  const match = url.match(/(\d{3})-(\d{2,3})r(\d{2})-(\d{2,3})([a-z])/i);
+function parseSizeFromText(text: string): ScrapedTireSize | null {
+  // Parse from text like "205/55 R17"
+  const match = text.match(/(\d{3})\/(\d{2,3})\s*R(\d{2})/i);
   if (!match) return null;
 
   return {
     width: parseInt(match[1], 10),
     aspectRatio: parseInt(match[2], 10),
     diameter: parseInt(match[3], 10),
-    loadIndex: match[4],
-    speedIndex: match[5].toUpperCase(),
   };
 }
 
-function parseSizeFromText(text: string): ScrapedTireSize | null {
-  // Parse from text like "205/55 R17 95V"
-  const match = text.match(/(\d{3})\/(\d{2,3})\s*R(\d{2})\s*(\d{2,3})?\s*([A-Z])?/i);
-  if (!match) return null;
+function parseSpeedIndex(text: string): string | undefined {
+  // Parse from text like "W (270 км/г)" or just "W"
+  const match = text.match(/([A-Z])\s*(?:\(|$)/i);
+  return match ? match[1].toUpperCase() : undefined;
+}
 
-  return {
-    width: parseInt(match[1], 10),
-    aspectRatio: parseInt(match[2], 10),
-    diameter: parseInt(match[3], 10),
-    loadIndex: match[4],
-    speedIndex: match[5]?.toUpperCase(),
-  };
+function parseLoadIndex(text: string): string | undefined {
+  // Parse from text like "96 (710 кг)" or just "96"
+  const match = text.match(/(\d{2,3})\s*(?:\(|$)/);
+  return match ? match[1] : undefined;
+}
+
+/**
+ * Scrape EU label from a size page
+ */
+async function scrapeEuLabel(page: Page, sizeUrl: string): Promise<EuLabel | null> {
+  try {
+    await page.goto(sizeUrl, { waitUntil: "networkidle2", timeout: 30000 });
+
+    // Click on Євроетикетка tab
+    await page.evaluate(() => {
+      const els = document.querySelectorAll(".js-tab-trigger");
+      for (const el of els) {
+        const text = el.textContent?.trim() || "";
+        if (text === "Євроетикетка" || text === "Евроэтикетка") {
+          (el as HTMLElement).click();
+          return;
+        }
+      }
+    });
+
+    // Wait for content to load
+    await new Promise((r) => setTimeout(r, 1000));
+
+    // Parse EU label from visible text
+    const euLabel = await page.evaluate(() => {
+      const text = document.body.innerText;
+
+      const fuelMatch = text.match(/(?:Клас[а-яі\s]+)?енергоефективності[\s\n]+([A-G])/i);
+      const wetMatch = text.match(/зчеплення[а-яі\s]+мокр[а-яі\s]+[\s\n]+([A-G])/i);
+      const noiseClassMatch = text.match(/(?:зовнішнього\s+)?шуму качення[\s\n]+([A-G])/i);
+      const noiseDbMatch = text.match(/(\d{2,3})\s*d[Bb]/i);
+
+      return {
+        fuelEfficiency: fuelMatch ? fuelMatch[1] : null,
+        wetGrip: wetMatch ? wetMatch[1] : null,
+        noiseClass: noiseClassMatch ? noiseClassMatch[1] : null,
+        noiseDb: noiseDbMatch ? parseInt(noiseDbMatch[1], 10) : null,
+      };
+    });
+
+    // Return only if we found at least some data
+    if (euLabel.fuelEfficiency || euLabel.wetGrip || euLabel.noiseDb) {
+      return {
+        fuelEfficiency: euLabel.fuelEfficiency || undefined,
+        wetGrip: euLabel.wetGrip || undefined,
+        noiseClass: euLabel.noiseClass || undefined,
+        noiseDb: euLabel.noiseDb || undefined,
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.log(`    Warning: Could not scrape EU label from ${sizeUrl}`);
+    return null;
+  }
 }
 
 /**
@@ -198,21 +258,63 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
       const descEl = document.querySelector(".text-formatted");
       const description = descEl?.textContent?.trim() || "";
 
-      // Image
-      const img = document.querySelector(".product-block picture img, picture img");
-      const imageUrl = img?.getAttribute("src") || "";
+      // Image - find product image, not logos/stickers
+      let imageUrl = "";
+      const imgs = document.querySelectorAll(".product-block img");
+      for (const img of imgs) {
+        const src = (img as HTMLImageElement).src || "";
+        // Skip logos, stickers, icons
+        if (src && !src.includes("logo") && !src.includes("sticker") &&
+            !src.includes("icon") && !src.includes(".svg") &&
+            (src.includes("bridgestone") || src.includes("catalog_models"))) {
+          imageUrl = src;
+          break;
+        }
+      }
 
-      // Collect all size URLs and texts
-      const sizeLinks = document.querySelectorAll('a[href*=".html"]');
-      const sizes: Array<{ url: string; text: string }> = [];
+      // Parse sizes from table rows
+      const sizes: Array<{
+        sizeText: string;
+        speedIndex: string;
+        loadIndex: string;
+        url: string;
+      }> = [];
 
-      sizeLinks.forEach((link) => {
-        const href = (link as HTMLAnchorElement).href;
-        const text = link.textContent?.trim() || "";
+      const tableRows = document.querySelectorAll("table tbody tr");
+      tableRows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length < 4) return;
 
-        // Filter for tire product pages
-        if (href.includes("bridgestone") && href.includes(".html") && text.match(/\d{3}\/\d{2}/)) {
-          sizes.push({ url: href, text });
+        // Cell 1: Типорозмір (with link)
+        const sizeLink = cells[1]?.querySelector("a");
+        const sizeText = sizeLink?.textContent?.trim() || "";
+        const url = (sizeLink as HTMLAnchorElement)?.href || "";
+
+        // Cell 2: Індекс швидкості - get text content excluding .key
+        let speedText = "";
+        cells[2]?.childNodes.forEach((node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            speedText += node.textContent || "";
+          }
+        });
+        speedText = speedText.trim();
+
+        // Cell 3: Індекс навантаження
+        let loadText = "";
+        cells[3]?.childNodes.forEach((node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            loadText += node.textContent || "";
+          }
+        });
+        loadText = loadText.trim();
+
+        if (sizeText.match(/\d{3}\/\d{2}/)) {
+          sizes.push({
+            sizeText,
+            speedIndex: speedText,
+            loadIndex: loadText,
+            url,
+          });
         }
       });
 
@@ -224,23 +326,43 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
       return null;
     }
 
-    // Parse sizes
+    // Parse sizes from table data
     const parsedSizes: ScrapedTireSize[] = [];
     const seenSizes = new Set<string>();
 
-    for (const { url, text } of data.sizes) {
-      const size = parseSizeFromText(text) || parseSizeFromUrl(url);
-      if (size) {
-        const key = `${size.width}-${size.aspectRatio}-${size.diameter}`;
-        if (!seenSizes.has(key)) {
-          seenSizes.add(key);
-          parsedSizes.push(size);
-        }
+    for (const { sizeText, speedIndex, loadIndex } of data.sizes) {
+      const baseSize = parseSizeFromText(sizeText);
+      if (!baseSize) continue;
+
+      const size: ScrapedTireSize = {
+        width: baseSize.width,
+        aspectRatio: baseSize.aspectRatio,
+        diameter: baseSize.diameter,
+        loadIndex: parseLoadIndex(loadIndex),
+        speedIndex: parseSpeedIndex(speedIndex),
+      };
+
+      // Include load/speed in key to distinguish different variants
+      const key = `${size.width}-${size.aspectRatio}-${size.diameter}-${size.loadIndex || ""}-${size.speedIndex || ""}`;
+      if (!seenSizes.has(key)) {
+        seenSizes.add(key);
+        parsedSizes.push(size);
       }
     }
 
     const sourceSlug = extractSourceSlug(modelUrl);
     const season = determineSeason(data.description, data.modelName);
+
+    // Get EU label from first available size
+    let euLabel: EuLabel | undefined;
+    const firstSizeUrl = data.sizes.find((s) => s.url)?.url;
+    if (firstSizeUrl) {
+      const label = await scrapeEuLabel(page, firstSizeUrl);
+      if (label) {
+        euLabel = label;
+        console.log(`    EU Label: ${label.fuelEfficiency}/${label.wetGrip}/${label.noiseDb}dB`);
+      }
+    }
 
     return {
       name: data.modelName,
@@ -248,6 +370,7 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
       canonicalSlug: createSlug(data.modelName),
       season,
       sizes: parsedSizes,
+      euLabel,
       description: data.description,
       imageUrl: data.imageUrl,
       sourceUrl: modelUrl,
