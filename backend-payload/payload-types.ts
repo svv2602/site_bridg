@@ -76,6 +76,8 @@ export interface Config {
     'vehicle-fitments': VehicleFitment;
     'contact-submissions': ContactSubmission;
     'seasonal-content': SeasonalContent;
+    'provider-settings': ProviderSetting;
+    'task-routing': TaskRouting;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +94,8 @@ export interface Config {
     'vehicle-fitments': VehicleFitmentsSelect<false> | VehicleFitmentsSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'seasonal-content': SeasonalContentSelect<false> | SeasonalContentSelect<true>;
+    'provider-settings': ProviderSettingsSelect<false> | ProviderSettingsSelect<true>;
+    'task-routing': TaskRoutingSelect<false> | TaskRoutingSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -512,6 +516,119 @@ export interface SeasonalContent {
   createdAt: string;
 }
 /**
+ * Керування AI провайдерами. API ключі налаштовуються у файлі .env на сервері.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provider-settings".
+ */
+export interface ProviderSetting {
+  id: number;
+  name:
+    | 'anthropic'
+    | 'openai'
+    | 'deepseek'
+    | 'google'
+    | 'groq'
+    | 'openrouter'
+    | 'ollama'
+    | 'openai-dalle'
+    | 'stability'
+    | 'replicate'
+    | 'leonardo';
+  /**
+   * Тип провайдера
+   */
+  type: 'llm' | 'image' | 'embedding';
+  /**
+   * Включити/виключити провайдера
+   */
+  enabled?: boolean | null;
+  /**
+   * Менше число = вищий пріоритет (1 = найвищий)
+   */
+  priority?: number | null;
+  defaultModel?: string | null;
+  /**
+   * Список моделей для вибору
+   */
+  availableModels?:
+    | {
+        model: string;
+        label?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  apiKeyEnvVar?: string | null;
+  /**
+   * Для провайдерів з кастомним URL
+   */
+  baseUrl?: string | null;
+  maxTokens?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Вибір провайдера та моделі для кожного типу задачі
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "task-routing".
+ */
+export interface TaskRouting {
+  id: number;
+  task:
+    | 'content-generation'
+    | 'content-rewrite'
+    | 'quick-task'
+    | 'reasoning'
+    | 'analysis'
+    | 'content-translation'
+    | 'code-generation'
+    | 'image-article'
+    | 'image-product'
+    | 'image-lifestyle'
+    | 'image-banner'
+    | 'embedding-search'
+    | 'embedding-similarity';
+  /**
+   * Для чого використовується цей тип задачі
+   */
+  description?: string | null;
+  preferredProvider:
+    | 'anthropic'
+    | 'openai'
+    | 'deepseek'
+    | 'google'
+    | 'groq'
+    | 'openrouter'
+    | 'ollama'
+    | 'openai-dalle'
+    | 'stability'
+    | 'replicate'
+    | 'leonardo';
+  /**
+   * ID моделі: claude-sonnet-4-20250514, gpt-4o, deepseek-chat, тощо
+   */
+  preferredModel: string;
+  /**
+   * Використовуються якщо основний провайдер недоступний
+   */
+  fallbackProviders?:
+    | ('anthropic' | 'openai' | 'deepseek' | 'google' | 'groq' | 'openrouter' | 'replicate' | 'stability')[]
+    | null;
+  maxRetries?: number | null;
+  /**
+   * Максимальний час очікування відповіді
+   */
+  timeoutMs?: number | null;
+  /**
+   * Максимальна вартість одного запиту
+   */
+  maxCost?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -570,6 +687,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'seasonal-content';
         value: number | SeasonalContent;
+      } | null)
+    | ({
+        relationTo: 'provider-settings';
+        value: number | ProviderSetting;
+      } | null)
+    | ({
+        relationTo: 'task-routing';
+        value: number | TaskRouting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -884,6 +1009,46 @@ export interface SeasonalContentSelect<T extends boolean = true> {
   ctaLink?: T;
   gradient?: T;
   promoText?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "provider-settings_select".
+ */
+export interface ProviderSettingsSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  enabled?: T;
+  priority?: T;
+  defaultModel?: T;
+  availableModels?:
+    | T
+    | {
+        model?: T;
+        label?: T;
+        description?: T;
+        id?: T;
+      };
+  apiKeyEnvVar?: T;
+  baseUrl?: T;
+  maxTokens?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "task-routing_select".
+ */
+export interface TaskRoutingSelect<T extends boolean = true> {
+  task?: T;
+  description?: T;
+  preferredProvider?: T;
+  preferredModel?: T;
+  fallbackProviders?: T;
+  maxRetries?: T;
+  timeoutMs?: T;
+  maxCost?: T;
   updatedAt?: T;
   createdAt?: T;
 }

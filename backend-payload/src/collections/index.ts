@@ -7,3 +7,5 @@ export { Technologies } from './Technologies';
 export { VehicleFitments } from './VehicleFitments';
 export { ContactSubmissions } from './ContactSubmissions';
 export { SeasonalContent } from './SeasonalContent';
+export { ProviderSettings } from './ProviderSettings';
+export { TaskRouting } from './TaskRouting';

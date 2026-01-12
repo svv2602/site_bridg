@@ -1,26 +1,11 @@
 /**
- * LLM Content Generator using Claude API
+ * LLM Content Generator using Multi-Provider Architecture
  *
  * Generates tire descriptions, article content, and other text in Ukrainian.
+ * Uses fallback-aware LLM system with automatic provider switching.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
-import { ENV } from "../config/env.js";
-
-// Initialize Claude client
-let client: Anthropic | null = null;
-
-function getClient(): Anthropic {
-  if (!client) {
-    if (!ENV.ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not set. Please add it to .env file.");
-    }
-    client = new Anthropic({
-      apiKey: ENV.ANTHROPIC_API_KEY,
-    });
-  }
-  return client;
-}
+import { fallbackLlm } from "../providers/index.js";
 
 // Types
 export interface GenerateOptions {
@@ -64,7 +49,7 @@ const SYSTEM_PROMPTS = {
 };
 
 /**
- * Generate content using Claude API
+ * Generate content using multi-provider LLM system with fallback
  */
 export async function generateContent(
   prompt: string,
@@ -77,28 +62,19 @@ export async function generateContent(
   } = options;
 
   try {
-    const anthropic = getClient();
+    // Combine system prompt with user prompt
+    const fullPrompt = `${systemPrompt}\n\n${prompt}`;
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: maxTokens,
+    // Use fallback-aware LLM (reads config from database)
+    const response = await fallbackLlm.generate(fullPrompt, {
+      maxTokens,
       temperature,
-      system: systemPrompt,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      taskType: "content-generation",
     });
 
-    // Extract text from response
-    const textBlock = message.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      throw new Error("No text response from Claude");
-    }
+    console.log(`[LLM] Generated with ${response.provider}/${response.model} (${response.latencyMs}ms, $${response.cost.toFixed(4)})`);
 
-    return textBlock.text;
+    return response.content;
   } catch (error) {
     console.error("LLM generation error:", error);
     throw error;
@@ -184,14 +160,7 @@ ${keywords.length ? `Ключові слова для включення: ${keyw
 
 // Test function
 async function main() {
-  console.log("Testing LLM Generator...\n");
-
-  if (!ENV.ANTHROPIC_API_KEY) {
-    console.error("ANTHROPIC_API_KEY not set. Skipping test.");
-    console.log("\nTo test, create .env file with:");
-    console.log("ANTHROPIC_API_KEY=your-key-here");
-    return;
-  }
+  console.log("Testing LLM Generator with Multi-Provider Fallback...\n");
 
   try {
     // Test tire description
@@ -218,7 +187,10 @@ async function main() {
   }
 }
 
-// Run if called directly
-main();
+// Run only if called directly (not when imported)
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+if (isMainModule) {
+  main();
+}
 
 export { SYSTEM_PROMPTS };

@@ -17,7 +17,15 @@ export * from "./image/index.js";
 // Export cost tracker
 export { costTracker, CostTrackerImpl } from "./cost-tracker.js";
 
-// Export configurations
+// Export fallback-aware LLM
+export {
+  fallbackLlm,
+  generateWithFallback,
+  generateJSONWithFallback,
+  type FallbackResult,
+} from "./fallback-llm.js";
+
+// Export configurations (static)
 export {
   LLM_PROVIDERS,
   IMAGE_PROVIDERS,
@@ -30,6 +38,18 @@ export {
   getTaskRouting,
   getProviderConfig,
 } from "../config/providers.js";
+
+// Export database-backed configurations
+export {
+  loadProvidersFromDatabase,
+  loadTaskRoutingFromDatabase,
+  getTaskRoutingFromDB,
+  getProviderConfigFromDB,
+  getEnabledLLMProvidersFromDB,
+  getEnabledImageProvidersFromDB,
+  hasApiKey,
+  clearProviderCache,
+} from "../config/database-providers.js";
 
 // Export pricing utilities
 export {

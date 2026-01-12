@@ -11,7 +11,6 @@
 
 import { generateContent } from "./llm-generator.js";
 import { getTireDescriptionPrompt, SYSTEM_PROMPTS } from "../config/prompts.js";
-import { ENV } from "../config/env.js";
 
 // Types
 export interface TireInput {
@@ -184,12 +183,7 @@ function sleep(ms: number): Promise<void> {
 async function main() {
   console.log("Testing Tire Description Generator...\n");
 
-  if (!ENV.ANTHROPIC_API_KEY) {
-    console.error("ANTHROPIC_API_KEY not set. Skipping test.");
-    console.log("\nTo test, create .env file with:");
-    console.log("ANTHROPIC_API_KEY=your-key-here");
-    return;
-  }
+  // No longer need ANTHROPIC_API_KEY check - using multi-provider fallback system
 
   // Test tire data
   const testTire: TireInput = {
@@ -233,5 +227,8 @@ async function main() {
   }
 }
 
-// Run if called directly
-main();
+// Run only if called directly (not when imported)
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+if (isMainModule) {
+  main();
+}

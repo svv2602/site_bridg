@@ -14,6 +14,8 @@ import {
   VehicleFitments,
   ContactSubmissions,
   SeasonalContent,
+  ProviderSettings,
+  TaskRouting,
 } from './src/collections';
 import {
   removeBackgroundsEndpoint,
@@ -26,6 +28,13 @@ import {
   contentImportEndpoint,
   contentJobsListEndpoint,
 } from './src/endpoints/contentGeneration';
+import {
+  providersSeedEndpoint,
+  providersStatusEndpoint,
+  providersToggleEndpoint,
+  providersUpdateModelEndpoint,
+  taskRoutingUpdateEndpoint,
+} from './src/endpoints/providerManagement';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -40,6 +49,9 @@ export default buildConfig({
     },
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      beforeDashboard: ['/src/components/Dashboard'],
     },
     theme: 'dark',
     avatar: 'gravatar',
@@ -56,6 +68,8 @@ export default buildConfig({
     VehicleFitments,
     ContactSubmissions,
     SeasonalContent,
+    ProviderSettings,
+    TaskRouting,
   ],
   endpoints: [
     removeBackgroundsEndpoint,
@@ -65,6 +79,11 @@ export default buildConfig({
     contentScrapeEndpoint,
     contentImportEndpoint,
     contentJobsListEndpoint,
+    providersSeedEndpoint,
+    providersStatusEndpoint,
+    providersToggleEndpoint,
+    providersUpdateModelEndpoint,
+    taskRoutingUpdateEndpoint,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',

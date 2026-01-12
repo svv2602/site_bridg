@@ -130,9 +130,72 @@ async function runScrapePipeline() {
  * Content generation pipeline
  */
 async function runContentGeneration() {
-  // This would be triggered by new models detected
-  // For now, just placeholder
-  console.log("Content generation ready for new models");
+  try {
+    // Read scraped data
+    const fs = await import("fs/promises");
+    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+
+    let tires: any[];
+    try {
+      const data = await fs.readFile(dataPath, "utf-8");
+      tires = JSON.parse(data);
+    } catch {
+      console.log("No scraped data found. Run 'scrape' first.");
+      return;
+    }
+
+    if (tires.length === 0) {
+      console.log("No tires to process");
+      return;
+    }
+
+    // Generate content for tires without AI-generated descriptions
+    const tiresToProcess = tires.filter((t: any) => !t.aiGenerated);
+    console.log(`Found ${tiresToProcess.length} tires needing content generation`);
+
+    if (tiresToProcess.length === 0) {
+      console.log("All tires already have generated content");
+      return;
+    }
+
+    // Process up to 3 tires (to avoid high costs during testing)
+    const batchSize = Math.min(tiresToProcess.length, 3);
+    console.log(`Processing ${batchSize} tires...`);
+
+    for (let i = 0; i < batchSize; i++) {
+      const tire = tiresToProcess[i];
+      console.log(`\n[${i + 1}/${batchSize}] Generating content for: ${tire.name}`);
+
+      const result = await generateTireContent({
+        name: tire.name,
+        slug: tire.canonicalSlug || tire.sourceSlug,
+        season: tire.season,
+        euLabel: tire.euLabel,
+        sourceDescription: tire.description,
+      });
+
+      if (result.success && result.content) {
+        console.log(`  ✓ Generated: ${result.content.shortDescription.substring(0, 60)}...`);
+
+        // Mark as processed and store generated content
+        tire.aiGenerated = true;
+        tire.generatedContent = result.content;
+        stats.tyresNew++;
+      } else {
+        console.log(`  ✗ Failed: ${result.error}`);
+        stats.errors.push(`${tire.name}: ${result.error}`);
+      }
+    }
+
+    // Save updated data
+    await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
+    console.log(`\nUpdated ${dataPath}`);
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    stats.errors.push(`Content generation failed: ${errorMessage}`);
+    console.error("Content generation error:", errorMessage);
+  }
 }
 
 /**

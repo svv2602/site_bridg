@@ -631,7 +631,10 @@ async function main() {
   }
 }
 
-// Run if called directly
-main();
+// Run only if called directly (not when imported)
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+if (isMainModule) {
+  main();
+}
 
 export { scrapeProkoleso, saveResults };
