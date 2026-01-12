@@ -17,6 +17,15 @@ interface BackgroundStatus {
   rembgAvailable: boolean
 }
 
+interface ContentJob {
+  id: string
+  status: 'running' | 'completed' | 'failed'
+  startedAt: string
+  completedAt?: string
+  command: string
+  error?: string
+}
+
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
     tyres: 0,
@@ -29,6 +38,8 @@ export const Dashboard: React.FC = () => {
   const [bgStatus, setBgStatus] = useState<BackgroundStatus | null>(null)
   const [bgProcessing, setBgProcessing] = useState(false)
   const [bgMessage, setBgMessage] = useState<string | null>(null)
+  const [contentJobs, setContentJobs] = useState<ContentJob[]>([])
+  const [contentProcessing, setContentProcessing] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -53,6 +64,13 @@ export const Dashboard: React.FC = () => {
         const bgStatusRes = await fetch('/api/remove-backgrounds/status')
         if (bgStatusRes.ok) {
           setBgStatus(await bgStatusRes.json())
+        }
+
+        // Fetch content jobs
+        const jobsRes = await fetch('/api/content/jobs')
+        if (jobsRes.ok) {
+          const data = await jobsRes.json()
+          setContentJobs(data.jobs || [])
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
@@ -84,6 +102,36 @@ export const Dashboard: React.FC = () => {
       setBgMessage('Помилка з\'єднання')
     } finally {
       setBgProcessing(false)
+    }
+  }
+
+  const runContentAction = async (action: 'scrape' | 'import' | 'generate') => {
+    setContentProcessing(action)
+    try {
+      const res = await fetch(`/api/content/${action}`, { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        // Refresh jobs list
+        const jobsRes = await fetch('/api/content/jobs')
+        if (jobsRes.ok) {
+          const jobsData = await jobsRes.json()
+          setContentJobs(jobsData.jobs || [])
+        }
+      } else {
+        alert(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+    } finally {
+      setContentProcessing(null)
+    }
+  }
+
+  const refreshJobs = async () => {
+    const jobsRes = await fetch('/api/content/jobs')
+    if (jobsRes.ok) {
+      const data = await jobsRes.json()
+      setContentJobs(data.jobs || [])
     }
   }
 
@@ -134,16 +182,51 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard__section">
-        <h2>Автоматизація</h2>
-        <div className="dashboard__automation">
-          <div className="dashboard__automation-status">
-            <span className="dashboard__automation-dot"></span>
-            <span>Планувальник активний</span>
+        <h2>Контент-автоматизація</h2>
+        <div className="dashboard__content-automation">
+          <div className="dashboard__content-actions">
+            <button
+              onClick={() => runContentAction('scrape')}
+              disabled={contentProcessing !== null}
+              className="dashboard__action"
+            >
+              {contentProcessing === 'scrape' ? 'Скрапінг...' : '1. Зібрати дані'}
+            </button>
+            <button
+              onClick={() => runContentAction('import')}
+              disabled={contentProcessing !== null}
+              className="dashboard__action"
+            >
+              {contentProcessing === 'import' ? 'Імпорт...' : '2. Імпортувати шини'}
+            </button>
+            <button
+              onClick={() => runContentAction('generate')}
+              disabled={contentProcessing !== null}
+              className="dashboard__action dashboard__action--primary"
+            >
+              {contentProcessing === 'generate' ? 'Генерація...' : '3. Згенерувати описи'}
+            </button>
           </div>
-          <p>Наступний запуск: неділя о 03:00 (Київ)</p>
-          <a href="/api/automation/status" target="_blank" className="dashboard__action">
-            Переглянути статус
-          </a>
+          <div className="dashboard__content-jobs">
+            <div className="dashboard__content-jobs-header">
+              <span>Останні завдання</span>
+              <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
+            </div>
+            {contentJobs.slice(0, 5).map((job) => (
+              <div key={job.id} className={`dashboard__job dashboard__job--${job.status}`}>
+                <span className="dashboard__job-command">{job.command.split(' ').pop()}</span>
+                <span className={`dashboard__job-status dashboard__job-status--${job.status}`}>
+                  {job.status === 'running' ? '⏳' : job.status === 'completed' ? '✓' : '✗'}
+                </span>
+                <span className="dashboard__job-time">
+                  {new Date(job.startedAt).toLocaleTimeString('uk-UA')}
+                </span>
+              </div>
+            ))}
+            {contentJobs.length === 0 && (
+              <div className="dashboard__job-empty">Немає завдань</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -401,6 +484,84 @@ export const Dashboard: React.FC = () => {
         button.dashboard__action:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+        }
+
+        .dashboard__content-automation {
+          padding: 1rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 8px;
+        }
+
+        .dashboard__content-actions {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .dashboard__content-jobs {
+          border-top: 1px solid var(--theme-elevation-100);
+          padding-top: 1rem;
+        }
+
+        .dashboard__content-jobs-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          font-size: 0.875rem;
+          color: var(--theme-elevation-800);
+        }
+
+        .dashboard__refresh-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 1rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__refresh-btn:hover {
+          color: var(--theme-text);
+        }
+
+        .dashboard__job {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.375rem 0;
+          font-size: 0.875rem;
+          border-bottom: 1px solid var(--theme-elevation-50);
+        }
+
+        .dashboard__job-command {
+          flex: 1;
+          font-family: monospace;
+          color: var(--theme-text);
+        }
+
+        .dashboard__job-status--running {
+          color: #f59e0b;
+        }
+
+        .dashboard__job-status--completed {
+          color: #16a34a;
+        }
+
+        .dashboard__job-status--failed {
+          color: #dc2626;
+        }
+
+        .dashboard__job-time {
+          color: var(--theme-elevation-600);
+          font-size: 0.75rem;
+        }
+
+        .dashboard__job-empty {
+          color: var(--theme-elevation-600);
+          font-size: 0.875rem;
+          font-style: italic;
         }
       `}</style>
     </div>

@@ -19,6 +19,13 @@ import {
   removeBackgroundsEndpoint,
   removeBackgroundsStatusEndpoint,
 } from './src/endpoints/removeBackgrounds';
+import {
+  contentGenerateEndpoint,
+  contentJobStatusEndpoint,
+  contentScrapeEndpoint,
+  contentImportEndpoint,
+  contentJobsListEndpoint,
+} from './src/endpoints/contentGeneration';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -50,7 +57,15 @@ export default buildConfig({
     ContactSubmissions,
     SeasonalContent,
   ],
-  endpoints: [removeBackgroundsEndpoint, removeBackgroundsStatusEndpoint],
+  endpoints: [
+    removeBackgroundsEndpoint,
+    removeBackgroundsStatusEndpoint,
+    contentGenerateEndpoint,
+    contentJobStatusEndpoint,
+    contentScrapeEndpoint,
+    contentImportEndpoint,
+    contentJobsListEndpoint,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
   db: postgresAdapter({
