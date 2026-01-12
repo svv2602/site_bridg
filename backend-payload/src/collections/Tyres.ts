@@ -1,13 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import {
-  lexicalEditor,
-  UploadFeature,
-} from '@payloadcms/richtext-lexical';
-import {
-  lexicalToHtml,
-  htmlToLexical,
-  hasHtmlChanged,
-} from '../utils/lexical-html-sync';
 import { euLabelField } from '../fields/euLabel';
 import { tyreSizeFields } from '../fields/tyreSize';
 import { usageField } from '../fields/usage';
@@ -133,55 +124,16 @@ export const Tyres: CollectionConfig = {
       type: 'textarea',
       maxLength: 350,
     },
+    // Full Description with CKEditor (HTML)
     {
-      type: 'tabs',
-      tabs: [
-        {
-          label: 'Візуальний редактор',
-          fields: [
-            {
-              name: 'fullDescription',
-              type: 'richText',
-              label: ' ',
-              editor: lexicalEditor({
-                features: ({ defaultFeatures }) => [
-                  ...defaultFeatures,
-                  UploadFeature({
-                    collections: {
-                      media: {
-                        fields: [
-                          {
-                            name: 'caption',
-                            type: 'text',
-                            label: 'Підпис',
-                          },
-                        ],
-                      },
-                    },
-                  }),
-                ],
-              }),
-              admin: {
-                description: 'Виділіть текст для форматування. "/" - вставити блок.',
-              },
-            },
-          ],
+      name: 'fullDescription',
+      type: 'textarea',
+      label: 'Повний опис',
+      admin: {
+        components: {
+          Field: '/src/fields/CKEditorField',
         },
-        {
-          label: 'HTML код',
-          fields: [
-            {
-              name: 'fullDescriptionHtml',
-              type: 'code',
-              label: ' ',
-              admin: {
-                language: 'html',
-                description: 'Пріоритетне поле. Якщо заповнене - використовується замість візуального.',
-              },
-            },
-          ],
-        },
-      ],
+      },
     },
     // EU Label
     euLabelField,
@@ -312,7 +264,7 @@ export const Tyres: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      ({ data, originalDoc }) => {
+      ({ data }) => {
         // Auto-generate slug from name if not provided
         if (data?.name && !data?.slug) {
           data.slug = data.name
@@ -320,22 +272,6 @@ export const Tyres: CollectionConfig = {
             .replace(/\s+/g, '-')
             .replace(/[^a-z0-9-]/g, '');
         }
-
-        // Sync Lexical ↔ HTML
-        const oldHtml = originalDoc?.fullDescriptionHtml;
-        const newHtml = data?.fullDescriptionHtml;
-        const oldLexical = originalDoc?.fullDescription;
-        const newLexical = data?.fullDescription;
-
-        // If HTML changed → update Lexical
-        if (hasHtmlChanged(oldHtml, newHtml) && newHtml) {
-          data.fullDescription = htmlToLexical(newHtml);
-        }
-        // Else if Lexical changed or HTML is empty → update HTML from Lexical
-        else if (newLexical?.root?.children?.length > 0) {
-          data.fullDescriptionHtml = lexicalToHtml(newLexical);
-        }
-
         return data;
       },
     ],

@@ -15,7 +15,6 @@ import { scrapeProkoleso } from "./scrapers/prokoleso.js";
 import { generateTireContent } from "./processors/tire-description-generator.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
-import { markdownToLexical } from "./utils/markdown-to-lexical.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
 
 // Types
@@ -239,8 +238,7 @@ async function runPublishPipeline() {
       try {
         const content = tire.generatedContent;
 
-        // Convert markdown fullDescription to Lexical and HTML
-        const fullDescriptionLexical = markdownToLexical(content.fullDescription);
+        // Convert markdown fullDescription to HTML (CKEditor stores HTML directly)
         const fullDescriptionHtml = markdownToHtml(content.fullDescription);
 
         // Convert keyBenefits array to Payload format
@@ -259,8 +257,7 @@ async function runPublishPipeline() {
           // Update existing tyre with generated content
           await client.updateTyre(existing.id, {
             shortDescription: content.shortDescription,
-            fullDescription: fullDescriptionLexical,
-            fullDescriptionHtml,
+            fullDescription: fullDescriptionHtml,
             keyBenefits,
             seoTitle,
             seoDescription,
@@ -274,8 +271,7 @@ async function runPublishPipeline() {
             season: tire.season || "summer",
             vehicleTypes: ["passenger"],
             shortDescription: content.shortDescription,
-            fullDescription: fullDescriptionLexical,
-            fullDescriptionHtml,
+            fullDescription: fullDescriptionHtml,
             keyBenefits,
             seoTitle,
             seoDescription,

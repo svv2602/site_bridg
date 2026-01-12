@@ -9,7 +9,7 @@ import { getPayloadHMR } from "@payloadcms/next/utilities";
 import configPromise from "@payload-config";
 import { validateAuth, isAdmin, unauthorizedResponse, forbiddenResponse } from "../auth";
 import { loadGeneratedContent } from "../storage-helper";
-import { markdownToLexical } from "../../../../../content-automation/src/utils/markdown-to-lexical";
+import { markdownToHtml } from "../../../../../content-automation/src/utils/markdown-to-html";
 
 // Fields that can be published
 const PUBLISHABLE_FIELDS = [
@@ -123,11 +123,11 @@ export async function POST(request: NextRequest) {
 
         case "fullDescription":
           if (generatedContent.fullDescription) {
-            // Convert Markdown to Lexical
-            const lexicalContent = markdownToLexical(
+            // Convert Markdown to HTML (CKEditor stores HTML)
+            const htmlContent = markdownToHtml(
               generatedContent.fullDescription
             );
-            updateData.fullDescription = lexicalContent;
+            updateData.fullDescription = htmlContent;
             updatedFields.push("fullDescription");
           }
           break;

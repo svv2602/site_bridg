@@ -28,6 +28,8 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
+    "@ckeditor/ckeditor5-react": "^11.0.1",
     "@payloadcms/db-postgres": "^3.70.0",
     "@payloadcms/next": "^3.70.0",
     "@payloadcms/richtext-lexical": "^3.70.0",
@@ -50,6 +52,7 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@vitest/coverage-v8": "^4.0.16",
+    "playwright": "^1.57.0",
     "sass": "^1.89.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

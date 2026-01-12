@@ -11,7 +11,6 @@
 
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { generateTireContent } from "./processors/tire-description-generator.js";
-import { markdownToLexical } from "./utils/markdown-to-lexical.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
 
 async function main() {
@@ -65,8 +64,7 @@ async function main() {
   // 3. Update tyre in Payload CMS
   console.log("\n[3/3] Updating tyre in Payload CMS...");
 
-  // Convert markdown to Lexical and HTML
-  const fullDescriptionLexical = markdownToLexical(result.content.fullDescription);
+  // Convert markdown to HTML (CKEditor stores HTML directly)
   const fullDescriptionHtml = markdownToHtml(result.content.fullDescription);
 
   // Truncate SEO fields to meet limits
@@ -80,8 +78,7 @@ async function main() {
 
   await client.updateTyre(tyre.id, {
     shortDescription: result.content.shortDescription,
-    fullDescription: fullDescriptionLexical,
-    fullDescriptionHtml,
+    fullDescription: fullDescriptionHtml,
     keyBenefits,
     seoTitle,
     seoDescription,

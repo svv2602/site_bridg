@@ -30,8 +30,7 @@ interface TyreData {
   season: "summer" | "winter" | "allseason";
   vehicleTypes: ("passenger" | "suv" | "van" | "sport")[];
   shortDescription?: string;
-  fullDescription?: any; // Lexical rich text
-  fullDescriptionHtml?: string; // Raw HTML alternative
+  fullDescription?: string; // HTML content for CKEditor
   seoTitle?: string;
   seoDescription?: string;
   isNew?: boolean;

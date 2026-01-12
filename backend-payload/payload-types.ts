@@ -146,6 +146,9 @@ export interface User {
   role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -239,21 +242,7 @@ export interface Tyre {
   vehicleTypes: ('passenger' | 'suv' | 'van' | 'sport')[];
   image?: (number | null) | Media;
   shortDescription?: string | null;
-  fullDescription?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  fullDescription?: string | null;
   euLabel?: {
     wetGrip?: ('A' | 'B' | 'C' | 'D' | 'E') | null;
     fuelEfficiency?: ('A' | 'B' | 'C' | 'D' | 'E') | null;
@@ -747,6 +736,9 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
