@@ -13,14 +13,8 @@ import { TestResultsSection } from "@/components/TestResultsSection";
 import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { KeyBenefits } from "@/components/KeyBenefits";
 import { Breadcrumb } from "@/components/ui";
+import { SizesByDiameter } from "@/components/SizesByDiameter";
 import { seasonLabels, SeasonIcons, formatVehicleTypes, getSiteUrl } from "@/lib/utils/tyres";
-
-function formatSize(size: TyreModel["sizes"][number]) {
-  const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
-  const li = size.loadIndex ? ` ${size.loadIndex}` : "";
-  const si = size.speedIndex ?? "";
-  return `${base}${li}${si}`;
-}
 
 function buildTitle(model: TyreModel): string {
   return `${model.name} — ${seasonLabels[model.season]} Bridgestone`;
@@ -208,41 +202,7 @@ export default async function TyreModelPage({
             <div className="lg:col-span-2 space-y-6">
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <h2 className="mb-4 text-xl font-bold">Технічні характеристики</h2>
-                {model.sizes.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Дані про типорозміри для цієї моделі будуть додані пізніше.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border-collapse text-sm">
-                      <thead>
-                        <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                          <th className="py-2 pr-4">Типорозмір</th>
-                          <th className="py-2 pr-4">Індекс навантаження</th>
-                          <th className="py-2 pr-4">Індекс швидкості</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {model.sizes.map((size, idx) => (
-                          <tr
-                            key={`${model.slug}-${idx}`}
-                            className="border-b border-border/60 last:border-0"
-                          >
-                            <td className="py-2 pr-4 font-medium text-foreground">
-                              {formatSize(size)}
-                            </td>
-                            <td className="py-2 pr-4 text-muted-foreground">
-                              {size.loadIndex ?? "—"}
-                            </td>
-                            <td className="py-2 pr-4 text-muted-foreground">
-                              {size.speedIndex ?? "—"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                <SizesByDiameter sizes={model.sizes} modelSlug={model.slug} />
               </div>
 
               {model.euLabel && (
