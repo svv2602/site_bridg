@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs/promises';
+import { fileURLToPath } from 'url';
 
 const execAsync = promisify(exec);
 
@@ -225,5 +226,116 @@ export const contentJobsListEndpoint: Endpoint = {
       .slice(0, 20);
 
     return Response.json({ jobs: recentJobs });
+  },
+};
+
+/**
+ * POST /api/content/regenerate/:slug
+ *
+ * Regenerate AI content for a specific tyre and publish to CMS
+ */
+export const contentRegenerateEndpoint: Endpoint = {
+  path: '/content/regenerate/:slug',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const slug = req.routeParams?.slug as string;
+    if (!slug) {
+      return Response.json({ error: 'Slug is required' }, { status: 400 });
+    }
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+
+    // Command to regenerate specific tyre
+    const command = `npx tsx src/regenerate-tyre.ts "${slug}"`;
+
+    const jobId = `regen-${slug}-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+    };
+    jobs.set(jobId, job);
+
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 120000, // 2 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        req.payload.logger.info(`Content regeneration completed for ${slug}: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        req.payload.logger.error(`Content regeneration failed for ${slug}: ${error.message}`);
+      });
+
+    return Response.json({
+      message: `Regeneration started for tyre: ${slug}`,
+      jobId,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
+  },
+};
+
+/**
+ * POST /api/content/publish
+ *
+ * Publish generated content to Payload CMS
+ */
+export const contentPublishEndpoint: Endpoint = {
+  path: '/content/publish',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+    const command = 'npx tsx src/scheduler.ts publish';
+
+    const jobId = `publish-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+    };
+    jobs.set(jobId, job);
+
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 300000, // 5 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        req.payload.logger.info(`Content publish completed: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        req.payload.logger.error(`Content publish failed: ${error.message}`);
+      });
+
+    return Response.json({
+      message: 'Publish started',
+      jobId,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
   },
 };

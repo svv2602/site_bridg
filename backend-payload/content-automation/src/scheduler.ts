@@ -13,8 +13,10 @@
 import { ENV } from "./config/env.js";
 import { scrapeProkoleso } from "./scrapers/prokoleso.js";
 import { generateTireContent } from "./processors/tire-description-generator.js";
-import { publishTyre } from "./publishers/payload-client.js";
+import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
+import { markdownToLexical } from "./utils/markdown-to-lexical.js";
+import { markdownToHtml } from "./utils/markdown-to-html.js";
 
 // Types
 export interface AutomationResult {
@@ -199,12 +201,109 @@ async function runContentGeneration() {
 }
 
 /**
- * Publish pipeline
+ * Publish pipeline - publishes generated content to Payload CMS
  */
 async function runPublishPipeline() {
-  // This would publish generated content
-  // For now, just placeholder
-  console.log("Publishing pipeline ready");
+  try {
+    const fs = await import("fs/promises");
+    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+
+    let tires: any[];
+    try {
+      const data = await fs.readFile(dataPath, "utf-8");
+      tires = JSON.parse(data);
+    } catch {
+      console.log("No scraped data found. Run 'scrape' first.");
+      return;
+    }
+
+    // Find tires with generated content that haven't been published yet
+    const tiresToPublish = tires.filter(
+      (t: any) => t.aiGenerated && t.generatedContent && !t.publishedToPayload
+    );
+
+    console.log(`Found ${tiresToPublish.length} tires ready for publishing`);
+
+    if (tiresToPublish.length === 0) {
+      console.log("No tires to publish");
+      return;
+    }
+
+    const client = getPayloadClient();
+    let published = 0;
+
+    for (const tire of tiresToPublish) {
+      const slug = tire.canonicalSlug || tire.sourceSlug;
+      console.log(`\nPublishing: ${tire.name} (${slug})`);
+
+      try {
+        const content = tire.generatedContent;
+
+        // Convert markdown fullDescription to Lexical and HTML
+        const fullDescriptionLexical = markdownToLexical(content.fullDescription);
+        const fullDescriptionHtml = markdownToHtml(content.fullDescription);
+
+        // Convert keyBenefits array to Payload format
+        const keyBenefits = content.keyBenefits.map((b: string) => ({
+          benefit: b,
+        }));
+
+        // Truncate SEO fields to meet Payload limits
+        const seoTitle = (content.seoTitle || "").substring(0, 70);
+        const seoDescription = (content.seoDescription || "").substring(0, 170);
+
+        // Find existing tyre or create new
+        const existing = await client.findTyreBySlug(slug);
+
+        if (existing) {
+          // Update existing tyre with generated content
+          await client.updateTyre(existing.id, {
+            shortDescription: content.shortDescription,
+            fullDescription: fullDescriptionLexical,
+            fullDescriptionHtml,
+            keyBenefits,
+            seoTitle,
+            seoDescription,
+          });
+          console.log(`  ✓ Updated tyre ID: ${existing.id}`);
+        } else {
+          // Create new tyre
+          await client.createTyre({
+            name: tire.name,
+            slug,
+            season: tire.season || "summer",
+            vehicleTypes: ["passenger"],
+            shortDescription: content.shortDescription,
+            fullDescription: fullDescriptionLexical,
+            fullDescriptionHtml,
+            keyBenefits,
+            seoTitle,
+            seoDescription,
+            euLabel: tire.euLabel,
+          });
+          console.log(`  ✓ Created new tyre`);
+        }
+
+        // Mark as published
+        tire.publishedToPayload = true;
+        tire.publishedAt = new Date().toISOString();
+        published++;
+        stats.tyresProcessed++;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.log(`  ✗ Failed: ${errorMessage}`);
+        stats.errors.push(`Publish ${tire.name}: ${errorMessage}`);
+      }
+    }
+
+    // Save updated data with publish flags
+    await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
+    console.log(`\nPublished ${published}/${tiresToPublish.length} tires`);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    stats.errors.push(`Publish pipeline failed: ${errorMessage}`);
+    console.error("Publish pipeline error:", errorMessage);
+  }
 }
 
 /**

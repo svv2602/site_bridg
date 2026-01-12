@@ -31,6 +31,9 @@ interface TyreData {
   vehicleTypes: ("passenger" | "suv" | "van" | "sport")[];
   shortDescription?: string;
   fullDescription?: any; // Lexical rich text
+  fullDescriptionHtml?: string; // Raw HTML alternative
+  seoTitle?: string;
+  seoDescription?: string;
   isNew?: boolean;
   isPopular?: boolean;
   euLabel?: {
@@ -73,17 +76,62 @@ type ArticleDoc = ArticleData & PayloadDoc;
 // Payload API client
 class PayloadClient {
   private baseUrl: string;
+  private token: string | null = null;
 
   constructor() {
     this.baseUrl = ENV.PAYLOAD_URL || "http://localhost:3001";
+  }
+
+  /**
+   * Authenticate with Payload CMS
+   */
+  async authenticate(email?: string, password?: string): Promise<void> {
+    const credentials = {
+      email: email || process.env.PAYLOAD_ADMIN_EMAIL || "admin@bridgestone.ua",
+      password: password || process.env.PAYLOAD_ADMIN_PASSWORD || "admin123",
+    };
+
+    try {
+      const response = await fetch(`${this.baseUrl}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Authentication failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      this.token = data.token;
+      console.log("Authenticated with Payload CMS");
+    } catch (error) {
+      console.error("Authentication error:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Ensure we have a valid token
+   */
+  private async ensureAuthenticated(): Promise<void> {
+    if (!this.token) {
+      await this.authenticate();
+    }
   }
 
   private async fetch<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    // For write operations, ensure authenticated
+    if (options.method && options.method !== "GET") {
+      await this.ensureAuthenticated();
+    }
+
     const headers: HeadersInit = {
       "Content-Type": "application/json",
+      ...(this.token ? { Authorization: `JWT ${this.token}` } : {}),
     };
 
     const url = `${this.baseUrl}/api${endpoint}`;

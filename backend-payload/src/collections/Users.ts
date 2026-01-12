@@ -6,7 +6,9 @@ export const Users: CollectionConfig = {
     singular: 'Користувач',
     plural: 'Користувачі',
   },
-  auth: true,
+  auth: {
+    useAPIKey: true,  // Enable API key authentication for automation
+  },
   admin: {
     useAsTitle: 'email',
     group: 'Налаштування',

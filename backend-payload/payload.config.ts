@@ -27,6 +27,8 @@ import {
   contentScrapeEndpoint,
   contentImportEndpoint,
   contentJobsListEndpoint,
+  contentRegenerateEndpoint,
+  contentPublishEndpoint,
 } from './src/endpoints/contentGeneration';
 import {
   providersSeedEndpoint,
@@ -79,6 +81,8 @@ export default buildConfig({
     contentScrapeEndpoint,
     contentImportEndpoint,
     contentJobsListEndpoint,
+    contentRegenerateEndpoint,
+    contentPublishEndpoint,
     providersSeedEndpoint,
     providersStatusEndpoint,
     providersToggleEndpoint,
