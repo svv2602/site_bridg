@@ -258,17 +258,38 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
       const descEl = document.querySelector(".text-formatted");
       const description = descEl?.textContent?.trim() || "";
 
-      // Image - find product image, not logos/stickers
+      // Image - find best quality product image
       let imageUrl = "";
-      const imgs = document.querySelectorAll(".product-block img");
-      for (const img of imgs) {
-        const src = (img as HTMLImageElement).src || "";
-        // Skip logos, stickers, icons
-        if (src && !src.includes("logo") && !src.includes("sticker") &&
-            !src.includes("icon") && !src.includes(".svg") &&
-            (src.includes("bridgestone") || src.includes("catalog_models"))) {
-          imageUrl = src;
-          break;
+
+      // Priority 1: Gallery image (highest quality ~463x463)
+      const galleryImg = document.querySelector("[js-product-gallery-slides] img") as HTMLImageElement;
+      if (galleryImg?.src && galleryImg.src.includes("gallery_image")) {
+        imageUrl = galleryImg.src;
+      }
+
+      // Priority 2: Any image with gallery_image in URL
+      if (!imageUrl) {
+        const allImgs = document.querySelectorAll("img");
+        for (const img of allImgs) {
+          const src = (img as HTMLImageElement).src || "";
+          if (src.includes("gallery_image") && src.includes("catalog_models")) {
+            imageUrl = src;
+            break;
+          }
+        }
+      }
+
+      // Priority 3: Fallback to card image or any product image
+      if (!imageUrl) {
+        const imgs = document.querySelectorAll(".product-block img, .product-card img");
+        for (const img of imgs) {
+          const src = (img as HTMLImageElement).src || "";
+          if (src && !src.includes("logo") && !src.includes("sticker") &&
+              !src.includes("icon") && !src.includes(".svg") &&
+              (src.includes("bridgestone") || src.includes("catalog_models"))) {
+            imageUrl = src;
+            break;
+          }
         }
       }
 
