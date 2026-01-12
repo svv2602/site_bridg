@@ -10,6 +10,13 @@ interface Stats {
   vehicleFitments: number
 }
 
+interface BackgroundStatus {
+  total: number
+  processed: number
+  pending: number
+  rembgAvailable: boolean
+}
+
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({
     tyres: 0,
@@ -19,6 +26,9 @@ export const Dashboard: React.FC = () => {
     vehicleFitments: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [bgStatus, setBgStatus] = useState<BackgroundStatus | null>(null)
+  const [bgProcessing, setBgProcessing] = useState(false)
+  const [bgMessage, setBgMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -38,6 +48,12 @@ export const Dashboard: React.FC = () => {
           technologies: technologies.totalDocs || 0,
           vehicleFitments: vehicleFitments.totalDocs || 0,
         })
+
+        // Fetch background removal status
+        const bgStatusRes = await fetch('/api/remove-backgrounds/status')
+        if (bgStatusRes.ok) {
+          setBgStatus(await bgStatusRes.json())
+        }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
       } finally {
@@ -47,6 +63,29 @@ export const Dashboard: React.FC = () => {
 
     fetchStats()
   }, [])
+
+  const handleRemoveBackgrounds = async () => {
+    setBgProcessing(true)
+    setBgMessage(null)
+    try {
+      const res = await fetch('/api/remove-backgrounds?all=true', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setBgMessage(`Оброблено: ${data.processed}, пропущено: ${data.skipped}, помилок: ${data.failed}`)
+        // Refresh status
+        const statusRes = await fetch('/api/remove-backgrounds/status')
+        if (statusRes.ok) {
+          setBgStatus(await statusRes.json())
+        }
+      } else {
+        setBgMessage(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      setBgMessage('Помилка з\'єднання')
+    } finally {
+      setBgProcessing(false)
+    }
+  }
 
   const cards = [
     { label: 'Шини', value: stats.tyres, icon: '🚗', href: '/admin/collections/tyres', color: '#E31837' },
@@ -105,6 +144,45 @@ export const Dashboard: React.FC = () => {
           <a href="/api/automation/status" target="_blank" className="dashboard__action">
             Переглянути статус
           </a>
+        </div>
+      </div>
+
+      <div className="dashboard__section">
+        <h2>Обробка зображень</h2>
+        <div className="dashboard__media">
+          {bgStatus && (
+            <div className="dashboard__media-stats">
+              <div className="dashboard__media-stat">
+                <span className="dashboard__media-value">{bgStatus.total}</span>
+                <span className="dashboard__media-label">Всього</span>
+              </div>
+              <div className="dashboard__media-stat">
+                <span className="dashboard__media-value dashboard__media-value--success">{bgStatus.processed}</span>
+                <span className="dashboard__media-label">Оброблено</span>
+              </div>
+              <div className="dashboard__media-stat">
+                <span className="dashboard__media-value dashboard__media-value--pending">{bgStatus.pending}</span>
+                <span className="dashboard__media-label">Очікує</span>
+              </div>
+            </div>
+          )}
+          <div className="dashboard__media-status">
+            {bgStatus?.rembgAvailable ? (
+              <span className="dashboard__media-available">rembg доступний</span>
+            ) : (
+              <span className="dashboard__media-unavailable">rembg не встановлено</span>
+            )}
+          </div>
+          {bgMessage && (
+            <div className="dashboard__media-message">{bgMessage}</div>
+          )}
+          <button
+            onClick={handleRemoveBackgrounds}
+            disabled={bgProcessing || !bgStatus?.rembgAvailable || bgStatus?.pending === 0}
+            className="dashboard__action dashboard__action--primary"
+          >
+            {bgProcessing ? 'Обробка...' : 'Видалити фон з усіх фото'}
+          </button>
         </div>
       </div>
 
@@ -254,6 +332,75 @@ export const Dashboard: React.FC = () => {
           color: var(--theme-elevation-800);
           margin: 0 0 1rem 0;
           font-size: 0.875rem;
+        }
+
+        .dashboard__media {
+          padding: 1rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 8px;
+        }
+
+        .dashboard__media-stats {
+          display: flex;
+          gap: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__media-stat {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .dashboard__media-value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--theme-text);
+        }
+
+        .dashboard__media-value--success {
+          color: #16a34a;
+        }
+
+        .dashboard__media-value--pending {
+          color: #ea580c;
+        }
+
+        .dashboard__media-label {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-800);
+        }
+
+        .dashboard__media-status {
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__media-available {
+          color: #16a34a;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__media-unavailable {
+          color: #dc2626;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__media-message {
+          padding: 0.5rem 0.75rem;
+          background: var(--theme-elevation-100);
+          border-radius: 4px;
+          font-size: 0.875rem;
+          margin-bottom: 1rem;
+        }
+
+        button.dashboard__action {
+          cursor: pointer;
+          border: none;
+        }
+
+        button.dashboard__action:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       `}</style>
     </div>

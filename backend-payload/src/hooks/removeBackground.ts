@@ -6,8 +6,17 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-// Path to rembg CLI in virtual environment
-const REMBG_CLI = path.resolve(process.cwd(), '.venv/bin/rembg');
+// Support multiple rembg locations: env var, venv, or system-wide
+function getRembgPath(): string {
+  if (process.env.REMBG_PATH) {
+    return process.env.REMBG_PATH;
+  }
+  // Try venv first (local development)
+  const venvPath = path.resolve(process.cwd(), '.venv/bin/rembg');
+  return venvPath;
+}
+
+const REMBG_CLI = getRembgPath();
 
 /**
  * Hook to automatically remove background from images using rembg (Python).

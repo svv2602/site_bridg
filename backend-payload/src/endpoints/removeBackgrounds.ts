@@ -5,7 +5,19 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
-const REMBG_CLI = path.resolve(process.cwd(), '.venv/bin/rembg');
+
+// Support multiple rembg locations: env var, venv, or system-wide
+function getRembgPath(): string {
+  if (process.env.REMBG_PATH) {
+    return process.env.REMBG_PATH;
+  }
+  // Try venv first (local development)
+  const venvPath = path.resolve(process.cwd(), '.venv/bin/rembg');
+  // Fallback to system-wide (Docker/server)
+  return venvPath;
+}
+
+const REMBG_CLI = getRembgPath();
 
 /**
  * Remove background from a single image file

@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create virtual environment and install rembg
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir "rembg[cpu]" pillow
+RUN pip install --no-cache-dir "rembg[cpu,cli]" pillow
 
 # Pre-download the U2-Net model (optional, ~170MB)
 # This speeds up first image processing
@@ -44,6 +44,7 @@ RUN mkdir -p media
 
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV REMBG_PATH=/opt/venv/bin/rembg
 
 EXPOSE 3001
 
