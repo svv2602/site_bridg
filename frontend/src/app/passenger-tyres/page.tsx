@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { type TyreModel, type Season } from "@/lib/data";
+import { type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
+import { SeasonCategoryCard } from "@/components/SeasonCategoryCard";
 import { Breadcrumb } from "@/components/ui";
-import { Car, Shield, Zap, ChevronRight, Star } from "lucide-react";
-import { seasonLabels, SeasonIcons, groupBySeason } from "@/lib/utils/tyres";
+import { Car, Shield, Zap, Star } from "lucide-react";
+import { groupBySeason } from "@/lib/utils/tyres";
 
 export const metadata: Metadata = {
   title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
@@ -127,57 +128,20 @@ export default async function PassengerTyresPage() {
               const items = bySeason[season];
               if (!items.length) return null;
 
+              const descriptions: Record<Season, string> = {
+                summer: "Ідеальні для літніх подорожей містом та трасою, забезпечують комфорт та економію палива.",
+                winter: "Надійне зчеплення на снігу, льоду та сльоті для безпеки в зимових умовах.",
+                allseason: "Універсальні шини для цілорічної експлуатації в різних дорожніх умовах.",
+              };
+
               return (
-                <div
+                <SeasonCategoryCard
                   key={season}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-lg"
-                >
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-full bg-primary/10 p-2">
-                        {(() => {
-                          const Icon = SeasonIcons[season];
-                          return <Icon className="h-5 w-5" aria-hidden="true" />;
-                        })()}
-                      </div>
-                      <h3 className="text-xl font-bold">{seasonLabels[season]}</h3>
-                    </div>
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-                      {items.length} моделей
-                    </span>
-                  </div>
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    {season === "summer"
-                      ? "Ідеальні для літніх подорожей містом та трасою, забезпечують комфорт та економію палива."
-                      : season === "winter"
-                        ? "Надійне зчеплення на снігу, льоду та сльоті для безпеки в зимових умовах."
-                        : "Універсальні шини для цілорічної експлуатації в різних дорожніх умовах."}
-                  </p>
-                  <div className="space-y-4">
-                    {items.slice(0, 3).map((model) => (
-                      <div
-                        key={model.slug}
-                        className="rounded-xl border border-border bg-background p-4"
-                      >
-                        <h4 className="font-semibold">{model.name}</h4>
-                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                          {model.shortDescription}
-                        </p>
-                        <Link
-                          href={`/shyny/${model.slug}`}
-                          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                        >
-                          Детальніше <ChevronRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                  {items.length > 3 && (
-                    <p className="mt-4 text-center text-sm text-muted-foreground">
-                      та ще {items.length - 3} моделей
-                    </p>
-                  )}
-                </div>
+                  season={season}
+                  items={items}
+                  initialCount={3}
+                  description={descriptions[season]}
+                />
               );
             })}
           </div>

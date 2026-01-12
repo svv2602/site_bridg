@@ -191,9 +191,10 @@ export async function getPayloadTyres(params?: {
   if (params?.vehicleType) {
     searchParams.set('where[vehicleTypes][contains]', params.vehicleType);
   }
-  if (params?.limit) {
-    searchParams.set('limit', String(params.limit));
-  }
+
+  // Set limit (default 100 to get all tyres)
+  searchParams.set('limit', String(params?.limit ?? 100));
+
   if (params?.page) {
     searchParams.set('page', String(params.page));
   }
@@ -286,9 +287,9 @@ export async function getPayloadArticles(params?: {
 }): Promise<PayloadArticle[]> {
   const searchParams = new URLSearchParams();
 
-  if (params?.limit) {
-    searchParams.set('limit', String(params.limit));
-  }
+  // Set limit (default 100 to get all articles)
+  searchParams.set('limit', String(params?.limit ?? 100));
+
   if (params?.page) {
     searchParams.set('page', String(params.page));
   }
@@ -311,6 +312,7 @@ export async function getPayloadArticleBySlug(slug: string): Promise<PayloadArti
 export async function getPayloadDealers(params?: {
   city?: string;
   type?: string;
+  limit?: number;
 }): Promise<PayloadDealer[]> {
   const searchParams = new URLSearchParams();
 
@@ -321,14 +323,17 @@ export async function getPayloadDealers(params?: {
     searchParams.set('where[type][equals]', params.type);
   }
 
+  // Set limit (default 200 to get all dealers)
+  searchParams.set('limit', String(params?.limit ?? 200));
+
   const query = searchParams.toString();
-  const data = await fetchPayload<PayloadDealer>(`dealers${query ? `?${query}` : ''}`);
+  const data = await fetchPayload<PayloadDealer>(`dealers?${query}`);
   return data.docs;
 }
 
 // Technologies API
 export async function getPayloadTechnologies(): Promise<PayloadTechnology[]> {
-  const data = await fetchPayload<PayloadTechnology>('technologies');
+  const data = await fetchPayload<PayloadTechnology>('technologies?limit=100');
   return data.docs;
 }
 
