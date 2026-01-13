@@ -52,13 +52,13 @@ export function Footer() {
                 B
               </div>
               <div>
-                <h3 className="text-lg font-bold">Bridgestone</h3>
-                <p className="text-xs text-muted-foreground">Україна</p>
+                <h3 className="text-lg font-bold">Bridgestone <span className="text-[#FF6600]">&</span> Firestone</h3>
+                <p className="text-xs text-muted-foreground">Офіційний представник в Україні</p>
               </div>
             </Link>
             <p className="mb-6 text-sm text-muted-foreground">
-              Офіційний представник Bridgestone в Україні. Преміум шини для легкових
-              автомобілів, SUV та комерційного транспорту.
+              Офіційний представник Bridgestone та Firestone в Україні. Шини преміум та оптимальної
+              цінової категорії для легкових авто, SUV та комерційного транспорту.
             </p>
 
             {/* Social links */}

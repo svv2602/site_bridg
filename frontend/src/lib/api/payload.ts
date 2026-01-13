@@ -10,6 +10,7 @@ export interface PayloadTyre {
   id: string;
   slug: string;
   name: string;
+  brand?: 'bridgestone' | 'firestone';
   season: 'summer' | 'winter' | 'allseason';
   vehicleTypes: ('passenger' | 'suv' | 'van' | 'sport')[];
   isNew: boolean;
@@ -510,6 +511,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
   return {
     slug: tyre.slug,
     name: tyre.name,
+    brand: tyre.brand || 'bridgestone', // Default to bridgestone for existing data
     season: tyre.season,
     vehicleTypes: tyre.vehicleTypes,
     isNew: tyre.isNew,

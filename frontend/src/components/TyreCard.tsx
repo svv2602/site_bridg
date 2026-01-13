@@ -5,6 +5,7 @@ import { Car, Truck, Sun, Snowflake, Cloud, ChevronRight } from "lucide-react";
 import { EuLabelGroup } from "@/components/ui/EuLabelBadge";
 import { TechnologyGroup } from "@/components/ui/TechnologyIcon";
 import { Badge } from "@/components/ui/Badge";
+import { brandLabels, brandColors } from "@/lib/utils/tyres";
 
 interface TyreCardProps {
   tyre: TyreModel;
@@ -129,10 +130,15 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
 
       {/* Content Section */}
       <div className="flex flex-1 flex-col p-4">
-        {/* Title */}
-        <h3 className="mb-3 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-          Bridgestone {tyre.name}
-        </h3>
+        {/* Brand indicator + Title */}
+        <div className="mb-3">
+          <span className={`inline-block text-xs font-semibold uppercase tracking-wide ${brandColors[tyre.brand].text}`}>
+            {brandLabels[tyre.brand]}
+          </span>
+          <h3 className="text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+            {tyre.name}
+          </h3>
+        </div>
 
         {/* Description - fixed height with line clamp */}
         <p className="mb-3 line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">

@@ -5,9 +5,11 @@ import { FormEvent, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   type Season,
+  type Brand,
   type TyreModel,
   type TyreSize,
 } from "@/lib/data";
+import { brandLabels, brandColors } from "@/lib/utils/tyres";
 import {
   Search,
   Car,
@@ -52,6 +54,21 @@ export default function TyreSearchPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchedSize, setSearchedSize] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState<Brand[]>(["bridgestone", "firestone"]);
+
+  // Filter results by selected brands
+  const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
+
+  function toggleBrand(brand: Brand) {
+    setSelectedBrands(prev => {
+      if (prev.includes(brand)) {
+        // Don't allow deselecting all brands
+        if (prev.length === 1) return prev;
+        return prev.filter(b => b !== brand);
+      }
+      return [...prev, brand];
+    });
+  }
 
   // Динамічні опції з бази даних
   const [widthOptions, setWidthOptions] = useState<SizeOption[]>([]);
@@ -333,7 +350,7 @@ export default function TyreSearchPage() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Ми гарантуємо точний підбір за офіційними каталогами Bridgestone</span>
+                      <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
                     </div>
                     <button
                       type="submit"
@@ -355,19 +372,44 @@ export default function TyreSearchPage() {
                         aria-live="polite"
                         aria-atomic="true"
                       >
-                        <h3 className="mb-4 text-xl font-bold text-stone-50">
-                          Результати пошуку {results.length > 0 && `(${results.length})`}
-                          {searchedSize && (
-                            <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
-                              {searchedSize}
-                            </span>
+                        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                          <h3 className="text-xl font-bold text-stone-50">
+                            Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}
+                            {searchedSize && (
+                              <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
+                                {searchedSize}
+                              </span>
+                            )}
+                          </h3>
+                          {/* Brand filter */}
+                          {results.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-stone-400">Бренд:</span>
+                              {(["bridgestone", "firestone"] as Brand[]).map(brand => (
+                                <button
+                                  key={brand}
+                                  type="button"
+                                  onClick={() => toggleBrand(brand)}
+                                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+                                    selectedBrands.includes(brand)
+                                      ? `${brandColors[brand].bg} text-white`
+                                      : "bg-stone-700 text-stone-400 hover:bg-stone-600"
+                                  }`}
+                                >
+                                  {brandLabels[brand]}
+                                </button>
+                              ))}
+                            </div>
                           )}
-                        </h3>
-                        {results.length === 0 ? (
+                        </div>
+                        {filteredResults.length === 0 ? (
                           <div className="rounded-xl border border-stone-700 bg-stone-800/50 p-6 text-center">
                             <Search className="mx-auto h-10 w-10 text-stone-500" />
                             <p className="mt-3 text-stone-400">
-                              Шин Bridgestone для розміру {searchedSize} не знайдено в каталозі.
+                              {results.length === 0
+                                ? `Шин для розміру ${searchedSize} не знайдено в каталозі.`
+                                : `Шин обраних брендів для розміру ${searchedSize} не знайдено.`
+                              }
                             </p>
                             <Link
                               href="/dealers"
@@ -379,7 +421,7 @@ export default function TyreSearchPage() {
                           </div>
                         ) : (
                           <div className="grid gap-4 sm:grid-cols-2">
-                            {results.map((model) => (
+                            {filteredResults.map((model) => (
                               <TyreCard key={model.slug} tyre={model} variant="compact" />
                             ))}
                           </div>

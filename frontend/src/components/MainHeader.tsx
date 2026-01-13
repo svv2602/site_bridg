@@ -33,10 +33,10 @@ export function MainHeader() {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold uppercase tracking-tight text-stone-100 md:text-base">
-              Bridgestone
+              Bridgestone <span className="text-[#FF6600]">&</span> Firestone
             </span>
             <span className="hidden text-[11px] text-stone-400 sm:block">
-              Офіційний сайт в Україні
+              Офіційний представник в Україні
             </span>
           </div>
         </Link>

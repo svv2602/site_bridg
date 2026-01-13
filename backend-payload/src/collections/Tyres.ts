@@ -12,9 +12,9 @@ export const Tyres: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'season', 'isNew', 'updatedAt'],
+    defaultColumns: ['brand', 'name', 'season', 'isNew', 'updatedAt'],
     group: 'Каталог',
-    description: 'Моделі шин Bridgestone',
+    description: 'Моделі шин Bridgestone та Firestone',
   },
   access: {
     read: () => true,
@@ -56,6 +56,17 @@ export const Tyres: CollectionConfig = {
       type: 'row',
       fields: [
         {
+          name: 'brand',
+          type: 'select',
+          required: true,
+          defaultValue: 'bridgestone',
+          options: [
+            { label: 'Bridgestone', value: 'bridgestone' },
+            { label: 'Firestone', value: 'firestone' },
+          ],
+          admin: { width: '20%' },
+        },
+        {
           name: 'season',
           type: 'select',
           required: true,
@@ -64,21 +75,21 @@ export const Tyres: CollectionConfig = {
             { label: 'Зимова', value: 'winter' },
             { label: 'Всесезонна', value: 'allseason' },
           ],
-          admin: { width: '25%' },
+          admin: { width: '20%' },
         },
         {
           name: 'isNew',
           type: 'checkbox',
           label: 'New',
           defaultValue: false,
-          admin: { width: '25%' },
+          admin: { width: '20%' },
         },
         {
           name: 'isPopular',
           type: 'checkbox',
           label: 'Popular',
           defaultValue: false,
-          admin: { width: '25%' },
+          admin: { width: '20%' },
         },
         {
           name: 'isPublished',
@@ -86,7 +97,7 @@ export const Tyres: CollectionConfig = {
           label: 'Published',
           defaultValue: false,
           admin: {
-            width: '25%',
+            width: '20%',
             description: 'Показувати на сайті',
           },
         },

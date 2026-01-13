@@ -1,10 +1,30 @@
 import { Sun, Snowflake, Cloud } from "lucide-react";
-import type { Season, TyreModel } from "@/lib/data";
+import type { Season, Brand, TyreModel } from "@/lib/data";
 
 /**
  * Shared utilities for tyre-related components
  * Consolidated from multiple files to eliminate duplication
  */
+
+// Brand labels for display
+export const brandLabels: Record<Brand, string> = {
+  bridgestone: "Bridgestone",
+  firestone: "Firestone",
+};
+
+// Brand colors (Tailwind classes)
+export const brandColors: Record<Brand, { bg: string; text: string; border: string }> = {
+  bridgestone: {
+    bg: "bg-[#E4002B]",
+    text: "text-[#E4002B]",
+    border: "border-[#E4002B]",
+  },
+  firestone: {
+    bg: "bg-[#FF6600]",
+    text: "text-[#FF6600]",
+    border: "border-[#FF6600]",
+  },
+};
 
 // Season labels for display
 export const seasonLabels: Record<Season, string> = {

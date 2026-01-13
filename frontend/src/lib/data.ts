@@ -2,6 +2,8 @@
 
 export type Season = "summer" | "winter" | "allseason";
 
+export type Brand = "bridgestone" | "firestone";
+
 export type VehicleType = "passenger" | "suv" | "lcv";
 
 export interface TyreSize {
@@ -43,6 +45,7 @@ export interface TestResult {
 export interface TyreModel {
   slug: string;
   name: string;
+  brand: Brand;
   season: Season;
   vehicleTypes: VehicleType[];
   isNew?: boolean;
