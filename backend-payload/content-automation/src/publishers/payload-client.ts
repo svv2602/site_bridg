@@ -65,9 +65,13 @@ interface TyreData {
 interface ArticleData {
   slug: string;
   title: string;
+  subtitle?: string;
   previewText: string;
-  body?: any; // Lexical rich text
+  body?: any; // HTML or Lexical rich text
+  image?: number; // Media ID for preview image
   tags?: Array<{ tag: string }>;
+  seoTitle?: string;
+  seoDescription?: string;
   readingTimeMinutes?: number;
 }
 
