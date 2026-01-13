@@ -6,8 +6,8 @@
  * Supports multi-brand (Bridgestone & Firestone).
  */
 
-import { generateContent } from "./llm-generator.js";
-import { SYSTEM_PROMPTS } from "../config/prompts.js";
+import { llm } from "../providers/index.js";
+import { SYSTEM_PROMPTS } from "../prompts/index.js";
 import { ENV } from "../config/env.js";
 import type { Brand } from "../types/content.js";
 import { BRAND_NAMES } from "../types/content.js";
@@ -284,19 +284,18 @@ export async function generateComparison(
     ? "Обидві моделі є якісними шинами. Вибір залежить від ваших потреб та стилю водіння."
     : `Обидві моделі є якісними шинами від ${brandText}. Вибір залежить від ваших потреб та стилю водіння.`;
 
-  if (ENV.ANTHROPIC_API_KEY) {
-    try {
-      const prompt = generateVerdictPrompt(tyres, comparisonTable);
-      const response = await generateContent(prompt, {
-        maxTokens: 800,
-        temperature: 0.7,
-        systemPrompt: SYSTEM_PROMPTS.tireDescription,
-      });
-      verdict = parseVerdict(response);
-    } catch (error) {
-      console.error("Failed to generate verdict:", error);
-      // Use default verdict
-    }
+  try {
+    const prompt = generateVerdictPrompt(tyres, comparisonTable);
+    const generator = llm.forTask("content-generation");
+    const response = await generator.generate(prompt, {
+      systemPrompt: SYSTEM_PROMPTS.tireDescription,
+      maxTokens: 800,
+      temperature: 0.7,
+    });
+    verdict = parseVerdict(response.content);
+  } catch (error) {
+    console.error("Failed to generate verdict:", error);
+    // Use default verdict
   }
 
   // Generate SEO

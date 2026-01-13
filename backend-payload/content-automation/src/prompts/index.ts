@@ -1,19 +1,15 @@
 /**
- * Prompts Loader
+ * LLM Prompts for Content Generation
  *
- * Loads prompt templates from markdown files for content generation.
+ * Centralized prompt templates for tire descriptions, articles, etc.
  * Supports multi-brand (Bridgestone & Firestone) content generation.
  */
 
-import { readFileSync, existsSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import type { Brand } from "../types/content.js";
 import { BRAND_NAMES } from "../types/content.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// ============ FORMATTING RULES ============
 
-// SEO formatting rules (shared across all content types)
 const SEO_FORMATTING_RULES = `
 ФОРМАТУВАННЯ (HTML):
 - Використовуй HTML теги: <h2>, <h3>, <p>, <ul>, <li>, <strong>
@@ -37,11 +33,40 @@ const INTERLINKING_RULES = `
 - Посилання мають бути органічно вплетені в текст
 - НЕ роби окремий блок "Схожі товари" - тільки природні посилання в тексті`;
 
-// Brand transliteration map
+// ============ LABELS & TRANSLATIONS ============
+
 const BRAND_TRANSLITS: Record<Brand, string> = {
   bridgestone: "Бріджстоун",
   firestone: "Файрстоун",
 };
+
+export const SEASON_LABELS = {
+  summer: {
+    name: "літня",
+    opposite: "взимку",
+    oppositeFull: "у зимовий період",
+  },
+  winter: {
+    name: "зимова",
+    opposite: "влітку",
+    oppositeFull: "у літній період",
+  },
+  allseason: {
+    name: "всесезонна",
+    opposite: "в екстремальних умовах",
+    oppositeFull: "в екстремальних погодних умовах",
+  },
+} as const;
+
+export const VEHICLE_LABELS: Record<string, string> = {
+  passenger: "легкові автомобілі",
+  suv: "SUV/кросовери",
+  van: "мікроавтобуси",
+  lcv: "легкі вантажівки",
+  sport: "спортивні автомобілі",
+};
+
+// ============ HELPER FUNCTIONS ============
 
 /**
  * Get brand name transliteration
@@ -50,54 +75,60 @@ export function getBrandTranslit(brand: Brand): string {
   return BRAND_TRANSLITS[brand];
 }
 
-// Related item for interlinking
+/**
+ * Format vehicle types for display
+ */
+export function formatVehicleTypes(types: string[]): string {
+  return types.map((t) => VEHICLE_LABELS[t] || t).join(", ");
+}
+
+// ============ TYPES ============
+
 export interface RelatedItem {
   slug: string;
   name: string;
   type: "tyre" | "article";
 }
 
-// Cache for loaded prompts
-const promptCache = new Map<string, string>();
-
-/**
- * Load a prompt template from markdown file
- */
-export function loadPrompt(name: string): string {
-  if (promptCache.has(name)) {
-    return promptCache.get(name)!;
-  }
-
-  const filePath = join(__dirname, `${name}.md`);
-
-  if (!existsSync(filePath)) {
-    throw new Error(`Prompt file not found: ${name}.md`);
-  }
-
-  const content = readFileSync(filePath, "utf-8");
-  promptCache.set(name, content);
-
-  return content;
+export interface TirePromptInput {
+  name: string;
+  season: "summer" | "winter" | "allseason";
+  vehicleTypes?: string[];
+  technologies?: string[];
+  euLabel?: {
+    wetGrip?: string;
+    fuelEfficiency?: string;
+    noiseDb?: number;
+  };
+  sourceDescription?: string;
+  testResults?: string;
 }
 
-/**
- * Extract system prompt from markdown template
- * (Content under ## Role section)
- */
-export function extractSystemPrompt(promptContent: string): string {
-  const roleMatch = promptContent.match(/## Role\n([\s\S]*?)(?=\n## |$)/);
-  return roleMatch ? roleMatch[1].trim() : "";
+export interface ArticlePromptInput {
+  topic: string;
+  type: "model-review" | "test-summary" | "comparison" | "seasonal-guide" | "technology";
+  models?: string[];
+  testData?: {
+    source: string;
+    year: number;
+    results: string;
+  };
+  keywords?: string[];
 }
 
-/**
- * Extract requirements from markdown template
- */
-export function extractRequirements(promptContent: string): string {
-  const reqMatch = promptContent.match(/## Requirements\n([\s\S]*?)(?=\n## |$)/);
-  return reqMatch ? reqMatch[1].trim() : "";
+export interface BadgePromptInput {
+  type: "winner" | "recommended" | "top3" | "best_category" | "eco";
+  source: string;
+  year: number;
+  testType?: string;
+  category?: string;
 }
 
-// Pre-defined prompt templates for common tasks (brand-neutral, for backward compatibility)
+// ============ SYSTEM PROMPTS ============
+
+/**
+ * Brand-neutral system prompts (for backward compatibility)
+ */
 export const SYSTEM_PROMPTS = {
   tireDescription: `Ти - SEO-копірайтер для офіційного сайту Bridgestone & Firestone Україна.
 
@@ -206,37 +237,132 @@ ${INTERLINKING_RULES}
   };
 }
 
-// Season labels in Ukrainian
-export const SEASON_LABELS = {
-  summer: {
-    name: "літня",
-    opposite: "взимку",
-    oppositeFull: "у зимовий період",
-  },
-  winter: {
-    name: "зимова",
-    opposite: "влітку",
-    oppositeFull: "у літній період",
-  },
-  allseason: {
-    name: "всесезонна",
-    opposite: "в екстремальних умовах",
-    oppositeFull: "в екстремальних погодних умовах",
-  },
-} as const;
-
-// Vehicle type labels in Ukrainian
-export const VEHICLE_LABELS: Record<string, string> = {
-  passenger: "легкові автомобілі",
-  suv: "SUV/кросовери",
-  van: "мікроавтобуси",
-  lcv: "легкі вантажівки",
-  sport: "спортивні автомобілі",
-};
+// ============ PROMPT BUILDERS ============
 
 /**
- * Format vehicle types for display
+ * Build tire description generation prompt
  */
-export function formatVehicleTypes(types: string[]): string {
-  return types.map((t) => VEHICLE_LABELS[t] || t).join(", ");
+export function getTireDescriptionPrompt(
+  tire: TirePromptInput,
+  brand: Brand = "bridgestone",
+  relatedItems?: RelatedItem[]
+): string {
+  const brandName = BRAND_NAMES[brand];
+  const vehicles = tire.vehicleTypes
+    ?.map((v) => VEHICLE_LABELS[v] || v)
+    .join(", ");
+
+  const relatedItemsSection = relatedItems?.length
+    ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):
+${relatedItems.map((item) => {
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/advice/${item.slug}`;
+  return `- ${item.name}: ${url}`;
+}).join("\n")}`
+    : "";
+
+  return `Створи унікальний контент для шини ${brandName} ${tire.name}.
+
+ВХІДНІ ДАНІ:
+- Модель: ${brandName} ${tire.name}
+- Сезон: ${SEASON_LABELS[tire.season].name}
+${vehicles ? `- Типи авто: ${vehicles}` : ""}
+${tire.technologies?.length ? `- Технології: ${tire.technologies.join(", ")}` : ""}
+${tire.euLabel ? `- EU Label: Мокре зчеплення ${tire.euLabel.wetGrip || "-"}, Паливна ефективність ${tire.euLabel.fuelEfficiency || "-"}, Шум ${tire.euLabel.noiseDb || "-"}дБ` : ""}
+${tire.testResults ? `- Результати тестів: ${tire.testResults}` : ""}
+${tire.sourceDescription ? `\nОПИС-РЕФЕРЕНС (НЕ копіювати, лише для розуміння):\n${tire.sourceDescription}` : ""}
+${relatedItemsSection}
+
+ФОРМАТ ВІДПОВІДІ (JSON):
+{
+  "shortDescription": "Короткий опис 2-3 речення, 150-200 символів. Головна перевага + для кого підійде. БЕЗ HTML тегів.",
+  "fullDescription": "Повний HTML опис 300-500 слів. Структура: <h2>Вступ</h2><p>...</p><h2>Переваги</h2><ul><li>...</li></ul> і т.д.",
+  "keyBenefits": ["Перевага 1", "Перевага 2", "Перевага 3", "Перевага 4"],
+  "seoTitle": "SEO заголовок 50-60 символів",
+  "seoDescription": "SEO опис 150-160 символів"
+}
+
+ВАЖЛИВО:
+- Відповідь ТІЛЬКИ у форматі JSON
+- fullDescription у форматі HTML (h2, h3, p, ul, li, strong, a)
+- При ПЕРШІЙ згадці моделі додай транслітерацію: "${brandName} ${tire.name} (${getBrandTranslit(brand)} ${tire.name})"
+- Контент має бути 100% унікальним
+- НЕ згадуй ціни
+- keyBenefits: 4-5 конкретних пунктів`;
+}
+
+/**
+ * Build article generation prompt
+ */
+export function getArticlePrompt(
+  params: ArticlePromptInput,
+  relatedItems?: RelatedItem[]
+): string {
+  const typeInstructions = {
+    "model-review": "Напиши детальний огляд моделі шини (800-1200 слів)",
+    "test-summary": "Напиши підсумок результатів тесту (600-800 слів)",
+    comparison: "Напиши порівняння моделей (1000-1500 слів)",
+    "seasonal-guide": "Напиши сезонний гайд з вибору шин (800-1000 слів)",
+    technology: "Напиши статтю про технологію (600-800 слів)",
+  };
+
+  const relatedItemsSection = relatedItems?.length
+    ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):
+${relatedItems.map((item) => {
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/advice/${item.slug}`;
+  return `- ${item.name}: ${url}`;
+}).join("\n")}`
+    : "";
+
+  return `${typeInstructions[params.type]}
+
+ТЕМА: ${params.topic}
+${params.models?.length ? `МОДЕЛІ: ${params.models.join(", ")}` : ""}
+${params.testData ? `
+ДАНІ ТЕСТУ:
+- Джерело: ${params.testData.source}
+- Рік: ${params.testData.year}
+- Результати: ${params.testData.results}
+` : ""}
+${params.keywords?.length ? `КЛЮЧОВІ СЛОВА: ${params.keywords.join(", ")}` : ""}
+${relatedItemsSection}
+
+ФОРМАТ ВІДПОВІДІ (JSON):
+{
+  "title": "Заголовок статті",
+  "excerpt": "Короткий опис для превʼю (1-2 речення). БЕЗ HTML.",
+  "content": "Повний HTML текст статті: <h2>Секція</h2><p>Текст...</p><ul><li>Пункт</li></ul>",
+  "tags": ["тег1", "тег2"],
+  "readingTime": 5
+}
+
+ВАЖЛИВО:
+- Відповідь ТІЛЬКИ у форматі JSON
+- content у форматі HTML (h2, h3, p, ul, li, strong, a)
+- При ПЕРШІЙ згадці бренду/моделі додай транслітерацію в дужках
+  Приклад: "Bridgestone Turanza 6 (Бріджстоун Туранза 6)"
+- НЕ вигадуй дані, яких немає у вхідних
+- Включай CTA "Знайти дилера" наприкінці
+- НЕ згадуй ціни`;
+}
+
+/**
+ * Build badge text generation prompt
+ */
+export function getBadgeTextPrompt(badge: BadgePromptInput): string {
+  return `Створи короткий текст для бейджа на картці шини.
+
+ТИП: ${badge.type}
+ДЖЕРЕЛО: ${badge.source}
+РІК: ${badge.year}
+${badge.testType ? `ТИП ТЕСТУ: ${badge.testType}` : ""}
+${badge.category ? `КАТЕГОРІЯ: ${badge.category}` : ""}
+
+Приклади:
+- winner + ADAC + 2024 = "Переможець ADAC 2024"
+- recommended + Auto Bild + 2024 = "Рекомендовано Auto Bild"
+- top3 + TCS + 2024 + winter = "Топ-3 зимових TCS 2024"
+- best_category + ADAC + 2024 + wet = "Найкраще мокре зчеплення"
+- eco + EU Label + 2024 = "Екологічний вибір"
+
+Дай відповідь одним рядком українською (максимум 30 символів).`;
 }

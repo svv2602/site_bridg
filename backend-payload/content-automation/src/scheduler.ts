@@ -12,7 +12,7 @@
 
 import { ENV } from "./config/env.js";
 import { scrapeProkoleso, scrapeProkolesoBrand } from "./scrapers/prokoleso.js";
-import { generateTireContent } from "./processors/tire-description-generator.js";
+import { generateTireDescription, generateTireSEO } from "./processors/content/index.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
@@ -182,28 +182,50 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
 
     for (let i = 0; i < batchSize; i++) {
       const tire = tiresToProcess[i];
+      const tireBrand = brand || tire.brand || "bridgestone";
+      const slug = tire.canonicalSlug || tire.sourceSlug;
       console.log(`\n[${i + 1}/${batchSize}] Generating content for: ${tire.name}`);
 
-      const result = await generateTireContent({
-        name: tire.name,
-        slug: tire.canonicalSlug || tire.sourceSlug,
-        season: tire.season,
-        euLabel: tire.euLabel,
-        sourceDescription: tire.description,
-        brand: brand || tire.brand || "bridgestone",
-      });
+      try {
+        // Generate description using new content pipeline
+        const descResult = await generateTireDescription({
+          modelSlug: slug,
+          modelName: tire.name,
+          brand: tireBrand,
+          season: tire.season || "summer",
+          euLabel: tire.euLabel,
+        });
 
-      if (result.success && result.content) {
-        console.log(`  ✓ Generated: ${result.content.shortDescription.substring(0, 60)}...`);
+        // Generate SEO metadata
+        const seoResult = await generateTireSEO({
+          modelSlug: slug,
+          modelName: tire.name,
+          season: tire.season || "summer",
+          shortDescription: descResult.content.shortDescription,
+          keyBenefits: descResult.content.highlights,
+        });
+
+        // Combine results into unified content object
+        const content = {
+          shortDescription: descResult.content.shortDescription,
+          fullDescription: descResult.content.fullDescription,
+          keyBenefits: descResult.content.highlights,
+          seoTitle: seoResult.seo.seoTitle,
+          seoDescription: seoResult.seo.seoDescription,
+        };
+
+        console.log(`  ✓ Generated: ${content.shortDescription.substring(0, 60)}...`);
+        console.log(`    Cost: $${(descResult.metadata.cost + seoResult.metadata.cost).toFixed(4)}`);
 
         // Mark as processed and store generated content
         tire.aiGenerated = true;
-        tire.generatedContent = result.content;
-        tire.brand = brand || tire.brand || "bridgestone";
+        tire.generatedContent = content;
+        tire.brand = tireBrand;
         stats.tyresNew++;
-      } else {
-        console.log(`  ✗ Failed: ${result.error}`);
-        stats.errors.push(`${tire.name}: ${result.error}`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.log(`  ✗ Failed: ${errorMessage}`);
+        stats.errors.push(`${tire.name}: ${errorMessage}`);
       }
     }
 

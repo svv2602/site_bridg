@@ -10,8 +10,9 @@
  */
 
 import { getPayloadClient } from "./publishers/payload-client.js";
-import { generateTireContent } from "./processors/tire-description-generator.js";
+import { generateTireDescription, generateTireSEO } from "./processors/content/index.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
+import type { Brand } from "./types/content.js";
 
 async function main() {
   const slug = process.argv[2];
@@ -42,42 +43,53 @@ async function main() {
 
   // 2. Generate new AI content
   console.log("\n[2/3] Generating AI content...");
-  const result = await generateTireContent({
-    name: tyre.name,
-    slug: tyre.slug,
-    season: tyre.season as "summer" | "winter" | "allseason",
+
+  const tireBrand = (tyre as { brand?: Brand }).brand || "bridgestone";
+  const tireSeason = tyre.season as "summer" | "winter" | "allseason";
+
+  // Generate description
+  const descResult = await generateTireDescription({
+    modelSlug: tyre.slug,
+    modelName: tyre.name,
+    brand: tireBrand,
+    season: tireSeason,
     vehicleTypes: tyre.vehicleTypes,
     euLabel: tyre.euLabel,
   });
 
-  if (!result.success || !result.content) {
-    console.error(`Content generation failed: ${result.error}`);
-    process.exit(1);
-  }
+  // Generate SEO
+  const seoResult = await generateTireSEO({
+    modelSlug: tyre.slug,
+    modelName: tyre.name,
+    season: tireSeason,
+    shortDescription: descResult.content.shortDescription,
+    keyBenefits: descResult.content.highlights,
+  });
 
   console.log("Content generated successfully!");
-  console.log(`  Short description: ${result.content.shortDescription.substring(0, 60)}...`);
-  console.log(`  Full description: ${result.content.fullDescription.substring(0, 60)}...`);
-  console.log(`  Key benefits: ${result.content.keyBenefits.length} items`);
-  console.log(`  SEO title: ${result.content.seoTitle}`);
+  console.log(`  Short description: ${descResult.content.shortDescription.substring(0, 60)}...`);
+  console.log(`  Full description: ${descResult.content.fullDescription.substring(0, 60)}...`);
+  console.log(`  Key benefits: ${descResult.content.highlights.length} items`);
+  console.log(`  SEO title: ${seoResult.seo.seoTitle}`);
+  console.log(`  Cost: $${(descResult.metadata.cost + seoResult.metadata.cost).toFixed(4)}`);
 
   // 3. Update tyre in Payload CMS
   console.log("\n[3/3] Updating tyre in Payload CMS...");
 
   // Convert markdown to HTML (CKEditor stores HTML directly)
-  const fullDescriptionHtml = markdownToHtml(result.content.fullDescription);
+  const fullDescriptionHtml = markdownToHtml(descResult.content.fullDescription);
 
   // Truncate SEO fields to meet limits
-  const seoTitle = (result.content.seoTitle || "").substring(0, 70);
-  const seoDescription = (result.content.seoDescription || "").substring(0, 170);
+  const seoTitle = (seoResult.seo.seoTitle || "").substring(0, 70);
+  const seoDescription = (seoResult.seo.seoDescription || "").substring(0, 170);
 
-  // Convert keyBenefits to Payload format
-  const keyBenefits = result.content.keyBenefits.map((b: string) => ({
+  // Convert highlights to Payload keyBenefits format
+  const keyBenefits = descResult.content.highlights.map((b: string) => ({
     benefit: b,
   }));
 
   await client.updateTyre(tyre.id, {
-    shortDescription: result.content.shortDescription,
+    shortDescription: descResult.content.shortDescription,
     fullDescription: fullDescriptionHtml,
     keyBenefits,
     seoTitle,
