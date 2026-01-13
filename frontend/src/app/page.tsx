@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone, Award } from "lucide-react";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
+import { ProductCarousel } from "@/components/ProductCarousel";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { getTyreModels } from "@/lib/api/tyres";
 import { getLatestArticles } from "@/lib/api/articles";
@@ -73,6 +74,11 @@ const vehicleLabels: Record<string, string> = {
 export default async function Home() {
   // Fetch popular tyres from API
   const allTyres = await getTyreModels();
+
+  // Tyres for carousel (full model objects)
+  const carouselTyres = allTyres.filter(t => t.isPopular).slice(0, 8);
+
+  // Featured tyres for sidebar list (formatted)
   const featuredTyres = allTyres
     .filter(t => t.isPopular)
     .slice(0, 3)
@@ -99,6 +105,9 @@ export default async function Home() {
       <SeasonalHero>
         <QuickSearchForm />
       </SeasonalHero>
+
+      {/* Product Carousel */}
+      <ProductCarousel tyres={carouselTyres} title="Популярні моделі" />
 
       {/* Features */}
       <section className="py-12">
