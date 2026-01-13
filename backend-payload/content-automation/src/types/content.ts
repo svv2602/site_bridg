@@ -4,12 +4,27 @@
  * Types for raw scraped content and generated content.
  */
 
+// === Brand Type ===
+
+/**
+ * Supported tire brands
+ */
+export type Brand = 'bridgestone' | 'firestone';
+
+/**
+ * Brand display names
+ */
+export const BRAND_NAMES: Record<Brand, string> = {
+  bridgestone: 'Bridgestone',
+  firestone: 'Firestone',
+};
+
 // === Raw Content Types ===
 
 /**
  * Source of scraped content
  */
-export type ContentSource = 'prokoleso' | 'bridgestone' | 'tyrereviews';
+export type ContentSource = 'prokoleso' | 'bridgestone' | 'firestone' | 'tyrereviews';
 
 /**
  * Raw tyre content scraped from external sources
@@ -17,6 +32,9 @@ export type ContentSource = 'prokoleso' | 'bridgestone' | 'tyrereviews';
 export interface RawTyreContent {
   /** Source website identifier */
   source: ContentSource;
+
+  /** Brand of the tire */
+  brand: Brand;
 
   /** Tyre model slug (e.g., "turanza-6", "blizzak-lm005") */
   modelSlug: string;
@@ -63,6 +81,7 @@ export interface RawTyreContent {
 export interface RawTyreContentCollection {
   modelSlug: string;
   modelName: string;
+  brand: Brand;
   sources: RawTyreContent[];
   collectedAt: string;
 }
@@ -74,6 +93,7 @@ export interface RawTyreContentCollection {
  */
 export interface GeneratedTyreContent {
   modelSlug: string;
+  brand: Brand;
 
   // Main content
   shortDescription: string;           // 150-200 chars for product card
@@ -160,6 +180,7 @@ export interface GeneratedImage {
  */
 export interface ContentStatus {
   modelSlug: string;
+  brand: Brand;
   hasRawData: boolean;
   hasGeneratedContent: boolean;
   isPublished: boolean;
