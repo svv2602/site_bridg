@@ -31,7 +31,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     getArticleTags(),
   ]);
 
-  const { articles, totalDocs, totalPages, hasNextPage, hasPrevPage } = paginatedResult;
+  const { articles, totalDocs, totalPages } = paginatedResult;
 
   return (
     <div className="bg-background text-foreground">
