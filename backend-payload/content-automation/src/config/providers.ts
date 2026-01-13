@@ -187,12 +187,12 @@ export const EMBEDDING_PROVIDERS: ProviderConfig[] = [
 // === Task Routing ===
 
 export const TASK_ROUTING: TaskRouting[] = [
-  // Content generation - prefer Claude for quality
+  // Content generation - prefer DeepSeek for cost efficiency
   {
     task: "content-generation",
-    preferredProvider: "anthropic",
-    preferredModel: "claude-sonnet-4-20250514",
-    fallbackProviders: ["openai", "deepseek", "openrouter"],
+    preferredProvider: "deepseek",
+    preferredModel: "deepseek-chat",
+    fallbackProviders: ["openai", "anthropic", "openrouter"],
     maxRetries: 2,
     timeoutMs: 60000,
     maxCost: 0.5,
