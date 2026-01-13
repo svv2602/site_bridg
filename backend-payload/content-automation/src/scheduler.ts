@@ -221,10 +221,11 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
 /**
  * Publish pipeline - publishes generated content to Payload CMS
  */
-async function runPublishPipeline() {
+async function runPublishPipeline(brand?: Brand) {
   try {
     const fs = await import("fs/promises");
-    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+    const dataFileName = brand ? `prokoleso-${brand}-tires.json` : "prokoleso-tires.json";
+    const dataPath = new URL(`../data/${dataFileName}`, import.meta.url);
 
     let tires: any[];
     try {
@@ -287,6 +288,7 @@ async function runPublishPipeline() {
           await client.createTyre({
             name: tire.name,
             slug,
+            brand: tire.brand || brand,
             season: tire.season || "summer",
             vehicleTypes: ["passenger"],
             shortDescription: content.shortDescription,
@@ -378,9 +380,9 @@ async function main() {
       break;
 
     case "publish":
-      console.log("Running publish only...");
+      console.log(`Running publish${brand ? ` for ${brand}` : ""}...`);
       resetStats();
-      await runPublishPipeline();
+      await runPublishPipeline(brand);
       break;
 
     case "test-telegram":
