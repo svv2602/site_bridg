@@ -146,6 +146,7 @@ async function runScrapePipeline(brand?: Brand) {
 
 /**
  * Content generation pipeline
+ * Skips tires that already have content in DB
  */
 async function runContentGeneration(brand?: Brand, limit?: number) {
   try {
@@ -177,12 +178,52 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
       return;
     }
 
+    // Check which tires already have content in DB and skip them
+    const client = getPayloadClient();
+    console.log("Checking existing content in DB...");
+
+    let skippedCount = 0;
+    const tiresNeedingGeneration: any[] = [];
+
+    for (const tire of tiresToProcess) {
+      const slug = tire.canonicalSlug || tire.sourceSlug;
+      const dbCheck = await client.checkTyreHasContent(slug);
+
+      if (dbCheck.exists && dbCheck.hasContent) {
+        // Already has content in DB - mark as generated and skip
+        tire.aiGenerated = true;
+        tire.publishedToPayload = true;
+        tire.skippedReason = "Already has content in DB";
+        skippedCount++;
+        console.log(`  ⏭️  Skipped: ${tire.name} (already has content in DB)`);
+      } else if (dbCheck.exists && !dbCheck.hasContent) {
+        // Exists but missing content - needs generation
+        tire.missingFields = dbCheck.missingFields;
+        tiresNeedingGeneration.push(tire);
+        console.log(`  📝 Needs content: ${tire.name} (missing: ${dbCheck.missingFields.join(", ")})`);
+      } else {
+        // New tire - needs generation
+        tiresNeedingGeneration.push(tire);
+        console.log(`  🆕 New tire: ${tire.name}`);
+      }
+    }
+
+    console.log(`\nSkipped ${skippedCount} tires (already have content in DB)`);
+    console.log(`${tiresNeedingGeneration.length} tires need content generation`);
+
+    if (tiresNeedingGeneration.length === 0) {
+      // Save updated flags
+      await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
+      console.log("No tires need content generation");
+      return;
+    }
+
     // Process tires (default limit 3 for safety)
-    const batchSize = limit || Math.min(tiresToProcess.length, 3);
+    const batchSize = limit || Math.min(tiresNeedingGeneration.length, 3);
     console.log(`Processing ${batchSize} tires...`);
 
     for (let i = 0; i < batchSize; i++) {
-      const tire = tiresToProcess[i];
+      const tire = tiresNeedingGeneration[i];
       const tireBrand = brand || tire.brand || "bridgestone";
       const slug = tire.canonicalSlug || tire.sourceSlug;
       console.log(`\n[${i + 1}/${batchSize}] Generating content for: ${tire.name}`);
@@ -243,6 +284,7 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
 
 /**
  * Publish pipeline - publishes generated content to Payload CMS
+ * Skips tires that already have content in DB (only publishes new or incomplete)
  */
 async function runPublishPipeline(brand?: Brand) {
   try {
@@ -273,12 +315,25 @@ async function runPublishPipeline(brand?: Brand) {
 
     const client = getPayloadClient();
     let published = 0;
+    let skipped = 0;
 
     for (const tire of tiresToPublish) {
       const slug = tire.canonicalSlug || tire.sourceSlug;
       console.log(`\nPublishing: ${tire.name} (${slug})`);
 
       try {
+        // Check if tyre already exists with content in DB
+        const dbCheck = await client.checkTyreHasContent(slug);
+
+        if (dbCheck.exists && dbCheck.hasContent && dbCheck.hasImage) {
+          // Already complete in DB - skip
+          tire.publishedToPayload = true;
+          tire.skippedReason = "Already complete in DB";
+          skipped++;
+          console.log(`  ⏭️  Skipped (already complete in DB)`);
+          continue;
+        }
+
         const content = tire.generatedContent;
 
         // Convert markdown fullDescription to HTML (CKEditor stores HTML directly)
@@ -293,12 +348,9 @@ async function runPublishPipeline(brand?: Brand) {
         const seoTitle = (content.seoTitle || "").substring(0, 70);
         const seoDescription = (content.seoDescription || "").substring(0, 170);
 
-        // Find existing tyre or create new
-        const existing = await client.findTyreBySlug(slug);
-
-        // Upload image if available (with background removal for tire images)
+        // Upload image if available and not already set
         let imageId: number | undefined;
-        if (tire.imageUrl) {
+        if (tire.imageUrl && !dbCheck.hasImage) {
           const imageResult = await client.uploadImageFromUrl(tire.imageUrl, {
             alt: `${tire.brand || brand} ${tire.name}`,
             filename: `${slug}.png`,
@@ -309,24 +361,47 @@ async function runPublishPipeline(brand?: Brand) {
           }
         }
 
-        if (existing) {
-          // Update existing tyre with generated content
-          const updateData: Record<string, unknown> = {
-            shortDescription: content.shortDescription,
-            fullDescription: fullDescriptionHtml,
-            keyBenefits,
-            seoTitle,
-            seoDescription,
-          };
-          if (imageId) {
+        if (dbCheck.exists) {
+          // Update existing tyre - only update missing fields
+          const updateData: Record<string, unknown> = {};
+
+          // Only update fields that are missing in DB
+          if (dbCheck.missingFields.includes("shortDescription")) {
+            updateData.shortDescription = content.shortDescription;
+          }
+          if (dbCheck.missingFields.includes("fullDescription")) {
+            updateData.fullDescription = fullDescriptionHtml;
+          }
+          if (dbCheck.missingFields.includes("seoTitle")) {
+            updateData.seoTitle = seoTitle;
+          }
+          if (dbCheck.missingFields.includes("seoDescription")) {
+            updateData.seoDescription = seoDescription;
+          }
+
+          // Always update keyBenefits if empty
+          const existingBenefits = (dbCheck.tyre as any)?.keyBenefits;
+          if (!existingBenefits || existingBenefits.length === 0) {
+            updateData.keyBenefits = keyBenefits;
+          }
+
+          // Update image if not set
+          if (imageId && !dbCheck.hasImage) {
             updateData.image = imageId;
           }
+
           // Add sizes if available and not already set
-          if (tire.sizes && tire.sizes.length > 0) {
+          const existingSizes = (dbCheck.tyre as any)?.sizes;
+          if (tire.sizes && tire.sizes.length > 0 && (!existingSizes || existingSizes.length === 0)) {
             updateData.sizes = tire.sizes;
           }
-          await client.updateTyre(existing.id, updateData);
-          console.log(`  ✓ Updated tyre ID: ${existing.id}`);
+
+          if (Object.keys(updateData).length > 0) {
+            await client.updateTyre(dbCheck.tyre!.id, updateData);
+            console.log(`  ✓ Updated tyre ID: ${dbCheck.tyre!.id} (fields: ${Object.keys(updateData).join(", ")})`);
+          } else {
+            console.log(`  ⏭️  No updates needed`);
+          }
         } else {
           // Create new tyre
           const createData: Record<string, unknown> = {
@@ -367,7 +442,7 @@ async function runPublishPipeline(brand?: Brand) {
 
     // Save updated data with publish flags
     await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
-    console.log(`\nPublished ${published}/${tiresToPublish.length} tires`);
+    console.log(`\nPublished ${published}, skipped ${skipped} / ${tiresToPublish.length} tires`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     stats.errors.push(`Publish pipeline failed: ${errorMessage}`);

@@ -174,6 +174,51 @@ class PayloadClient {
   }
 
   /**
+   * Check if tyre exists in DB and has content filled
+   * Returns: { exists: boolean, hasContent: boolean, missingFields: string[] }
+   */
+  async checkTyreHasContent(slug: string): Promise<{
+    exists: boolean;
+    hasContent: boolean;
+    hasImage: boolean;
+    missingFields: string[];
+    tyre?: TyreDoc;
+  }> {
+    const tyre = await this.findTyreBySlug(slug);
+
+    if (!tyre) {
+      return { exists: false, hasContent: false, hasImage: false, missingFields: ["all"] };
+    }
+
+    const missingFields: string[] = [];
+
+    // Check required content fields
+    if (!tyre.shortDescription || tyre.shortDescription.length < 50) {
+      missingFields.push("shortDescription");
+    }
+    if (!tyre.fullDescription || tyre.fullDescription.length < 100) {
+      missingFields.push("fullDescription");
+    }
+    if (!tyre.seoTitle || tyre.seoTitle.length < 10) {
+      missingFields.push("seoTitle");
+    }
+    if (!tyre.seoDescription || tyre.seoDescription.length < 20) {
+      missingFields.push("seoDescription");
+    }
+
+    // Check image
+    const hasImage = !!(tyre as any).image;
+
+    return {
+      exists: true,
+      hasContent: missingFields.length === 0,
+      hasImage,
+      missingFields,
+      tyre,
+    };
+  }
+
+  /**
    * Create new tyre
    */
   async createTyre(data: TyreData): Promise<TyreDoc> {
