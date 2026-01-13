@@ -284,6 +284,7 @@ export async function getPayloadArticles(params?: {
   limit?: number;
   page?: number;
   tag?: string;
+  search?: string;
 }): Promise<PayloadArticle[]> {
   const searchParams = new URLSearchParams();
 
@@ -298,7 +299,39 @@ export async function getPayloadArticles(params?: {
 
   const query = searchParams.toString();
   const data = await fetchPayload<PayloadArticle>(`articles?${query}`);
-  return data.docs;
+
+  let articles = data.docs;
+
+  // Client-side filtering for tag (Payload REST API doesn't easily filter array fields)
+  if (params?.tag) {
+    articles = articles.filter(article =>
+      article.tags?.some(t => t.tag.toLowerCase() === params.tag?.toLowerCase())
+    );
+  }
+
+  // Client-side search (title + previewText)
+  if (params?.search) {
+    const searchLower = params.search.toLowerCase();
+    articles = articles.filter(article =>
+      article.title.toLowerCase().includes(searchLower) ||
+      article.previewText?.toLowerCase().includes(searchLower) ||
+      article.tags?.some(t => t.tag.toLowerCase().includes(searchLower))
+    );
+  }
+
+  return articles;
+}
+
+// Get all unique tags from articles
+export async function getPayloadArticleTags(): Promise<string[]> {
+  const articles = await getPayloadArticles();
+  const tagsSet = new Set<string>();
+
+  articles.forEach(article => {
+    article.tags?.forEach(t => tagsSet.add(t.tag));
+  });
+
+  return Array.from(tagsSet).sort();
 }
 
 export async function getPayloadArticleBySlug(slug: string): Promise<PayloadArticle | null> {

@@ -98,7 +98,7 @@ export function TestResultCard({ result }: TestResultCardProps) {
         </span>
         {result.articleSlug && (
           <Link
-            href={`/advice/${result.articleSlug}`}
+            href={`/blog/${result.articleSlug}`}
             className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
           >
             Детальніше

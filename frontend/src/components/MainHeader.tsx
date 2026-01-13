@@ -10,7 +10,7 @@ const primaryNav = [
   { href: "/suv-4x4-tyres", label: "SUV" },
   { href: "/lcv-tyres", label: "Комерційні" },
   { href: "/dealers", label: "Дилери" },
-  { href: "/advice", label: "Поради" },
+  { href: "/blog", label: "Блог" },
 ];
 
 // Повне меню для мобільних та бургера
@@ -21,7 +21,7 @@ const fullNav = [
   { href: "/tyre-search", label: "Пошук шин" },
   { href: "/dealers", label: "Де купити" },
   { href: "/about", label: "Бренд" },
-  { href: "/advice", label: "Поради" },
+  { href: "/blog", label: "Блог" },
   { href: "/contacts", label: "Контакти" },
 ];
 

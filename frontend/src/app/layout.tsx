@@ -81,7 +81,7 @@ const mainNav = [
   { href: "/tyre-search", label: "Пошук шин", icon: "🔍" },
   { href: "/dealers", label: "Де купити", icon: "📍" },
   { href: "/about", label: "Бренд", icon: "🌟" },
-  { href: "/advice", label: "Поради", icon: "📚" },
+  { href: "/blog", label: "Блог", icon: "📚" },
   { href: "/contacts", label: "Контакти", icon: "📞" },
 ];
 

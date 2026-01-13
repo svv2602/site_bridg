@@ -355,7 +355,7 @@ export default function ContactsPage() {
                   ))}
                 </div>
                 <Link
-                  href="/advice"
+                  href="/blog"
                   className="mt-6 inline-flex items-center gap-2 text-primary hover:underline"
                 >
                   Перейти до всіх питань <ArrowRight className="h-4 w-4" />

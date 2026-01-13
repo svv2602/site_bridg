@@ -2,6 +2,23 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone', // Required for Docker deployment
+
+  // Redirects from old URLs to new ones (SEO-friendly 301)
+  async redirects() {
+    return [
+      {
+        source: '/advice',
+        destination: '/blog',
+        permanent: true, // 301 redirect
+      },
+      {
+        source: '/advice/:slug',
+        destination: '/blog/:slug',
+        permanent: true, // 301 redirect
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {

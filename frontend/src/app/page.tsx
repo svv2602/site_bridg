@@ -230,7 +230,7 @@ export default async function Home() {
                 <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
                 <p className="mb-4 text-sm text-muted-foreground">{article.readingTime}</p>
                 <Link
-                  href={`/advice/${article.slug}`}
+                  href={`/blog/${article.slug}`}
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                 >
                   Читати статтю <ChevronRight className="h-4 w-4" />

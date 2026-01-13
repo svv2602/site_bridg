@@ -85,7 +85,7 @@ export function generateArticleSchema(article: Article, baseUrl: string = "https
     "@type": "Article",
     headline: article.title,
     description: article.previewText,
-    url: `${baseUrl}/advice/${article.slug}`,
+    url: `${baseUrl}/blog/${article.slug}`,
     ...(article.publishedAt && { datePublished: article.publishedAt }),
     author: {
       "@type": "Organization",

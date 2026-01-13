@@ -60,7 +60,7 @@ async function sendTelegramNotification(data: ContactFormData): Promise<boolean>
   }
 
   try {
-    const subjectLabel = SUBJECT_LABELS[data.subject || 'other'] || data.subject;
+    const subjectLabel = SUBJECT_LABELS[data.subject || 'other'] || data.subject || 'Інше';
     const message = `🔔 *Нове звернення з сайту*
 
 👤 *Ім'я:* ${escapeMarkdown(data.name)}
@@ -110,6 +110,7 @@ async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
 
   try {
     // Dynamic import to avoid issues when nodemailer is not installed
+    // @ts-expect-error - nodemailer types may not be installed
     const nodemailer = await import('nodemailer').catch(() => null);
     if (!nodemailer) {
       console.log('Nodemailer not installed, skipping email notification');
@@ -126,7 +127,7 @@ async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
       },
     });
 
-    const subjectLabel = SUBJECT_LABELS[data.subject || 'other'] || data.subject;
+    const subjectLabel = SUBJECT_LABELS[data.subject || 'other'] || data.subject || 'Інше';
 
     await transporter.sendMail({
       from: `"Bridgestone Ukraine" <${SMTP_USER}>`,

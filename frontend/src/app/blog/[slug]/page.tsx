@@ -28,13 +28,13 @@ export async function generateMetadata(
 
   if (!article) {
     return {
-      title: "Стаття не знайдена — Поради Bridgestone",
+      title: "Стаття не знайдена — Блог Bridgestone",
     };
   }
 
   const title =
     // @ts-expect-error: seoTitle/seoDescription закладені в CMS‑моделі, але відсутні в мок‑даних
-    article.seoTitle ?? `${article.title} — корисні поради щодо шин Bridgestone`;
+    article.seoTitle ?? `${article.title} — Блог Bridgestone Україна`;
 
   return {
     title,
@@ -42,7 +42,7 @@ export async function generateMetadata(
       // @ts-expect-error: seoDescription закладене в CMS‑моделі, але відсутнє в мок‑даних
       article.seoDescription ??
       article.previewText ??
-      "Корисні поради щодо вибору та експлуатації шин Bridgestone в Україні.",
+      "Корисні статті про шини Bridgestone в Україні.",
   };
 }
 
@@ -55,12 +55,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const siteUrl = getSiteUrl();
-  const articleUrl = `${siteUrl}/advice/${article.slug}`;
+  const articleUrl = `${siteUrl}/blog/${article.slug}`;
 
   const articleSchema = generateArticleSchema(article);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: `${siteUrl}/` },
-    { name: "Поради", url: `${siteUrl}/advice` },
+    { name: "Блог", url: `${siteUrl}/blog` },
     { name: article.title, url: articleUrl },
   ]);
 
@@ -80,12 +80,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             className="mb-4"
             items={[
               { label: "Головна", href: "/" },
-              { label: "Поради", href: "/advice" },
+              { label: "Блог", href: "/blog" },
               { label: article.title },
             ]}
           />
           <Link
-            href="/advice"
+            href="/blog"
             className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-stone-200 hover:text-white"
           >
             <ArrowLeft className="h-3 w-3" />
@@ -110,7 +110,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {article.tags && article.tags.length > 0 && (
                 <span className="inline-flex items-center gap-1">
                   <Tag className="h-3 w-3" />
-                  {article.tags.join(", ")}
+                  {article.tags.map((tag, i) => (
+                    <Link
+                      key={tag}
+                      href={`/blog?tag=${encodeURIComponent(tag)}`}
+                      className="hover:text-stone-200"
+                    >
+                      #{tag}{i < article.tags!.length - 1 ? ", " : ""}
+                    </Link>
+                  ))}
                 </span>
               )}
             </div>
@@ -141,6 +149,26 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </article>
         </div>
       </section>
+
+      {/* Related tags */}
+      {article.tags && article.tags.length > 0 && (
+        <section className="border-t border-border py-8">
+          <div className="container mx-auto max-w-4xl px-4 md:px-8">
+            <h3 className="mb-4 text-lg font-semibold">Схожі теми</h3>
+            <div className="flex flex-wrap gap-2">
+              {article.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  className="rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                >
+                  #{tag}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
