@@ -27,9 +27,9 @@ const sitemapSections = [
   {
     title: 'За сезоном',
     links: [
-      { href: '/passenger-tyres?season=summer', label: 'Літні шини' },
-      { href: '/passenger-tyres?season=winter', label: 'Зимові шини' },
-      { href: '/passenger-tyres?season=all-season', label: 'Всесезонні шини' },
+      { href: '/passenger-tyres/summer', label: 'Літні шини' },
+      { href: '/passenger-tyres/winter', label: 'Зимові шини' },
+      { href: '/passenger-tyres/all-season', label: 'Всесезонні шини' },
     ],
   },
   {

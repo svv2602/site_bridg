@@ -19,7 +19,7 @@ const tyreCategories = [
     description: "Для теплої пори року, оптимальні для сухого та мокрого асфальту.",
     icon: Sun,
     color: "from-orange-500 to-yellow-500",
-    href: "/passenger-tyres?season=summer",
+    href: "/passenger-tyres/summer",
   },
   {
     id: "winter",
@@ -27,7 +27,7 @@ const tyreCategories = [
     description: "Максимальне зчеплення на снігу та льоду в зимових умовах.",
     icon: Snowflake,
     color: "from-blue-500 to-cyan-400",
-    href: "/passenger-tyres?season=winter",
+    href: "/passenger-tyres/winter",
   },
   {
     id: "allseason",
@@ -35,7 +35,7 @@ const tyreCategories = [
     description: "Компромісне рішення для помірного клімату без екстремальних умов.",
     icon: Cloud,
     color: "from-gray-500 to-gray-300",
-    href: "/passenger-tyres?season=all-season",
+    href: "/passenger-tyres/all-season",
   },
 ];
 

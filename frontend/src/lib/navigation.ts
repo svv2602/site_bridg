@@ -25,19 +25,19 @@ export const tyresMenuData: MegaMenuData = {
       items: [
         {
           label: 'Літні шини',
-          href: '/passenger-tyres?season=summer',
+          href: '/passenger-tyres/summer',
           icon: Sun,
           description: 'Для теплої пори року',
         },
         {
           label: 'Зимові шини',
-          href: '/passenger-tyres?season=winter',
+          href: '/passenger-tyres/winter',
           icon: Snowflake,
           description: 'Для снігу та льоду',
         },
         {
           label: 'Всесезонні',
-          href: '/passenger-tyres?season=all-season',
+          href: '/passenger-tyres/all-season',
           icon: Cloud,
           description: 'Цілорічне використання',
         },

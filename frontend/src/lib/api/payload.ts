@@ -441,7 +441,7 @@ export async function getSeasonalContent() {
     featuredSeason: isWinter ? ('winter' as const) : ('summer' as const),
     gradient: 'from-stone-800 to-stone-900',
     ctaText: isWinter ? 'Зимові моделі' : 'Переглянути каталог',
-    ctaLink: isWinter ? '/passenger-tyres?season=winter' : '/passenger-tyres',
+    ctaLink: isWinter ? '/passenger-tyres/winter' : '/passenger-tyres',
   };
 }
 
