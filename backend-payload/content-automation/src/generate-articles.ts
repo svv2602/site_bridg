@@ -254,20 +254,35 @@ async function generateAndUploadImages(
       contexts: contexts.slice(0, contentCount),
     });
 
+    // Store uploaded image IDs for later URL retrieval
+    const uploadedIds: number[] = [];
+
     for (const img of contentImages) {
       if (img.url) {
         // Upload each content image
         const uploadResult = await client.uploadImageFromUrl(img.url, {
           alt: img.alt,
-          filename: `article-content-${generateSlug(topic)}-${result.contentImageUrls.length + 1}.png`,
+          filename: `article-content-${generateSlug(topic)}-${uploadedIds.length + 1}.png`,
         });
 
         if (uploadResult) {
-          // Use full URL from Payload
-          result.contentImageUrls.push(uploadResult.url);
+          uploadedIds.push(uploadResult.id);
           result.contentImageAlts.push(img.alt);
           logger.info(`Content image uploaded: ID ${uploadResult.id}`);
         }
+      }
+    }
+
+    // Wait for any background processing to complete and get final URLs
+    // This handles cases where removeBackground hook runs asynchronously
+    logger.info("Waiting for media processing to complete...");
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Short wait for async hooks
+
+    for (const id of uploadedIds) {
+      const finalMedia = await client.getMediaById(id);
+      if (finalMedia) {
+        result.contentImageUrls.push(finalMedia.url);
+        logger.info(`Final URL for ID ${id}: ${finalMedia.filename}`);
       }
     }
   } catch (error) {

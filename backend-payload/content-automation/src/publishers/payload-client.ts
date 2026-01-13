@@ -472,6 +472,55 @@ class PayloadClient {
   }
 
   /**
+   * Get media by ID - useful to get updated URL after background removal
+   */
+  async getMediaById(id: number): Promise<{ id: number; url: string; filename: string } | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/media/${id}`);
+      if (!response.ok) return null;
+      const media = await response.json();
+      return {
+        id: media.id,
+        url: media.url,
+        filename: media.filename,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Wait for background removal to complete and return updated URL
+   */
+  async waitForMediaProcessing(
+    id: number,
+    maxWaitMs: number = 30000
+  ): Promise<{ id: number; url: string; filename: string } | null> {
+    const startTime = Date.now();
+    const checkInterval = 2000; // Check every 2 seconds
+
+    while (Date.now() - startTime < maxWaitMs) {
+      const media = await this.getMediaById(id);
+      if (!media) return null;
+
+      // Check if background removal is complete (filename ends with -nobg.png)
+      // or if removeBackground was not requested
+      const response = await fetch(`${this.baseUrl}/api/media/${id}`);
+      const fullMedia = await response.json();
+
+      if (!fullMedia.removeBackground || fullMedia.backgroundRemoved) {
+        return media;
+      }
+
+      // Wait before next check
+      await new Promise(resolve => setTimeout(resolve, checkInterval));
+    }
+
+    // Return whatever we have after timeout
+    return this.getMediaById(id);
+  }
+
+  /**
    * Update tyre with image
    */
   async updateTyreImage(tyreId: string, mediaId: number): Promise<boolean> {
