@@ -1,7 +1,8 @@
 /**
- * ProKoleso.ua Scraper for Bridgestone Tires
+ * ProKoleso.ua Scraper for Bridgestone & Firestone Tires
  *
  * Scrapes tire data from model pages like https://prokoleso.ua/shiny/bridgestone/blizzak-6/
+ * or https://prokoleso.ua/shiny/firestone/destination-hp/
  * Combined approach: collects model URLs from catalog, then scrapes each model page for full data
  */
 
@@ -9,7 +10,7 @@ import puppeteer, { type Browser, type Page } from "puppeteer";
 import { writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import type { RawTyreContent } from "../types/content.js";
+import type { RawTyreContent, Brand } from "../types/content.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -32,6 +33,7 @@ export interface EuLabel {
 
 export interface ScrapedTire {
   name: string;              // Model name from page (e.g., "Blizzak 6 ENLITEN")
+  brand: Brand;              // Brand: bridgestone or firestone
   sourceSlug: string;        // Slug from URL (e.g., "blizzak-6")
   canonicalSlug: string;     // Generated slug (e.g., "blizzak-6-enliten")
   season: "summer" | "winter" | "allseason";
@@ -47,19 +49,33 @@ export interface ScrapedTire {
 const BASE_URL = "https://prokoleso.ua";
 const MAX_CATALOG_PAGES = 5; // Pages per catalog
 
-// All catalogs to scan for Bridgestone models
-const BRIDGESTONE_CATALOGS = [
-  `${BASE_URL}/shiny/bridgestone/`,             // Main Bridgestone catalog
-  `${BASE_URL}/shiny/letnie/bridgestone/`,      // Summer
-  `${BASE_URL}/shiny/zimnie/bridgestone/`,      // Winter
-  `${BASE_URL}/shiny/vsesezonie/bridgestone/`,  // All-season
-];
+// Catalog configurations for each brand
+const BRAND_CATALOGS: Record<Brand, string[]> = {
+  bridgestone: [
+    `${BASE_URL}/shiny/bridgestone/`,             // Main Bridgestone catalog
+    `${BASE_URL}/shiny/letnie/bridgestone/`,      // Summer
+    `${BASE_URL}/shiny/zimnie/bridgestone/`,      // Winter
+    `${BASE_URL}/shiny/vsesezonie/bridgestone/`,  // All-season
+  ],
+  firestone: [
+    `${BASE_URL}/shiny/firestone/`,               // Main Firestone catalog
+    `${BASE_URL}/shiny/letnie/firestone/`,        // Summer
+    `${BASE_URL}/shiny/zimnie/firestone/`,        // Winter
+    `${BASE_URL}/shiny/vsesezonie/firestone/`,    // All-season
+  ],
+};
+
+// Legacy alias for backward compatibility
+const BRIDGESTONE_CATALOGS = BRAND_CATALOGS.bridgestone;
 
 // Model pages that exist but aren't linked from catalogs
-const ADDITIONAL_MODEL_URLS = [
-  `${BASE_URL}/ua/shiny/bridgestone/turanza-all-season-6/`,
-  `${BASE_URL}/ua/shiny/bridgestone/weather-control-a005-evo/`,
-];
+const ADDITIONAL_MODEL_URLS: Record<Brand, string[]> = {
+  bridgestone: [
+    `${BASE_URL}/ua/shiny/bridgestone/turanza-all-season-6/`,
+    `${BASE_URL}/ua/shiny/bridgestone/weather-control-a005-evo/`,
+  ],
+  firestone: [],
+};
 
 // Helpers
 function determineSeason(text: string, modelName: string): ScrapedTire["season"] {
@@ -91,9 +107,19 @@ function createSlug(name: string): string {
 }
 
 function extractSourceSlug(url: string): string {
-  // Extract slug from URL like /shiny/bridgestone/blizzak-6/
-  const match = url.match(/\/shiny\/bridgestone\/([a-z0-9-]+)\/?$/i);
+  // Extract slug from URL like /shiny/bridgestone/blizzak-6/ or /shiny/firestone/destination-hp/
+  const match = url.match(/\/shiny\/(?:bridgestone|firestone)\/([a-z0-9-]+)\/?$/i);
   return match?.[1] || "";
+}
+
+/**
+ * Detect brand from URL
+ */
+function detectBrandFromUrl(url: string): Brand {
+  if (url.toLowerCase().includes("/firestone/")) {
+    return "firestone";
+  }
+  return "bridgestone";
 }
 
 function parseSizeFromText(text: string): ScrapedTireSize | null {
@@ -177,12 +203,13 @@ async function scrapeEuLabel(page: Page, sizeUrl: string): Promise<EuLabel | nul
 }
 
 /**
- * Find all model page URLs from seasonal catalogs
+ * Find all model page URLs from seasonal catalogs for a specific brand
  */
-async function findModelUrls(page: Page): Promise<string[]> {
+async function findModelUrlsForBrand(page: Page, brand: Brand): Promise<string[]> {
   const modelUrls = new Set<string>();
+  const catalogs = BRAND_CATALOGS[brand];
 
-  for (const catalogBase of BRIDGESTONE_CATALOGS) {
+  for (const catalogBase of catalogs) {
     console.log(`\n  Scanning catalog: ${catalogBase}`);
 
     for (let pageNum = 1; pageNum <= MAX_CATALOG_PAGES; pageNum++) {
@@ -192,20 +219,22 @@ async function findModelUrls(page: Page): Promise<string[]> {
       try {
         await page.goto(catalogUrl, { waitUntil: "networkidle2", timeout: 30000 });
 
-        const urls = await page.evaluate(() => {
-          const links = document.querySelectorAll('a[href*="/shiny/bridgestone/"]');
+        const brandPattern = brand; // Pass brand to evaluate context
+        const urls = await page.evaluate((b: string) => {
+          const links = document.querySelectorAll(`a[href*="/shiny/${b}/"]`);
           const found: string[] = [];
 
           links.forEach((link) => {
             const href = (link as HTMLAnchorElement).href;
-            // Model pages: /shiny/bridgestone/model-name/ (ends with /, no .html)
-            if (href.match(/\/shiny\/bridgestone\/[a-z0-9-]+\/?$/i) && !href.includes(".html")) {
+            // Model pages: /shiny/{brand}/model-name/ (ends with /, no .html)
+            const regex = new RegExp(`/shiny/${b}/[a-z0-9-]+/?$`, "i");
+            if (regex.test(href) && !href.includes(".html")) {
               found.push(href.replace(/\/?$/, "/")); // Normalize trailing slash
             }
           });
 
           return found;
-        });
+        }, brandPattern);
 
         urls.forEach((url) => {
           // Normalize: prefer /ua/ version
@@ -231,10 +260,18 @@ async function findModelUrls(page: Page): Promise<string[]> {
   }
 
   // Add additional model URLs that aren't found in catalogs
-  console.log(`\n  Adding ${ADDITIONAL_MODEL_URLS.length} additional model URLs...`);
-  ADDITIONAL_MODEL_URLS.forEach((url) => modelUrls.add(url));
+  const additionalUrls = ADDITIONAL_MODEL_URLS[brand];
+  console.log(`\n  Adding ${additionalUrls.length} additional model URLs...`);
+  additionalUrls.forEach((url) => modelUrls.add(url));
 
   return Array.from(modelUrls);
+}
+
+/**
+ * Find all model page URLs from seasonal catalogs (legacy, defaults to Bridgestone)
+ */
+async function findModelUrls(page: Page): Promise<string[]> {
+  return findModelUrlsForBrand(page, "bridgestone");
 }
 
 /**
@@ -385,8 +422,12 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
       }
     }
 
+    // Detect brand from URL
+    const brand = detectBrandFromUrl(modelUrl);
+
     return {
       name: data.modelName,
+      brand,
       sourceSlug,
       canonicalSlug: createSlug(data.modelName),
       season,
@@ -404,11 +445,12 @@ async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTir
 }
 
 /**
- * Main scraper - scrapes model pages for full data
+ * Scrape tires for a specific brand
  */
-async function scrapeProkoleso(): Promise<ScrapedTire[]> {
-  console.log("Starting ProKoleso Model Page Scraper...");
-  console.log(`Catalogs: ${BRIDGESTONE_CATALOGS.join(", ")}`);
+async function scrapeProkolesoBrand(brand: Brand): Promise<ScrapedTire[]> {
+  const brandName = brand === "bridgestone" ? "Bridgestone" : "Firestone";
+  console.log(`Starting ProKoleso Model Page Scraper for ${brandName}...`);
+  console.log(`Catalogs: ${BRAND_CATALOGS[brand].join(", ")}`);
 
   let browser: Browser | null = null;
 
@@ -423,9 +465,9 @@ async function scrapeProkoleso(): Promise<ScrapedTire[]> {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
 
-    // Step 1: Find all model URLs
-    console.log("\n[Step 1] Finding model URLs from catalog...");
-    const modelUrls = await findModelUrls(page);
+    // Step 1: Find all model URLs for brand
+    console.log(`\n[Step 1] Finding ${brandName} model URLs from catalog...`);
+    const modelUrls = await findModelUrlsForBrand(page, brand);
     console.log(`Found ${modelUrls.length} model pages`);
     modelUrls.forEach((url) => console.log(`  - ${url}`));
 
@@ -439,7 +481,7 @@ async function scrapeProkoleso(): Promise<ScrapedTire[]> {
 
       if (tire) {
         scrapedTires.push(tire);
-        console.log(`  ✓ ${tire.name} (${tire.season}, ${tire.sizes.length} sizes)`);
+        console.log(`  ✓ ${tire.name} (${tire.brand}, ${tire.season}, ${tire.sizes.length} sizes)`);
         console.log(`    sourceSlug: ${tire.sourceSlug}`);
         console.log(`    canonicalSlug: ${tire.canonicalSlug}`);
       }
@@ -448,9 +490,76 @@ async function scrapeProkoleso(): Promise<ScrapedTire[]> {
       await new Promise((r) => setTimeout(r, 500));
     }
 
-    console.log(`\n[Done] Scraped ${scrapedTires.length} tire models`);
+    console.log(`\n[Done] Scraped ${scrapedTires.length} ${brandName} tire models`);
 
     return scrapedTires;
+  } catch (error) {
+    console.error("Scraping error:", error);
+    throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+
+/**
+ * Main scraper - scrapes model pages for all brands (Bridgestone + Firestone)
+ */
+async function scrapeProkoleso(brands?: Brand[]): Promise<ScrapedTire[]> {
+  const brandsToScrape = brands || ["bridgestone", "firestone"] as Brand[];
+  console.log(`Starting ProKoleso Model Page Scraper for brands: ${brandsToScrape.join(", ")}`);
+
+  let browser: Browser | null = null;
+  const allTires: ScrapedTire[] = [];
+
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    );
+
+    for (const brand of brandsToScrape) {
+      const brandName = brand === "bridgestone" ? "Bridgestone" : "Firestone";
+      console.log(`\n${"=".repeat(50)}`);
+      console.log(`Scraping ${brandName}...`);
+      console.log(`${"=".repeat(50)}`);
+
+      // Step 1: Find all model URLs for brand
+      console.log(`\n[Step 1] Finding ${brandName} model URLs from catalog...`);
+      const modelUrls = await findModelUrlsForBrand(page, brand);
+      console.log(`Found ${modelUrls.length} model pages`);
+      modelUrls.forEach((url) => console.log(`  - ${url}`));
+
+      // Step 2: Scrape each model page
+      console.log("\n[Step 2] Scraping model pages...");
+
+      for (const modelUrl of modelUrls) {
+        console.log(`\nScraping: ${modelUrl}`);
+        const tire = await scrapeModelPage(page, modelUrl);
+
+        if (tire) {
+          allTires.push(tire);
+          console.log(`  ✓ ${tire.name} (${tire.brand}, ${tire.season}, ${tire.sizes.length} sizes)`);
+          console.log(`    sourceSlug: ${tire.sourceSlug}`);
+          console.log(`    canonicalSlug: ${tire.canonicalSlug}`);
+        }
+
+        // Delay between requests
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    console.log(`\n${"=".repeat(50)}`);
+    console.log(`[Done] Scraped ${allTires.length} tire models total`);
+    console.log(`${"=".repeat(50)}`);
+
+    return allTires;
   } catch (error) {
     console.error("Scraping error:", error);
     throw error;
@@ -501,7 +610,8 @@ export async function scrapeModelDescription(
       // Model name
       const modelSpan = document.querySelector("h1 .product-model, h1");
       let modelName = modelSpan?.textContent?.trim() || "";
-      modelName = modelName.replace(/^Bridgestone\s+/i, "").trim();
+      // Remove brand prefix from model name
+      modelName = modelName.replace(/^(Bridgestone|Firestone)\s+/i, "").trim();
 
       // Full description
       const descEl = document.querySelector(".text-formatted");
@@ -533,9 +643,11 @@ export async function scrapeModelDescription(
 
     const sourceSlug = extractSourceSlug(pageUrl);
     const modelSlug = createSlug(content.modelName);
+    const brand = detectBrandFromUrl(pageUrl);
 
     const result: RawTyreContent = {
       source: "prokoleso",
+      brand,
       modelSlug,
       modelName: content.modelName,
       fullDescription: content.fullDescription,
@@ -566,9 +678,9 @@ export async function scrapeModelDescription(
 }
 
 /**
- * Find all Bridgestone tire model URLs from catalog
+ * Find all tire model URLs from catalog for a specific brand
  */
-export async function findBridgestoneTireUrls(browser?: Browser): Promise<string[]> {
+export async function findTireUrlsByBrand(brand: Brand, browser?: Browser): Promise<string[]> {
   const shouldCloseBrowser = !browser;
 
   try {
@@ -584,7 +696,7 @@ export async function findBridgestoneTireUrls(browser?: Browser): Promise<string
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
 
-    const urls = await findModelUrls(page);
+    const urls = await findModelUrlsForBrand(page, brand);
 
     await page.close();
 
@@ -594,12 +706,26 @@ export async function findBridgestoneTireUrls(browser?: Browser): Promise<string
 
     return urls;
   } catch (error) {
-    console.error("Failed to find tire URLs:", error);
+    console.error(`Failed to find ${brand} tire URLs:`, error);
     if (shouldCloseBrowser && browser) {
       await browser.close();
     }
     return [];
   }
+}
+
+/**
+ * Find all Bridgestone tire model URLs from catalog (legacy function for backward compatibility)
+ */
+export async function findBridgestoneTireUrls(browser?: Browser): Promise<string[]> {
+  return findTireUrlsByBrand("bridgestone", browser);
+}
+
+/**
+ * Find all Firestone tire model URLs from catalog
+ */
+export async function findFirestoneTireUrls(browser?: Browser): Promise<string[]> {
+  return findTireUrlsByBrand("firestone", browser);
 }
 
 // Main execution
@@ -637,4 +763,4 @@ if (isMainModule) {
   main();
 }
 
-export { scrapeProkoleso, saveResults };
+export { scrapeProkoleso, scrapeProkolesoBrand, saveResults };

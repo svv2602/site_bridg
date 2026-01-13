@@ -2,11 +2,12 @@
  * Tyre Content Scraper
  *
  * Aggregates tyre content from multiple sources for AI content generation.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
 import puppeteer, { type Browser } from "puppeteer";
-import { scrapeModelDescription, findBridgestoneTireUrls } from "./prokoleso.js";
-import type { RawTyreContent, RawTyreContentCollection } from "../types/content.js";
+import { scrapeModelDescription, findTireUrlsByBrand, findBridgestoneTireUrls } from "./prokoleso.js";
+import type { RawTyreContent, RawTyreContentCollection, Brand } from "../types/content.js";
 import { createLogger } from "../utils/logger.js";
 import { saveRawContentCollection, loadRawContentCollection, hasRawContent } from "../utils/storage.js";
 
@@ -21,13 +22,14 @@ const SCRAPE_DELAY_MS = 2000; // Delay between requests to avoid rate limiting
 export async function scrapeContentForModel(
   modelSlug: string,
   options: {
-    sources?: Array<"prokoleso" | "bridgestone" | "tyrereviews">;
+    sources?: Array<"prokoleso" | "bridgestone" | "firestone" | "tyrereviews">;
+    brand?: Brand;
     browser?: Browser;
     save?: boolean;
     skipIfExists?: boolean;
   } = {}
 ): Promise<RawTyreContentCollection> {
-  const { sources = ["prokoleso"], browser, save = true, skipIfExists = false } = options;
+  const { sources = ["prokoleso"], brand = "bridgestone", browser, save = true, skipIfExists = false } = options;
 
   // Skip if content already exists
   if (skipIfExists && hasRawContent(modelSlug)) {
@@ -35,6 +37,7 @@ export async function scrapeContentForModel(
     return loadRawContentCollection(modelSlug) || {
       modelSlug,
       modelName: "",
+      brand,
       sources: [],
       collectedAt: new Date().toISOString(),
     };
@@ -45,6 +48,7 @@ export async function scrapeContentForModel(
   const collection: RawTyreContentCollection = {
     modelSlug,
     modelName: "",
+    brand,
     sources: [],
     collectedAt: new Date().toISOString(),
   };
@@ -58,7 +62,7 @@ export async function scrapeContentForModel(
     }
 
     // Find URLs for this model
-    const allUrls = await findBridgestoneTireUrls(activeBrowser);
+    const allUrls = await findTireUrlsByBrand(brand, activeBrowser);
 
     // Filter URLs that match the model slug
     const modelUrls = allUrls.filter((url) => {
@@ -113,11 +117,12 @@ export async function scrapeContentForModel(
 export async function scrapeContentForModels(
   modelSlugs: string[],
   options: {
-    sources?: Array<"prokoleso" | "bridgestone" | "tyrereviews">;
+    sources?: Array<"prokoleso" | "bridgestone" | "firestone" | "tyrereviews">;
+    brand?: Brand;
     delayMs?: number;
   } = {}
 ): Promise<RawTyreContentCollection[]> {
-  const { sources = ["prokoleso"], delayMs = SCRAPE_DELAY_MS } = options;
+  const { sources = ["prokoleso"], brand = "bridgestone", delayMs = SCRAPE_DELAY_MS } = options;
   const results: RawTyreContentCollection[] = [];
 
   let browser: Browser | null = null;
@@ -134,6 +139,7 @@ export async function scrapeContentForModels(
 
       const collection = await scrapeContentForModel(slug, {
         sources,
+        brand,
         browser,
       });
 
@@ -154,9 +160,10 @@ export async function scrapeContentForModels(
 }
 
 /**
- * Scrape all available Bridgestone tire content
+ * Scrape all available tire content for a specific brand
  */
-export async function scrapeAllBridgestoneContent(
+export async function scrapeAllContentByBrand(
+  brand: Brand,
   options: {
     limit?: number;
     delayMs?: number;
@@ -164,6 +171,7 @@ export async function scrapeAllBridgestoneContent(
 ): Promise<RawTyreContentCollection[]> {
   const { limit, delayMs = SCRAPE_DELAY_MS } = options;
   const results: RawTyreContentCollection[] = [];
+  const brandName = brand === "bridgestone" ? "Bridgestone" : "Firestone";
 
   let browser: Browser | null = null;
 
@@ -173,8 +181,8 @@ export async function scrapeAllBridgestoneContent(
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
-    // Find all tire URLs
-    const allUrls = await findBridgestoneTireUrls(browser);
+    // Find all tire URLs for brand
+    const allUrls = await findTireUrlsByBrand(brand, browser);
     const urlsToScrape = limit ? allUrls.slice(0, limit) : allUrls;
 
     logger.info(`Scraping ${urlsToScrape.length} tire pages...`);
@@ -182,8 +190,8 @@ export async function scrapeAllBridgestoneContent(
     // Group URLs by model (remove size from URL to get unique models)
     const modelUrls = new Map<string, string>();
     for (const url of urlsToScrape) {
-      // Extract model name from URL (remove size part)
-      const modelMatch = url.match(/bridgestone-([a-z0-9-]+?)-\d{3}/i);
+      // Extract model name from URL (remove size part) - works for both brands
+      const modelMatch = url.match(/(?:bridgestone|firestone)-([a-z0-9-]+?)-\d{3}/i);
       if (modelMatch) {
         const modelKey = modelMatch[1].toLowerCase();
         if (!modelUrls.has(modelKey)) {
@@ -192,7 +200,7 @@ export async function scrapeAllBridgestoneContent(
       }
     }
 
-    logger.info(`Found ${modelUrls.size} unique models`);
+    logger.info(`Found ${modelUrls.size} unique ${brandName} models`);
 
     let i = 0;
     for (const [modelKey, url] of modelUrls) {
@@ -204,6 +212,7 @@ export async function scrapeAllBridgestoneContent(
         results.push({
           modelSlug: content.modelSlug,
           modelName: content.modelName,
+          brand: content.brand,
           sources: [content],
           collectedAt: new Date().toISOString(),
         });
@@ -295,6 +304,30 @@ export function mergeRawContent(
   return merged;
 }
 
+/**
+ * Scrape all available Bridgestone tire content (legacy function for backward compatibility)
+ */
+export async function scrapeAllBridgestoneContent(
+  options: {
+    limit?: number;
+    delayMs?: number;
+  } = {}
+): Promise<RawTyreContentCollection[]> {
+  return scrapeAllContentByBrand("bridgestone", options);
+}
+
+/**
+ * Scrape all available Firestone tire content
+ */
+export async function scrapeAllFirestoneContent(
+  options: {
+    limit?: number;
+    delayMs?: number;
+  } = {}
+): Promise<RawTyreContentCollection[]> {
+  return scrapeAllContentByBrand("firestone", options);
+}
+
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
@@ -309,17 +342,25 @@ Usage:
 Options:
   --test              Test with single URL
   --model <slug>      Scrape specific model
-  --all               Scrape all Bridgestone models
+  --brand <brand>     Brand to scrape (bridgestone or firestone, default: bridgestone)
+  --all               Scrape all models for specified brand
   --limit <n>         Limit number of pages (with --all)
   --help              Show this help
 
 Examples:
   npx tsx tyre-content.ts --test
   npx tsx tyre-content.ts --model blizzak-6
-  npx tsx tyre-content.ts --all --limit 5
+  npx tsx tyre-content.ts --all --brand bridgestone --limit 5
+  npx tsx tyre-content.ts --all --brand firestone
 `);
     return;
   }
+
+  // Get brand option
+  const brandIndex = args.indexOf("--brand");
+  const brand: Brand = (brandIndex !== -1 && args[brandIndex + 1] === "firestone")
+    ? "firestone"
+    : "bridgestone";
 
   if (args.includes("--test")) {
     console.log("Testing with sample URL...\n");
@@ -333,8 +374,8 @@ Examples:
   const modelIndex = args.indexOf("--model");
   if (modelIndex !== -1 && args[modelIndex + 1]) {
     const modelSlug = args[modelIndex + 1];
-    console.log(`Scraping content for model: ${modelSlug}\n`);
-    const collection = await scrapeContentForModel(modelSlug);
+    console.log(`Scraping content for model: ${modelSlug} (brand: ${brand})\n`);
+    const collection = await scrapeContentForModel(modelSlug, { brand });
     console.log("\nResult:");
     console.log(JSON.stringify(collection, null, 2));
     return;
@@ -343,8 +384,9 @@ Examples:
   if (args.includes("--all")) {
     const limitIndex = args.indexOf("--limit");
     const limit = limitIndex !== -1 ? parseInt(args[limitIndex + 1], 10) : undefined;
-    console.log(`Scraping all Bridgestone content${limit ? ` (limit: ${limit})` : ""}...\n`);
-    const results = await scrapeAllBridgestoneContent({ limit });
+    const brandName = brand === "bridgestone" ? "Bridgestone" : "Firestone";
+    console.log(`Scraping all ${brandName} content${limit ? ` (limit: ${limit})` : ""}...\n`);
+    const results = await scrapeAllContentByBrand(brand, { limit });
     console.log(`\nScraped ${results.length} models`);
     console.log(JSON.stringify(results, null, 2));
     return;

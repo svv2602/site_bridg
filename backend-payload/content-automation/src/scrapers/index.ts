@@ -2,10 +2,20 @@
  * Scrapers Index
  *
  * Unified interface for all scraping functionality.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
+import type { Brand } from "../types/content.js";
+
 // ProKoleso scraper
-export { scrapeProkoleso, saveResults, type ScrapedTire, type ScrapedTireSize } from "./prokoleso.js";
+export {
+  scrapeProkoleso,
+  scrapeProkolesoBrand,
+  saveResults,
+  findTireUrlsByBrand,
+  type ScrapedTire,
+  type ScrapedTireSize,
+} from "./prokoleso.js";
 
 // Test results scrapers
 export { scrapeADAC, type ADACScraperResult } from "./adac.js";
@@ -143,30 +153,50 @@ export async function scrapeAllTestSources(
 }
 
 /**
- * Get Bridgestone results from test results
+ * Get results for a specific brand from test results
  */
-export function filterBridgestoneResults(
-  testResults: TestResult[]
+export function filterResultsByBrand(
+  testResults: TestResult[],
+  brand: Brand
 ): TestResult[] {
   return testResults.filter((result) =>
     result.results.some((r) =>
-      r.tireName.toLowerCase().includes("bridgestone")
+      r.tireName.toLowerCase().includes(brand)
     )
   );
 }
 
 /**
- * Get winning Bridgestone results (top 3 positions)
+ * Get Bridgestone results from test results (legacy function)
  */
-export function getBridgestoneWins(
+export function filterBridgestoneResults(
   testResults: TestResult[]
+): TestResult[] {
+  return filterResultsByBrand(testResults, "bridgestone");
+}
+
+/**
+ * Get Firestone results from test results
+ */
+export function filterFirestoneResults(
+  testResults: TestResult[]
+): TestResult[] {
+  return filterResultsByBrand(testResults, "firestone");
+}
+
+/**
+ * Get winning results for a specific brand (top 3 positions)
+ */
+export function getWinsByBrand(
+  testResults: TestResult[],
+  brand: Brand
 ): Array<{ test: TestResult; entry: TestResult["results"][0] }> {
   const wins: Array<{ test: TestResult; entry: TestResult["results"][0] }> = [];
 
   for (const result of testResults) {
     for (const entry of result.results) {
       if (
-        entry.tireName.toLowerCase().includes("bridgestone") &&
+        entry.tireName.toLowerCase().includes(brand) &&
         entry.position <= 3
       ) {
         wins.push({ test: result, entry });
@@ -175,4 +205,22 @@ export function getBridgestoneWins(
   }
 
   return wins.sort((a, b) => a.entry.position - b.entry.position);
+}
+
+/**
+ * Get winning Bridgestone results (top 3 positions) - legacy function
+ */
+export function getBridgestoneWins(
+  testResults: TestResult[]
+): Array<{ test: TestResult; entry: TestResult["results"][0] }> {
+  return getWinsByBrand(testResults, "bridgestone");
+}
+
+/**
+ * Get winning Firestone results (top 3 positions)
+ */
+export function getFirestoneWins(
+  testResults: TestResult[]
+): Array<{ test: TestResult; entry: TestResult["results"][0] }> {
+  return getWinsByBrand(testResults, "firestone");
 }
