@@ -298,6 +298,10 @@ async function runPublishPipeline(brand?: Brand) {
           if (imageId) {
             updateData.image = imageId;
           }
+          // Add sizes if available and not already set
+          if (tire.sizes && tire.sizes.length > 0) {
+            updateData.sizes = tire.sizes;
+          }
           await client.updateTyre(existing.id, updateData);
           console.log(`  ✓ Updated tyre ID: ${existing.id}`);
         } else {
@@ -317,6 +321,10 @@ async function runPublishPipeline(brand?: Brand) {
           };
           if (imageId) {
             createData.image = imageId;
+          }
+          // Add sizes if available
+          if (tire.sizes && tire.sizes.length > 0) {
+            createData.sizes = tire.sizes;
           }
           await client.createTyre(createData as any);
           console.log(`  ✓ Created new tyre`);
