@@ -85,6 +85,25 @@ export const TaskRouting: CollectionConfig = {
       },
     },
     {
+      name: 'fallbackModels',
+      type: 'array',
+      label: 'Резервні моделі',
+      admin: {
+        description: 'Моделі для спроби якщо основна не працює (в порядку пріоритету)',
+      },
+      fields: [
+        {
+          name: 'model',
+          type: 'text',
+          label: 'ID моделі',
+          required: true,
+          admin: {
+            description: 'Наприклад: dall-e-2, gpt-4o-mini, deepseek-chat',
+          },
+        },
+      ],
+    },
+    {
       name: 'fallbackProviders',
       type: 'select',
       label: 'Резервні провайдери',

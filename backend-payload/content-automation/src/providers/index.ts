@@ -237,34 +237,59 @@ export const llm = {
 export const image = {
   /**
    * Generate image using default or specified provider
+   * Supports model fallback: tries fallback models if primary model fails
    */
   async generate(
     prompt: string,
-    options?: ImageOptions & { provider?: string; taskType?: TaskType }
+    options?: ImageOptions & { provider?: string; taskType?: TaskType; fallbackModels?: string[] }
   ): Promise<ImageResult> {
     const provider = getImageProvider(options?.provider);
+    const primaryModel = options?.model || provider.defaultModel;
+
+    // Build list of models to try: primary + fallbacks
+    const modelsToTry = [primaryModel];
+    if (options?.fallbackModels && options.fallbackModels.length > 0) {
+      modelsToTry.push(...options.fallbackModels.filter(m => m !== primaryModel));
+    }
 
     // Check cost limits
-    const estimatedCost = provider.estimateCost(options?.model, options?.size, options?.quality);
-
+    const estimatedCost = provider.estimateCost(primaryModel, options?.size, options?.quality);
     const affordCheck = costTracker.canAfford(estimatedCost);
     if (!affordCheck.allowed) {
       throw new Error(`Cost limit exceeded: ${affordCheck.reason}`);
     }
 
-    const result = await provider.generateImage(prompt, options);
+    let lastError: Error | null = null;
 
-    // Record cost
-    costTracker.record({
-      provider: result.provider,
-      model: result.model,
-      taskType: options?.taskType || "image-article",
-      cost: result.cost,
-      latencyMs: result.latencyMs,
-      success: true,
-    });
+    // Try each model in order
+    for (const model of modelsToTry) {
+      try {
+        logger.info(`Trying image generation with model: ${model}`, { provider: provider.name });
 
-    return result;
+        const result = await provider.generateImage(prompt, { ...options, model });
+
+        // Record cost
+        costTracker.record({
+          provider: result.provider,
+          model: result.model,
+          taskType: options?.taskType || "image-article",
+          cost: result.cost,
+          latencyMs: result.latencyMs,
+          success: true,
+        });
+
+        return result;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        logger.warn(`Model ${model} failed, trying next fallback`, {
+          error: lastError.message,
+          remainingModels: modelsToTry.slice(modelsToTry.indexOf(model) + 1),
+        });
+      }
+    }
+
+    // All models failed
+    throw new Error(`All models failed. Last error: ${lastError?.message}`);
   },
 
   /**

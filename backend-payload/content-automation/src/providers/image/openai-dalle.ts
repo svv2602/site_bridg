@@ -19,6 +19,9 @@ export type DalleModel = (typeof DALLE_MODELS)[number];
 // DALL-E 3 sizes
 const DALLE3_SIZES: ImageSize[] = ["1024x1024", "1792x1024", "1024x1792"];
 
+// DALL-E 2 sizes (more limited)
+const DALLE2_SIZES: ImageSize[] = ["256x256", "512x512", "1024x1024"];
+
 export class OpenAIDalleProvider extends BaseImageProvider {
   readonly name = "openai-dalle";
   readonly models = DALLE_MODELS;
@@ -56,10 +59,14 @@ export class OpenAIDalleProvider extends BaseImageProvider {
     const startTime = Date.now();
     const model = (options?.model as DalleModel) || this.defaultModel;
 
-    // Validate and adjust size for DALL-E 3
+    // Validate and adjust size based on model
     let size: ImageSize = options?.size || "1024x1024";
     if (model === "dall-e-3" && !DALLE3_SIZES.includes(size)) {
       size = "1024x1024";
+    } else if (model === "dall-e-2" && !DALLE2_SIZES.includes(size)) {
+      // DALL-E 2 has more limited sizes, fallback to max supported
+      size = "1024x1024";
+      logger.info("Adjusted size for dall-e-2", { original: options?.size, adjusted: size });
     }
 
     this.logRequest(model, prompt);

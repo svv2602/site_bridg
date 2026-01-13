@@ -5,6 +5,7 @@
  */
 
 import { image } from "../../providers/index.js";
+import { getTaskRoutingFromDB } from "../../config/database-providers.js";
 import type { GeneratedImage } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -115,6 +116,7 @@ function generateAltText(input: ArticleImageInput): string {
 
 /**
  * Generate single article image
+ * Uses task routing config for provider/model selection and fallbacks
  */
 export async function generateArticleImage(
   input: ArticleImageInput,
@@ -122,19 +124,28 @@ export async function generateArticleImage(
     provider?: string;
     model?: string;
     quality?: "standard" | "hd";
+    fallbackModels?: string[];
   }
 ): Promise<GeneratedImage> {
   const promptTemplate = IMAGE_PROMPTS[input.type];
   const prompt = promptTemplate(input);
   const size = IMAGE_SIZES[input.type];
 
+  // Get task routing config for fallback models
+  const taskRouting = await getTaskRoutingFromDB("image-article");
+  const fallbackModels = options?.fallbackModels || taskRouting?.fallbackModels || [];
+
   logger.info(`Generating ${input.type} image: ${input.topic}`, {
-    provider: options?.provider || "default",
+    provider: options?.provider || taskRouting?.preferredProvider || "default",
+    model: options?.model || taskRouting?.preferredModel,
+    fallbackModels: fallbackModels.length > 0 ? fallbackModels : "none",
   });
 
   const result = await image.generate(prompt, {
     size: `${size.width}x${size.height}` as "1024x1024" | "1792x1024" | "1024x1792",
     quality: options?.quality || "standard",
+    taskType: "image-article",
+    fallbackModels,
     ...(options?.provider && { provider: options.provider }),
     ...(options?.model && { model: options.model }),
   });

@@ -281,6 +281,8 @@ export interface TaskRouting {
   preferredProvider: string;
   /** Preferred model */
   preferredModel: string;
+  /** Fallback models in order (same provider, tried before switching providers) */
+  fallbackModels?: string[];
   /** Fallback providers in order */
   fallbackProviders: string[];
   /** Max retries before trying fallback */

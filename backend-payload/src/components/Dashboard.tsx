@@ -43,6 +43,7 @@ interface TaskRoute {
   description?: string
   preferredProvider: string
   preferredModel: string
+  fallbackModels?: Array<{ model: string }>
   fallbackProviders?: string[]
   maxRetries?: number
   timeoutMs?: number
@@ -562,6 +563,41 @@ export const Dashboard: React.FC<any> = () => {
                                     return <option value={route.preferredModel}>{route.preferredModel}</option>
                                   })()}
                                 </select>
+                              </div>
+                              <div className="dashboard__route-field">
+                                <label>Резервні моделі (fallback):</label>
+                                <div className="dashboard__route-fallback-models">
+                                  {(() => {
+                                    const currentProvider = relevantProviders.find((p) => p.name === route.preferredProvider)
+                                    if (!currentProvider?.availableModels?.length) return null
+                                    const currentFallbackModels = route.fallbackModels?.map((m) => m.model) || []
+                                    return currentProvider.availableModels
+                                      .filter((m) => m.model !== route.preferredModel)
+                                      .map((m) => {
+                                        const isSelected = currentFallbackModels.includes(m.model)
+                                        return (
+                                          <label key={m.model} className={`dashboard__route-fallback ${isSelected ? 'dashboard__route-fallback--active' : ''}`}>
+                                            <input
+                                              type="checkbox"
+                                              checked={isSelected}
+                                              onChange={(e) => {
+                                                const newFallbacks = e.target.checked
+                                                  ? [...currentFallbackModels, m.model]
+                                                  : currentFallbackModels.filter((f) => f !== m.model)
+                                                updateTaskRouting(route.task, {
+                                                  fallbackModels: newFallbacks.map((model) => ({ model }))
+                                                })
+                                              }}
+                                            />
+                                            <span>{m.label}</span>
+                                          </label>
+                                        )
+                                      })
+                                  })()}
+                                </div>
+                                <div className="dashboard__route-hint">
+                                  Якщо основна модель не працює, буде використана резервна
+                                </div>
                               </div>
                               <div className="dashboard__route-field">
                                 <label>Резервні провайдери:</label>
@@ -1185,6 +1221,19 @@ export const Dashboard: React.FC<any> = () => {
 
         .dashboard__route-fallback .key-missing {
           opacity: 0.6;
+        }
+
+        .dashboard__route-fallback-models {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .dashboard__route-hint {
+          font-size: 0.7rem;
+          color: var(--theme-elevation-500);
+          margin-top: 0.375rem;
+          font-style: italic;
         }
 
         .dashboard__route-meta {

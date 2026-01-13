@@ -128,6 +128,7 @@ export async function loadTaskRoutingFromDatabase(): Promise<TaskRouting[]> {
       task: r.task as TaskType,
       preferredProvider: r.preferredProvider,
       preferredModel: r.preferredModel,
+      fallbackModels: r.fallbackModels?.map((m: any) => m.model) || [],
       fallbackProviders: r.fallbackProviders || [],
       maxRetries: r.maxRetries || 2,
       timeoutMs: r.timeoutMs || 60000,

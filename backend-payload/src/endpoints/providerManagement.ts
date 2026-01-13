@@ -399,6 +399,7 @@ export const taskRoutingUpdateEndpoint: Endpoint = {
     const body = await req.json?.() as {
       preferredProvider?: string;
       preferredModel?: string;
+      fallbackModels?: Array<{ model: string }>;
       fallbackProviders?: string[];
       maxRetries?: number;
       timeoutMs?: number;
@@ -429,6 +430,9 @@ export const taskRoutingUpdateEndpoint: Endpoint = {
     }
     if (body.preferredModel !== undefined) {
       updateData.preferredModel = body.preferredModel;
+    }
+    if (body.fallbackModels !== undefined) {
+      updateData.fallbackModels = body.fallbackModels;
     }
     if (body.fallbackProviders !== undefined) {
       updateData.fallbackProviders = body.fallbackProviders;

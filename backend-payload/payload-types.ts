@@ -587,6 +587,18 @@ export interface TaskRouting {
    */
   preferredModel: string;
   /**
+   * Моделі для спроби якщо основна не працює (в порядку пріоритету)
+   */
+  fallbackModels?:
+    | {
+        /**
+         * Наприклад: dall-e-2, gpt-4o-mini, deepseek-chat
+         */
+        model: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Використовуються якщо основний провайдер недоступний
    */
   fallbackProviders?:
@@ -1025,6 +1037,12 @@ export interface TaskRoutingSelect<T extends boolean = true> {
   description?: T;
   preferredProvider?: T;
   preferredModel?: T;
+  fallbackModels?:
+    | T
+    | {
+        model?: T;
+        id?: T;
+      };
   fallbackProviders?: T;
   maxRetries?: T;
   timeoutMs?: T;
