@@ -55,6 +55,28 @@ All cards in a grid must have equal heights. Use these patterns:
 </div>
 ```
 
+### Card Title Typography
+
+Card titles must use consistent typography for a lighter, more elegant appearance:
+
+```tsx
+// CORRECT: Medium weight, proper spacing, thin underline
+<h3 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+  {item.title}
+</h3>
+
+// INCORRECT: Bold weight, thick underline
+<h3 className="mb-1 text-base font-bold ... group-hover:decoration-2">
+  {item.title}
+</h3>
+```
+
+**Rules:**
+- Font weight: `font-medium` (not `font-bold` or `font-semibold`)
+- Spacing after title: `mb-3` (not `mb-1` or `mb-2`)
+- Hover underline thickness: `decoration-1` (not `decoration-2`)
+- Always include: `group-hover:underline group-hover:underline-offset-4`
+
 ### Standard Card Structure
 
 ```tsx
@@ -71,7 +93,9 @@ All cards in a grid must have equal heights. Use these patterns:
 
   {/* Content Section */}
   <div className="flex flex-1 flex-col p-4">
-    <h3 className="mb-2 text-lg font-bold">{item.title}</h3>
+    <h3 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+      {item.title}
+    </h3>
     <p className="mb-4 flex-1 text-sm text-muted-foreground min-h-[2.5rem]">
       {item.description}
     </p>
@@ -180,6 +204,7 @@ When creating new card components, verify:
 
 - [ ] Parent grid has `pt-2` if cards have `hover:-translate-y-*`
 - [ ] Card container has `h-full` for equal heights in grid
+- [ ] Title uses `font-medium` (not bold), `mb-3`, `decoration-1` on hover
 - [ ] Content sections have `min-h-[X]` for optional content
 - [ ] Bottom actions use `mt-auto` for consistent positioning
 - [ ] Images have proper `object-contain` or `object-cover`
