@@ -176,12 +176,12 @@ export default async function LcvTyresPage() {
                     <div className={`absolute top-4 left-4 badge-${model.season} rounded-lg px-3 py-1.5 text-xs font-semibold shadow-lg`}>
                       {seasonLabels[model.season]}
                     </div>
-                    <div className="absolute top-4 right-4 rounded-full bg-background/80 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+                    <div className="absolute top-4 right-4 rounded-full bg-background/80 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur-sm">
                       LCV
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-6">
-                    <h3 className="mb-3 text-xl font-medium transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                    <h3 className="mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                       {model.name}
                     </h3>
                     <p className="mb-4 text-sm text-muted-foreground flex-1 line-clamp-2">
@@ -189,10 +189,10 @@ export default async function LcvTyresPage() {
                     </p>
                     {model.euLabel && (
                       <div className="mb-4 flex gap-2 text-xs">
-                        <span className="rounded bg-green-100 dark:bg-green-900 px-2 py-1">
+                        <span className="rounded bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1">
                           Зчеплення: {model.euLabel.wetGrip}
                         </span>
-                        <span className="rounded bg-blue-100 dark:bg-blue-900 px-2 py-1">
+                        <span className="rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1">
                           Паливо: {model.euLabel.fuelEfficiency}
                         </span>
                       </div>
@@ -203,7 +203,7 @@ export default async function LcvTyresPage() {
                         {model.sizes.slice(0, 3).map((size, i) => (
                           <span
                             key={i}
-                            className="rounded-full border border-border bg-background px-3 py-1 text-xs"
+                            className="rounded-full border border-border bg-background px-3 py-1 text-xs text-foreground"
                           >
                             {size.width}/{size.aspectRatio}R{size.diameter}
                           </span>

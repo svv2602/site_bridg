@@ -269,7 +269,7 @@ export default function DealersPage() {
                               ? "Партнер"
                               : "Сервісний центр"}
                         </span>
-                        <h3 className="mt-3 mb-1 text-xl font-medium transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                        <h3 className="mt-3 mb-1 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                           {dealer.name}
                         </h3>
                         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
