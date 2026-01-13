@@ -181,6 +181,55 @@ Key points:
 | Article cards | `gap-8` | `pt-2` |
 | Feature icons | `gap-4` | - |
 
+## TyreCard Component
+
+The `TyreCard` component is the standard card for displaying tyre models across the site.
+
+### Props
+
+```tsx
+interface TyreCardProps {
+  tyre: TyreModel;
+  variant?: "default" | "compact" | "featured";
+  matchingSizes?: string[];  // For vehicle search results
+}
+```
+
+### Variants
+
+| Variant | Image Height | Shows | Use Case |
+|---------|--------------|-------|----------|
+| `default` | h-72 | Description, EU Label, Technologies, Sizes preview | Catalog pages |
+| `compact` | h-48 | Description, EU Label, Sizes count | Search results, carousels |
+| `featured` | h-80 | Full details | Homepage highlights |
+
+### Usage with Vehicle Search
+
+When displaying tyres from vehicle search, pass `matchingSizes` to show matching sizes as badges instead of total sizes count:
+
+```tsx
+// Size search - shows "X розмірів" at bottom
+<TyreCard tyre={tyre} variant="compact" />
+
+// Vehicle search - shows matching size badges at bottom
+<TyreCard
+  tyre={tyre}
+  variant="compact"
+  matchingSizes={tyre.matchingSizes}  // ["205/55 R16", "215/50 R17"]
+/>
+```
+
+### MatchingTyre Type
+
+For vehicle search, the API returns `MatchingTyre` which extends `TyreModel`:
+
+```tsx
+// lib/types/vehicles.ts
+interface MatchingTyre extends TyreModel {
+  matchingSizes: string[];  // Sizes that match the selected vehicle
+}
+```
+
 ## Season Badge Colors
 
 Use consistent badge classes for season indicators:
