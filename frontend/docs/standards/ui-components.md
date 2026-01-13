@@ -60,12 +60,12 @@ All cards in a grid must have equal heights. Use these patterns:
 Card titles must use consistent typography for a lighter, more elegant appearance:
 
 ```tsx
-// CORRECT: Medium weight, proper spacing, thin underline
-<h3 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+// CORRECT: Medium weight, proper spacing, thin underline, explicit text color
+<h3 className="mb-3 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
   {item.title}
 </h3>
 
-// INCORRECT: Bold weight, thick underline
+// INCORRECT: Bold weight, thick underline, missing text color
 <h3 className="mb-1 text-base font-bold ... group-hover:decoration-2">
   {item.title}
 </h3>
@@ -75,7 +75,51 @@ Card titles must use consistent typography for a lighter, more elegant appearanc
 - Font weight: `font-medium` (not `font-bold` or `font-semibold`)
 - Spacing after title: `mb-3` (not `mb-1` or `mb-2`)
 - Hover underline thickness: `decoration-1` (not `decoration-2`)
+- Always include: `text-foreground` for light/dark theme compatibility
 - Always include: `group-hover:underline group-hover:underline-offset-4`
+
+### Text Colors for Light/Dark Theme
+
+**IMPORTANT:** Always use explicit text color classes for readability in both themes.
+
+```tsx
+// CORRECT: Explicit text colors
+<h3 className="text-foreground">Title</h3>
+<p className="text-muted-foreground">Description</p>
+<span className="text-foreground">Badge text</span>
+
+// INCORRECT: Relies on inheritance (may break in light theme)
+<h3>Title</h3>
+<span className="bg-background px-2 py-1">Badge</span>
+```
+
+**Rules for badges and small elements:**
+
+```tsx
+// Size badges - always include text-foreground
+<span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground">
+  205/55 R16
+</span>
+
+// Colored badges - use explicit light/dark text colors
+<span className="rounded bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1">
+  Зчеплення: A
+</span>
+
+<span className="rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1">
+  Паливо: B
+</span>
+```
+
+**Common text color classes:**
+
+| Class | Use Case |
+|-------|----------|
+| `text-foreground` | Primary text (titles, labels, badge text) |
+| `text-muted-foreground` | Secondary text (descriptions, hints) |
+| `text-primary` | Accent text, links |
+| `text-green-800 dark:text-green-200` | Success/eco badges |
+| `text-blue-800 dark:text-blue-200` | Info badges |
 
 ### Standard Card Structure
 
@@ -93,12 +137,19 @@ Card titles must use consistent typography for a lighter, more elegant appearanc
 
   {/* Content Section */}
   <div className="flex flex-1 flex-col p-4">
-    <h3 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+    <h3 className="mb-3 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
       {item.title}
     </h3>
     <p className="mb-4 flex-1 text-sm text-muted-foreground min-h-[2.5rem]">
       {item.description}
     </p>
+
+    {/* Size badges - with explicit text color */}
+    <div className="flex flex-wrap gap-1.5">
+      <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground">
+        205/55 R16
+      </span>
+    </div>
 
     {/* Bottom-aligned actions */}
     <div className="mt-auto flex gap-2">
@@ -253,7 +304,9 @@ When creating new card components, verify:
 
 - [ ] Parent grid has `pt-2` if cards have `hover:-translate-y-*`
 - [ ] Card container has `h-full` for equal heights in grid
-- [ ] Title uses `font-medium` (not bold), `mb-3`, `decoration-1` on hover
+- [ ] Title uses `font-medium`, `mb-3`, `text-foreground`, `decoration-1` on hover
+- [ ] All text elements have explicit color (`text-foreground` or `text-muted-foreground`)
+- [ ] Badges have explicit text colors for light/dark theme
 - [ ] Content sections have `min-h-[X]` for optional content
 - [ ] Bottom actions use `mt-auto` for consistent positioning
 - [ ] Images have proper `object-contain` or `object-cover`
