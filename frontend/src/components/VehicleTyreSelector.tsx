@@ -794,7 +794,7 @@ export function VehicleTyreSelector() {
 
                           {/* Content Section */}
                           <div className="flex flex-1 flex-col p-4">
-                            <h4 className="mb-1 text-base font-bold leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+                            <h4 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
                               Bridgestone {tyre.name}
                             </h4>
 
