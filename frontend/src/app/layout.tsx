@@ -150,7 +150,7 @@ export default function RootLayout({
               <div className="grid gap-8 md:grid-cols-4">
                 <div>
                   <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-xl font-bold text-white">
                       B
                     </div>
                     <div>

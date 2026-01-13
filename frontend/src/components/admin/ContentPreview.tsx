@@ -201,7 +201,7 @@ export function ContentPreview({
                     }}
                     className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                       isSelected
-                        ? "border-primary bg-primary text-white"
+                        ? "border-primary bg-primary text-primary-text"
                         : "border-border bg-white dark:bg-stone-700"
                     }`}
                   >

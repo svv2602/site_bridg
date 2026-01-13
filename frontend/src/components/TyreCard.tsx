@@ -128,7 +128,7 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
       {/* Content Section */}
       <div className="flex flex-1 flex-col p-5">
         {/* Title */}
-        <h3 className="mb-2 text-lg font-bold leading-tight transition-colors group-hover:text-primary">
+        <h3 className="mb-2 text-lg font-bold leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
           Bridgestone {tyre.name}
         </h3>
 

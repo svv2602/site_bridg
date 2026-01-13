@@ -5,8 +5,10 @@ import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { VehicleTypeCard, vehicleTypesData } from "@/components/VehicleTypeCard";
+import { DealerLocatorCompact } from "@/components/DealerLocatorCompact";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { getTyreModels } from "@/lib/api/tyres";
+import { getDealers } from "@/lib/api/dealers";
 import { getLatestArticles } from "@/lib/api/articles";
 import { t } from "@/lib/i18n";
 
@@ -90,6 +92,9 @@ export default async function Home() {
       description: t.shortDescription || '',
       rating: 4.8,
     }));
+
+  // Fetch dealers for locator
+  const allDealers = await getDealers();
 
   // Fetch latest articles from API
   const latestArticles = await getLatestArticles(3);
@@ -220,7 +225,7 @@ export default async function Home() {
                           </Link>
                           <Link
                             href="/dealers"
-                            className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-primary-dark"
+                            className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
                           >
                             Знайти дилера
                           </Link>
@@ -336,10 +341,13 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Dealer Locator */}
+      <DealerLocatorCompact initialDealers={allDealers} />
+
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <AnimatedCard className="rounded-3xl bg-primary p-10 text-white shadow-2xl">
+          <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини для вашого автомобіля
@@ -348,7 +356,7 @@ export default async function Home() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 Отримати консультацію
               </Link>

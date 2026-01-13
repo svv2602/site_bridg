@@ -205,7 +205,7 @@ export default function AboutPage() {
                     {/* Desktop: empty spacer for alternating layout */}
                     <div className="hidden lg:block lg:w-1/2" />
                     {/* Year badge: left-aligned on mobile, centered on desktop */}
-                    <div className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shadow-lg lg:mx-4">
+                    <div className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white shadow-lg lg:mx-4">
                       {item.year}
                     </div>
                     {/* Event card: with left margin on mobile */}
@@ -229,7 +229,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl"
+            className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Готові дізнатися більше?</h3>
             <p className="mb-8 text-lg opacity-90">
@@ -239,7 +239,7 @@ export default function AboutPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/dealers"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 Знайти дилера
               </Link>

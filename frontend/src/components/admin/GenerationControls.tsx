@@ -46,7 +46,7 @@ export function GenerationControls({
         <button
           onClick={onGenerate}
           disabled={isDisabled || isGenerating}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-text transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />

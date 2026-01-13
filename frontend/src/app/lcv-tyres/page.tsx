@@ -123,7 +123,7 @@ export default async function LcvTyresPage() {
               </p>
               <Link
                 href="/contacts"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary/90"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-text hover:bg-primary-hover"
               >
                 Зв&apos;язатися з нами
                 <ChevronRight className="h-4 w-4" />
@@ -165,7 +165,7 @@ export default async function LcvTyresPage() {
               {lcvTyres.slice(0, 6).map((model) => (
                 <div
                   key={model.slug}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1"
                 >
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
                     <TyreImage
@@ -181,7 +181,7 @@ export default async function LcvTyresPage() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-6">
-                    <h3 className="mb-2 text-xl font-bold group-hover:text-primary transition-colors">
+                    <h3 className="mb-2 text-xl font-bold transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
                       {model.name}
                     </h3>
                     <p className="mb-4 text-sm text-muted-foreground flex-1 line-clamp-2">
@@ -224,7 +224,7 @@ export default async function LcvTyresPage() {
                       </Link>
                       <Link
                         href="/dealers"
-                        className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary/90 text-center"
+                        className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-text hover:bg-primary-hover text-center"
                       >
                         Знайти дилера
                       </Link>
@@ -240,7 +240,7 @@ export default async function LcvTyresPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна консультація для автопарку?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати оптимальні шини для вашого комерційного
@@ -249,7 +249,7 @@ export default async function LcvTyresPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 Отримати консультацію
               </Link>

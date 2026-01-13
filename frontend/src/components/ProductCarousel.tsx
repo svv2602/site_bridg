@@ -132,7 +132,7 @@ export function ProductCarousel({ tyres, title = 'Популярні модел�
         <div className="mt-8 text-center">
           <a
             href="/passenger-tyres"
-            className="inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
           >
             Переглянути всі шини
             <ChevronRight className="h-4 w-4" />

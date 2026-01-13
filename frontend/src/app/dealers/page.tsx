@@ -250,7 +250,7 @@ export default function DealersPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="p-6">
                     <div className="mb-4 flex items-start justify-between">
@@ -269,7 +269,7 @@ export default function DealersPage() {
                               ? "Партнер"
                               : "Сервісний центр"}
                         </span>
-                        <h3 className="mt-3 text-xl font-bold group-hover:text-primary transition-colors">
+                        <h3 className="mt-3 text-xl font-bold transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
                           {dealer.name}
                         </h3>
                         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -334,7 +334,7 @@ export default function DealersPage() {
                         href={buildRouteUrl(dealer)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-text hover:bg-primary-hover"
                       >
                         <Navigation className="h-4 w-4" />
                         Побудувати маршрут
@@ -376,7 +376,7 @@ export default function DealersPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-primary p-10 text-white shadow-2xl"
+            className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>
             <p className="mb-8 text-lg opacity-90">
@@ -386,7 +386,7 @@ export default function DealersPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="tel:+380800123456"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />
                 Зателефонувати

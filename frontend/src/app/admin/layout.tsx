@@ -28,7 +28,7 @@ export default function AdminLayout({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-4">
             <Link href="/admin/automation" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
                 B
               </div>
               <span className="font-semibold">Admin Dashboard</span>

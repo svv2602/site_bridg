@@ -101,7 +101,7 @@ export function CookiesBanner() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={accept}
-                className="flex-1 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="flex-1 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-text hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-silver focus:ring-offset-2"
               >
                 Прийняти всі
               </button>

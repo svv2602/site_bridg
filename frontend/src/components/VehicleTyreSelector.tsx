@@ -319,7 +319,7 @@ function SizeBadge({
       onClick={onClick}
       className={`rounded-full border px-3 py-1 text-sm font-medium transition-all ${
         isSelected
-          ? "border-primary bg-primary text-white shadow-lg shadow-primary/30"
+          ? "border-primary bg-primary text-primary-text shadow-lg shadow-silver/30"
           : "border-border bg-muted text-foreground hover:border-muted-foreground hover:bg-muted/80"
       }`}
     >
@@ -743,7 +743,7 @@ export function VehicleTyreSelector() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="group overflow-hidden rounded-xl border border-border bg-card/50 transition-all hover:border-muted-foreground hover:shadow-xl"
+                      className="group overflow-hidden rounded-xl border border-border bg-card/50 transition-all hover:border-muted-foreground hover:shadow-xl hover:-translate-y-1"
                     >
                       <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50">
                         {tyre.imageUrl ? (
@@ -766,7 +766,7 @@ export function VehicleTyreSelector() {
                         </div>
                       </div>
                       <div className="flex flex-col p-4">
-                        <h4 className="font-bold text-foreground transition-colors group-hover:text-primary line-clamp-2">
+                        <h4 className="font-bold text-foreground transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 line-clamp-2">
                           {tyre.name}
                         </h4>
                         <div className="mt-2 flex flex-wrap gap-1 min-h-[1.5rem]">

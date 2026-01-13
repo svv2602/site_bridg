@@ -233,7 +233,7 @@ function ActionButton({
   const baseClasses =
     "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
   const variantClasses = {
-    primary: "bg-primary text-white hover:bg-primary/90",
+    primary: "bg-primary text-primary-text hover:bg-primary-hover",
     secondary:
       "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600",
     danger: "bg-red-600 text-white hover:bg-red-700",

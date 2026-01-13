@@ -113,7 +113,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 href={searchQuery ? `/blog?search=${searchQuery}` : "/blog"}
                 className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                   !activeTag
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-primary-text"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
@@ -125,7 +125,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   href={`/blog?tag=${encodeURIComponent(tag)}${searchQuery ? `&search=${searchQuery}` : ""}`}
                   className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
                     activeTag === tag
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-primary-text"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
@@ -162,7 +162,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               </p>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-text hover:bg-primary-hover"
               >
                 Переглянути всі статті
               </Link>
@@ -172,7 +172,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {articles.map((article) => (
                 <article
                   key={article.slug}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -184,7 +184,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       <Clock className="h-3 w-3" />
                       <span>{article.readingTimeMinutes} хвилин читання</span>
                     </div>
-                    <h3 className="mb-2 text-xl font-bold transition-colors group-hover:text-primary">
+                    <h3 className="mb-2 text-xl font-bold transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
                       {article.title}
                     </h3>
                     {article.subtitle && (
@@ -206,7 +206,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     </div>
                     <Link
                       href={`/blog/${article.slug}`}
-                      className="group/btn mt-auto inline-flex items-center justify-center rounded-full border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+                      className="group/btn mt-auto inline-flex items-center justify-center rounded-full border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
                     >
                       Читати статтю
                     </Link>
@@ -221,7 +221,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібну інформацію?</h3>
             <p className="mb-8 text-lg opacity-90">
               Задайте питання нашим експертам або знайдіть найближчого дилера.
@@ -229,7 +229,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 Задати питання
               </Link>

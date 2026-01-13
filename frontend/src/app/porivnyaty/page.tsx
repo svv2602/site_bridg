@@ -286,9 +286,9 @@ export default function ComparisonSelectionPage() {
               <Link
                 key={comparison.slug}
                 href={`/porivnyaty/${comparison.slug}`}
-                className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-md transition-all group"
+                className="bg-card border border-border rounded-xl p-6 hover:border-silver/50 hover:shadow-md hover:-translate-y-1 transition-all group"
               >
-                <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                <h3 className="font-semibold mb-2 transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
                   {comparison.title}
                 </h3>
                 <p className="text-sm text-muted-foreground">

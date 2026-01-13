@@ -319,7 +319,7 @@ export default function ContactsPage() {
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-lg font-semibold text-white shadow-lg hover:bg-primary-dark disabled:opacity-50"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-lg font-semibold text-primary-text shadow-lg hover:bg-primary-hover disabled:opacity-50"
                   >
                     {status === 'loading' ? (
                       <>
@@ -397,7 +397,7 @@ export default function ContactsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl"
+            className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Потрібна негайна допомога?</h3>
             <p className="mb-8 text-lg opacity-90">
@@ -406,7 +406,7 @@ export default function ContactsPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="tel:0800123456"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />
                 Зателефонувати зараз

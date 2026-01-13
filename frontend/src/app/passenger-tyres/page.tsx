@@ -162,14 +162,14 @@ export default async function PassengerTyresPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary/80 p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини для вашого автомобіля
               з урахуванням стилю водіння, умов експлуатації та бюджету.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/contacts" className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100">
+              <Link href="/contacts" className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100">
                 Отримати консультацію
               </Link>
               <Link href="/dealers" className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10">

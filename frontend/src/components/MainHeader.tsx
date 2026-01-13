@@ -28,7 +28,7 @@ export function MainHeader() {
       <div className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-white shadow-lg transition-transform group-hover:scale-105">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-base font-bold text-white shadow-lg transition-transform group-hover:scale-105">
             B
           </div>
           <div className="flex flex-col">
@@ -63,7 +63,7 @@ export function MainHeader() {
           {/* Search CTA */}
           <Link
             href="/tyre-search"
-            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-stone-900"
+            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-text shadow-md transition-all hover:bg-primary-hover hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-silver focus:ring-offset-2 focus:ring-offset-stone-900"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Пошук шин</span>

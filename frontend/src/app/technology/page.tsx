@@ -246,7 +246,7 @@ export default async function TechnologyPage() {
                       <div className="mt-8 flex flex-wrap gap-4">
                         <Link
                           href={`/passenger-tyres?technology=${tech.slug}`}
-                          className="rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-dark"
+                          className="rounded-full bg-primary px-6 py-3 font-semibold text-primary-text hover:bg-primary-hover"
                         >
                           Знайти шини з цією технологією
                         </Link>
@@ -263,7 +263,7 @@ export default async function TechnologyPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-gradient-to-r from-primary to-primary-dark p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
             <h3 className="mb-4 text-3xl font-bold">Зацікавили технології Bridgestone?</h3>
             <p className="mb-8 text-lg opacity-90">
               Отримайте детальну консультацію від наших експертів щодо технологій,
@@ -272,7 +272,7 @@ export default async function TechnologyPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-primary hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
                 Замовити консультацію
               </Link>

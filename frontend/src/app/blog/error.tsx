@@ -22,7 +22,7 @@ export default function BlogError({
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => reset()}
-              className="rounded-full bg-primary px-8 py-3 font-semibold text-white hover:bg-primary-dark"
+              className="rounded-full bg-primary px-8 py-3 font-semibold text-primary-text hover:bg-primary-hover"
             >
               Спробувати ще раз
             </button>

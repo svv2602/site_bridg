@@ -129,7 +129,7 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
               <div className="mt-6 border-t border-stone-700 pt-4">
                 <Link
                   href="/passenger-tyres"
-                  className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-text transition-colors hover:bg-primary-hover"
                   onClick={() => setIsOpen(false)}
                 >
                   Переглянути всі шини

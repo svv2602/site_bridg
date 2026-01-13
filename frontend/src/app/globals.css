@@ -11,13 +11,35 @@
 :root {
   color-scheme: light;
 
-  /* Brand tokens Bridgestone */
+  /* ============================================
+     MINI DESIGN SYSTEM 2026: Premium Dark Theme
+     Silver accents, minimal red (brand only)
+     ============================================ */
+
+  /* Brand tokens Bridgestone - ONLY for logo, alerts, badges */
   --bridgestone-red: #e30613;
   --bridgestone-red-dark: #b8050f;
   --bridgestone-red-light: #ff3344;
   --bridgestone-black: #1c1917;
 
-  /* REDESIGN: Stone palette (warm neutrals) */
+  /* NEW: Core Dark Palette */
+  --black-base: #0E0E0E;
+  --wet-asphalt: #1C1F22;
+  --graphite: #24282C;
+  --graphite-hover: #2A2F34;
+
+  /* NEW: Silver Accent System (primary CTA color) */
+  --silver-accent: #D7D9DC;
+  --silver-hover: #FFFFFF;
+  --silver-muted: #BFC3C7;
+  --border-dark: #2F3438;
+
+  /* NEW: Text Colors for Dark Theme */
+  --text-primary: #E0E0E0;
+  --text-secondary: #8B8F94;
+  --text-muted: #6F7378;
+
+  /* Stone palette (warm neutrals) - kept for light mode */
   --stone-50: #fafaf9;
   --stone-100: #f5f5f4;
   --stone-200: #e7e5e4;
@@ -30,7 +52,7 @@
   --stone-900: #1c1917;
   --stone-950: #0c0a09;
 
-  /* Accent colors */
+  /* Accent colors (secondary) */
   --amber-warm: #f59e0b;
   --emerald-tech: #10b981;
   --sky-trust: #0ea5e9;
@@ -52,12 +74,17 @@
   --hero-border: rgba(255, 255, 255, 0.1);
   --hero-accent: rgba(255, 255, 255, 0.1);
 
-  /* Light theme (default) - REDESIGN: warm stone colors */
+  /* Light theme (default) - Premium silver accents */
   --background: var(--stone-50);
   --foreground: var(--stone-900);
-  --primary: var(--bridgestone-red);
-  --primary-dark: var(--bridgestone-red-dark);
-  --primary-light: var(--bridgestone-red-light);
+
+  /* NEW: Primary = Silver (for CTAs), Brand = Red (for logo/alerts) */
+  --primary: var(--silver-accent);
+  --primary-hover: var(--silver-hover);
+  --primary-text: var(--black-base);
+  --brand: var(--bridgestone-red);
+  --brand-dark: var(--bridgestone-red-dark);
+
   --secondary: var(--bridgestone-black);
   --accent: var(--stone-600);
   --muted: var(--stone-500);
@@ -82,8 +109,11 @@
   --shadow-lg: 0 8px 32px rgba(var(--shadow-color), 0.12);
   --shadow-xl: 0 16px 48px rgba(var(--shadow-color), 0.15);
   --shadow-2xl: 0 24px 64px rgba(var(--shadow-color), 0.18);
-  --shadow-glow: 0 0 40px rgba(227, 6, 19, 0.3);
-  --shadow-glow-lg: 0 0 60px rgba(227, 6, 19, 0.4);
+  /* Glow effects - silver instead of red */
+  --shadow-glow: 0 0 40px rgba(215, 217, 220, 0.25);
+  --shadow-glow-lg: 0 0 60px rgba(215, 217, 220, 0.35);
+  /* Brand glow - only for special brand elements */
+  --shadow-glow-brand: 0 0 40px rgba(227, 6, 19, 0.3);
 
   /* REDESIGN: Typography scale */
   --text-xs: 0.875rem;    /* 14px - minimum readable */
@@ -103,24 +133,33 @@
   --leading-relaxed: 1.75;
 }
 
-/* REDESIGN: Dark theme with warm stone colors */
+/* MINI DESIGN SYSTEM: Premium Dark Theme */
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --background: var(--stone-950);
-  --foreground: var(--stone-50);
-  --primary: var(--bridgestone-red);
-  --primary-dark: var(--bridgestone-red-dark);
-  --primary-light: var(--bridgestone-red-light);
-  --secondary: var(--stone-200);
-  --accent: var(--stone-400);
-  --muted: var(--stone-400);
-  --muted-foreground: var(--stone-300);
-  --card: var(--stone-900);
-  --card-foreground: var(--stone-50);
-  --border: var(--stone-700);
+  /* Core backgrounds from Mini Design System */
+  --background: var(--black-base);
+  --foreground: var(--text-primary);
 
-  /* Status colors in dark mode */
+  /* Silver accent system */
+  --primary: var(--silver-accent);
+  --primary-hover: var(--silver-hover);
+  --primary-text: var(--black-base);
+  --brand: var(--bridgestone-red);
+  --brand-dark: var(--bridgestone-red-dark);
+
+  --secondary: var(--text-primary);
+  --accent: var(--silver-muted);
+  --muted: var(--text-secondary);
+  --muted-foreground: var(--text-muted);
+
+  /* Card styling from Mini Design System */
+  --card: var(--graphite);
+  --card-foreground: var(--text-primary);
+  --card-hover: var(--graphite-hover);
+  --border: var(--border-dark);
+
+  /* Status colors in dark mode - red only for errors */
   --error: #f87171;
   --error-foreground: #450a0a;
   --success: #4ade80;
@@ -131,21 +170,38 @@
   --info-foreground: #1e3a5f;
 }
 
-/* REDESIGN: Extended theme configuration for Tailwind v4 */
+/* MINI DESIGN SYSTEM: Extended theme configuration for Tailwind v4 */
 @theme inline {
-  /* Colors */
+  /* Core Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Primary = Silver (CTAs, interactive elements) */
   --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-light: var(--primary-light);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-text: var(--primary-text);
+
+  /* Brand = Red (logo, alerts, badges only) */
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-card-hover: var(--graphite-hover);
   --color-border: var(--border);
+
+  /* NEW: Dark Palette for direct use */
+  --color-black-base: var(--black-base);
+  --color-wet-asphalt: var(--wet-asphalt);
+  --color-graphite: var(--graphite);
+  --color-graphite-hover: var(--graphite-hover);
+  --color-silver: var(--silver-accent);
+  --color-silver-hover: var(--silver-hover);
+  --color-border-dark: var(--border-dark);
 
   /* Status colors */
   --color-error: var(--error);
@@ -232,13 +288,13 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--silver-accent);
 }
 
-/* Selection */
+/* Selection - silver instead of red */
 ::selection {
-  background-color: var(--primary);
-  color: white;
+  background-color: var(--silver-accent);
+  color: var(--black-base);
 }
 
 /* Animations */
@@ -403,7 +459,7 @@ html {
 }
 
 .hero-input:focus {
-  border-color: var(--primary);
+  border-color: var(--silver-accent);
   outline: none;
 }
 
@@ -516,7 +572,7 @@ html {
   border: 1px solid rgba(250, 250, 249, 0.08);
 }
 
-/* Hero glow effect */
+/* Hero glow effect - subtle silver/white glow */
 .hero-glow::before {
   content: '';
   position: absolute;
@@ -525,7 +581,7 @@ html {
   transform: translate(-50%, -50%);
   width: 800px;
   height: 600px;
-  background: radial-gradient(ellipse, rgba(227, 6, 19, 0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(215, 217, 220, 0.08) 0%, transparent 70%);
   filter: blur(100px);
   pointer-events: none;
   z-index: 0;
@@ -539,9 +595,17 @@ html {
   background-size: 50px 50px;
 }
 
-/* Gradient text */
+/* Gradient text - silver gradient for premium look */
 .gradient-text {
-  color: var(--primary);
+  background: linear-gradient(135deg, var(--silver-accent), var(--silver-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Brand gradient text - use only for brand elements */
+.gradient-text-brand {
+  color: var(--bridgestone-red);
 }
 
 /* Shine effect */
@@ -572,12 +636,13 @@ html {
 }
 
 /* ======================================
-   Accessibility: Focus-visible styles
+   MINI DESIGN SYSTEM: Focus-visible styles
+   Silver focus rings instead of red
    ====================================== */
 
 /* Global focus-visible для всіх інтерактивних елементів */
 :focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 1px solid var(--silver-accent);
   outline-offset: 2px;
 }
 
@@ -589,7 +654,7 @@ html {
 /* Спеціальні стилі для кнопок та посилань */
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 1px solid var(--silver-accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -598,17 +663,17 @@ button:focus-visible {
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 1px solid var(--silver-accent);
   outline-offset: 0;
-  border-color: var(--primary);
+  border-color: var(--silver-accent);
 }
 
 /* Стилі для карток (clickable) */
 [role="button"]:focus-visible,
 .card:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 1px solid var(--silver-accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.2);
+  box-shadow: 0 0 0 4px rgba(215, 217, 220, 0.2);
 }
 
 /* Skip link для keyboard navigation */
@@ -618,8 +683,8 @@ textarea:focus-visible {
   left: 0;
   z-index: 9999;
   padding: 1rem 1.5rem;
-  background: var(--primary);
-  color: white;
+  background: var(--silver-accent);
+  color: var(--black-base);
   font-weight: 600;
   text-decoration: none;
   transition: top 0.3s;
@@ -663,7 +728,8 @@ textarea:focus-visible {
 }
 
 /* ======================================
-   REDESIGN 2026: Button Styles
+   MINI DESIGN SYSTEM: Button Styles
+   Primary = Silver, Brand = Red (special cases)
    ====================================== */
 
 .btn-primary {
@@ -671,25 +737,50 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--primary);
-  color: white;
+  background: var(--silver-accent);
+  color: var(--black-base);
   padding: 0.875rem 2rem;
-  border-radius: 9999px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.2s ease-out;
   cursor: pointer;
   border: none;
+  /* Mini Design System: height 44-48px */
+  min-height: 44px;
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: var(--silver-hover);
   transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(28, 25, 23, 0.1);
+  box-shadow: 0 4px 16px rgba(215, 217, 220, 0.2);
 }
 
 .btn-primary:active {
   transform: scale(0.98);
+}
+
+/* NEW: Brand button - use only for special cases (alerts, promos) */
+.btn-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bridgestone-red);
+  color: white;
+  padding: 0.875rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  border: none;
+  min-height: 44px;
+}
+
+.btn-brand:hover {
+  background: var(--bridgestone-red-dark);
+  transform: scale(1.02);
 }
 
 .btn-secondary {
@@ -700,17 +791,18 @@ textarea:focus-visible {
   background: transparent;
   color: var(--foreground);
   padding: 0.875rem 2rem;
-  border: 2px solid var(--border);
-  border-radius: 9999px;
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.2s ease-out;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .btn-secondary:hover {
-  background: var(--card);
-  border-color: var(--muted);
+  background: var(--graphite-hover);
+  border-color: var(--silver-muted);
 }
 
 .btn-ghost {
@@ -719,9 +811,9 @@ textarea:focus-visible {
   justify-content: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--silver-accent);
   padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
+  border-radius: 12px;
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.2s ease-out;
@@ -730,7 +822,7 @@ textarea:focus-visible {
 }
 
 .btn-ghost:hover {
-  background: rgba(227, 6, 19, 0.1);
+  background: rgba(215, 217, 220, 0.1);
 }
 
 /* ======================================
@@ -750,8 +842,8 @@ textarea:focus-visible {
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
+  border-color: var(--silver-accent);
+  box-shadow: 0 0 0 3px rgba(215, 217, 220, 0.15);
 }
 
 .input::placeholder {
@@ -784,8 +876,8 @@ textarea:focus-visible {
 
 .select:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
+  border-color: var(--silver-accent);
+  box-shadow: 0 0 0 3px rgba(215, 217, 220, 0.15);
 }
 
 /* ======================================

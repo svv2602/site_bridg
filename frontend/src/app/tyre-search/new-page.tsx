@@ -358,7 +358,7 @@ export default function TyreSearchPage() {
                         <h3 className="mb-4 text-xl font-bold text-stone-50">
                           Результати пошуку {results.length > 0 && `(${results.length})`}
                           {searchedSize && (
-                            <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-white">
+                            <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
                               {searchedSize}
                             </span>
                           )}
