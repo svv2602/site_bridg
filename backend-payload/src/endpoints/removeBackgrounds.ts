@@ -142,17 +142,33 @@ export const removeBackgroundsEndpoint: Endpoint = {
         const success = await removeBackground(filePath, newFilePath);
 
         if (success) {
-          // Update database record
-          await payload.update({
-            collection: 'media',
-            id: item.id,
-            data: {
-              filename: newFilename,
-              mimeType: 'image/png',
-              backgroundRemoved: true,
-              removeBackground: true,
-            },
-          });
+          // Get file stats for the new file
+          const newFileStats = await fs.stat(newFilePath);
+
+          // Construct new URL to match new filename
+          const serverUrl = process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001';
+          const newUrl = `${serverUrl}/api/media/file/${newFilename}`;
+
+          // Update database record with new filename and matching URL
+          try {
+            await payload.update({
+              collection: 'media',
+              id: item.id,
+              data: {
+                filename: newFilename,
+                mimeType: 'image/png',
+                url: newUrl,
+                filesize: newFileStats.size,
+                backgroundRemoved: true,
+                removeBackground: true,
+              },
+            });
+          } catch (updateError) {
+            payload.logger.error(`Failed to update media ${item.id}: ${String(updateError)}`);
+            results.push({ id: item.id, filename, status: 'db_update_failed' });
+            failed++;
+            continue;
+          }
 
           // Delete original file if different
           if (filename !== newFilename) {
