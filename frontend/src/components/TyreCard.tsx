@@ -130,7 +130,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
       {/* Content Section */}
       <div className="flex flex-1 flex-col p-4">
         {/* Title */}
-        <h3 className="mb-3 text-base font-medium leading-tight transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+        <h3 className="mb-3 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
           Bridgestone {tyre.name}
         </h3>
 
@@ -175,7 +175,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
               {tyre.sizes.slice(0, 3).map((size, i) => (
                 <span
                   key={i}
-                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium"
+                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
                 >
                   {size.width}/{size.aspectRatio}R{size.diameter}
                 </span>
@@ -196,7 +196,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
               {matchingSizes.slice(0, 2).map((size) => (
                 <span
                   key={size}
-                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium"
+                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
                 >
                   {size}
                 </span>
