@@ -302,6 +302,91 @@ class PayloadClient {
     }
   }
 
+  // ============ MEDIA ============
+
+  /**
+   * Download image from URL and upload to Payload CMS Media
+   */
+  async uploadImageFromUrl(
+    imageUrl: string,
+    options: { alt?: string; filename?: string } = {}
+  ): Promise<{ id: number; url: string } | null> {
+    try {
+      await this.ensureAuthenticated();
+
+      // Download image
+      console.log(`  Downloading image: ${imageUrl}`);
+      const imageResponse = await fetch(imageUrl);
+      if (!imageResponse.ok) {
+        console.error(`  Failed to download image: ${imageResponse.status}`);
+        return null;
+      }
+
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const contentType = imageResponse.headers.get("content-type") || "image/png";
+
+      // Determine filename
+      let filename = options.filename;
+      if (!filename) {
+        const urlPath = new URL(imageUrl).pathname;
+        filename = urlPath.split("/").pop() || "image.png";
+      }
+
+      // Create form data for upload
+      const formData = new FormData();
+      const blob = new Blob([imageBuffer], { type: contentType });
+      formData.append("file", blob, filename);
+
+      // Alt is required by Payload Media collection
+      // Payload expects metadata in _payload JSON field
+      const altText = options.alt || filename.replace(/\.[^.]+$/, "").replace(/-/g, " ");
+      formData.append("_payload", JSON.stringify({ alt: altText }));
+
+      // Upload to Payload
+      console.log(`  Uploading to Payload: ${filename} (alt: ${altText})`);
+      const uploadResponse = await fetch(`${this.baseUrl}/api/media`, {
+        method: "POST",
+        headers: {
+          Authorization: `JWT ${this.token}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        console.error(`  Upload failed: ${uploadResponse.status} ${errorText}`);
+        return null;
+      }
+
+      const result = await uploadResponse.json();
+      console.log(`  ✓ Uploaded media ID: ${result.doc?.id}`);
+
+      return {
+        id: result.doc?.id,
+        url: result.doc?.url,
+      };
+    } catch (error) {
+      console.error(`  Image upload error:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Update tyre with image
+   */
+  async updateTyreImage(tyreId: string, mediaId: number): Promise<boolean> {
+    try {
+      await this.fetch(`/tyres/${tyreId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ image: mediaId }),
+      });
+      return true;
+    } catch (error) {
+      console.error(`Failed to update tyre image:`, error);
+      return false;
+    }
+  }
+
   // ============ BATCH OPERATIONS ============
 
   /**

@@ -273,19 +273,35 @@ async function runPublishPipeline(brand?: Brand) {
         // Find existing tyre or create new
         const existing = await client.findTyreBySlug(slug);
 
+        // Upload image if available
+        let imageId: number | undefined;
+        if (tire.imageUrl) {
+          const imageResult = await client.uploadImageFromUrl(tire.imageUrl, {
+            alt: `${tire.brand || brand} ${tire.name}`,
+            filename: `${slug}.png`,
+          });
+          if (imageResult) {
+            imageId = imageResult.id;
+          }
+        }
+
         if (existing) {
           // Update existing tyre with generated content
-          await client.updateTyre(existing.id, {
+          const updateData: Record<string, unknown> = {
             shortDescription: content.shortDescription,
             fullDescription: fullDescriptionHtml,
             keyBenefits,
             seoTitle,
             seoDescription,
-          });
+          };
+          if (imageId) {
+            updateData.image = imageId;
+          }
+          await client.updateTyre(existing.id, updateData);
           console.log(`  ✓ Updated tyre ID: ${existing.id}`);
         } else {
           // Create new tyre
-          await client.createTyre({
+          const createData: Record<string, unknown> = {
             name: tire.name,
             slug,
             brand: tire.brand || brand,
@@ -297,7 +313,11 @@ async function runPublishPipeline(brand?: Brand) {
             seoTitle,
             seoDescription,
             euLabel: tire.euLabel,
-          });
+          };
+          if (imageId) {
+            createData.image = imageId;
+          }
+          await client.createTyre(createData as any);
           console.log(`  ✓ Created new tyre`);
         }
 
