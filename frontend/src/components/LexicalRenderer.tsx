@@ -60,9 +60,15 @@ interface LexicalRoot {
   };
 }
 
+type ProseVariant = "default" | "article" | "product" | "minimal";
+
 interface LexicalRendererProps {
   content: LexicalRoot | string | null | undefined;
   className?: string;
+  /** Style variant: article, product (clean), minimal, default */
+  variant?: ProseVariant;
+  /** Lead paragraph (larger first paragraph) */
+  leadParagraph?: boolean;
 }
 
 // Text format bitmasks
@@ -167,16 +173,54 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
   });
 }
 
-export function LexicalRenderer({ content, className = "" }: LexicalRendererProps) {
+/**
+ * Get prose classes based on variant and options
+ */
+function getProseClasses(
+  variant: ProseVariant,
+  options: { leadParagraph?: boolean }
+): string {
+  const baseClasses = "prose prose-stone dark:prose-invert max-w-none";
+
+  // Variant-specific defaults
+  const variantDefaults: Record<ProseVariant, { leadParagraph: boolean }> = {
+    default: { leadParagraph: false },
+    article: { leadParagraph: true },
+    product: { leadParagraph: false },
+    minimal: { leadParagraph: false },
+  };
+
+  const defaults = variantDefaults[variant];
+  const showLeadParagraph = options.leadParagraph ?? defaults.leadParagraph;
+
+  const classes = [baseClasses];
+
+  if (showLeadParagraph) classes.push("prose-lead");
+
+  // Variant-specific classes
+  if (variant === "article") classes.push("prose-article");
+  if (variant === "product") classes.push("prose-product");
+
+  return classes.join(" ");
+}
+
+export function LexicalRenderer({
+  content,
+  className = "",
+  variant = "default",
+  leadParagraph,
+}: LexicalRendererProps) {
   if (!content) {
     return null;
   }
+
+  const proseClasses = getProseClasses(variant, { leadParagraph });
 
   // Handle HTML string from CKEditor
   if (typeof content === "string") {
     return (
       <div
-        className={`prose prose-stone dark:prose-invert max-w-none ${className}`}
+        className={`${proseClasses} ${className}`}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     );
@@ -188,7 +232,7 @@ export function LexicalRenderer({ content, className = "" }: LexicalRendererProp
   }
 
   return (
-    <div className={`prose prose-stone dark:prose-invert max-w-none ${className}`}>
+    <div className={`${proseClasses} ${className}`}>
       {renderChildren(content.root.children, "lexical")}
     </div>
   );

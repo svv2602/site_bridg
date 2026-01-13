@@ -133,18 +133,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
       <section className="py-10">
         <div className="container mx-auto max-w-4xl px-4 md:px-8">
-          <article className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-a:text-primary">
+          <article>
             {article.content ? (
-              <LexicalRenderer content={article.content as Parameters<typeof LexicalRenderer>[0]['content']} />
+              <LexicalRenderer
+                content={article.content as Parameters<typeof LexicalRenderer>[0]['content']}
+                variant="article"
+              />
             ) : (
-              <>
+              <div className="prose prose-stone dark:prose-invert max-w-none">
                 <p className="text-sm text-muted-foreground">
                   {article.previewText}
                 </p>
                 <p className="mt-6 text-[13px] text-muted-foreground">
                   Повний текст статті буде підтягуватися з CMS.
                 </p>
-              </>
+              </div>
             )}
           </article>
         </div>

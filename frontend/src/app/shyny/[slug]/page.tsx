@@ -257,7 +257,11 @@ export default async function TyreModelPage({
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                   <h2 className="mb-4 text-xl font-bold">Про модель {model.name}</h2>
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  <LexicalRenderer content={model.fullDescription as any} />
+                  <LexicalRenderer
+                    content={model.fullDescription as any}
+                    variant="product"
+                    leadParagraph
+                  />
                 </div>
               ) : null}
 
