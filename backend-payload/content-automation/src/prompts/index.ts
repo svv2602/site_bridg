@@ -13,6 +13,50 @@ import { BRAND_NAMES } from "../types/content.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// SEO formatting rules (shared across all content types)
+const SEO_FORMATTING_RULES = `
+ФОРМАТУВАННЯ (HTML):
+- Використовуй HTML теги: <h2>, <h3>, <p>, <ul>, <li>, <strong>
+- Заголовки: <h2> для основних секцій, <h3> для підсекцій
+- Списки: <ul><li>...</li></ul> для переваг та характеристик
+- Виділення: <strong> для ключових термінів
+- Абзаци: <p>...</p> для тексту
+
+SEO-ОПТИМІЗАЦІЯ НАЗВ:
+- При ПЕРШІЙ згадці бренду/моделі додавай транслітерацію в дужках
+- Приклад: "Bridgestone Turanza 6 (Бріджстоун Туранза 6)"
+- Приклад: "Firestone Roadhawk (Файрстоун Роадхок)"
+- Далі по тексту використовуй тільки оригінальну назву
+- Транслітеруй фонетично, не дослівно`;
+
+const INTERLINKING_RULES = `
+ПЕРЕЛІНКОВКА:
+- Додавай 2-3 внутрішні посилання на релевантні сторінки
+- Формат: <a href="/shyny/model-slug">Назва моделі</a>
+- Формат: <a href="/advice/article-slug">Назва статті</a>
+- Посилання мають бути органічно вплетені в текст
+- НЕ роби окремий блок "Схожі товари" - тільки природні посилання в тексті`;
+
+// Brand transliteration map
+const BRAND_TRANSLITS: Record<Brand, string> = {
+  bridgestone: "Бріджстоун",
+  firestone: "Файрстоун",
+};
+
+/**
+ * Get brand name transliteration
+ */
+export function getBrandTranslit(brand: Brand): string {
+  return BRAND_TRANSLITS[brand];
+}
+
+// Related item for interlinking
+export interface RelatedItem {
+  slug: string;
+  name: string;
+  type: "tyre" | "article";
+}
+
 // Cache for loaded prompts
 const promptCache = new Map<string, string>();
 
@@ -64,7 +108,9 @@ export const SYSTEM_PROMPTS = {
 - НІКОЛИ не згадуй ціни
 - Уникай кліше, канцеляризмів та надмірних епітетів
 - Фокусуйся на перевагах для водія
-- Використовуй конкретні факти з вхідних даних`,
+- Використовуй конкретні факти з вхідних даних
+${SEO_FORMATTING_RULES}
+${INTERLINKING_RULES}`,
 
   tireSEO: `Ти - SEO-спеціаліст для автомобільного сайту Bridgestone & Firestone Україна.
 
@@ -81,7 +127,8 @@ export const SYSTEM_PROMPTS = {
 - Конкретні факти, без загальних фраз
 - Не вигадуй дані
 - Оптимізуй для featured snippets
-- Українська мова`,
+- Українська мова
+${SEO_FORMATTING_RULES}`,
 
   article: `Ти - автомобільний журналіст для блогу Bridgestone & Firestone Україна.
 
@@ -91,7 +138,9 @@ export const SYSTEM_PROMPTS = {
 - Структура: вступ → основна частина → висновок
 - НЕ вигадуй дані
 - Уникай рекламного тону
-- Українська мова`,
+- Українська мова
+${SEO_FORMATTING_RULES}
+${INTERLINKING_RULES}`,
 
   imageGeneration: `Generate professional automotive photography.
 Focus on quality, realism, and brand-appropriate imagery.
@@ -103,6 +152,7 @@ Avoid text, watermarks, or unrealistic elements.`,
  */
 export function getSystemPromptsForBrand(brand: Brand) {
   const brandName = BRAND_NAMES[brand];
+  const brandTranslit = BRAND_TRANSLITS[brand];
 
   return {
     tireDescription: `Ти - SEO-копірайтер для офіційного сайту ${brandName} Україна.
@@ -114,7 +164,11 @@ export function getSystemPromptsForBrand(brand: Brand) {
 - НІКОЛИ не згадуй ціни
 - Уникай кліше, канцеляризмів та надмірних епітетів
 - Фокусуйся на перевагах для водія
-- Використовуй конкретні факти з вхідних даних`,
+- Використовуй конкретні факти з вхідних даних
+${SEO_FORMATTING_RULES}
+${INTERLINKING_RULES}
+
+Транслітерація бренду: ${brandName} (${brandTranslit})`,
 
     tireSEO: `Ти - SEO-спеціаліст для автомобільного сайту ${brandName} Україна.
 
@@ -131,7 +185,10 @@ export function getSystemPromptsForBrand(brand: Brand) {
 - Конкретні факти, без загальних фраз
 - Не вигадуй дані
 - Оптимізуй для featured snippets
-- Українська мова`,
+- Українська мова
+${SEO_FORMATTING_RULES}
+
+Транслітерація бренду: ${brandName} (${brandTranslit})`,
 
     article: `Ти - автомобільний журналіст для блогу ${brandName} Україна.
 
@@ -141,7 +198,11 @@ export function getSystemPromptsForBrand(brand: Brand) {
 - Структура: вступ → основна частина → висновок
 - НЕ вигадуй дані
 - Уникай рекламного тону
-- Українська мова`,
+- Українська мова
+${SEO_FORMATTING_RULES}
+${INTERLINKING_RULES}
+
+Транслітерація бренду: ${brandName} (${brandTranslit})`,
   };
 }
 
