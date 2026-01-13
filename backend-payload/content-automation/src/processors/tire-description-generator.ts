@@ -3,14 +3,14 @@
  *
  * Generates complete tire content using Claude API:
  * - shortDescription (2-3 sentences)
- * - fullDescription (300-500 words, markdown)
+ * - fullDescription (300-500 words, HTML)
  * - keyBenefits (4-5 items)
  * - seoTitle (50-60 chars)
  * - seoDescription (150-160 chars)
  */
 
-import { generateContent } from "./llm-generator.js";
-import { getTireDescriptionPrompt, getSystemPromptsForBrand, SYSTEM_PROMPTS } from "../config/prompts.js";
+import { llm } from "../providers/index.js";
+import { getTireDescriptionPrompt, getSystemPromptsForBrand } from "../config/prompts.js";
 import type { Brand } from "../types/content.js";
 
 // Types
@@ -45,72 +45,71 @@ export interface GenerationResult {
   error?: string;
 }
 
+// Maximum retries for JSON parsing failures
+const MAX_JSON_RETRIES = 2;
+
 /**
- * Generate complete tire content
+ * Generate complete tire content with retry logic for JSON parsing
  */
 export async function generateTireContent(
   tire: TireInput
 ): Promise<GenerationResult> {
-  try {
-    const brand = tire.brand || "bridgestone";
-    const prompt = getTireDescriptionPrompt(tire, brand);
+  const brand = tire.brand || "bridgestone";
+  const systemPrompts = getSystemPromptsForBrand(brand);
 
-    // Use brand-specific system prompts
-    const systemPrompts = getSystemPromptsForBrand(brand);
+  // Get generator for content-generation task
+  const generator = llm.forTask("content-generation");
 
-    const response = await generateContent(prompt, {
-      maxTokens: 1500,
-      temperature: 0.7,
-      systemPrompt: systemPrompts.tireDescription,
-    });
+  let lastError: string = "";
 
-    // Parse JSON response
-    const content = parseJsonResponse(response);
+  for (let attempt = 0; attempt <= MAX_JSON_RETRIES; attempt++) {
+    try {
+      // Build prompt with stronger JSON enforcement on retries
+      let prompt = getTireDescriptionPrompt(tire, brand);
 
-    // Validate content
-    validateContent(content);
+      if (attempt > 0) {
+        // Add stronger JSON enforcement on retry
+        prompt += `\n\n⚠️ КРИТИЧНО: Відповідь ПОВИННА бути ТІЛЬКИ валідним JSON об'єктом. Без пояснень, без markdown, без тексту до або після JSON. Тільки JSON!`;
+        console.log(`  Retry ${attempt}/${MAX_JSON_RETRIES} with stronger JSON enforcement...`);
+      }
 
-    return {
-      success: true,
-      tire,
-      content,
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Failed to generate content for ${tire.name}:`, errorMessage);
+      // Use generateJSON for automatic JSON parsing
+      const { data, response } = await generator.generateJSON<GeneratedTireContent>(prompt, {
+        systemPrompt: systemPrompts.tireDescription,
+        maxTokens: 2000,
+        temperature: attempt > 0 ? 0.5 : 0.7, // Lower temperature on retries
+      });
 
-    return {
-      success: false,
-      tire,
-      error: errorMessage,
-    };
+      // Validate content
+      validateContent(data);
+
+      console.log(`[LLM] Generated with ${response.provider}/${response.model} (${response.latencyMs}ms, $${response.cost.toFixed(4)})`);
+
+      return {
+        success: true,
+        tire,
+        content: data,
+      };
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+
+      // Only retry on JSON parsing errors
+      const isJsonError = lastError.includes("JSON") || lastError.includes("parse");
+      if (!isJsonError || attempt >= MAX_JSON_RETRIES) {
+        break;
+      }
+
+      console.log(`  JSON parse failed: ${lastError}`);
+    }
   }
-}
 
-/**
- * Parse JSON response from LLM
- */
-function parseJsonResponse(response: string): GeneratedTireContent {
-  // Try to find JSON in response
-  const jsonMatch = response.match(/\{[\s\S]*\}/);
+  console.error(`Failed to generate content for ${tire.name}:`, lastError);
 
-  if (!jsonMatch) {
-    throw new Error("No JSON found in response");
-  }
-
-  try {
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    return {
-      shortDescription: parsed.shortDescription || "",
-      fullDescription: parsed.fullDescription || "",
-      keyBenefits: Array.isArray(parsed.keyBenefits) ? parsed.keyBenefits : [],
-      seoTitle: parsed.seoTitle || "",
-      seoDescription: parsed.seoDescription || "",
-    };
-  } catch (parseError) {
-    throw new Error(`Failed to parse JSON: ${parseError}`);
-  }
+  return {
+    success: false,
+    tire,
+    error: lastError,
+  };
 }
 
 /**
