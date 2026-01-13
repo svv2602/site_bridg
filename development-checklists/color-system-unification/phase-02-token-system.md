@@ -1,12 +1,12 @@
 # Фаза 2: Токен-система
 
 ## Статус
-- [ ] Не начата
-- [ ] В процессе
-- [ ] Завершена
+- [x] Не начата
+- [x] В процессе
+- [x] Завершена
 
-**Начата:** -
-**Завершена:** -
+**Начата:** 2026-01-13
+**Завершена:** 2026-01-13
 
 ## Цель фазы
 Расширить систему токенов в `globals.css` для полной поддержки обеих тем.
@@ -21,10 +21,16 @@
 ### 2.0 ОБЯЗАТЕЛЬНО: Анализ и планирование
 
 #### A. Анализ существующих токенов
-- [ ] Изучить `:root` секцию в globals.css
-- [ ] Изучить `.dark` секцию в globals.css
-- [ ] Найти все использования прямых hex в globals.css
-- [ ] Определить недостающие токены по аудиту
+- [x] Изучить `:root` секцию в globals.css
+- [x] Изучить `.dark` секцию в globals.css
+- [x] Найти все использования прямых hex в globals.css
+- [x] Определить недостающие токены по аудиту
+
+**Результаты анализа:**
+- `--graphite-hover: #2A2F34` - УЖЕ СУЩЕСТВУЕТ ✅
+- `--silver-muted: #BFC3C7` - УЖЕ СУЩЕСТВУЕТ ✅
+- `.dark` секция называется `:root[data-theme="dark"]`
+- Прямые hex используются в hero-* классах (допустимо для гарантии контраста)
 
 **Команды для анализа:**
 ```bash
@@ -37,23 +43,26 @@ grep -n "#[0-9a-fA-F]" frontend/src/app/globals.css
 ```
 
 #### B. Планирование новых токенов
-- [ ] Список токенов для header
-- [ ] Список токенов для text-label/caption
-- [ ] Токен silver-muted
+- [x] Список токенов для header
+- [x] Список токенов для text-label/caption
+- [x] Токен silver-muted - УЖЕ СУЩЕСТВУЕТ
 
-**Новые токены:**
+**Новые токены (план):**
 ```css
-/* Header токены (Light/Dark) */
---header-bg: ?
---header-text: ?
---header-border: ?
+/* Header токены - хедер всегда темный */
+--header-bg: var(--stone-950);        /* #0c0a09 */
+--header-text: #ffffff;
+--header-border: rgba(255,255,255,0.1);
 
 /* Text токены */
---text-label: ?
---text-caption: ?
+--text-label: var(--stone-700);       /* Light: #44403c */
+--text-caption: var(--stone-500);     /* Light: #78716c */
+/* Dark: использовать --text-secondary (#8B8F94) и --text-muted (#6F7378) */
 
-/* Secondary CTA */
---silver-muted: ?
+/* Disabled состояния */
+--disabled-bg: var(--stone-200);      /* Light */
+--disabled-text: var(--stone-400);    /* Light */
+/* Dark: --disabled-bg: var(--graphite); --disabled-text: var(--text-muted) */
 ```
 
 **Цель:** Спланировать все новые токены ПЕРЕД внесением изменений.
@@ -61,65 +70,65 @@ grep -n "#[0-9a-fA-F]" frontend/src/app/globals.css
 ---
 
 ### 2.1 Добавить header-токены в :root (Light)
-- [ ] `--header-bg` для светлого хедера (если применимо)
-- [ ] `--header-text` для текста хедера
-- [ ] `--header-border` для бордера хедера
-- [ ] Документировать в комментарии
+- [x] `--header-bg` для светлого хедера (если применимо)
+- [x] `--header-text` для текста хедера
+- [x] `--header-border` для бордера хедера
+- [x] Документировать в комментарии
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** Возможно, хедер остается темным в обеих темах - тогда токен один
+**Нотатки:** Хедер остается темным в обеих темах (--stone-950)
 
 ---
 
 ### 2.2 Добавить header-токены в .dark
-- [ ] Настроить `--header-bg` для Dark (если отличается)
-- [ ] Настроить `--header-text` для Dark
-- [ ] Настроить `--header-border` для Dark
+- [x] Настроить `--header-bg` для Dark (если отличается)
+- [x] Настроить `--header-text` для Dark
+- [x] Настроить `--header-border` для Dark
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** -
+**Нотатки:** Использует --black-base, --text-primary, --border-dark
 
 ---
 
 ### 2.3 Добавить text-label и text-caption токены
-- [ ] `--text-label` - для лейблов форм (более контрастный чем muted)
-- [ ] `--text-caption` - для мелких подписей
-- [ ] Настроить для Light темы (darker than muted)
-- [ ] Настроить для Dark темы
+- [x] `--text-label` - для лейблов форм (более контрастный чем muted)
+- [x] `--text-caption` - для мелких подписей
+- [x] Настроить для Light темы (darker than muted)
+- [x] Настроить для Dark темы
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** Решает проблему §2.3 аудита - контраст muted на теплых фонах
+**Нотатки:** Light: --stone-700/--stone-500, Dark: --text-secondary/--text-muted
 
 ---
 
 ### 2.4 Добавить silver-muted токен
-- [ ] `--silver-muted` для вторичных CTA в Dark теме
-- [ ] Менее яркий чем --silver-accent
-- [ ] Добавить в :root и .dark
+- [x] `--silver-muted` для вторичных CTA в Dark теме
+- [x] Менее яркий чем --silver-accent
+- [x] Добавить в :root и .dark
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** Решает проблему §3.2 аудита - перегрузка серебром
+**Нотатки:** УЖЕ СУЩЕСТВОВАЛ: --silver-muted: #BFC3C7
 
 ---
 
 ### 2.5 Добавить disabled-состояния как токены
-- [ ] `--disabled-bg` - фон disabled элементов
-- [ ] `--disabled-text` - текст disabled элементов
-- [ ] Настроить для Light и Dark
-- [ ] Обновить btn-* классы для использования токенов
+- [x] `--disabled-bg` - фон disabled элементов
+- [x] `--disabled-text` - текст disabled элементов
+- [x] Настроить для Light и Dark
+- [x] Обновить btn-* классы для использования токенов
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** Решает проблему §1.3 аудита - консистентное disabled
+**Нотатки:** Добавлены токены и в @theme inline для Tailwind
 
 ---
 
 ### 2.6 Добавить graphite-hover если отсутствует
-- [ ] Проверить наличие `--graphite-hover`
-- [ ] Если нет - добавить (lighter than --graphite)
-- [ ] Убедиться что значение достаточно контрастное
+- [x] Проверить наличие `--graphite-hover`
+- [x] Если нет - добавить (lighter than --graphite)
+- [x] Убедиться что значение достаточно контрастное
 
 **Файлы:** `frontend/src/app/globals.css`
-**Нотатки:** Решает проблему §3.3 аудита - неразличимые hover
+**Нотатки:** УЖЕ СУЩЕСТВОВАЛ: --graphite-hover: #2A2F34
 
 ---
 

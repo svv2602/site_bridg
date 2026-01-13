@@ -39,6 +39,19 @@
   --text-secondary: #8B8F94;
   --text-muted: #6F7378;
 
+  /* Header tokens - always dark regardless of theme */
+  --header-bg: var(--stone-950);
+  --header-text: #ffffff;
+  --header-border: rgba(255, 255, 255, 0.1);
+
+  /* Text hierarchy tokens */
+  --text-label: var(--stone-700);
+  --text-caption: var(--stone-500);
+
+  /* Disabled state tokens */
+  --disabled-bg: var(--stone-200);
+  --disabled-text: var(--stone-400);
+
   /* Stone palette (warm neutrals) - kept for light mode */
   --stone-50: #fafaf9;
   --stone-100: #f5f5f4;
@@ -168,6 +181,19 @@
   --warning-foreground: #451a03;
   --info: #60a5fa;
   --info-foreground: #1e3a5f;
+
+  /* Header tokens - same in dark (always dark header) */
+  --header-bg: var(--black-base);
+  --header-text: var(--text-primary);
+  --header-border: var(--border-dark);
+
+  /* Text hierarchy tokens for dark */
+  --text-label: var(--text-secondary);
+  --text-caption: var(--text-muted);
+
+  /* Disabled state tokens for dark */
+  --disabled-bg: var(--graphite);
+  --disabled-text: var(--text-muted);
 }
 
 /* MINI DESIGN SYSTEM: Extended theme configuration for Tailwind v4 */
@@ -237,6 +263,19 @@
   --color-amber-warm: var(--amber-warm);
   --color-emerald-tech: var(--emerald-tech);
   --color-sky-trust: var(--sky-trust);
+
+  /* Header tokens */
+  --color-header-bg: var(--header-bg);
+  --color-header-text: var(--header-text);
+  --color-header-border: var(--header-border);
+
+  /* Text hierarchy tokens */
+  --color-text-label: var(--text-label);
+  --color-text-caption: var(--text-caption);
+
+  /* Disabled state tokens */
+  --color-disabled-bg: var(--disabled-bg);
+  --color-disabled-text: var(--disabled-text);
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
