@@ -3,10 +3,13 @@
  *
  * Generates FAQ content for tire product pages using LLM.
  * Creates standard questions with tire-specific answers optimized for featured snippets.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
 import { llm } from "../../providers/index.js";
-import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes } from "../../prompts/index.js";
+import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand } from "../../prompts/index.js";
+import type { Brand } from "../../types/content.js";
+import { BRAND_NAMES } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
 const logger = createLogger("TireFAQGenerator");
@@ -17,6 +20,7 @@ const logger = createLogger("TireFAQGenerator");
 export interface TireFAQInput {
   modelSlug: string;
   modelName: string;
+  brand?: Brand;
   season: "summer" | "winter" | "allseason";
   vehicleTypes?: string[];
   technologies?: string[];
@@ -49,26 +53,28 @@ export interface FAQOutput {
 function buildPrompt(input: TireFAQInput): string {
   const season = SEASON_LABELS[input.season];
   const vehicles = input.vehicleTypes ? formatVehicleTypes(input.vehicleTypes) : "";
+  const brand = input.brand || "bridgestone";
+  const brandName = BRAND_NAMES[brand];
 
   // Standard question templates
   const questions = [
-    `Для яких автомобілів підходить Bridgestone ${input.modelName}?`,
+    `Для яких автомобілів підходить ${brandName} ${input.modelName}?`,
     input.season === "summer"
-      ? `Чи можна використовувати Bridgestone ${input.modelName} взимку?`
+      ? `Чи можна використовувати ${brandName} ${input.modelName} взимку?`
       : input.season === "winter"
-        ? `Чи підходить Bridgestone ${input.modelName} для льоду?`
-        : `В яких умовах найкраще працює Bridgestone ${input.modelName}?`,
-    `Який термін служби шин Bridgestone ${input.modelName}?`,
-    `Як правильно зберігати шини Bridgestone ${input.modelName}?`,
+        ? `Чи підходить ${brandName} ${input.modelName} для льоду?`
+        : `В яких умовах найкраще працює ${brandName} ${input.modelName}?`,
+    `Який термін служби шин ${brandName} ${input.modelName}?`,
+    `Як правильно зберігати шини ${brandName} ${input.modelName}?`,
     input.predecessorName
-      ? `Чим Bridgestone ${input.modelName} відрізняється від ${input.predecessorName}?`
-      : `Які технології використовуються в Bridgestone ${input.modelName}?`,
+      ? `Чим ${brandName} ${input.modelName} відрізняється від ${input.predecessorName}?`
+      : `Які технології використовуються в ${brandName} ${input.modelName}?`,
   ];
 
-  return `Створи FAQ (5 питань з відповідями) для шини Bridgestone ${input.modelName}.
+  return `Створи FAQ (5 питань з відповідями) для шини ${brandName} ${input.modelName}.
 
 ДАНІ ПРО ШИНУ:
-- Модель: Bridgestone ${input.modelName}
+- Модель: ${brandName} ${input.modelName}
 - Сезон: ${season.name}
 ${vehicles ? `- Типи авто: ${vehicles}` : ""}
 ${input.technologies?.length ? `- Технології: ${input.technologies.join(", ")}` : ""}
@@ -189,14 +195,16 @@ export async function generateTireFAQ(
   };
 }> {
   const prompt = buildPrompt(input);
+  const brand = input.brand || "bridgestone";
 
-  logger.info(`Generating FAQ for ${input.modelName}`);
+  logger.info(`Generating FAQ for ${input.modelName} (${brand})`);
 
-  // Use content-generation routing for FAQ
+  // Use content-generation routing for FAQ with brand-specific system prompt
   const generator = llm.forTask("content-generation");
+  const systemPrompts = getSystemPromptsForBrand(brand);
 
   const { data, response } = await generator.generateJSON<FAQOutput>(prompt, {
-    systemPrompt: SYSTEM_PROMPTS.tireFAQ,
+    systemPrompt: systemPrompts.tireFAQ,
     maxTokens: 1500,
     temperature: 0.7,
     ...(options?.provider && { provider: options.provider }),

@@ -2,11 +2,13 @@
  * Tire Description Generator
  *
  * Generates SEO-optimized tire descriptions using multi-provider LLM system.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
 import { llm } from "../../providers/index.js";
-import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes } from "../../prompts/index.js";
-import type { RawTyreContent, GeneratedTyreContent } from "../../types/content.js";
+import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand } from "../../prompts/index.js";
+import type { RawTyreContent, GeneratedTyreContent, Brand } from "../../types/content.js";
+import { BRAND_NAMES } from "../../types/content.js";
 import { loadFromStorage } from "../../utils/storage.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -18,6 +20,7 @@ const logger = createLogger("TireDescriptionGenerator");
 export interface TireDescriptionInput {
   modelSlug: string;
   modelName: string;
+  brand?: Brand;
   season: "summer" | "winter" | "allseason";
   vehicleTypes?: string[];
   technologies?: string[];
@@ -45,6 +48,8 @@ interface DescriptionOutput {
 function buildPrompt(input: TireDescriptionInput): string {
   const season = SEASON_LABELS[input.season];
   const vehicles = input.vehicleTypes ? formatVehicleTypes(input.vehicleTypes) : "";
+  const brand = input.brand || "bridgestone";
+  const brandName = BRAND_NAMES[brand];
 
   // Merge raw content from multiple sources
   let rawDescription = "";
@@ -67,10 +72,10 @@ function buildPrompt(input: TireDescriptionInput): string {
     advantages = [...new Set(advantages)];
   }
 
-  return `Створи унікальний контент для шини Bridgestone ${input.modelName}.
+  return `Створи унікальний контент для шини ${brandName} ${input.modelName}.
 
 ВХІДНІ ДАНІ:
-- Модель: Bridgestone ${input.modelName}
+- Модель: ${brandName} ${input.modelName}
 - Сезон: ${season.name}
 ${vehicles ? `- Типи авто: ${vehicles}` : ""}
 ${input.technologies?.length ? `- Технології: ${input.technologies.join(", ")}` : ""}
@@ -163,16 +168,18 @@ export async function generateTireDescription(
   };
 }> {
   const prompt = buildPrompt(input);
+  const brand = input.brand || "bridgestone";
 
-  logger.info(`Generating description for ${input.modelName}`, {
+  logger.info(`Generating description for ${input.modelName} (${brand})`, {
     provider: options?.provider || "default",
   });
 
-  // Use task-specific routing
+  // Use task-specific routing with brand-specific system prompt
   const generator = llm.forTask("content-generation");
+  const systemPrompts = getSystemPromptsForBrand(brand);
 
   const { data, response } = await generator.generateJSON<DescriptionOutput>(prompt, {
-    systemPrompt: SYSTEM_PROMPTS.tireDescription,
+    systemPrompt: systemPrompts.tireDescription,
     maxTokens: 2000,
     temperature: 0.7,
     ...(options?.provider && { provider: options.provider }),

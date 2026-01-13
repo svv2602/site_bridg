@@ -3,16 +3,20 @@
  *
  * Generates comparison pages for 2-3 tyre models.
  * Creates comparison table, verdict via LLM, and SEO content.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
 import { generateContent } from "./llm-generator.js";
 import { SYSTEM_PROMPTS } from "../config/prompts.js";
 import { ENV } from "../config/env.js";
+import type { Brand } from "../types/content.js";
+import { BRAND_NAMES } from "../types/content.js";
 
 // Types
 export interface TyreForComparison {
   name: string;
   slug: string;
+  brand?: Brand;
   season: "summer" | "winter" | "allseason";
   vehicleTypes: string[];
   euLabel?: {
@@ -199,6 +203,14 @@ function buildComparisonTable(tyres: TyreForComparison[]): ComparisonRow[] {
 }
 
 /**
+ * Get display name for tyre with brand
+ */
+function getTyreDisplayName(tyre: TyreForComparison): string {
+  const brandName = BRAND_NAMES[tyre.brand || "bridgestone"];
+  return `${brandName} ${tyre.name}`;
+}
+
+/**
  * Generate verdict prompt
  */
 function generateVerdictPrompt(
@@ -206,7 +218,7 @@ function generateVerdictPrompt(
   table: ComparisonRow[]
 ): string {
   const tyreNames = tyres
-    .map((t) => `Bridgestone ${t.name}`)
+    .map((t) => getTyreDisplayName(t))
     .join(" vs ");
 
   const tableText = table
@@ -257,12 +269,20 @@ export async function generateComparison(
   }
 
   const slug = generateComparisonSlug(tyres);
-  const title = tyres.map((t) => `Bridgestone ${t.name}`).join(" vs ");
+  const title = tyres.map((t) => getTyreDisplayName(t)).join(" vs ");
   const comparisonTable = buildComparisonTable(tyres);
 
+  // Determine if comparing different brands or same brand
+  const uniqueBrands = [...new Set(tyres.map(t => t.brand || "bridgestone"))];
+  const isCrossBrand = uniqueBrands.length > 1;
+  const brandText = isCrossBrand
+    ? "Bridgestone & Firestone"
+    : BRAND_NAMES[uniqueBrands[0]];
+
   // Generate verdict via LLM
-  let verdict =
-    "Обидві моделі є якісними шинами від Bridgestone. Вибір залежить від ваших потреб та стилю водіння.";
+  let verdict = isCrossBrand
+    ? "Обидві моделі є якісними шинами. Вибір залежить від ваших потреб та стилю водіння."
+    : `Обидві моделі є якісними шинами від ${brandText}. Вибір залежить від ваших потреб та стилю водіння.`;
 
   if (ENV.ANTHROPIC_API_KEY) {
     try {
@@ -281,7 +301,7 @@ export async function generateComparison(
 
   // Generate SEO
   const tyreNames = tyres.map((t) => t.name).join(" vs ");
-  const seoTitle = `${tyreNames} - Порівняння шин Bridgestone | Bridgestone Україна`;
+  const seoTitle = `${tyreNames} - Порівняння шин | ${brandText} Україна`;
   const seoDescription = `Детальне порівняння ${tyreNames}. EU-маркування, технології, характеристики. Який варіант обрати для вашого автомобіля?`;
 
   const comparison: ComparisonPage = {
@@ -305,6 +325,12 @@ export async function generateComparison(
  * Generate Schema.org structured data for comparison
  */
 export function generateComparisonSchema(comparison: ComparisonPage): object {
+  // Determine organization name based on brands
+  const uniqueBrands = [...new Set(comparison.tyres.map(t => t.brand || "bridgestone"))];
+  const orgName = uniqueBrands.length > 1
+    ? "Bridgestone & Firestone Україна"
+    : `${BRAND_NAMES[uniqueBrands[0]]} Україна`;
+
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -313,17 +339,20 @@ export function generateComparisonSchema(comparison: ComparisonPage): object {
     datePublished: comparison.createdAt,
     author: {
       "@type": "Organization",
-      name: "Bridgestone Україна",
+      name: orgName,
     },
-    about: comparison.tyres.map((tyre) => ({
-      "@type": "Product",
-      name: `Bridgestone ${tyre.name}`,
-      brand: {
-        "@type": "Brand",
-        name: "Bridgestone",
-      },
-      category: "Автомобільні шини",
-    })),
+    about: comparison.tyres.map((tyre) => {
+      const brandName = BRAND_NAMES[tyre.brand || "bridgestone"];
+      return {
+        "@type": "Product",
+        name: `${brandName} ${tyre.name}`,
+        brand: {
+          "@type": "Brand",
+          name: brandName,
+        },
+        category: "Автомобільні шини",
+      };
+    }),
   };
 }
 

@@ -188,6 +188,7 @@ export async function generateFullTyreContent(
     // 5. Build final content
     const content: GeneratedTyreContent = {
       modelSlug,
+      brand: firstSource.brand || "bridgestone",
       shortDescription: descResult.content.shortDescription,
       fullDescription: descResult.content.fullDescription,
       fullDescriptionLexical,
