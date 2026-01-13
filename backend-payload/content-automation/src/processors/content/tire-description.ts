@@ -180,7 +180,7 @@ export async function generateTireDescription(
 
   const { data, response } = await generator.generateJSON<DescriptionOutput>(prompt, {
     systemPrompt: systemPrompts.tireDescription,
-    maxTokens: 2000,
+    maxTokens: 4000,
     temperature: 0.7,
     ...(options?.provider && { provider: options.provider }),
     ...(options?.model && { model: options.model }),

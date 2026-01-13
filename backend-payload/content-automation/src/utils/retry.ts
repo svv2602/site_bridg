@@ -309,4 +309,4 @@ async function main() {
   console.log("\n✅ Retry test complete");
 }
 
-main();
+if (process.argv[1]?.includes("retry.ts")) main();

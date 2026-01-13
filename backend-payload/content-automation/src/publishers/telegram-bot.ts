@@ -223,4 +223,4 @@ async function main() {
   }
 }
 
-main();
+if (process.argv[1]?.includes("telegram-bot.ts")) main();

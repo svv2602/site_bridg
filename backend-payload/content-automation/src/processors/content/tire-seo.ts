@@ -135,8 +135,8 @@ export async function generateTireSEO(
 
   logger.info(`Generating SEO for ${input.modelName}`);
 
-  // Use quick-task routing for SEO (simple, short output)
-  const generator = llm.forTask("quick-task");
+  // Use content-generation routing (DeepSeek available, Groq requires separate key)
+  const generator = llm.forTask("content-generation");
 
   const { data, response } = await generator.generateJSON<SEOOutput>(prompt, {
     systemPrompt: SYSTEM_PROMPTS.tireSEO,

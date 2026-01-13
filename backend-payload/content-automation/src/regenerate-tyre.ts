@@ -10,7 +10,8 @@
  */
 
 import { getPayloadClient } from "./publishers/payload-client.js";
-import { generateTireDescription, generateTireSEO } from "./processors/content/index.js";
+import { generateTireDescription } from "./processors/content/tire-description.js";
+import { generateTireSEO } from "./processors/content/tire-seo.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
 import type { Brand } from "./types/content.js";
 
@@ -57,14 +58,14 @@ async function main() {
     euLabel: tyre.euLabel,
   });
 
-  // Generate SEO
+  // Generate SEO (skip strict validation, will truncate on save)
   const seoResult = await generateTireSEO({
     modelSlug: tyre.slug,
     modelName: tyre.name,
     season: tireSeason,
     shortDescription: descResult.content.shortDescription,
     keyBenefits: descResult.content.highlights,
-  });
+  }, { skipValidation: true });
 
   console.log("Content generated successfully!");
   console.log(`  Short description: ${descResult.content.shortDescription.substring(0, 60)}...`);

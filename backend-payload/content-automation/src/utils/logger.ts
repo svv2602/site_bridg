@@ -238,4 +238,4 @@ async function main() {
   console.log(`Log file: ${config.logFilePath}`);
 }
 
-main();
+if (process.argv[1]?.includes("logger.ts")) main();

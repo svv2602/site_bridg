@@ -261,3 +261,39 @@ export function deleteGeneratedContent(modelSlug: string): boolean {
 
 // Export directories for reference
 export { DATA_DIR, RAW_DIR, GENERATED_DIR };
+
+// === Generic Storage Functions ===
+
+/**
+ * Generic load from storage (async wrapper for compatibility)
+ */
+export async function loadFromStorage<T>(path: string): Promise<T | null> {
+  const filepath = join(DATA_DIR, `${path}.json`);
+
+  if (!existsSync(filepath)) {
+    return null;
+  }
+
+  try {
+    const data = readFileSync(filepath, "utf-8");
+    return JSON.parse(data) as T;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generic save to storage (async wrapper for compatibility)
+ */
+export async function saveToStorage<T>(path: string, data: T): Promise<string> {
+  ensureDirectories();
+  const filepath = join(DATA_DIR, `${path}.json`);
+  const dir = dirname(filepath);
+
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
+
+  writeFileSync(filepath, JSON.stringify(data, null, 2), "utf-8");
+  return filepath;
+}

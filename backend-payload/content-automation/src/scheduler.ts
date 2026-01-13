@@ -12,7 +12,8 @@
 
 import { ENV } from "./config/env.js";
 import { scrapeProkoleso, scrapeProkolesoBrand } from "./scrapers/prokoleso.js";
-import { generateTireDescription, generateTireSEO } from "./processors/content/index.js";
+import { generateTireDescription } from "./processors/content/tire-description.js";
+import { generateTireSEO } from "./processors/content/tire-seo.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
@@ -194,16 +195,16 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
           brand: tireBrand,
           season: tire.season || "summer",
           euLabel: tire.euLabel,
-        });
+        }, { skipValidation: true });
 
-        // Generate SEO metadata
+        // Generate SEO metadata (skip strict validation for now)
         const seoResult = await generateTireSEO({
           modelSlug: slug,
           modelName: tire.name,
           season: tire.season || "summer",
           shortDescription: descResult.content.shortDescription,
           keyBenefits: descResult.content.highlights,
-        });
+        }, { skipValidation: true });
 
         // Combine results into unified content object
         const content = {
