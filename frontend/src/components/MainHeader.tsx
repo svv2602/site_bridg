@@ -3,33 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, Menu, X } from "lucide-react";
-
-// Основні пункти меню для горизонтальної навігації на десктопі
-const primaryNav = [
-  { href: "/passenger-tyres", label: "Легкові" },
-  { href: "/suv-4x4-tyres", label: "SUV" },
-  { href: "/lcv-tyres", label: "Комерційні" },
-  { href: "/dealers", label: "Дилери" },
-  { href: "/blog", label: "Блог" },
-];
-
-// Повне меню для мобільних та бургера
-const fullNav = [
-  { href: "/passenger-tyres", label: "Легкові шини" },
-  { href: "/suv-4x4-tyres", label: "Шини для SUV" },
-  { href: "/lcv-tyres", label: "Комерційні шини" },
-  { href: "/tyre-search", label: "Пошук шин" },
-  { href: "/dealers", label: "Де купити" },
-  { href: "/about", label: "Бренд" },
-  { href: "/blog", label: "Блог" },
-  { href: "/contacts", label: "Контакти" },
-];
+import { MegaMenu } from "./MegaMenu";
+import { tyresMenuData, primaryNav, fullNav } from "@/lib/navigation";
 
 export function MainHeader() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Закриття меню при кліку поза ним
+  // Close menu on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -60,8 +41,12 @@ export function MainHeader() {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation with Mega Menu */}
         <nav className="hidden items-center gap-1 lg:flex">
+          {/* Mega Menu for Tyres */}
+          <MegaMenu trigger={tyresMenuData.trigger} columns={tyresMenuData.columns} />
+
+          {/* Regular nav items */}
           {primaryNav.map((item) => (
             <Link
               key={item.href}
@@ -75,7 +60,7 @@ export function MainHeader() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Пошук шин CTA */}
+          {/* Search CTA */}
           <Link
             href="/tyre-search"
             className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-stone-900"
@@ -84,7 +69,7 @@ export function MainHeader() {
             <span className="hidden md:inline">Пошук шин</span>
           </Link>
 
-          {/* Бургер-меню (мобільний + додаткові пункти на десктопі) */}
+          {/* Burger menu (mobile + additional items on desktop) */}
           <div ref={menuRef}>
             <button
               type="button"
