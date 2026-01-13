@@ -4,6 +4,7 @@ import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, P
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
 import { ProductCarousel } from "@/components/ProductCarousel";
+import { VehicleTypeCard, vehicleTypesData } from "@/components/VehicleTypeCard";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { getTyreModels } from "@/lib/api/tyres";
 import { getLatestArticles } from "@/lib/api/articles";
@@ -130,6 +131,25 @@ export default async function Home() {
                 </div>
                 <h3 className="mb-2 text-xl font-bold">{feat.title}</h3>
                 <p className="text-sm text-muted-foreground">{feat.description}</p>
+              </AnimatedCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vehicle Types */}
+      <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
+        <div className="container mx-auto max-w-7xl px-4 md:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="mb-4 text-3xl font-bold">Шини за типом авто</h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              Оберіть категорію, що відповідає вашому автомобілю
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {vehicleTypesData.map((vehicle, idx) => (
+              <AnimatedCard key={vehicle.href} delay={idx * 0.15}>
+                <VehicleTypeCard {...vehicle} />
               </AnimatedCard>
             ))}
           </div>
