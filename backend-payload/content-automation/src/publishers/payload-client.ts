@@ -305,7 +305,44 @@ class PayloadClient {
   // ============ MEDIA ============
 
   /**
+   * Find media by filename (checks both original and processed -nobg versions)
+   * Prefers processed (-nobg) version if available
+   */
+  async findMediaByFilename(filename: string): Promise<{ id: number; url: string; backgroundRemoved: boolean } | null> {
+    try {
+      // Get base name without extension
+      const baseName = filename.replace(/\.[^.]+$/, "");
+
+      // Search for processed version first (preferred), then original
+      const filenames = [
+        `${baseName}-nobg.png`,            // processed: blizzak-6-enliten-nobg.png (preferred)
+        filename,                          // original: blizzak-6-enliten.png
+      ];
+
+      for (const searchFilename of filenames) {
+        const query = `/media?where[filename][equals]=${encodeURIComponent(searchFilename)}&limit=1`;
+        const response = await this.fetch<PayloadResponse<{ id: number; url: string; filename: string; backgroundRemoved?: boolean }>>(query);
+
+        if (response.docs.length > 0) {
+          const media = response.docs[0];
+          return {
+            id: media.id,
+            url: media.url,
+            backgroundRemoved: media.backgroundRemoved || false,
+          };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`  Error finding media by filename:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Download image from URL and upload to Payload CMS Media
+   * Reuses existing media if found by filename
    */
   async uploadImageFromUrl(
     imageUrl: string,
@@ -313,6 +350,20 @@ class PayloadClient {
   ): Promise<{ id: number; url: string } | null> {
     try {
       await this.ensureAuthenticated();
+
+      // Determine filename first
+      let filename = options.filename;
+      if (!filename) {
+        const urlPath = new URL(imageUrl).pathname;
+        filename = urlPath.split("/").pop() || "image.png";
+      }
+
+      // Check if media already exists (including processed -nobg version)
+      const existing = await this.findMediaByFilename(filename);
+      if (existing) {
+        console.log(`  ✓ Reusing existing media ID: ${existing.id} (backgroundRemoved: ${existing.backgroundRemoved})`);
+        return { id: existing.id, url: existing.url };
+      }
 
       // Download image
       console.log(`  Downloading image: ${imageUrl}`);
@@ -324,13 +375,6 @@ class PayloadClient {
 
       const imageBuffer = await imageResponse.arrayBuffer();
       const contentType = imageResponse.headers.get("content-type") || "image/png";
-
-      // Determine filename
-      let filename = options.filename;
-      if (!filename) {
-        const urlPath = new URL(imageUrl).pathname;
-        filename = urlPath.split("/").pop() || "image.png";
-      }
 
       // Create form data for upload
       const formData = new FormData();
