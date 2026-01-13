@@ -2,10 +2,11 @@
  * Payload CMS Publisher
  *
  * Publishes generated content and badges to Payload CMS.
- * Replaces Strapi client after migration.
+ * Supports multi-brand (Bridgestone & Firestone).
  */
 
 import { ENV } from "../config/env.js";
+import type { Brand } from "../types/content.js";
 
 // Types
 interface PayloadResponse<T> {
@@ -27,6 +28,7 @@ interface PayloadDoc {
 interface TyreData {
   slug: string;
   name: string;
+  brand?: Brand;
   season: "summer" | "winter" | "allseason";
   vehicleTypes: ("passenger" | "suv" | "van" | "sport")[];
   shortDescription?: string;
@@ -161,10 +163,12 @@ class PayloadClient {
   /**
    * Find tyre by slug
    */
-  async findTyreBySlug(slug: string): Promise<TyreDoc | null> {
-    const response = await this.fetch<PayloadResponse<TyreDoc>>(
-      `/tyres?where[slug][equals]=${encodeURIComponent(slug)}&depth=1`
-    );
+  async findTyreBySlug(slug: string, brand?: Brand): Promise<TyreDoc | null> {
+    let query = `/tyres?where[slug][equals]=${encodeURIComponent(slug)}&depth=1`;
+    if (brand) {
+      query += `&where[brand][equals]=${brand}`;
+    }
+    const response = await this.fetch<PayloadResponse<TyreDoc>>(query);
 
     return response.docs.length > 0 ? response.docs[0] : null;
   }
@@ -205,7 +209,7 @@ class PayloadClient {
    * Publish tyre - creates new or updates existing
    */
   async publishTyre(data: TyreData): Promise<{ action: "create" | "update"; id: string }> {
-    const existing = await this.findTyreBySlug(data.slug);
+    const existing = await this.findTyreBySlug(data.slug, data.brand);
 
     if (existing) {
       await this.updateTyre(existing.id, data);
@@ -329,11 +333,20 @@ class PayloadClient {
   /**
    * Get all tyres
    */
-  async getAllTyres(limit = 100): Promise<TyreDoc[]> {
-    const response = await this.fetch<PayloadResponse<TyreDoc>>(
-      `/tyres?limit=${limit}&depth=1`
-    );
+  async getAllTyres(limit = 100, brand?: Brand): Promise<TyreDoc[]> {
+    let query = `/tyres?limit=${limit}&depth=1`;
+    if (brand) {
+      query += `&where[brand][equals]=${brand}`;
+    }
+    const response = await this.fetch<PayloadResponse<TyreDoc>>(query);
     return response.docs;
+  }
+
+  /**
+   * Get all tyres for a specific brand
+   */
+  async getTyresByBrand(brand: Brand, limit = 100): Promise<TyreDoc[]> {
+    return this.getAllTyres(limit, brand);
   }
 
   /**
@@ -372,25 +385,30 @@ export async function updateTyreBadges(slug: string, badges: TyreData["badges"])
 
 // Test
 async function main() {
-  console.log("Testing Payload Publisher...\n");
+  console.log("Testing Payload Publisher with multi-brand support...\n");
 
   const client = getPayloadClient();
 
-  // Test finding a tyre
-  console.log("Finding tyre 'turanza-6'...");
-  const tyre = await client.findTyreBySlug("turanza-6");
+  // Test finding a Bridgestone tyre
+  console.log("Finding Bridgestone tyre 'turanza-6'...");
+  const bridgestoneTyre = await client.findTyreBySlug("turanza-6", "bridgestone");
 
-  if (tyre) {
-    console.log(`Found: ${tyre.name} (ID: ${tyre.id})`);
+  if (bridgestoneTyre) {
+    console.log(`Found: ${bridgestoneTyre.name} (ID: ${bridgestoneTyre.id})`);
   } else {
-    console.log("Tyre not found");
+    console.log("Bridgestone tyre not found");
   }
 
-  // List all tyres
-  console.log("\nListing all tyres...");
-  const tyres = await client.getAllTyres();
-  console.log(`Total tyres: ${tyres.length}`);
-  tyres.forEach(t => console.log(`  - ${t.name} (${t.slug})`));
+  // List tyres by brand
+  console.log("\nListing Bridgestone tyres...");
+  const bridgestoneTyres = await client.getTyresByBrand("bridgestone");
+  console.log(`Total Bridgestone tyres: ${bridgestoneTyres.length}`);
+  bridgestoneTyres.slice(0, 5).forEach(t => console.log(`  - ${t.name} (${t.slug})`));
+
+  console.log("\nListing Firestone tyres...");
+  const firestoneTyres = await client.getTyresByBrand("firestone");
+  console.log(`Total Firestone tyres: ${firestoneTyres.length}`);
+  firestoneTyres.slice(0, 5).forEach(t => console.log(`  - ${t.name} (${t.slug})`));
 }
 
 // Run test if called directly

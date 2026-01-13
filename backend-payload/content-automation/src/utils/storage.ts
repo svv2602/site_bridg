@@ -186,16 +186,20 @@ export function getContentStatus(modelSlug: string): ContentStatus {
 
   const status: ContentStatus = {
     modelSlug,
+    brand: "bridgestone", // Default, will be overwritten if found
     hasRawData: existsSync(rawFilepath),
     hasGeneratedContent: existsSync(generatedFilepath),
     isPublished: false, // TODO: Check Payload CMS
   };
 
-  // Get dates if files exist
+  // Get dates and brand if files exist
   if (status.hasRawData) {
     try {
       const data = JSON.parse(readFileSync(rawFilepath, "utf-8"));
       status.rawDataDate = data.collectedAt || data.scrapedAt;
+      if (data.brand) {
+        status.brand = data.brand;
+      }
     } catch {
       // Ignore
     }
@@ -205,6 +209,9 @@ export function getContentStatus(modelSlug: string): ContentStatus {
     try {
       const data = JSON.parse(readFileSync(generatedFilepath, "utf-8"));
       status.generatedDate = data.metadata?.generatedAt;
+      if (data.brand) {
+        status.brand = data.brand;
+      }
     } catch {
       // Ignore
     }
