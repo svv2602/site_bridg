@@ -53,8 +53,14 @@ export function VehicleTypeCard({
           <Icon className="h-4 w-4" />
           <span className="text-xs font-medium uppercase tracking-wide">Категорія</span>
         </div>
-        <h3 className="mb-2 text-xl font-bold md:text-2xl">{title}</h3>
-        <p className="mb-4 text-sm opacity-90 line-clamp-2">{description}</p>
+        {/* Title - fixed height container */}
+        <div className="mb-2 h-[2rem]">
+          <h3 className="text-xl font-bold md:text-2xl line-clamp-1">{title}</h3>
+        </div>
+        {/* Description - fixed height container */}
+        <div className="mb-4 h-[2.5rem]">
+          <p className="text-sm opacity-90 line-clamp-2">{description}</p>
+        </div>
         <span className="inline-flex items-center gap-2 text-sm font-semibold transition-all group-hover:gap-3">
           Переглянути шини
           <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

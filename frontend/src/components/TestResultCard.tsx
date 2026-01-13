@@ -53,7 +53,8 @@ export function TestResultCard({ result }: TestResultCardProps) {
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="mb-3 flex items-start justify-between gap-3">
+      {/* Header - fixed height container */}
+      <div className="mb-3 h-[2.5rem] flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {logoPath ? (
             <div className="relative h-10 w-20 shrink-0 overflow-hidden rounded">

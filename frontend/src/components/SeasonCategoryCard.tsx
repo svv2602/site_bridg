@@ -45,10 +45,16 @@ export function SeasonCategoryCard({
             key={model.slug}
             className="rounded-xl border border-border bg-background p-4"
           >
-            <h4 className="font-semibold">{model.name}</h4>
-            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-              {model.shortDescription}
-            </p>
+            {/* Title - fixed height container */}
+            <div className="h-[1.5rem]">
+              <h4 className="font-semibold line-clamp-1">{model.name}</h4>
+            </div>
+            {/* Description - fixed height container */}
+            <div className="mt-1 h-[2.5rem]">
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {model.shortDescription}
+              </p>
+            </div>
             <Link
               href={`/shyny/${model.slug}`}
               className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"

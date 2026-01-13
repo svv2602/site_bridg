@@ -130,23 +130,25 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
 
       {/* Content Section */}
       <div className="flex flex-1 flex-col p-4">
-        {/* Brand indicator + Title */}
-        <div className="mb-3">
+        {/* Brand indicator + Title - fixed height container */}
+        <div className="mb-3 h-[3.5rem]">
           <span className={`inline-block text-xs font-semibold uppercase tracking-wide ${brandColors[tyre.brand].text}`}>
             {brandLabels[tyre.brand]}
           </span>
-          <h3 className="text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+          <h3 className="line-clamp-2 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
             {tyre.name}
           </h3>
         </div>
 
-        {/* Description - fixed height with line clamp */}
-        <p className="mb-3 line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">
-          {tyre.shortDescription}
-        </p>
+        {/* Description - fixed height container */}
+        <div className="mb-4 h-[2.5rem]">
+          <p className="line-clamp-2 text-sm text-muted-foreground">
+            {tyre.shortDescription}
+          </p>
+        </div>
 
-        {/* EU Label - always show section for consistent height */}
-        <div className="mb-3 min-h-[1.75rem]">
+        {/* EU Label - fixed height container */}
+        <div className="mb-3 h-[1.75rem]">
           {tyre.euLabel && (
             <EuLabelGroup
               wetGrip={tyre.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
@@ -157,9 +159,9 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
           )}
         </div>
 
-        {/* Technologies - always show section for consistent height */}
+        {/* Technologies - fixed height container */}
         {variant !== "compact" && (
-          <div className="mb-3 min-h-[1.5rem]">
+          <div className="mb-3 h-[1.5rem]">
             {tyre.technologies && tyre.technologies.length > 0 && (
               <TechnologyGroup
                 technologies={tyre.technologies}
