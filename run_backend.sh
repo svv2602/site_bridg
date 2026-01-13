@@ -12,11 +12,19 @@ echo -e "${BLUE}🚀 Запуск Payload Backend (Bridgestone Ukraine)...${NC}"
 
 # Освобождаем порт 3001
 echo -e "${BLUE}🔄 Проверка и освобождение порта 3001...${NC}"
-BACKEND_PID=$(lsof -ti:3001)
-if [ ! -z "$BACKEND_PID" ]; then
-    echo -e "${BLUE}🛑 Останавливаем процесс на порту 3001 (PID: $BACKEND_PID)${NC}"
-    kill -9 $BACKEND_PID 2>/dev/null || true
-    sleep 1
+# Используем fuser для более надёжного поиска процессов на порту
+BACKEND_PIDS=$(fuser 3001/tcp 2>/dev/null || lsof -ti:3001 2>/dev/null || true)
+if [ ! -z "$BACKEND_PIDS" ]; then
+    echo -e "${BLUE}🛑 Останавливаем процессы на порту 3001 (PID: $BACKEND_PIDS)${NC}"
+    # Убиваем все процессы на порту
+    fuser -k 3001/tcp 2>/dev/null || kill -9 $BACKEND_PIDS 2>/dev/null || true
+    # Ждём освобождения порта (до 5 секунд)
+    for i in {1..5}; do
+        if ! fuser 3001/tcp >/dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
     echo -e "${GREEN}✅ Порт 3001 освобожден${NC}"
 else
     echo -e "${GREEN}✅ Порт 3001 свободен${NC}"

@@ -216,9 +216,9 @@ export function QuickSearchForm() {
 
   return (
     <div className="hero-card p-6">
-      <h2 className="text-xl font-semibold text-hero-foreground">Швидкий пошук шин</h2>
+      <h2 className="text-xl font-semibold text-hero-foreground">Знайдіть ідеальні шини</h2>
       <p className="mt-1 text-sm text-hero-muted">
-        Виберіть спосіб пошуку: за розміром або за вашим автомобілем.
+        За розміром на боковині шини або за маркою вашого авто
       </p>
 
       <div
@@ -270,6 +270,7 @@ export function QuickSearchForm() {
           className="mt-6 space-y-4"
           onSubmit={handleSizeSearch}
         >
+          <p className="mb-2 text-xs text-hero-muted">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="mb-1 block text-sm font-medium text-hero-muted">Ширина</label>
@@ -283,14 +284,14 @@ export function QuickSearchForm() {
                 disabled={loadingWidths}
                 className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
-                <option value="">{loadingWidths ? 'Завантаження...' : 'Оберіть'}</option>
+                <option value="">{loadingWidths ? 'Завантаження...' : '205'}</option>
                 {widths.map((w) => (
                   <option key={w.value} value={w.value}>{w.value}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Висота профілю</label>
+              <label className="mb-1 block text-sm font-medium text-hero-muted">Профіль</label>
               <select
                 value={aspectRatio}
                 onChange={(e) => {
@@ -300,7 +301,7 @@ export function QuickSearchForm() {
                 disabled={!width || loadingHeights}
                 className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
-                <option value="">{loadingHeights ? 'Завантаження...' : 'Оберіть'}</option>
+                <option value="">{loadingHeights ? 'Завантаження...' : '55'}</option>
                 {heights.map((h) => (
                   <option key={h.value} value={h.value}>{h.value}</option>
                 ))}
@@ -314,7 +315,7 @@ export function QuickSearchForm() {
                 disabled={!aspectRatio || loadingDiameters}
                 className="hero-input w-full rounded-xl px-3 py-2 text-sm"
               >
-                <option value="">{loadingDiameters ? 'Завантаження...' : 'Оберіть'}</option>
+                <option value="">{loadingDiameters ? 'Завантаження...' : 'R16'}</option>
                 {diameters.map((d) => (
                   <option key={d.value} value={d.value}>R{d.value}</option>
                 ))}

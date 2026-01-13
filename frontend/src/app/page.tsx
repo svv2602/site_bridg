@@ -189,7 +189,7 @@ export default async function Home() {
                       href={cat.href}
                       className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-semibold hover:bg-card"
                     >
-                      Перейти
+                      Обрати шини
                     </Link>
                   </AnimatedCardX>
                 ))}
@@ -221,13 +221,13 @@ export default async function Home() {
                             href={`/shyny/${tyre.slug}`}
                             className="rounded-full border border-border bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold hover:bg-card"
                           >
-                            Детальніше
+                            Дізнатися більше
                           </Link>
                           <Link
                             href="/dealers"
                             className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
                           >
-                            Знайти дилера
+                            Знайти магазин
                           </Link>
                         </div>
                       </div>
@@ -267,7 +267,7 @@ export default async function Home() {
                   href={`/blog/${article.slug}`}
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                 >
-                  Читати статтю <ChevronRight className="h-4 w-4" />
+                  Читати <ChevronRight className="h-4 w-4" />
                 </Link>
               </AnimatedCard>
             ))}
@@ -348,17 +348,17 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
-            <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
+            <h3 className="mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</h3>
             <p className="mb-8 text-lg opacity-90">
-              Наші експерти допоможуть підібрати ідеальні шини для вашого автомобіля
-              з урахуванням стилю водіння, умов експлуатації та бюджету.
+              Наші експерти допоможуть підібрати ідеальні шини саме для вас —
+              з урахуванням вашого стилю водіння та бюджету.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
                 className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
               >
-                Отримати консультацію
+                Допоможіть мені обрати
               </Link>
               <a
                 href="tel:+380800123456"

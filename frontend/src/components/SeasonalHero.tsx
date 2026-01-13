@@ -26,8 +26,8 @@ interface SeasonalData {
 }
 
 const defaultData: SeasonalData = {
-  heroTitle: 'Шини Bridgestone',
-  heroSubtitle: 'Офіційний представник в Україні',
+  heroTitle: 'Безпека на кожному кілометрі',
+  heroSubtitle: 'Шини Bridgestone — офіційний представник в Україні',
   featuredSeason: null,
   gradient: 'from-stone-800 to-stone-900',
   ctaText: 'Переглянути каталог',
@@ -105,8 +105,8 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             </h1>
 
             <p className="hero-text max-w-xl text-sm md:text-base">
-              Підбір шин за параметрами авто, типорозміром та сценаріями використання —
-              інтерфейс у більш «технічному» стилі, узгодженому з сторінкою пошуку шин.
+              Оберіть шини, які підходять саме вам — за розміром, сезоном
+              або маркою автомобіля. Офіційна гарантія та мережа дилерів по всій Україні.
             </p>
 
             <ul className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 md:text-sm">

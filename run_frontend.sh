@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}🚀 Запуск Frontend (Bridgestone Ukraine)...${NC}"
 
 # 1. Проверяем, запущен ли Backend (Payload на порту 3001)
-BACKEND_PID=$(lsof -ti:3001)
+BACKEND_PID=$(fuser 3001/tcp 2>/dev/null || lsof -ti:3001 2>/dev/null || true)
 
 if [ -z "$BACKEND_PID" ]; then
     echo -e "${BLUE}📦 Payload Backend не запущен, запускаем...${NC}"
@@ -43,18 +43,21 @@ fi
 
 # 3. Освобождаем порт 3010
 echo -e "${BLUE}🔄 Проверка и освобождение порта 3010...${NC}"
-FRONTEND_PID=$(lsof -ti:3010)
-if [ ! -z "$FRONTEND_PID" ]; then
-    echo -e "${BLUE}🛑 Останавливаем процесс на порту 3010 (PID: $FRONTEND_PID)${NC}"
-    kill -9 $FRONTEND_PID 2>/dev/null || true
-    sleep 1
+FRONTEND_PIDS=$(fuser 3010/tcp 2>/dev/null || lsof -ti:3010 2>/dev/null || true)
+if [ ! -z "$FRONTEND_PIDS" ]; then
+    echo -e "${BLUE}🛑 Останавливаем процессы на порту 3010 (PID: $FRONTEND_PIDS)${NC}"
+    fuser -k 3010/tcp 2>/dev/null || kill -9 $FRONTEND_PIDS 2>/dev/null || true
+    # Ждём освобождения порта (до 5 секунд)
+    for i in {1..5}; do
+        if ! fuser 3010/tcp >/dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
     echo -e "${GREEN}✅ Порт 3010 освобожден${NC}"
 else
     echo -e "${GREEN}✅ Порт 3010 свободен${NC}"
 fi
-
-# Дополнительно останавливаем старые Frontend процессы
-pkill -f "node.*next" 2>/dev/null || true
 
 # 4. Переходим в директорию Frontend
 cd /home/snisar/RubyProjects/site_Bridgestone/frontend || exit 1

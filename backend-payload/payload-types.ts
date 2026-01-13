@@ -366,21 +366,7 @@ export interface Article {
   subtitle?: string | null;
   previewText: string;
   image?: (number | null) | Media;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  body?: string | null;
   tags?:
     | {
         tag: string;

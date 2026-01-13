@@ -1,8 +1,9 @@
 /**
- * Lexical Renderer Component
+ * Rich Text Renderer Component
  *
- * Renders Lexical JSON content as HTML.
- * Supports: paragraph, heading, list, listItem, link, text formatting.
+ * Renders rich text content - supports both:
+ * - Lexical JSON format (legacy)
+ * - HTML strings from CKEditor (current)
  */
 
 "use client";
@@ -60,7 +61,7 @@ interface LexicalRoot {
 }
 
 interface LexicalRendererProps {
-  content: LexicalRoot | null | undefined;
+  content: LexicalRoot | string | null | undefined;
   className?: string;
 }
 
@@ -167,7 +168,22 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
 }
 
 export function LexicalRenderer({ content, className = "" }: LexicalRendererProps) {
-  if (!content || !content.root || !content.root.children) {
+  if (!content) {
+    return null;
+  }
+
+  // Handle HTML string from CKEditor
+  if (typeof content === "string") {
+    return (
+      <div
+        className={`prose prose-stone dark:prose-invert max-w-none ${className}`}
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+    );
+  }
+
+  // Handle Lexical JSON format (legacy)
+  if (!content.root || !content.root.children) {
     return null;
   }
 
