@@ -14,44 +14,64 @@ Next.js‑проєкті [`frontend`](./).
 
 ## 1. Палітра кольорів
 
-Базова ідея: сильний контраст чорний/білий + акцентний червоний Bridgestone,
-нейтральні сіри для фону/бордерів.
+Базова ідея: преміальний темний дизайн із сріблястими акцентами + обмежене використання
+брендового червоного Bridgestone (тільки логотип, алерти, промо).
 
-> Точні бренд‑коди Bridgestone можна буде замінити після отримання брендбуку.
+### Primary (Silver Accent)
 
-### Primary
+- **Primary (Silver)** — основний колір для кнопок CTA, інтерактивних елементів
+  - `--silver-accent: #D7D9DC`
+  - `--silver-hover: #FFFFFF`
+  - `--silver-muted: #BFC3C7`
 
-- **Primary Red** — акцентний колір (кнопки, бейджі, ключові CTA)
-  - `#E30613` (умовний Bridgestone Red)
-- **Primary Black** — основний колір для темних елементів
-  - `#111111`
+### Brand (Bridgestone Red) — ОБМЕЖЕНЕ ВИКОРИСТАННЯ
 
-### Background / Surface
+> ⚠️ Червоний колір використовується ТІЛЬКИ для:
+> - Логотипу Bridgestone
+> - Алертів та попереджень
+> - Спеціальних промо-елементів
 
-- **Background Light** — фон сторінок
-  - `#F4F4F5` (близько до Tailwind zinc‑100)
-- **Surface White** — картки, контентні блоки
-  - `#FFFFFF`
-- **Surface Dark Hero** — темні hero‑секції
-  - `#0B0B0C` – градієнти через близькі значення: `from-zinc-900 to-zinc-800`
+- **Brand Red** — `--bridgestone-red: #E30613`
+- **Brand Red Dark** — `--bridgestone-red-dark: #B8050F`
 
-### Text
+### Stone Palette (Neutral Colors)
 
-- **Text Primary** — базовий текст
-  - `#111827` (темний, високий контраст)
-- **Text Secondary** — другорядний опис
-  - `#4B5563`
-- **Text Muted** — допоміжні підписи, примітки
-  - `#6B7280`
-- **Text On Dark** — текст на темному фоні
-  - `#F9FAFB`
+Замінює холодну zinc палітру на теплу stone:
 
-### Borders / Lines
+| Токен | Значення | Використання |
+|-------|----------|--------------|
+| `--stone-50` | `#fafaf9` | Фон сторінки (Light) |
+| `--stone-100` | `#f5f5f4` | Альтернативний фон секцій |
+| `--stone-200` | `#e7e5e4` | Бордери (Light) |
+| `--stone-500` | `#78716c` | Muted текст |
+| `--stone-600` | `#57534e` | Secondary текст |
+| `--stone-900` | `#1c1917` | Foreground (Light) |
+| `--stone-950` | `#0c0a09` | Hero фон |
 
-- **Border Light** — бордери карток, роздільники
-  - `#E5E7EB`
-- **Border Muted / Dashed** — інформаційні бокси
-  - `#D4D4D8`
+### Premium Dark Palette
+
+Токени для темної теми та hero-секцій:
+
+| Токен | Значення | Використання |
+|-------|----------|--------------|
+| `--black-base` | `#0E0E0E` | Фон сторінки (Dark) |
+| `--wet-asphalt` | `#1C1F22` | Альтернативний фон секцій |
+| `--graphite` | `#24282C` | Картки (Dark) |
+| `--graphite-hover` | `#2A2F34` | Hover стан карток |
+| `--border-dark` | `#2F3438` | Бордери (Dark) |
+
+### Семантичні токени
+
+Використовуйте семантичні токени замість прямих кольорів:
+
+| Токен | Light | Dark |
+|-------|-------|------|
+| `--background` | `--stone-50` | `--black-base` |
+| `--foreground` | `--stone-900` | `--text-primary` |
+| `--card` | `#ffffff` | `--graphite` |
+| `--border` | `--stone-200` | `--border-dark` |
+| `--primary` | `--silver-accent` | `--silver-accent` |
+| `--brand` | `--bridgestone-red` | `--bridgestone-red` |
 
 ---
 
@@ -76,15 +96,18 @@ Next.js‑проєкті [`frontend`](./).
 ### Текст
 
 - **Body текст**:
-  - клас: `text-sm text-zinc-600 leading-relaxed`
+  - клас: `text-sm text-stone-600 leading-relaxed`
+  - або семантичний: `text-muted-foreground`
   - довгі абзаци на світлому фоні.
 
 - **Малі підписи / labels**:
-  - клас: `text-xs text-zinc-500 uppercase tracking-wide`
+  - клас: `text-xs text-stone-500 uppercase tracking-wide`
+  - або семантичний: `text-muted`
   - для бейджів «Стаття», «Офіційний дилер», типів шин, сезонності.
 
 - **Caption / примітки**:
-  - клас: `text-[11px] text-zinc-500`
+  - клас: `text-[11px] text-stone-500`
+  - або семантичний: `text-muted`
   - допоміжний текст у формі, disclaimers, примітки до прототипу.
 
 ---
@@ -102,18 +125,20 @@ Next.js‑проєкті [`frontend`](./).
 ### Секційний патерн
 
 1. **Hero‑секції**:
-   - фон: темний градієнт (`bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800`)
-   - текст: білий/світлий.
+   - клас: `hero-dark` (гарантовано темний фон у всіх темах)
+   - фон: градієнт `#0c0a09 → #1c1917 → #292524`
+   - текст: завжди білий (`hero-title`, `hero-subtitle`, `hero-text`)
    - компонування:
      - зліва: заголовок + bullets + CTA;
-     - справа: карта / форма пошуку / великий візуал (placeholder під зображення шини/авто).
+     - справа: карта / форма пошуку / великий візуал.
 
 2. **Контентні блоки**:
-   - фон: білий (`bg-white`) з бордерами `border-zinc-200`.
+   - фон: `bg-card` з бордерами `border-border`
    - тінь: помірна (`shadow-sm`), щоб не перевантажувати.
 
 3. **Альтернативні секції**:
-   - фон: світло‑сірий (`bg-zinc-50`) для розділення інформаційних блоків.
+   - Light: `bg-stone-100`
+   - Dark: `bg-wet-asphalt`
 
 ---
 
@@ -150,22 +175,42 @@ Next.js‑проєкті [`frontend`](./).
 
 ### Кнопки
 
-- **Primary CTA** (темна):
-  - `inline-flex items-center rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-800`
+Використовуйте готові класи з `globals.css`:
+
+- **Primary CTA** (сріблястий — основний):
+  - клас: `.btn-primary`
+  - фон: `--silver-accent`, текст: `--black-base`
+  - hover: `--silver-hover`, scale 1.02
   - використовувати для: «Знайти шини», «Підібрати шини», «Показати дилерів».
 
-- **Secondary CTA** (outline):
-  - `inline-flex items-center rounded-full border border-zinc-200 px-3 py-1 text-xs hover:bg-zinc-50`
+- **Secondary CTA** (ghost/outline):
+  - клас: `.btn-secondary`
+  - прозорий фон, бордер `--border-dark`
+  - hover: `--graphite-hover`
   - для: «Детальніше», «Читати статтю», другорядні дії.
 
-- **Accent CTA** (червоний, за потреби):
-  - `bg-red-500 hover:bg-red-600 text-white rounded-full text-xs px-4 py-2`
-  - помірно використовувати для ключових маркетингових дій.
+- **Brand CTA** (червоний — ОБМЕЖЕНО):
+  - клас: `.btn-brand`
+  - фон: `--bridgestone-red`
+  - ⚠️ **НЕ використовувати для стандартних CTA!**
+  - тільки для: промо-банерів, алертів, спецакцій
+
+- **Ghost CTA**:
+  - клас: `.btn-ghost`
+  - прозорий фон, текст `--silver-accent`
+  - для третинних дій
+
+### Hero Buttons
+
+Спеціальні кнопки для hero-секцій (гарантований контраст):
+
+- `.hero-btn-primary` — білий фон, темний текст
+- `.hero-btn-secondary` — прозорий з білим бордером
 
 ### Картки
 
 - **Картка шини**:
-  - контейнер: `rounded-xl border border-zinc-200 bg-white p-4 shadow-sm`
+  - контейнер: `rounded-xl border border-border bg-card p-4 shadow-sm`
   - layout:
     - маленький круглий блок для фото/іконки;
     - назва моделі + бейдж сезону/типу авто;
@@ -208,6 +253,77 @@ Next.js‑проєкті [`frontend`](./).
 - **Від firststop.be / bridgestone.com**:
   - беремо лише бренд‑ідентику (логотип, дозволені кольори/патерни — після отримання гайду).
   - не наслідуємо legacy‑мікси layout’ів.
+
+---
+
+## 8. Light vs Dark тема
+
+Проект підтримує дві теми з автоматичним перемиканням через `data-theme` атрибут.
+
+### Ієрархія фонів
+
+| Рівень | Light Theme | Dark Theme |
+|--------|-------------|------------|
+| Сторінка | `bg-background` (stone-50) | `bg-background` (black-base) |
+| Альт. секція | `bg-stone-100` | `bg-wet-asphalt` |
+| Картка | `bg-card` (white) | `bg-card` (graphite) |
+| Hover | `hover:bg-stone-50` | `hover:bg-graphite-hover` |
+
+### Таблиця відповідності токенів
+
+| Призначення | Токен | Light | Dark |
+|-------------|-------|-------|------|
+| Фон сторінки | `--background` | `#fafaf9` | `#0E0E0E` |
+| Основний текст | `--foreground` | `#1c1917` | `#E0E0E0` |
+| Картка | `--card` | `#ffffff` | `#24282C` |
+| Бордер | `--border` | `#e7e5e4` | `#2F3438` |
+| Muted текст | `--muted` | `#78716c` | `#8B8F94` |
+| Primary CTA | `--primary` | `#D7D9DC` | `#D7D9DC` |
+
+### Hero-секції
+
+Hero-секції завжди темні незалежно від теми. Використовуйте клас `.hero-dark`:
+
+```html
+<section class="hero-dark">
+  <h1 class="hero-title">Заголовок</h1>
+  <p class="hero-subtitle">Підзаголовок</p>
+  <button class="hero-btn-primary">Дія</button>
+</section>
+```
+
+---
+
+## 9. Заборонені патерни
+
+### ❌ Заборонено використовувати
+
+| Патерн | Чому заборонено | Заміна |
+|--------|-----------------|--------|
+| `bg-zinc-*`, `text-zinc-*` | Холодні відтінки, не відповідають дизайну | `bg-stone-*`, `text-stone-*` |
+| `border-zinc-*` | Застарілий нейтральний | `border-border` |
+| Прямі hex (#0c0a09) | Не адаптуються до теми | Семантичні токени |
+| `bg-red-500` для CTA | Червоний тільки для бренду | `.btn-primary` (сріблястий) |
+| `.btn-brand` для звичайних CTA | Червоний тільки для промо | `.btn-primary` |
+
+### ✅ Правильні заміни
+
+```jsx
+// ❌ Неправильно
+<button className="bg-red-500 text-white">Знайти шини</button>
+<div className="bg-zinc-900 text-zinc-100">Hero</div>
+<div className="border-zinc-200">Картка</div>
+
+// ✅ Правильно
+<button className="btn-primary">Знайти шини</button>
+<div className="hero-dark">Hero</div>
+<div className="border-border bg-card">Картка</div>
+```
+
+### Виключення
+
+- `zinc-*` дозволено тільки в dev-утилітах та debug-компонентах
+- Прямі hex дозволено в `.hero-dark` для гарантованого контрасту
 
 ---
 
