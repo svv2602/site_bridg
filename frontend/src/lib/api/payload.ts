@@ -286,14 +286,53 @@ export async function getPayloadArticles(params?: {
   tag?: string;
   search?: string;
 }): Promise<PayloadArticle[]> {
-  const searchParams = new URLSearchParams();
+  const result = await getPayloadArticlesPaginated(params);
+  return result.articles;
+}
 
-  // Set limit (default 100 to get all articles)
-  searchParams.set('limit', String(params?.limit ?? 100));
+export interface PaginatedArticlesResult {
+  articles: PayloadArticle[];
+  totalDocs: number;
+  totalPages: number;
+  page: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
 
-  if (params?.page) {
-    searchParams.set('page', String(params.page));
+export async function getPayloadArticlesPaginated(params?: {
+  limit?: number;
+  page?: number;
+  tag?: string;
+  search?: string;
+}): Promise<PaginatedArticlesResult> {
+  const limit = params?.limit ?? 9;
+  const page = params?.page ?? 1;
+  const hasFilters = params?.tag || params?.search;
+
+  // If no filters, use server-side pagination
+  if (!hasFilters) {
+    const searchParams = new URLSearchParams();
+    searchParams.set('limit', String(limit));
+    searchParams.set('page', String(page));
+    searchParams.set('sort', '-createdAt');
+    searchParams.set('depth', '1');
+
+    const query = searchParams.toString();
+    const data = await fetchPayload<PayloadArticle>(`articles?${query}`);
+
+    return {
+      articles: data.docs,
+      totalDocs: data.totalDocs,
+      totalPages: data.totalPages,
+      page: data.page,
+      hasNextPage: data.hasNextPage,
+      hasPrevPage: data.hasPrevPage,
+    };
   }
+
+  // With filters, fetch all and paginate client-side
+  const searchParams = new URLSearchParams();
+  searchParams.set('limit', '500');
   searchParams.set('sort', '-createdAt');
   searchParams.set('depth', '1');
 
@@ -302,7 +341,7 @@ export async function getPayloadArticles(params?: {
 
   let articles = data.docs;
 
-  // Client-side filtering for tag (Payload REST API doesn't easily filter array fields)
+  // Client-side filtering for tag
   if (params?.tag) {
     articles = articles.filter(article =>
       article.tags?.some(t => t.tag.toLowerCase() === params.tag?.toLowerCase())
@@ -319,7 +358,20 @@ export async function getPayloadArticles(params?: {
     );
   }
 
-  return articles;
+  // Manual pagination
+  const totalDocs = articles.length;
+  const totalPages = Math.ceil(totalDocs / limit);
+  const startIndex = (page - 1) * limit;
+  const paginatedArticles = articles.slice(startIndex, startIndex + limit);
+
+  return {
+    articles: paginatedArticles,
+    totalDocs,
+    totalPages,
+    page,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
 }
 
 // Get all unique tags from articles

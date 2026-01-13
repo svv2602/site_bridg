@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, Clock, Search, X } from "lucide-react";
-import { getArticles, getArticleTags } from "@/lib/api/articles";
-import { Breadcrumb } from "@/components/ui";
+import { getArticlesPaginated, getArticleTags } from "@/lib/api/articles";
+import { Breadcrumb, Pagination } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Блог — Bridgestone Україна",
@@ -17,18 +17,21 @@ export const metadata: Metadata = {
 };
 
 interface BlogPageProps {
-  searchParams: Promise<{ tag?: string; search?: string }>;
+  searchParams: Promise<{ tag?: string; search?: string; page?: string }>;
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const params = await searchParams;
   const activeTag = params.tag;
   const searchQuery = params.search;
+  const currentPage = params.page ? parseInt(params.page, 10) : 1;
 
-  const [articles, allTags] = await Promise.all([
-    getArticles({ tag: activeTag, search: searchQuery }),
+  const [paginatedResult, allTags] = await Promise.all([
+    getArticlesPaginated({ tag: activeTag, search: searchQuery, page: currentPage }),
     getArticleTags(),
   ]);
+
+  const { articles, totalDocs, totalPages, hasNextPage, hasPrevPage } = paginatedResult;
 
   return (
     <div className="bg-background text-foreground">
@@ -145,7 +148,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {activeTag ? `Статті з тегом #${activeTag}` : searchQuery ? `Результати пошуку` : "Усі статті"}
             </h2>
             <span className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground">
-              {articles.length} {articles.length === 1 ? "стаття" : articles.length < 5 ? "статті" : "статей"}
+              {totalDocs} {totalDocs === 1 ? "стаття" : totalDocs < 5 ? "статті" : "статей"}
             </span>
           </div>
 
@@ -168,52 +171,63 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-3">
-              {articles.map((article) => (
-                <article
-                  key={article.slug}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-                >
-                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <BookOpen className="h-16 w-16 text-primary/40" />
+            <>
+              <div className="grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-3">
+                {articles.map((article) => (
+                  <article
+                    key={article.slug}
+                    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+                  >
+                    <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <BookOpen className="h-16 w-16 text-primary/40" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-1 flex-col p-6">
-                    <div className="mb-3 flex items-center gap-2 text-xs text-muted">
-                      <Clock className="h-3 w-3" />
-                      <span>{article.readingTimeMinutes} хвилин читання</span>
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="mb-3 flex items-center gap-2 text-xs text-muted">
+                        <Clock className="h-3 w-3" />
+                        <span>{article.readingTimeMinutes} хвилин читання</span>
+                      </div>
+                      <h3 className="mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                        {article.title}
+                      </h3>
+                      {article.subtitle && (
+                        <p className="mb-4 text-sm text-muted-foreground">{article.subtitle}</p>
+                      )}
+                      <p className="mb-6 flex-1 text-sm text-foreground/80">
+                        {article.previewText}
+                      </p>
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        {article.tags?.slice(0, 3).map((tag) => (
+                          <Link
+                            key={tag}
+                            href={`/blog?tag=${encodeURIComponent(tag)}`}
+                            className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20"
+                          >
+                            #{tag}
+                          </Link>
+                        ))}
+                      </div>
+                      <Link
+                        href={`/blog/${article.slug}`}
+                        className="group/btn mt-auto inline-flex items-center justify-center rounded-full border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
+                      >
+                        Читати статтю
+                      </Link>
                     </div>
-                    <h3 className="mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                      {article.title}
-                    </h3>
-                    {article.subtitle && (
-                      <p className="mb-4 text-sm text-muted-foreground">{article.subtitle}</p>
-                    )}
-                    <p className="mb-6 flex-1 text-sm text-foreground/80">
-                      {article.previewText}
-                    </p>
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      {article.tags?.slice(0, 3).map((tag) => (
-                        <Link
-                          key={tag}
-                          href={`/blog?tag=${encodeURIComponent(tag)}`}
-                          className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20"
-                        >
-                          #{tag}
-                        </Link>
-                      ))}
-                    </div>
-                    <Link
-                      href={`/blog/${article.slug}`}
-                      className="group/btn mt-auto inline-flex items-center justify-center rounded-full border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
-                    >
-                      Читати статтю
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+                  </article>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                baseUrl="/blog"
+                searchParams={{ tag: activeTag, search: searchQuery }}
+                className="mt-12"
+              />
+            </>
           )}
         </div>
       </section>

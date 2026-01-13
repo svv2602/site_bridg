@@ -1,10 +1,21 @@
 import { MOCK_ARTICLES, type Article } from "@/lib/data";
 import {
   getPayloadArticles,
+  getPayloadArticlesPaginated,
   getPayloadArticleBySlug,
   getPayloadArticleTags,
   transformPayloadArticle,
+  type PaginatedArticlesResult,
 } from "./payload";
+
+export interface PaginatedArticles {
+  articles: Article[];
+  totalDocs: number;
+  totalPages: number;
+  page: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
 
 /**
  * Повертає всі статті / поради. Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
@@ -39,6 +50,71 @@ export async function getArticles(params?: {
   }
 
   return result;
+}
+
+/**
+ * Повертає статті з пагінацією.
+ */
+export async function getArticlesPaginated(params?: {
+  tag?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<PaginatedArticles> {
+  const page = params?.page ?? 1;
+  const limit = params?.limit ?? 9;
+
+  try {
+    const result = await getPayloadArticlesPaginated({
+      tag: params?.tag,
+      search: params?.search,
+      page,
+      limit,
+    });
+
+    if (result.articles.length > 0 || result.totalDocs === 0) {
+      return {
+        articles: result.articles.map(article => transformPayloadArticle(article) as Article),
+        totalDocs: result.totalDocs,
+        totalPages: result.totalPages,
+        page: result.page,
+        hasNextPage: result.hasNextPage,
+        hasPrevPage: result.hasPrevPage,
+      };
+    }
+  } catch (error) {
+    console.warn("Payload CMS unavailable, using mock data:", error);
+  }
+
+  // Fallback to mock data with filtering and pagination
+  let filtered = MOCK_ARTICLES;
+
+  if (params?.tag) {
+    filtered = filtered.filter(a => a.tags?.some(t => t.toLowerCase() === params.tag?.toLowerCase()));
+  }
+
+  if (params?.search) {
+    const searchLower = params.search.toLowerCase();
+    filtered = filtered.filter(a =>
+      a.title.toLowerCase().includes(searchLower) ||
+      a.previewText?.toLowerCase().includes(searchLower) ||
+      a.tags?.some(t => t.toLowerCase().includes(searchLower))
+    );
+  }
+
+  const totalDocs = filtered.length;
+  const totalPages = Math.ceil(totalDocs / limit);
+  const startIndex = (page - 1) * limit;
+  const paginatedArticles = filtered.slice(startIndex, startIndex + limit);
+
+  return {
+    articles: paginatedArticles,
+    totalDocs,
+    totalPages,
+    page,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
 }
 
 /**
