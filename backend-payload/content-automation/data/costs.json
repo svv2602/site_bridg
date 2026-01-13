@@ -365,7 +365,94 @@
       "success": false,
       "error": "404 The model `deepseek-chat` does not exist or you do not have access to it.",
       "timestamp": "2026-01-12T18:46:41.942Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 2621,
+      "outputTokens": 1500,
+      "cost": 0.0007869400000000001,
+      "latencyMs": 52147,
+      "success": true,
+      "timestamp": "2026-01-13T13:17:20.159Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 1783,
+      "outputTokens": 1496,
+      "cost": 0.0006685,
+      "latencyMs": 51667,
+      "success": true,
+      "timestamp": "2026-01-13T13:18:11.947Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 2444,
+      "outputTokens": 1500,
+      "cost": 0.0007621600000000001,
+      "latencyMs": 52705,
+      "success": true,
+      "timestamp": "2026-01-13T13:19:04.801Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 1409,
+      "outputTokens": 1352,
+      "cost": 0.00057582,
+      "latencyMs": 47396,
+      "success": true,
+      "timestamp": "2026-01-13T13:19:52.353Z"
+    },
+    {
+      "provider": "openai",
+      "model": "claude-sonnet-4-20250514",
+      "taskType": "content-generation",
+      "cost": 0,
+      "latencyMs": 0,
+      "success": false,
+      "error": "404 The model `claude-sonnet-4-20250514` does not exist or you do not have access to it.",
+      "timestamp": "2026-01-13T13:19:56.097Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 2633,
+      "outputTokens": 1408,
+      "cost": 0.00076286,
+      "latencyMs": 48852,
+      "success": true,
+      "timestamp": "2026-01-13T13:27:09.650Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 2456,
+      "outputTokens": 1632,
+      "cost": 0.0008008,
+      "latencyMs": 57171,
+      "success": true,
+      "timestamp": "2026-01-13T13:28:06.826Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 2707,
+      "outputTokens": 1385,
+      "cost": 0.0007667800000000001,
+      "latencyMs": 48537,
+      "success": true,
+      "timestamp": "2026-01-13T13:28:55.365Z"
     }
   ],
-  "lastUpdated": "2026-01-12T18:46:41.942Z"
+  "lastUpdated": "2026-01-13T13:28:55.365Z"
 }
