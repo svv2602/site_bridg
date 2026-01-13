@@ -309,7 +309,7 @@ class PayloadClient {
    */
   async uploadImageFromUrl(
     imageUrl: string,
-    options: { alt?: string; filename?: string } = {}
+    options: { alt?: string; filename?: string; removeBackground?: boolean } = {}
   ): Promise<{ id: number; url: string } | null> {
     try {
       await this.ensureAuthenticated();
@@ -340,7 +340,14 @@ class PayloadClient {
       // Alt is required by Payload Media collection
       // Payload expects metadata in _payload JSON field
       const altText = options.alt || filename.replace(/\.[^.]+$/, "").replace(/-/g, " ");
-      formData.append("_payload", JSON.stringify({ alt: altText }));
+      const payload: Record<string, unknown> = { alt: altText };
+
+      // Enable background removal for tire images
+      if (options.removeBackground) {
+        payload.removeBackground = true;
+      }
+
+      formData.append("_payload", JSON.stringify(payload));
 
       // Upload to Payload
       console.log(`  Uploading to Payload: ${filename} (alt: ${altText})`);
@@ -385,6 +392,36 @@ class PayloadClient {
       console.error(`Failed to update tyre image:`, error);
       return false;
     }
+  }
+
+  /**
+   * Update media to trigger background removal
+   */
+  async enableBackgroundRemoval(mediaId: number): Promise<boolean> {
+    try {
+      await this.fetch(`/media/${mediaId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ removeBackground: true }),
+      });
+      console.log(`  ✓ Background removal enabled for media ID: ${mediaId}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to enable background removal:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Batch enable background removal for multiple media
+   */
+  async enableBackgroundRemovalBatch(mediaIds: number[]): Promise<number> {
+    let successCount = 0;
+    for (const id of mediaIds) {
+      if (await this.enableBackgroundRemoval(id)) {
+        successCount++;
+      }
+    }
+    return successCount;
   }
 
   // ============ BATCH OPERATIONS ============

@@ -273,12 +273,13 @@ async function runPublishPipeline(brand?: Brand) {
         // Find existing tyre or create new
         const existing = await client.findTyreBySlug(slug);
 
-        // Upload image if available
+        // Upload image if available (with background removal for tire images)
         let imageId: number | undefined;
         if (tire.imageUrl) {
           const imageResult = await client.uploadImageFromUrl(tire.imageUrl, {
             alt: `${tire.brand || brand} ${tire.name}`,
             filename: `${slug}.png`,
+            removeBackground: true,
           });
           if (imageResult) {
             imageId = imageResult.id;
