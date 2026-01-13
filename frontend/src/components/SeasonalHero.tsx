@@ -27,7 +27,7 @@ interface SeasonalData {
 
 const defaultData: SeasonalData = {
   heroTitle: 'Безпека на кожному кілометрі',
-  heroSubtitle: 'Шини Bridgestone — офіційний представник в Україні',
+  heroSubtitle: 'Bridgestone & Firestone — офіційний представник в Україні',
   featuredSeason: null,
   gradient: 'from-stone-800 to-stone-900',
   ctaText: 'Переглянути каталог',

@@ -123,6 +123,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "turanza-t005",
     name: "Bridgestone Turanza T005",
+    brand: "bridgestone",
     season: "summer",
     vehicleTypes: ["passenger"],
     isPopular: true,
@@ -149,6 +150,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "blizzak-lm005",
     name: "Bridgestone Blizzak LM005",
+    brand: "bridgestone",
     season: "winter",
     vehicleTypes: ["passenger", "suv"],
     isPopular: true,
@@ -176,6 +178,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "potenza-sport",
     name: "Bridgestone Potenza Sport",
+    brand: "bridgestone",
     season: "summer",
     vehicleTypes: ["passenger", "suv"],
     isNew: true,
@@ -201,6 +204,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "weather-control-a005-evo",
     name: "Bridgestone Weather Control A005 EVO",
+    brand: "bridgestone",
     season: "allseason",
     vehicleTypes: ["passenger"],
     isNew: true,
@@ -228,6 +232,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "dueler-hp-sport",
     name: "Bridgestone Dueler H/P Sport",
+    brand: "bridgestone",
     season: "summer",
     vehicleTypes: ["suv"],
     isPopular: true,
@@ -253,6 +258,7 @@ export const MOCK_TYRE_MODELS: TyreModel[] = [
   {
     slug: "blizzak-dm-v3",
     name: "Bridgestone Blizzak DM-V3",
+    brand: "bridgestone",
     season: "winter",
     vehicleTypes: ["suv"],
     isPopular: true,

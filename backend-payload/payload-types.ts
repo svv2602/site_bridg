@@ -221,7 +221,7 @@ export interface Media {
   };
 }
 /**
- * Моделі шин Bridgestone
+ * Моделі шин Bridgestone та Firestone
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tyres".
@@ -232,6 +232,7 @@ export interface Tyre {
   seoTitle?: string | null;
   seoDescription?: string | null;
   name: string;
+  brand: 'bridgestone' | 'firestone';
   season: 'summer' | 'winter' | 'allseason';
   isNew?: boolean | null;
   isPopular?: boolean | null;
@@ -803,6 +804,7 @@ export interface TyresSelect<T extends boolean = true> {
   seoTitle?: T;
   seoDescription?: T;
   name?: T;
+  brand?: T;
   season?: T;
   isNew?: T;
   isPopular?: T;
