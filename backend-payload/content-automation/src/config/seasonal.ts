@@ -33,7 +33,7 @@ export const SEASONAL_CONFIGS: Record<SeasonalPeriod, SeasonalConfig> = {
   summer: {
     period: "summer",
     heroTitle: "Впевненість на сухому та мокрому асфальті",
-    heroSubtitle: "Літні шини Bridgestone для комфортних поїздок",
+    heroSubtitle: "Літні шини Bridgestone та Firestone для комфортних поїздок",
     featuredSeason: "summer",
     accentColor: "from-amber-500 to-orange-500",
     bgGradient: "from-amber-950 via-zinc-900 to-zinc-800",
@@ -53,7 +53,7 @@ export const SEASONAL_CONFIGS: Record<SeasonalPeriod, SeasonalConfig> = {
   winter: {
     period: "winter",
     heroTitle: "Безпека на засніжених дорогах",
-    heroSubtitle: "Зимові шини Bridgestone для впевненого зчеплення",
+    heroSubtitle: "Зимові шини Bridgestone та Firestone для впевненого зчеплення",
     featuredSeason: "winter",
     accentColor: "from-cyan-400 to-blue-500",
     bgGradient: "from-slate-950 via-blue-950 to-zinc-900",

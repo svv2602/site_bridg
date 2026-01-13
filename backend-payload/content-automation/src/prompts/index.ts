@@ -2,11 +2,14 @@
  * Prompts Loader
  *
  * Loads prompt templates from markdown files for content generation.
+ * Supports multi-brand (Bridgestone & Firestone) content generation.
  */
 
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import type { Brand } from "../types/content.js";
+import { BRAND_NAMES } from "../types/content.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -50,9 +53,9 @@ export function extractRequirements(promptContent: string): string {
   return reqMatch ? reqMatch[1].trim() : "";
 }
 
-// Pre-defined prompt templates for common tasks
+// Pre-defined prompt templates for common tasks (brand-neutral, for backward compatibility)
 export const SYSTEM_PROMPTS = {
-  tireDescription: `Ти - SEO-копірайтер для офіційного сайту Bridgestone Україна.
+  tireDescription: `Ти - SEO-копірайтер для офіційного сайту Bridgestone & Firestone Україна.
 
 Правила:
 - Пиши виключно українською мовою
@@ -63,7 +66,7 @@ export const SYSTEM_PROMPTS = {
 - Фокусуйся на перевагах для водія
 - Використовуй конкретні факти з вхідних даних`,
 
-  tireSEO: `Ти - SEO-спеціаліст для автомобільного сайту Bridgestone Україна.
+  tireSEO: `Ти - SEO-спеціаліст для автомобільного сайту Bridgestone & Firestone Україна.
 
 Правила:
 - seoTitle: 50-60 символів, включає назву моделі
@@ -71,7 +74,7 @@ export const SYSTEM_PROMPTS = {
 - Ключові слова природно інтегровані
 - Українська мова`,
 
-  tireFAQ: `Ти - експерт з автомобільних шин для сайту Bridgestone Україна.
+  tireFAQ: `Ти - експерт з автомобільних шин для сайту Bridgestone & Firestone Україна.
 
 Правила:
 - Відповіді 2-3 речення
@@ -80,7 +83,7 @@ export const SYSTEM_PROMPTS = {
 - Оптимізуй для featured snippets
 - Українська мова`,
 
-  article: `Ти - автомобільний журналіст для блогу Bridgestone Україна.
+  article: `Ти - автомобільний журналіст для блогу Bridgestone & Firestone Україна.
 
 Правила:
 - Інформативний, не рекламний стиль
@@ -94,6 +97,53 @@ export const SYSTEM_PROMPTS = {
 Focus on quality, realism, and brand-appropriate imagery.
 Avoid text, watermarks, or unrealistic elements.`,
 };
+
+/**
+ * Get brand-specific system prompts
+ */
+export function getSystemPromptsForBrand(brand: Brand) {
+  const brandName = BRAND_NAMES[brand];
+
+  return {
+    tireDescription: `Ти - SEO-копірайтер для офіційного сайту ${brandName} Україна.
+
+Правила:
+- Пиши виключно українською мовою
+- Використовуй професійний, але доступний стиль
+- Підкреслюй технічні переваги та безпеку
+- НІКОЛИ не згадуй ціни
+- Уникай кліше, канцеляризмів та надмірних епітетів
+- Фокусуйся на перевагах для водія
+- Використовуй конкретні факти з вхідних даних`,
+
+    tireSEO: `Ти - SEO-спеціаліст для автомобільного сайту ${brandName} Україна.
+
+Правила:
+- seoTitle: 50-60 символів, включає назву моделі ${brandName}
+- seoDescription: 150-160 символів, включає основну перевагу
+- Ключові слова природно інтегровані
+- Українська мова`,
+
+    tireFAQ: `Ти - експерт з автомобільних шин для сайту ${brandName} Україна.
+
+Правила:
+- Відповіді 2-3 речення
+- Конкретні факти, без загальних фраз
+- Не вигадуй дані
+- Оптимізуй для featured snippets
+- Українська мова`,
+
+    article: `Ти - автомобільний журналіст для блогу ${brandName} Україна.
+
+Правила:
+- Інформативний, не рекламний стиль
+- Практичні поради для водіїв
+- Структура: вступ → основна частина → висновок
+- НЕ вигадуй дані
+- Уникай рекламного тону
+- Українська мова`,
+  };
+}
 
 // Season labels in Ukrainian
 export const SEASON_LABELS = {

@@ -2,11 +2,20 @@
  * LLM Prompts for Content Generation
  *
  * Centralized prompt templates for tire descriptions, articles, etc.
+ * Supports multi-brand (Bridgestone & Firestone) content generation.
  */
 
-// System prompts for different content types
+import type { Brand } from "../types/content.js";
+
+// Brand display names
+const BRAND_NAMES: Record<Brand, string> = {
+  bridgestone: "Bridgestone",
+  firestone: "Firestone",
+};
+
+// System prompts for different content types (brand-neutral for backward compatibility)
 export const SYSTEM_PROMPTS = {
-  tireDescription: `Ти - експерт з автомобільних шин та професійний копірайтер для офіційного сайту Bridgestone в Україні.
+  tireDescription: `Ти - експерт з автомобільних шин та професійний копірайтер для офіційного сайту Bridgestone & Firestone в Україні.
 
 Правила:
 - Пиши виключно українською мовою
@@ -17,7 +26,7 @@ export const SYSTEM_PROMPTS = {
 - Фокусуйся на перевагах для водія, а не на характеристиках
 - Використовуй конкретні факти з вхідних даних`,
 
-  article: `Ти - автомобільний журналіст, який пише статті для блогу Bridgestone Україна.
+  article: `Ти - автомобільний журналіст, який пише статті для блогу Bridgestone & Firestone Україна.
 
 Правила:
 - Пиши виключно українською мовою
@@ -36,20 +45,63 @@ export const SYSTEM_PROMPTS = {
 - Використовуй ключові слова природно`,
 };
 
-// Tire description generation prompt
-export function getTireDescriptionPrompt(tire: {
-  name: string;
-  season: "summer" | "winter" | "allseason";
-  vehicleTypes?: string[];
-  technologies?: string[];
-  euLabel?: {
-    wetGrip?: string;
-    fuelEfficiency?: string;
-    noiseDb?: number;
+/**
+ * Get brand-specific system prompts
+ */
+export function getSystemPromptsForBrand(brand: Brand) {
+  const brandName = BRAND_NAMES[brand];
+
+  return {
+    tireDescription: `Ти - експерт з автомобільних шин та професійний копірайтер для офіційного сайту ${brandName} в Україні.
+
+Правила:
+- Пиши виключно українською мовою
+- Використовуй професійний, але доступний стиль
+- Підкреслюй технічні переваги та безпеку
+- НІКОЛИ не згадуй ціни
+- Уникай кліше, канцеляризмів та надмірних епітетів
+- Фокусуйся на перевагах для водія, а не на характеристиках
+- Використовуй конкретні факти з вхідних даних`,
+
+    article: `Ти - автомобільний журналіст, який пише статті для блогу ${brandName} Україна.
+
+Правила:
+- Пиши виключно українською мовою
+- Стиль: інформативний, корисний для водіїв
+- Структура: вступ, основні пункти, висновок
+- Включай практичні поради
+- Уникай рекламного тону
+- НЕ вигадуй дані, яких немає у вхідних`,
+
+    seo: `Ти - SEO-спеціаліст для автомобільного сайту ${brandName}.
+
+Правила:
+- Пиши українською
+- seoTitle: 50-60 символів, включає назву моделі ${brandName}
+- seoDescription: 150-160 символів, включає основну перевагу
+- Використовуй ключові слова природно`,
   };
-  sourceDescription?: string;
-  testResults?: string;
-}): string {
+}
+
+// Tire description generation prompt
+export function getTireDescriptionPrompt(
+  tire: {
+    name: string;
+    season: "summer" | "winter" | "allseason";
+    vehicleTypes?: string[];
+    technologies?: string[];
+    euLabel?: {
+      wetGrip?: string;
+      fuelEfficiency?: string;
+      noiseDb?: number;
+    };
+    sourceDescription?: string;
+    testResults?: string;
+  },
+  brand: Brand = "bridgestone"
+): string {
+  const brandName = BRAND_NAMES[brand];
+
   const seasonLabels = {
     summer: "літня",
     winter: "зимова",
@@ -67,10 +119,10 @@ export function getTireDescriptionPrompt(tire: {
     ?.map((v) => vehicleLabels[v] || v)
     .join(", ");
 
-  return `Створи унікальний контент для шини Bridgestone ${tire.name}.
+  return `Створи унікальний контент для шини ${brandName} ${tire.name}.
 
 ВХІДНІ ДАНІ:
-- Модель: Bridgestone ${tire.name}
+- Модель: ${brandName} ${tire.name}
 - Сезон: ${seasonLabels[tire.season]}
 ${vehicles ? `- Типи авто: ${vehicles}` : ""}
 ${tire.technologies?.length ? `- Технології: ${tire.technologies.join(", ")}` : ""}
