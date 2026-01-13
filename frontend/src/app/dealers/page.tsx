@@ -243,14 +243,14 @@ export default function DealersPage() {
               </p>
             </motion.div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
               {filteredDealers.map((dealer, idx) => (
                 <motion.article
                   key={dealer.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="p-6">
                     <div className="mb-4 flex items-start justify-between">

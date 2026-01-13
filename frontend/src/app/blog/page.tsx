@@ -168,11 +168,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-3">
               {articles.map((article) => (
                 <article
                   key={article.slug}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
                     <div className="absolute inset-0 flex items-center justify-center">

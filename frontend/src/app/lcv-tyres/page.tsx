@@ -161,11 +161,11 @@ export default async function LcvTyresPage() {
         <section className="py-12 bg-gradient-to-b from-card to-background">
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
             <h2 className="mb-8 text-3xl font-bold text-center">Популярні моделі для комерційних авто</h2>
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 pt-2 md:grid-cols-2 lg:grid-cols-3">
               {lcvTyres.slice(0, 6).map((model) => (
                 <div
                   key={model.slug}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1"
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1"
                 >
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
                     <TyreImage

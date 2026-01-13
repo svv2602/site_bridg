@@ -145,13 +145,13 @@ export default async function Home() {
       {/* Vehicle Types */}
       <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-10 text-center">
+          <div className="mb-8 text-center">
             <h2 className="mb-4 text-3xl font-bold">Шини за типом авто</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               Оберіть категорію, що відповідає вашому автомобілю
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-2">
             {vehicleTypesData.map((vehicle, idx) => (
               <AnimatedCard key={vehicle.href} delay={idx * 0.15}>
                 <VehicleTypeCard {...vehicle} />

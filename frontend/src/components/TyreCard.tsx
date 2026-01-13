@@ -72,13 +72,13 @@ function FallbackIcon({ vehicleTypes }: { vehicleTypes: string[] }) {
 }
 
 export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
-  const imageHeight = variant === "compact" ? "h-56" : variant === "featured" ? "h-80" : "h-72";
+  const imageHeight = variant === "compact" ? "h-48" : variant === "featured" ? "h-80" : "h-72";
   const topBadge = getTopBadge(tyre.badges);
 
   return (
     <Link
       href={`/shyny/${tyre.slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
     >
       {/* Image Section - Large and prominent */}
       <div className={`relative ${imageHeight} overflow-hidden bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800`}>
@@ -126,42 +126,46 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4">
         {/* Title */}
-        <h3 className="mb-2 text-lg font-bold leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+        <h3 className="mb-1 text-base font-bold leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
           Bridgestone {tyre.name}
         </h3>
 
-        {/* Description */}
-        <p className="mb-4 line-clamp-2 flex-1 text-sm text-muted-foreground">
+        {/* Description - fixed height with line clamp */}
+        <p className="mb-3 line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">
           {tyre.shortDescription}
         </p>
 
-        {/* EU Label */}
-        {tyre.euLabel && (
-          <EuLabelGroup
-            wetGrip={tyre.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
-            fuelEfficiency={tyre.euLabel.fuelEfficiency as "A" | "B" | "C" | "D" | "E"}
-            noiseDb={tyre.euLabel.noiseDb}
-            size="sm"
-            className="mb-3"
-          />
+        {/* EU Label - always show section for consistent height */}
+        <div className="mb-3 min-h-[1.75rem]">
+          {tyre.euLabel && (
+            <EuLabelGroup
+              wetGrip={tyre.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
+              fuelEfficiency={tyre.euLabel.fuelEfficiency as "A" | "B" | "C" | "D" | "E"}
+              noiseDb={tyre.euLabel.noiseDb}
+              size="sm"
+            />
+          )}
+        </div>
+
+        {/* Technologies - always show section for consistent height */}
+        {variant !== "compact" && (
+          <div className="mb-3 min-h-[1.5rem]">
+            {tyre.technologies && tyre.technologies.length > 0 && (
+              <TechnologyGroup
+                technologies={tyre.technologies}
+                size="sm"
+                showLabels={false}
+                maxVisible={4}
+              />
+            )}
+          </div>
         )}
 
-        {/* Technologies */}
-        {tyre.technologies && tyre.technologies.length > 0 && (
-          <TechnologyGroup
-            technologies={tyre.technologies}
-            size="sm"
-            showLabels={false}
-            maxVisible={4}
-            className="mb-4"
-          />
-        )}
-
-        {/* Sizes Preview */}
+        {/* Sizes Preview - push to bottom */}
         {variant !== "compact" && tyre.sizes.length > 0 && (
-          <div className="mt-auto">
+          <div className="mt-auto pt-2">
             <p className="mb-2 text-xs font-medium text-muted-foreground">
               {tyre.sizes.length} розмірів доступно
             </p>
@@ -182,6 +186,13 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
             </div>
           </div>
         )}
+
+        {/* Compact variant: show sizes count at bottom */}
+        {variant === "compact" && tyre.sizes.length > 0 && (
+          <div className="mt-auto pt-2 text-xs text-muted-foreground">
+            {tyre.sizes.length} розмірів
+          </div>
+        )}
       </div>
     </Link>
   );
@@ -189,7 +200,7 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
 
 export function TyreCardGrid({ tyres, variant }: { tyres: TyreModel[]; variant?: "default" | "compact" | "featured" }) {
   return (
-    <div className={`grid gap-6 ${variant === "compact" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-2 lg:grid-cols-3"}`}>
+    <div className={`grid gap-6 pt-2 ${variant === "compact" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : "md:grid-cols-2 lg:grid-cols-3"}`}>
       {tyres.map((tyre) => (
         <TyreCard key={tyre.slug} tyre={tyre} variant={variant} />
       ))}

@@ -265,7 +265,7 @@ export default function ComparisonSelectionPage() {
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Популярні порівняння</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
             {[
               {
                 title: "Turanza 6 vs Potenza Sport",

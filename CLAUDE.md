@@ -192,6 +192,16 @@ npm run test:coverage  # With coverage report
 4. **Dynamic routes**: `/shyny/[slug]` and `/advice/[slug]` use `generateStaticParams()`
 5. **Styling**: Dark hero sections (zinc-900), cards with border-border bg-card
 
+## UI Component Standards
+
+See detailed standards in `frontend/docs/standards/ui-components.md`.
+
+Key rules:
+- **Hover lift cards**: Grids with `hover:-translate-y-1` cards must have `pt-2`
+- **Equal card heights**: Use `h-full` on card container + `min-h-[X]` for optional sections
+- **Carousel spacing**: Use `-ml-4` on flex container + `pl-4` on items
+- **Carousel overflow**: Use `overflow-x-clip overflow-y-visible` for hover effects
+
 ## Language
 
 All UI text is in Ukrainian. Variable names and code comments in English.
