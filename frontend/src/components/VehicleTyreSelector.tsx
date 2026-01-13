@@ -129,10 +129,6 @@ function SelectField({
     ? options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()))
     : options;
 
-  // Показувати максимум 100 опцій
-  const displayOptions = filteredOptions.slice(0, 100);
-  const hasMore = filteredOptions.length > 100;
-
   // Закрити при кліку поза компонентом
   useEffect(() => {
     if (!isOpen) return;
@@ -216,36 +212,29 @@ function SelectField({
 
             {isOpen && !disabled && (
               <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-border bg-card py-1 shadow-xl">
-                {displayOptions.length === 0 ? (
+                {filteredOptions.length === 0 ? (
                   <div className="px-3 py-2 text-sm text-muted-foreground">
                     Нічого не знайдено
                   </div>
                 ) : (
-                  <>
-                    {displayOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        className={`w-full px-3 py-2 text-left text-sm hover:bg-muted ${
-                          opt.value === value
-                            ? "bg-muted text-primary"
-                            : "text-foreground"
-                        }`}
-                        onClick={() => {
-                          onChange(opt.value);
-                          setIsOpen(false);
-                          setSearch("");
-                        }}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                    {hasMore && (
-                      <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border">
-                        Показано {displayOptions.length} з {filteredOptions.length}. Введіть текст для пошуку.
-                      </div>
-                    )}
-                  </>
+                  filteredOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`w-full px-3 py-2 text-left text-sm hover:bg-muted ${
+                        opt.value === value
+                          ? "bg-muted text-primary"
+                          : "text-foreground"
+                      }`}
+                      onClick={() => {
+                        onChange(opt.value);
+                        setIsOpen(false);
+                        setSearch("");
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))
                 )}
               </div>
             )}
