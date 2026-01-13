@@ -3,9 +3,18 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Star, Car, Shield, MapPin, Zap, Sun, Snowflake } from 'lucide-react';
 import { getSeasonalContent } from '@/lib/api/payload';
 import { t } from '@/lib/i18n';
+
+// Mapping сезон → зображення шини для hero
+const heroImages: Record<string, string> = {
+  summer: '/images/hero/turanza-hero.png',
+  winter: '/images/hero/blizzak-hero.png',
+  'all-season': '/images/hero/turanza-all-season-hero.png',
+  default: '/images/hero/turanza-hero.png',
+};
 
 interface SeasonalData {
   heroTitle: string;
@@ -146,14 +155,20 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             transition={{ duration: 0.6 }}
             className="space-y-6"
           >
-            {/* Season visual card */}
+            {/* Season visual card with tyre image */}
             <div className={`hero-card relative h-64 overflow-hidden lg:h-80 ${seasonalData.featuredSeason ? `bg-gradient-to-br ${seasonalData.gradient}` : ''}`}>
+              {/* Tyre image */}
               <div className="absolute inset-0 flex items-center justify-center">
-                {seasonalData.featuredSeason ? (
-                  <SeasonIcon className="h-40 w-40 text-white/20" />
-                ) : (
-                  <Car className="h-40 w-40 text-white/10" />
-                )}
+                <div className="relative h-48 w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 transform transition-transform duration-500 hover:scale-105">
+                  <Image
+                    src={heroImages[seasonalData.featuredSeason || 'default']}
+                    alt={`Bridgestone ${seasonalData.featuredSeason === 'winter' ? 'Blizzak' : 'Turanza'}`}
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    sizes="(max-width: 768px) 192px, (max-width: 1024px) 224px, 256px"
+                    priority
+                  />
+                </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
                 <h3 className="text-xl font-semibold text-hero-foreground">
