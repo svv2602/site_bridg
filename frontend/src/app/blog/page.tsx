@@ -184,7 +184,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       <Clock className="h-3 w-3" />
                       <span>{article.readingTimeMinutes} хвилин читання</span>
                     </div>
-                    <h3 className="mb-2 text-xl font-bold transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+                    <h3 className="mb-3 text-xl font-medium transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                       {article.title}
                     </h3>
                     {article.subtitle && (

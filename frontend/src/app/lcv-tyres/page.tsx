@@ -181,7 +181,7 @@ export default async function LcvTyresPage() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-6">
-                    <h3 className="mb-2 text-xl font-bold transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+                    <h3 className="mb-3 text-xl font-medium transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                       {model.name}
                     </h3>
                     <p className="mb-4 text-sm text-muted-foreground flex-1 line-clamp-2">
