@@ -14,6 +14,9 @@ import {
   Loader2,
   Info,
   MapPin,
+  Sun,
+  Snowflake,
+  Cloud,
 } from "lucide-react";
 import type {
   CarBrand,
@@ -737,71 +740,90 @@ export function VehicleTyreSelector() {
                   )}
                 </h3>
                 <div className="grid gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredTyres.map((tyre, idx) => (
-                    <motion.article
-                      key={tyre.slug}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="group overflow-hidden rounded-xl border border-border bg-card/50 transition-all hover:border-muted-foreground hover:shadow-xl hover:-translate-y-1"
-                    >
-                      <div className="relative h-32 bg-gradient-to-br from-muted to-muted/50">
-                        {tyre.imageUrl ? (
-                          <img
-                            src={tyre.imageUrl}
-                            alt={tyre.name}
-                            className="h-full w-full object-contain p-4"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center">
-                            <Car className="h-16 w-16 text-muted-foreground/50" />
+                  {filteredTyres.map((tyre, idx) => {
+                    const seasonConfig = {
+                      summer: { label: "Літня", icon: Sun, color: "badge-summer" },
+                      winter: { label: "Зимова", icon: Snowflake, color: "badge-winter" },
+                      allseason: { label: "Всесезонна", icon: Cloud, color: "badge-allseason" },
+                    };
+                    const season = seasonConfig[tyre.season];
+                    const SeasonIcon = season.icon;
+
+                    return (
+                      <motion.div
+                        key={tyre.slug}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <Link
+                          href={`/shyny/${tyre.slug}`}
+                          className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
+                        >
+                          {/* Image Section */}
+                          <div className="relative h-48 overflow-hidden bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800">
+                            {tyre.imageUrl ? (
+                              <img
+                                src={tyre.imageUrl}
+                                alt={`Шина ${tyre.name}`}
+                                className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center">
+                                <Car className="h-32 w-32 text-muted-foreground/20" />
+                              </div>
+                            )}
+
+                            {/* Season Badge */}
+                            <div className={`absolute top-4 left-4 flex items-center gap-1.5 rounded-lg ${season.color} px-3 py-1.5 text-sm font-semibold text-white shadow-lg`}>
+                              <SeasonIcon className="h-4 w-4" />
+                              <span>{season.label}</span>
+                            </div>
+
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                            {/* Quick View Button on Hover */}
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                              <span className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-stone-900 shadow-xl">
+                                Детальніше
+                                <ChevronRight className="h-4 w-4" />
+                              </span>
+                            </div>
                           </div>
-                        )}
-                        <div className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-0.5 text-xs font-semibold text-foreground">
-                          {tyre.season === "summer"
-                            ? "Літні"
-                            : tyre.season === "winter"
-                              ? "Зимові"
-                              : "Всесезонні"}
-                        </div>
-                      </div>
-                      <div className="flex flex-col p-4">
-                        <h4 className="font-bold text-foreground transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 line-clamp-2">
-                          {tyre.name}
-                        </h4>
-                        <div className="mt-2 flex flex-wrap gap-1 min-h-[1.5rem]">
-                          {tyre.matchingSizes.slice(0, 3).map((size) => (
-                            <span
-                              key={size}
-                              className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-                            >
-                              {size}
-                            </span>
-                          ))}
-                          {tyre.matchingSizes.length > 3 && (
-                            <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                              +{tyre.matchingSizes.length - 3}
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-auto pt-4 flex flex-wrap gap-2">
-                          <Link
-                            href={`/shyny/${tyre.slug}`}
-                            className="flex-1 min-w-[80px] rounded-full border border-border px-3 py-1.5 text-center text-xs sm:text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-                          >
-                            Детальніше
-                          </Link>
-                          <Link
-                            href="/dealers"
-                            className="flex-1 min-w-[80px] flex items-center justify-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                          >
-                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
-                            Купити
-                          </Link>
-                        </div>
-                      </div>
-                    </motion.article>
-                  ))}
+
+                          {/* Content Section */}
+                          <div className="flex flex-1 flex-col p-4">
+                            <h4 className="mb-1 text-base font-bold leading-tight transition-all group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+                              Bridgestone {tyre.name}
+                            </h4>
+
+                            {/* Matching Sizes */}
+                            <div className="mb-3 flex flex-wrap gap-1.5 min-h-[2rem]">
+                              {tyre.matchingSizes.slice(0, 2).map((size) => (
+                                <span
+                                  key={size}
+                                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium"
+                                >
+                                  {size}
+                                </span>
+                              ))}
+                              {tyre.matchingSizes.length > 2 && (
+                                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                                  +{tyre.matchingSizes.length - 2}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Sizes count at bottom */}
+                            <div className="mt-auto pt-2 text-xs text-muted-foreground">
+                              {tyre.matchingSizes.length} підходящих розмірів
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
