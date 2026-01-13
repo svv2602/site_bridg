@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { MapPin, Phone, ChevronRight } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import { AnimatedMain } from "@/components/AnimatedMain";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MainHeader } from "@/components/MainHeader";
+import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
 import { Analytics } from "@/components/Analytics";
 
@@ -74,24 +75,6 @@ const websiteSchema = {
   },
 };
 
-const mainNav = [
-  { href: "/passenger-tyres", label: "Легкові шини", icon: "🚗" },
-  { href: "/suv-4x4-tyres", label: "Шини для SUV", icon: "🚙" },
-  { href: "/lcv-tyres", label: "Комерційні шини", icon: "🚐" },
-  { href: "/tyre-search", label: "Пошук шин", icon: "🔍" },
-  { href: "/dealers", label: "Де купити", icon: "📍" },
-  { href: "/about", label: "Бренд", icon: "🌟" },
-  { href: "/blog", label: "Блог", icon: "📚" },
-  { href: "/contacts", label: "Контакти", icon: "📞" },
-];
-
-const footerLinks = [
-  { label: "Політика конфіденційності", href: "#" },
-  { label: "Умови використання", href: "#" },
-  { label: "Карта сайту", href: "#" },
-  { label: "Повернення та гарантія", href: "#" },
-];
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -145,89 +128,7 @@ export default function RootLayout({
           <AnimatedMain>{children}</AnimatedMain>
 
           {/* Footer */}
-          <footer className="border-t border-border bg-background">
-            <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
-              <div className="grid gap-8 md:grid-cols-4">
-                <div>
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-xl font-bold text-white">
-                      B
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold">Bridgestone</h3>
-                      <p className="text-xs text-muted">Україна</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted">
-                    Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні.
-                    Пошук шин, каталог, дилери, поради.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
-                    Навігація
-                  </h4>
-                  <ul className="space-y-2 text-sm">
-                    {mainNav.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-2 text-muted hover:text-primary"
-                        >
-                          <ChevronRight className="h-3 w-3" />
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
-                    Корисні посилання
-                  </h4>
-                  <ul className="space-y-2 text-sm">
-                    {footerLinks.map((link) => (
-                      <li key={link.label}>
-                        <Link
-                          href={link.href}
-                          className="text-muted hover:text-primary"
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
-                    Контакти
-                  </h4>
-                  <address className="not-italic text-sm text-muted">
-                    <p className="mb-2">Гаряча лінія:</p>
-                    <p className="text-lg font-bold text-primary">
-                      0 800 123 456
-                    </p>
-                    <p className="mt-4">Пн‑Пт 9:00–18:00</p>
-                    <p className="mt-2">support@bridgestone.ua</p>
-                  </address>
-                </div>
-              </div>
-
-              <div className="mt-12 border-t border-border pt-8 text-center text-xs text-muted">
-                <p>
-                  © {new Date().getFullYear()} Bridgestone. Усі права захищені.
-                  Сайт створено для кінцевих споживачів в Україні.
-                </p>
-                <p className="mt-2">
-                  Цей сайт є демонстраційним макетом та не належить компанії
-                  Bridgestone.
-                </p>
-              </div>
-            </div>
-          </footer>
+          <Footer />
 
           {/* Cookies Consent Banner */}
           <CookiesBanner />
