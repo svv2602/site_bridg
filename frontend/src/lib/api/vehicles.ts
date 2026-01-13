@@ -219,11 +219,9 @@ export async function findMatchingBridgestoneTyres(
     }
 
     if (matchingSizes.length > 0) {
+      // Повертаємо повні дані моделі + підходящі розміри
       matchingTyres.push({
-        slug: tyre.slug,
-        name: tyre.name,
-        season: tyre.season,
-        imageUrl: tyre.imageUrl,
+        ...tyre,
         matchingSizes,
       });
     }

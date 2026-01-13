@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/Badge";
 interface TyreCardProps {
   tyre: TyreModel;
   variant?: "default" | "compact" | "featured";
+  /** For vehicle search: show matching sizes instead of all sizes */
+  matchingSizes?: string[];
 }
 
 const seasonLabels: Record<Season, string> = {
@@ -71,7 +73,7 @@ function FallbackIcon({ vehicleTypes }: { vehicleTypes: string[] }) {
   );
 }
 
-export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
+export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardProps) {
   const imageHeight = variant === "compact" ? "h-48" : variant === "featured" ? "h-80" : "h-72";
   const topBadge = getTopBadge(tyre.badges);
 
@@ -187,12 +189,30 @@ export function TyreCard({ tyre, variant = "default" }: TyreCardProps) {
           </div>
         )}
 
-        {/* Compact variant: show sizes count at bottom */}
-        {variant === "compact" && tyre.sizes.length > 0 && (
+        {/* Compact variant: show matching sizes as badges or sizes count */}
+        {variant === "compact" && (matchingSizes ? (
+          <div className="mt-auto pt-2">
+            <div className="flex flex-wrap gap-1.5">
+              {matchingSizes.slice(0, 2).map((size) => (
+                <span
+                  key={size}
+                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium"
+                >
+                  {size}
+                </span>
+              ))}
+              {matchingSizes.length > 2 && (
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                  +{matchingSizes.length - 2}
+                </span>
+              )}
+            </div>
+          </div>
+        ) : tyre.sizes.length > 0 && (
           <div className="mt-auto pt-2 text-xs text-muted-foreground">
             {tyre.sizes.length} розмірів
           </div>
-        )}
+        ))}
       </div>
     </Link>
   );

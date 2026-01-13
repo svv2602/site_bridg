@@ -65,12 +65,10 @@ export interface VehicleInfo {
   boltSize: string | null;
 }
 
-// Шина Bridgestone, що підходить
-export interface MatchingTyre {
-  slug: string;
-  name: string;
-  season: 'summer' | 'winter' | 'allseason';
-  imageUrl?: string;
+// Шина Bridgestone, що підходить (повні дані моделі + підходящі розміри)
+import type { TyreModel } from '@/lib/data';
+
+export interface MatchingTyre extends TyreModel {
   matchingSizes: string[];
 }
 
