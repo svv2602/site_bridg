@@ -22,9 +22,9 @@ export default function AdminLayout({
   const isActive = (href: string) => pathname === href;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-white dark:bg-zinc-800">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-4">
             <Link href="/admin/automation" className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export default function AdminLayout({
           {/* Mobile menu button */}
           <button
             type="button"
-            className="rounded-md p-2 text-muted-foreground hover:bg-zinc-100 hover:text-foreground lg:hidden dark:hover:bg-zinc-700"
+            className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden dark:hover:bg-card-hover"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label={mobileMenuOpen ? "Закрити меню" : "Відкрити меню"}
@@ -78,7 +78,7 @@ export default function AdminLayout({
 
         {/* Mobile navigation */}
         {mobileMenuOpen && (
-          <nav className="border-t border-border bg-white px-4 py-4 lg:hidden dark:bg-zinc-800">
+          <nav className="border-t border-border bg-card px-4 py-4 lg:hidden">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
                 <Link
@@ -88,7 +88,7 @@ export default function AdminLayout({
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     isActive(item.href)
                       ? "bg-primary/10 font-medium text-primary"
-                      : "text-muted-foreground hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-700"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-card-hover"
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -99,7 +99,7 @@ export default function AdminLayout({
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-700"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-card-hover"
               >
                 <Home className="h-5 w-5" />
                 Main Site

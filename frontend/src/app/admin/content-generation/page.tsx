@@ -47,7 +47,7 @@ function StatCard({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+    <div className="rounded-lg border border-border bg-white p-4 dark:bg-card">
       <div className="flex items-center gap-3">
         <div className={`rounded-lg p-2 ${colorClasses[color]}`}>
           <Icon className="h-5 w-5" />
@@ -88,11 +88,11 @@ function StatusInfo({
 
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-card">
         {status.hasRawData ? (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         ) : (
-          <XCircle className="h-5 w-5 text-zinc-300" />
+          <XCircle className="h-5 w-5 text-muted" />
         )}
         <div>
           <p className="text-sm font-medium">Raw дані</p>
@@ -102,11 +102,11 @@ function StatusInfo({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-card">
         {status.hasGeneratedContent ? (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         ) : (
-          <XCircle className="h-5 w-5 text-zinc-300" />
+          <XCircle className="h-5 w-5 text-muted" />
         )}
         <div>
           <p className="text-sm font-medium">Згенеровано</p>
@@ -118,11 +118,11 @@ function StatusInfo({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-white p-4 dark:bg-card">
         {status.isPublished ? (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         ) : (
-          <XCircle className="h-5 w-5 text-zinc-300" />
+          <XCircle className="h-5 w-5 text-muted" />
         )}
         <div>
           <p className="text-sm font-medium">Опубліковано</p>
@@ -234,7 +234,7 @@ export default function ContentGenerationPage() {
         <button
           onClick={fetchTyres}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+          className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-stone-200 disabled:opacity-50 dark:bg-graphite dark:hover:bg-graphite-hover"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -290,7 +290,7 @@ export default function ContentGenerationPage() {
       </div>
 
       {/* Model Selection */}
-      <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+      <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
         <h2 className="mb-4 text-lg font-semibold">Вибір моделі</h2>
         <ModelSelector
           tyres={tyres}
@@ -339,7 +339,7 @@ export default function ContentGenerationPage() {
 
       {/* Content Preview */}
       {showPreview && preview && (
-        <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Превью контенту</h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

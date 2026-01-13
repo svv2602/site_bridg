@@ -1,12 +1,12 @@
 # Фаза 3: Миграция админки
 
 ## Статус
-- [ ] Не начата
-- [ ] В процессе
-- [ ] Завершена
+- [x] Не начата
+- [x] В процессе
+- [x] Завершена
 
-**Начата:** -
-**Завершена:** -
+**Начата:** 2026-01-13
+**Завершена:** 2026-01-13
 
 ## Цель фазы
 Перевести админ-панель с `zinc-*` классов на семантические токены.
@@ -20,10 +20,10 @@
 ### 3.0 ОБЯЗАТЕЛЬНО: Анализ и планирование
 
 #### A. Инвентаризация zinc-классов в админке
-- [ ] Найти все zinc-классы в admin/layout.tsx
-- [ ] Найти все zinc-классы в admin/automation/page.tsx
-- [ ] Найти все zinc-классы в admin/vehicles-import/page.tsx
-- [ ] Найти zinc в других файлах админки
+- [x] Найти все zinc-классы в admin/layout.tsx - 6 мест
+- [x] Найти все zinc-классы в admin/automation/page.tsx - 8 мест
+- [x] Найти все zinc-классы в admin/vehicles-import/page.tsx - 10 мест
+- [x] Найти zinc в других файлах админки - admin/content-generation/page.tsx - 10 мест
 
 **Команды для анализа:**
 ```bash
@@ -38,11 +38,11 @@ grep -n "zinc" frontend/src/app/admin/vehicles-import/page.tsx
 ```
 
 #### B. Составление карты замен
-- [ ] bg-zinc-50 → bg-background
-- [ ] bg-zinc-100 → bg-stone-100 или bg-muted
-- [ ] bg-zinc-800/900 → bg-card или bg-[var(--graphite)]
-- [ ] text-zinc-500/600 → text-muted-foreground
-- [ ] border-zinc-* → border-border
+- [x] bg-zinc-50 → bg-background или bg-muted
+- [x] bg-zinc-100 → bg-muted
+- [x] bg-zinc-800/900 → bg-card
+- [x] text-zinc-500/600 → text-muted-foreground
+- [x] border-zinc-* → border-border
 
 **Карта замен:**
 | Было | Стало |
@@ -61,69 +61,69 @@ grep -n "zinc" frontend/src/app/admin/vehicles-import/page.tsx
 ---
 
 ### 3.1 Миграция admin/layout.tsx
-- [ ] Заменить bg-zinc-* на семантические токены
-- [ ] Заменить text-zinc-* на text-muted-foreground и т.д.
-- [ ] Заменить border-zinc-* на border-border
-- [ ] Проверить dark: варианты
-- [ ] Визуально проверить в браузере
+- [x] Заменить bg-zinc-* на семантические токены
+- [x] Заменить text-zinc-* на text-muted-foreground и т.д.
+- [x] Заменить border-zinc-* на border-border
+- [x] Проверить dark: варианты
+- [x] Визуально проверить в браузере
 
 **Файлы:** `frontend/src/app/admin/layout.tsx`
-**Замены сделаны:** -
+**Замены сделаны:** bg-zinc-50/900→bg-background, bg-zinc-800→bg-card, hover:bg-zinc-100/700→hover:bg-muted/card-hover
 
 ---
 
 ### 3.2 Миграция admin/automation/page.tsx
-- [ ] Заменить bg-zinc-* на семантические токены
-- [ ] Заменить text-zinc-* на text-muted-foreground
-- [ ] Заменить border-zinc-*
-- [ ] Проверить карточки статистики
-- [ ] Проверить таблицу jobs
+- [x] Заменить bg-zinc-* на семантические токены
+- [x] Заменить text-zinc-* на text-muted-foreground
+- [x] Заменить border-zinc-*
+- [x] Проверить карточки статистики
+- [x] Проверить таблицу jobs
 
 **Файлы:** `frontend/src/app/admin/automation/page.tsx`
-**Замены сделаны:** -
+**Замены сделаны:** dark:bg-zinc-800→dark:bg-card, bg-zinc-50/900→bg-muted/background
 
 ---
 
 ### 3.3 Миграция admin/vehicles-import/page.tsx
-- [ ] Заменить bg-zinc-* на семантические токены
-- [ ] Заменить text-zinc-*
-- [ ] Заменить border-zinc-*
-- [ ] Проверить форму импорта
-- [ ] Проверить таблицу результатов
+- [x] Заменить bg-zinc-* на семантические токены
+- [x] Заменить text-zinc-*
+- [x] Заменить border-zinc-*
+- [x] Проверить форму импорта
+- [x] Проверить таблицу результатов
 
 **Файлы:** `frontend/src/app/admin/vehicles-import/page.tsx`
-**Замены сделаны:** -
+**Замены сделаны:** Все zinc→семантические токены
 
 ---
 
 ### 3.4 Миграция других файлов админки
-- [ ] Проверить наличие других файлов с zinc
-- [ ] Применить карту замен
-- [ ] Проверить визуально
+- [x] Проверить наличие других файлов с zinc
+- [x] Применить карту замен
+- [x] Проверить визуально
 
-**Файлы:** (определить в 3.0)
-**Нотатки:** -
+**Файлы:** `frontend/src/app/admin/content-generation/page.tsx`
+**Нотатки:** Заменено 10 мест с zinc на семантические токены
 
 ---
 
 ### 3.5 Проверка консистентности
-- [ ] Открыть админку в Light режиме
-- [ ] Открыть админку в Dark режиме
-- [ ] Проверить читаемость текста
-- [ ] Проверить различимость карточек от фона
-- [ ] Проверить hover-состояния
+- [x] Открыть админку в Light режиме
+- [x] Открыть админку в Dark режиме
+- [x] Проверить читаемость текста
+- [x] Проверить различимость карточек от фона
+- [x] Проверить hover-состояния
 
 **Скриншоты:** -
-**Проблемы:** -
+**Проблемы:** Нет
 
 ---
 
 ### 3.6 Финальный grep-тест
-- [ ] Выполнить `grep -rn "zinc" frontend/src/app/admin/`
-- [ ] Результат должен быть пустым
-- [ ] Если есть остатки - устранить
+- [x] Выполнить `grep -rn "zinc" frontend/src/app/admin/`
+- [x] Результат должен быть пустым
+- [x] Если есть остатки - устранить
 
-**Результат grep:** -
+**Результат grep:** No matches found ✅
 
 ---
 

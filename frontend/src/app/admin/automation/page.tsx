@@ -71,7 +71,7 @@ function StatCard({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+    <div className="rounded-lg border border-border bg-white p-4 dark:bg-card">
       <div className="flex items-center gap-3">
         <div className={`rounded-lg p-2 ${colorClasses[color]}`}>
           <Icon className="h-5 w-5" />
@@ -130,7 +130,7 @@ function ActionButton({
   const variantClasses =
     variant === "primary"
       ? "bg-primary text-primary-text hover:bg-primary-hover"
-      : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600";
+      : "bg-muted text-foreground hover:bg-stone-200 dark:bg-graphite dark:hover:bg-graphite-hover";
 
   return (
     <button
@@ -335,7 +335,7 @@ export default function AutomationDashboard() {
       {/* Schedule Info & Actions */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Schedule Info */}
-        <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
           <h2 className="mb-4 text-lg font-semibold">Розклад</h2>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -356,14 +356,14 @@ export default function AutomationDashboard() {
                 </p>
               </div>
             </div>
-            <div className="rounded-lg bg-zinc-50 p-3 text-sm text-muted-foreground dark:bg-zinc-900">
+            <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground dark:bg-background">
               Автоматичний запуск: щонеділі о 03:00 ({status?.timezone})
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
           <h2 className="mb-4 text-lg font-semibold">Дії</h2>
           <div className="space-y-3">
             <ActionButton
@@ -400,14 +400,14 @@ export default function AutomationDashboard() {
       </div>
 
       {/* Jobs Table */}
-      <div className="rounded-lg border border-border bg-white dark:bg-zinc-800">
+      <div className="rounded-lg border border-border bg-white dark:bg-card">
         <div className="border-b border-border p-4">
           <h2 className="text-lg font-semibold">Останні запуски</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border bg-zinc-50 dark:bg-zinc-900">
+              <tr className="border-b border-border bg-muted dark:bg-background">
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   Тип
                 </th>

@@ -92,7 +92,7 @@ function StatCard({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4 dark:bg-zinc-800">
+    <div className="rounded-lg border border-border bg-white p-4 dark:bg-card">
       <div className="flex items-center gap-3">
         <div className={`rounded-lg p-2 ${colorClasses[color]}`}>
           <Icon className="h-5 w-5" />
@@ -133,7 +133,7 @@ function ProgressBar({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+    <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Прогрес імпорту</h2>
         {isRunning && (
@@ -159,7 +159,7 @@ function ProgressBar({
       {/* Stage progress bar */}
       <div className="mb-4 flex gap-1">
         {stages.map((stage, index) => {
-          let bgClass = "bg-zinc-200 dark:bg-zinc-700";
+          let bgClass = "bg-stone-200 dark:bg-graphite";
           if (progress.stage === "done") {
             bgClass = "bg-green-500";
           } else if (progress.stage === "error" && index <= currentIndex) {
@@ -235,7 +235,7 @@ function ActionButton({
   const variantClasses = {
     primary: "bg-primary text-primary-text hover:bg-primary-hover",
     secondary:
-      "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600",
+      "bg-muted text-foreground hover:bg-stone-200 dark:bg-graphite dark:hover:bg-graphite-hover",
     danger: "bg-red-600 text-white hover:bg-red-700",
   };
 
@@ -419,7 +419,7 @@ export default function VehiclesImportPage() {
       {/* Actions */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Import Info */}
-        <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
           <h2 className="mb-4 text-lg font-semibold">Інформація</h2>
           <div className="space-y-4 text-sm">
             <div className="flex items-center gap-3">
@@ -429,7 +429,7 @@ export default function VehiclesImportPage() {
                 <p className="font-medium">CSV файли (db_size_auto/)</p>
               </div>
             </div>
-            <div className="rounded-lg bg-zinc-50 p-3 text-muted-foreground dark:bg-zinc-900">
+            <div className="rounded-lg bg-muted p-3 text-muted-foreground dark:bg-background">
               <p className="mb-2 font-medium text-foreground">Фільтрація:</p>
               <ul className="list-inside list-disc space-y-1">
                 <li>Тільки авто з 2005 року</li>
@@ -437,7 +437,7 @@ export default function VehiclesImportPage() {
                 <li>~800K розмірів шин</li>
               </ul>
             </div>
-            <div className="rounded-lg bg-zinc-50 p-3 text-muted-foreground dark:bg-zinc-900">
+            <div className="rounded-lg bg-muted p-3 text-muted-foreground dark:bg-background">
               <p className="mb-2 font-medium text-foreground">Час імпорту:</p>
               <p>Приблизно 3-4 хвилини</p>
             </div>
@@ -445,7 +445,7 @@ export default function VehiclesImportPage() {
         </div>
 
         {/* Actions */}
-        <div className="rounded-lg border border-border bg-white p-6 dark:bg-zinc-800">
+        <div className="rounded-lg border border-border bg-white p-6 dark:bg-card">
           <h2 className="mb-4 text-lg font-semibold">Дії</h2>
           <div className="space-y-3">
             <ActionButton
