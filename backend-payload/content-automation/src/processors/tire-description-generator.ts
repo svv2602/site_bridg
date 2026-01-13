@@ -10,13 +10,15 @@
  */
 
 import { generateContent } from "./llm-generator.js";
-import { getTireDescriptionPrompt, SYSTEM_PROMPTS } from "../config/prompts.js";
+import { getTireDescriptionPrompt, getSystemPromptsForBrand, SYSTEM_PROMPTS } from "../config/prompts.js";
+import type { Brand } from "../types/content.js";
 
 // Types
 export interface TireInput {
   name: string;
   slug: string;
   season: "summer" | "winter" | "allseason";
+  brand?: Brand;
   vehicleTypes?: string[];
   technologies?: string[];
   euLabel?: {
@@ -50,12 +52,16 @@ export async function generateTireContent(
   tire: TireInput
 ): Promise<GenerationResult> {
   try {
-    const prompt = getTireDescriptionPrompt(tire);
+    const brand = tire.brand || "bridgestone";
+    const prompt = getTireDescriptionPrompt(tire, brand);
+
+    // Use brand-specific system prompts
+    const systemPrompts = getSystemPromptsForBrand(brand);
 
     const response = await generateContent(prompt, {
       maxTokens: 1500,
       temperature: 0.7,
-      systemPrompt: SYSTEM_PROMPTS.tireDescription,
+      systemPrompt: systemPrompts.tireDescription,
     });
 
     // Parse JSON response

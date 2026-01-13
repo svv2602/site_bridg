@@ -11,11 +11,12 @@
  */
 
 import { ENV } from "./config/env.js";
-import { scrapeProkoleso } from "./scrapers/prokoleso.js";
+import { scrapeProkoleso, scrapeProkolesoBrand } from "./scrapers/prokoleso.js";
 import { generateTireContent } from "./processors/tire-description-generator.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
+import type { Brand } from "./types/content.js";
 
 // Types
 export interface AutomationResult {
@@ -115,11 +116,26 @@ export async function runWeeklyAutomation(): Promise<AutomationResult> {
 /**
  * Scrape pipeline
  */
-async function runScrapePipeline() {
+async function runScrapePipeline(brand?: Brand) {
   try {
-    const tires = await scrapeProkoleso();
+    let tires;
+    if (brand) {
+      console.log(`Scraping ${brand} tires...`);
+      tires = await scrapeProkolesoBrand(brand);
+    } else {
+      console.log("Scraping all tires...");
+      tires = await scrapeProkoleso();
+    }
     stats.tyresProcessed = tires.length;
     console.log(`Found ${tires.length} tires`);
+
+    // Save brand-specific data file
+    if (brand && tires.length > 0) {
+      const fs = await import("fs/promises");
+      const dataPath = new URL(`../data/prokoleso-${brand}-tires.json`, import.meta.url);
+      await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
+      console.log(`Saved to ${dataPath}`);
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     stats.errors.push(`Scrape failed: ${errorMessage}`);
@@ -130,18 +146,19 @@ async function runScrapePipeline() {
 /**
  * Content generation pipeline
  */
-async function runContentGeneration() {
+async function runContentGeneration(brand?: Brand, limit?: number) {
   try {
-    // Read scraped data
+    // Read scraped data (brand-specific or general)
     const fs = await import("fs/promises");
-    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+    const dataFileName = brand ? `prokoleso-${brand}-tires.json` : "prokoleso-tires.json";
+    const dataPath = new URL(`../data/${dataFileName}`, import.meta.url);
 
     let tires: any[];
     try {
       const data = await fs.readFile(dataPath, "utf-8");
       tires = JSON.parse(data);
     } catch {
-      console.log("No scraped data found. Run 'scrape' first.");
+      console.log(`No scraped data found at ${dataFileName}. Run 'scrape${brand ? ` --brand ${brand}` : ""}' first.`);
       return;
     }
 
@@ -159,8 +176,8 @@ async function runContentGeneration() {
       return;
     }
 
-    // Process up to 3 tires (to avoid high costs during testing)
-    const batchSize = Math.min(tiresToProcess.length, 3);
+    // Process tires (default limit 3 for safety)
+    const batchSize = limit || Math.min(tiresToProcess.length, 3);
     console.log(`Processing ${batchSize} tires...`);
 
     for (let i = 0; i < batchSize; i++) {
@@ -173,6 +190,7 @@ async function runContentGeneration() {
         season: tire.season,
         euLabel: tire.euLabel,
         sourceDescription: tire.description,
+        brand: brand || tire.brand || "bridgestone",
       });
 
       if (result.success && result.content) {
@@ -181,6 +199,7 @@ async function runContentGeneration() {
         // Mark as processed and store generated content
         tire.aiGenerated = true;
         tire.generatedContent = result.content;
+        tire.brand = brand || tire.brand || "bridgestone";
         stats.tyresNew++;
       } else {
         console.log(`  ✗ Failed: ${result.error}`);
@@ -316,9 +335,29 @@ async function sendSummary() {
 }
 
 // CLI interface
+function parseArgs(args: string[]): { brand?: Brand; limit?: number } {
+  const result: { brand?: Brand; limit?: number } = {};
+
+  const brandIndex = args.indexOf("--brand");
+  if (brandIndex !== -1 && args[brandIndex + 1]) {
+    const brandValue = args[brandIndex + 1].toLowerCase();
+    if (brandValue === "bridgestone" || brandValue === "firestone") {
+      result.brand = brandValue as Brand;
+    }
+  }
+
+  const limitIndex = args.indexOf("--limit");
+  if (limitIndex !== -1 && args[limitIndex + 1]) {
+    result.limit = parseInt(args[limitIndex + 1], 10);
+  }
+
+  return result;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0] || "help";
+  const { brand, limit } = parseArgs(args);
 
   switch (command) {
     case "run-full":
@@ -326,16 +365,16 @@ async function main() {
       break;
 
     case "scrape":
-      console.log("Running scrape only...");
+      console.log(`Running scrape${brand ? ` for ${brand}` : " for all brands"}...`);
       resetStats();
-      await runScrapePipeline();
+      await runScrapePipeline(brand);
       console.log(`Found ${stats.tyresProcessed} tires`);
       break;
 
     case "generate":
-      console.log("Running content generation only...");
+      console.log(`Running content generation${brand ? ` for ${brand}` : ""}${limit ? ` (limit: ${limit})` : ""}...`);
       resetStats();
-      await runContentGeneration();
+      await runContentGeneration(brand, limit);
       break;
 
     case "publish":
@@ -362,7 +401,7 @@ async function main() {
 Content Automation CLI
 
 Usage:
-  npx tsx src/scheduler.ts <command>
+  npx tsx src/scheduler.ts <command> [options]
 
 Commands:
   run-full       Run complete weekly automation
@@ -371,6 +410,15 @@ Commands:
   publish        Only publish to Payload CMS
   test-telegram  Send test Telegram notification
   help           Show this help
+
+Options:
+  --brand <brand>   Filter by brand (bridgestone or firestone)
+  --limit <n>       Limit number of items to process
+
+Examples:
+  npx tsx src/scheduler.ts scrape --brand firestone
+  npx tsx src/scheduler.ts generate --brand firestone --limit 5
+  npx tsx src/scheduler.ts scrape --brand bridgestone
 
 Environment:
   ANTHROPIC_API_KEY   Required for content generation
