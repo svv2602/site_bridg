@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import sharp from 'sharp';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -37,6 +38,11 @@ import {
   providersUpdateModelEndpoint,
   taskRoutingUpdateEndpoint,
 } from './src/endpoints/providerManagement';
+import {
+  regenerateImageEndpoint,
+  regenerateImageStatusEndpoint,
+  generatePromptEndpoint,
+} from './src/endpoints/imageRegeneration';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -88,6 +94,9 @@ export default buildConfig({
     providersToggleEndpoint,
     providersUpdateModelEndpoint,
     taskRoutingUpdateEndpoint,
+    generatePromptEndpoint,
+    regenerateImageStatusEndpoint,
+    regenerateImageEndpoint,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
@@ -119,4 +128,5 @@ export default buildConfig({
       fileSize: 10000000,
     },
   },
+  sharp,
 });

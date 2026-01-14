@@ -182,6 +182,22 @@ export interface Media {
    * Встановлюється автоматично після обробки
    */
   backgroundRemoved?: boolean | null;
+  /**
+   * Промпт, який використовувався для генерації (зберігається автоматично)
+   */
+  generationPrompt?: string | null;
+  /**
+   * Тип зображення для генерації промпта
+   */
+  generationType?: ('hero' | 'content' | 'product' | 'lifestyle') | null;
+  /**
+   * Сезон для hero/lifestyle зображень
+   */
+  generationSeason?: ('summer' | 'winter' | 'allseason') | null;
+  /**
+   * Розмір зображення для генерації
+   */
+  generationSize?: ('1024x1024' | '1792x1024' | '1024x1792') | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -761,6 +777,10 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   removeBackground?: T;
   backgroundRemoved?: T;
+  generationPrompt?: T;
+  generationType?: T;
+  generationSeason?: T;
+  generationSize?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

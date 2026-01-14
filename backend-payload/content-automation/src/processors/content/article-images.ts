@@ -28,49 +28,141 @@ export interface ArticleImageInput {
 }
 
 /**
- * Image prompt templates
+ * Negative prompt to avoid common AI image artifacts
+ */
+const NEGATIVE_PROMPT = `blurry, low quality, distorted, deformed, disfigured, bad anatomy,
+watermark, text, logo, signature, cropped, out of frame, worst quality, low resolution,
+jpeg artifacts, pixelated, noise, grain, overexposed, underexposed, oversaturated,
+cartoon, anime, illustration, 3d render, cgi, artificial looking, plastic looking,
+duplicate, clone, extra limbs, missing parts, floating objects, unnatural proportions`;
+
+/**
+ * Image prompt templates - detailed prompts for high-quality generation
  */
 const IMAGE_PROMPTS: Record<ImageType, (input: ArticleImageInput) => string> = {
   hero: (input) => {
     const seasonContext = {
-      summer: "sunny day, dry asphalt road, warm lighting",
-      winter: "snowy road, winter atmosphere, cold blue tones",
-      allseason: "varied weather conditions, dramatic sky",
+      summer: `golden hour sunlight, warm summer day, dry clean asphalt highway,
+clear blue sky with soft clouds, vibrant green landscape in background,
+warm orange and gold color grading, lens flare effects`,
+      winter: `fresh snow on road, winter morning atmosphere, cold blue and white tones,
+frost on trees, overcast sky with soft diffused light,
+breath-visible cold air, tire tracks in snow showing grip`,
+      allseason: `dramatic weather transition, partly cloudy sky with sun breaking through,
+wet road reflecting light, versatile conditions,
+dynamic atmospheric lighting, moody cinematic feel`,
     };
-    const weather = input.season ? seasonContext[input.season] : "professional lighting";
+    const weather = input.season ? seasonContext[input.season] : "professional studio lighting, neutral backdrop";
 
-    return `Professional automotive photography, ${input.topic}, ${weather},
-modern SUV or sedan with premium tires, cinematic composition,
-4K quality, realistic, no text or watermarks, clean background`;
+    return `Award-winning automotive photography, ultra high resolution 8K, ${input.topic}.
+
+Scene: ${weather}. Modern premium SUV or luxury sedan (Mercedes, BMW, Audi style)
+photographed at dynamic 3/4 front angle. Vehicle positioned on scenic road with
+emphasis on wheel and tire visibility.
+
+Technical details: Shot with Sony A7R V, 85mm f/1.4 lens, shallow depth of field
+with sharp focus on vehicle and tires. Professional color grading, high dynamic range.
+Cinematic widescreen composition following rule of thirds.
+
+Style: Editorial automotive magazine quality, photorealistic, hyperdetailed.
+Lighting: Natural environmental lighting with professional fill, rim lighting on vehicle.
+Colors: Rich, vibrant but natural color palette, professional post-processing.
+
+Requirements: Photorealistic only, no CGI, no text, no logos, no watermarks,
+clean uncluttered composition, premium luxury feel.`;
   },
 
   content: (input) => {
-    return `Illustrative photo for article about ${input.topic},
-${input.context || "automotive theme"}, editorial style,
-professional photography, clean composition, realistic,
-no text or watermarks, suitable for blog article`;
+    return `Professional editorial photography for automotive blog article about ${input.topic}.
+
+Context: ${input.context || "tire and automotive safety theme"}.
+
+Scene composition: Clean, well-organized frame with clear focal point.
+Environmental context showing real-world automotive situations.
+People interacting naturally with vehicles when appropriate.
+
+Technical specs: High resolution photograph, 24-70mm lens perspective,
+balanced exposure, professional white balance, sharp details throughout.
+
+Style: Modern editorial magazine aesthetic, authentic documentary feel,
+relatable to everyday drivers, warm and approachable mood.
+
+Lighting: Natural daylight or professional studio setup, soft shadows,
+even illumination, no harsh contrasts.
+
+Requirements: Photorealistic, no text overlays, no watermarks,
+publication-ready quality, clean background, professional composition.`;
   },
 
   product: (input) => {
-    const model = input.tireModel || "premium tire";
-    return `Close-up product photography of ${model} tire,
-studio lighting, black or white background,
-focus on tread pattern detail, high quality,
-professional product shot, 4K quality, realistic`;
+    const model = input.tireModel || "premium performance tire";
+    return `Ultra high-resolution product photography of ${model} automotive tire.
+
+Setup: Professional product photography studio, infinity curve backdrop in
+gradient dark gray to black. Single tire displayed at slight angle (15-20 degrees)
+to showcase both tread pattern and sidewall branding.
+
+Lighting: Three-point professional lighting setup:
+- Key light: Large softbox 45 degrees from front
+- Fill light: Reflector panel opposite key light
+- Rim/accent light: Strip softbox behind for edge definition
+
+Focus: Razor-sharp detail on tread pattern grooves, sipes, and shoulder blocks.
+Visible sidewall markings and size specifications in crisp detail.
+
+Technical: Shot with medium format camera, 100mm macro lens, f/8-f/11 for
+maximum depth of field, focus stacking for complete sharpness.
+
+Style: Clean commercial product photography, premium brand aesthetic,
+suitable for e-commerce and marketing materials.
+
+Post-processing: Professional retouching, enhanced contrast on rubber texture,
+clean background, color-accurate representation of black rubber.
+
+Requirements: Hyperrealistic, no text additions, no watermarks,
+studio quality, emphasize quality and engineering precision.`;
   },
 
   lifestyle: (input) => {
     const seasonContext = {
-      summer: "summer road trip, sunny weather, happy atmosphere",
-      winter: "winter family vacation, snowy scenery, cozy feeling",
-      allseason: "all weather adventure, versatile driving",
+      summer: `family summer road trip adventure, scenic coastal or mountain highway,
+bright sunny day, happy relaxed atmosphere, adventure and freedom feeling,
+warm golden tones, vacation mood, luggage on roof rack`,
+      winter: `cozy winter family journey, snow-covered landscape,
+safe confident driving in winter conditions, warm interior glow from vehicle,
+holiday travel feeling, ski equipment visible, breath in cold air`,
+      allseason: `versatile everyday driving, suburban family neighborhood,
+mix of weather conditions showing adaptability, practical daily life,
+school run, grocery shopping, weekend activities`,
     };
-    const scene = input.season ? seasonContext[input.season] : "road trip atmosphere";
+    const scene = input.season ? seasonContext[input.season] : "everyday driving moments, relatable situations";
 
-    return `Lifestyle automotive photography, ${scene},
-family or driver enjoying the journey, safety concept,
-warm tones, photorealistic, editorial quality,
-no text or watermarks, subtle car/tire context`;
+    return `Authentic lifestyle automotive photography capturing ${scene}.
+
+Story: Real moments of people enjoying safe, confident driving.
+Families, couples, or individuals in genuine automotive situations.
+Subtle emphasis on tire/vehicle reliability without being promotional.
+
+Subjects: Diverse, relatable people (age 30-50) in natural poses,
+authentic expressions of comfort and confidence while driving.
+
+Vehicle: Modern family SUV or crossover, clean but not showroom-perfect,
+realistic everyday use condition.
+
+Environment: ${scene}. Authentic locations, real backgrounds,
+environmental context that tells a story.
+
+Technical: Editorial style photography, 35-50mm lens,
+natural depth of field, candid documentary approach.
+
+Lighting: Natural available light, golden hour preferred,
+soft flattering illumination on subjects, environmental fill.
+
+Mood: Warm, positive, aspirational but achievable, family-oriented,
+safety and reliability themes subtly conveyed.
+
+Requirements: Photorealistic, authentic feel, no staged look,
+no text, no watermarks, magazine editorial quality.`;
   },
 };
 
@@ -143,7 +235,8 @@ export async function generateArticleImage(
 
   const result = await image.generate(prompt, {
     size: `${size.width}x${size.height}` as "1024x1024" | "1792x1024" | "1024x1792",
-    quality: options?.quality || "standard",
+    quality: options?.quality || "hd",
+    negativePrompt: NEGATIVE_PROMPT,
     taskType: "image-article",
     fallbackModels,
     ...(options?.provider && { provider: options.provider }),

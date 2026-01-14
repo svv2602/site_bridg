@@ -10,6 +10,11 @@ export const Media: CollectionConfig = {
   admin: {
     group: 'Налаштування',
     description: 'Зображення та файли',
+    components: {
+      edit: {
+        beforeDocumentControls: ['/src/components/RegenerateImageSection'],
+      },
+    },
   },
   upload: {
     staticDir: 'media',
@@ -58,6 +63,58 @@ export const Media: CollectionConfig = {
       admin: {
         readOnly: true,
         description: 'Встановлюється автоматично після обробки',
+      },
+    },
+    // AI Image Generation fields
+    {
+      name: 'generationPrompt',
+      type: 'textarea',
+      label: 'Промпт генерації',
+      admin: {
+        description: 'Промпт, який використовувався для генерації (зберігається автоматично)',
+        rows: 8,
+      },
+    },
+    {
+      name: 'generationType',
+      type: 'select',
+      label: 'Тип зображення',
+      options: [
+        { label: 'Hero (широкий банер)', value: 'hero' },
+        { label: 'Content (контент статті)', value: 'content' },
+        { label: 'Product (продуктове фото)', value: 'product' },
+        { label: 'Lifestyle (лайфстайл)', value: 'lifestyle' },
+      ],
+      admin: {
+        description: 'Тип зображення для генерації промпта',
+      },
+    },
+    {
+      name: 'generationSeason',
+      type: 'select',
+      label: 'Сезон',
+      options: [
+        { label: 'Літо', value: 'summer' },
+        { label: 'Зима', value: 'winter' },
+        { label: 'Всесезон', value: 'allseason' },
+      ],
+      admin: {
+        condition: (data) => ['hero', 'lifestyle'].includes(data?.generationType),
+        description: 'Сезон для hero/lifestyle зображень',
+      },
+    },
+    {
+      name: 'generationSize',
+      type: 'select',
+      label: 'Розмір генерації',
+      options: [
+        { label: '1024x1024 (квадрат)', value: '1024x1024' },
+        { label: '1792x1024 (широкий)', value: '1792x1024' },
+        { label: '1024x1792 (вертикальний)', value: '1024x1792' },
+      ],
+      defaultValue: '1024x1024',
+      admin: {
+        description: 'Розмір зображення для генерації',
       },
     },
   ],

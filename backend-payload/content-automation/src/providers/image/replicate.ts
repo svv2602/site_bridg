@@ -65,13 +65,16 @@ export class ReplicateProvider extends BaseImageProvider {
     this.logRequest(model, prompt);
 
     try {
-      // Create prediction
+      // Create prediction with optimized settings for quality
       const prediction = await this.createPrediction(model, {
         prompt,
         width: dimensions.width,
         height: dimensions.height,
         seed: options?.seed,
-        num_inference_steps: options?.quality === "hd" ? 50 : 25,
+        // Increased inference steps for better quality (was 25/50, now 40/60)
+        num_inference_steps: options?.quality === "hd" ? 60 : 40,
+        // Add guidance scale for better prompt adherence
+        guidance_scale: options?.quality === "hd" ? 7.5 : 6.0,
         negative_prompt: options?.negativePrompt,
       });
 

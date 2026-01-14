@@ -390,12 +390,31 @@ class PayloadClient {
   }
 
   /**
+   * Delete media by ID
+   */
+  async deleteMedia(id: number): Promise<boolean> {
+    try {
+      await this.ensureAuthenticated();
+      const response = await fetch(`${this.baseUrl}/api/media/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `JWT ${this.token}`,
+        },
+      });
+      return response.ok;
+    } catch (error) {
+      console.error(`  Error deleting media ID ${id}:`, error);
+      return false;
+    }
+  }
+
+  /**
    * Download image from URL and upload to Payload CMS Media
-   * Reuses existing media if found by filename
+   * Reuses existing media if found by filename (unless force: true)
    */
   async uploadImageFromUrl(
     imageUrl: string,
-    options: { alt?: string; filename?: string; removeBackground?: boolean } = {}
+    options: { alt?: string; filename?: string; removeBackground?: boolean; force?: boolean } = {}
   ): Promise<{ id: number; url: string } | null> {
     try {
       await this.ensureAuthenticated();
@@ -407,11 +426,20 @@ class PayloadClient {
         filename = urlPath.split("/").pop() || "image.png";
       }
 
-      // Check if media already exists (including processed -nobg version)
-      const existing = await this.findMediaByFilename(filename);
-      if (existing) {
-        console.log(`  ✓ Reusing existing media ID: ${existing.id} (backgroundRemoved: ${existing.backgroundRemoved})`);
-        return { id: existing.id, url: existing.url };
+      // Check if media already exists (unless force regeneration requested)
+      if (!options.force) {
+        const existing = await this.findMediaByFilename(filename);
+        if (existing) {
+          console.log(`  ✓ Reusing existing media ID: ${existing.id} (backgroundRemoved: ${existing.backgroundRemoved})`);
+          return { id: existing.id, url: existing.url };
+        }
+      } else {
+        // Delete existing media if force is true
+        const existing = await this.findMediaByFilename(filename);
+        if (existing) {
+          console.log(`  🔄 Force regeneration: deleting existing media ID: ${existing.id}`);
+          await this.deleteMedia(existing.id);
+        }
       }
 
       // Download image
