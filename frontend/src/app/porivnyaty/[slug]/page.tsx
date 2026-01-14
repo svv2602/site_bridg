@@ -374,7 +374,7 @@ export default async function ComparisonPage({
               </Link>
               <Link
                 href="/porivnyaty"
-                className="inline-flex items-center justify-center px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 border border-stone-300 rounded-lg font-medium text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700 transition-colors"
               >
                 Порівняти інші моделі
               </Link>

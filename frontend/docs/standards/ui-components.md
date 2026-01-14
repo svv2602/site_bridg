@@ -347,6 +347,58 @@ interface MatchingTyre extends TyreModel {
 | Error/Official | `bg-red-100 text-red-700` | `bg-red-900 text-red-200` |
 | Info | `bg-blue-100 text-blue-700` | `bg-blue-900 text-blue-200` |
 
+## Button Contrast Standards
+
+**CRITICAL:** Never use `hover:bg-muted` or `bg-muted` for buttons — these have poor contrast in light theme.
+
+### Secondary/Outline Buttons
+
+```tsx
+// CORRECT: Explicit stone colors
+<button className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700">
+  Secondary action
+</button>
+
+// INCORRECT: Low contrast hover state
+<button className="rounded-full border border-border bg-transparent px-5 py-2 text-sm font-semibold text-foreground hover:bg-muted">
+```
+
+### Toggle Buttons (Tabs, Filters)
+
+```tsx
+// CORRECT: Clear active/inactive states
+<button className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+  isActive
+    ? "bg-primary text-primary-text"
+    : "bg-stone-200 text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+}`}>
+
+// INCORRECT: Muted backgrounds
+<button className={`... ${isActive ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"}`}>
+```
+
+### Pagination Buttons
+
+```tsx
+// CORRECT: Explicit colors for all states
+// Active
+<button className="bg-primary text-primary-text">
+
+// Inactive
+<button className="border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700">
+
+// Disabled
+<span className="border border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed dark:border-stone-700 dark:bg-stone-800 dark:text-stone-500">
+```
+
+### Button Color Reference
+
+| State | Light Theme | Dark Theme |
+|-------|-------------|------------|
+| Secondary | `border-stone-300 text-stone-700 hover:bg-stone-100` | `border-stone-600 text-stone-200 hover:bg-stone-700` |
+| Toggle inactive | `bg-stone-200 text-stone-700 hover:bg-stone-300` | `bg-stone-700 text-stone-200 hover:bg-stone-600` |
+| Disabled | `bg-stone-100 text-stone-400` | `bg-stone-800 text-stone-500` |
+
 ## Season Badge Colors
 
 Use consistent badge classes for season indicators:

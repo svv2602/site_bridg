@@ -28,7 +28,7 @@ export default function BlogError({
             </button>
             <Link
               href="/"
-              className="rounded-full border border-border px-8 py-3 font-semibold hover:bg-muted"
+              className="rounded-full border border-stone-300 px-8 py-3 font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
             >
               На головну
             </Link>

@@ -75,13 +75,13 @@ export function Pagination({
       {currentPage > 1 ? (
         <Link
           href={buildUrl(currentPage - 1)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-700 transition-colors hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
           aria-label="Попередня сторінка"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted/50 text-muted-foreground/50 cursor-not-allowed">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed dark:border-stone-700 dark:bg-stone-800 dark:text-stone-500">
           <ChevronLeft className="h-5 w-5" />
         </span>
       )}
@@ -103,7 +103,7 @@ export function Pagination({
               className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors ${
                 page === currentPage
                   ? "bg-primary text-primary-text"
-                  : "border border-border bg-card text-foreground hover:bg-muted"
+                  : "border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
               }`}
               aria-current={page === currentPage ? "page" : undefined}
             >
@@ -117,13 +117,13 @@ export function Pagination({
       {currentPage < totalPages ? (
         <Link
           href={buildUrl(currentPage + 1)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-700 transition-colors hover:bg-stone-100 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
           aria-label="Наступна сторінка"
         >
           <ChevronRight className="h-5 w-5" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted/50 text-muted-foreground/50 cursor-not-allowed">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed dark:border-stone-700 dark:bg-stone-800 dark:text-stone-500">
           <ChevronRight className="h-5 w-5" />
         </span>
       )}

@@ -136,8 +136,8 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
               onClick={() => setCompareRating(rating)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 compareRating === rating
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted hover:bg-muted/80"
+                  ? "bg-primary text-primary-text"
+                  : "bg-stone-200 text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
               }`}
             >
               Клас {rating}

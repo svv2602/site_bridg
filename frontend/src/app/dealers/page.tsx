@@ -188,7 +188,7 @@ export default function DealersPage() {
                       setCityQuery("");
                       setSelectedType("all");
                     }}
-                    className="rounded-full border border-border bg-transparent px-5 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+                    className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
                   >
                     Скинути фільтри
                   </button>
