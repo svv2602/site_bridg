@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
@@ -7,6 +8,13 @@ import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-react";
 import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
+
+// Hero images for each season
+const seasonHeroImages: Record<Season, string> = {
+  summer: "/images/hero/hero-summer.jpg",
+  winter: "/images/hero/hero-winter.jpg",
+  allseason: "/images/hero/hero-allseason.jpg",
+};
 
 // URL slug to internal season mapping
 const slugToSeason: Record<string, Season> = {
@@ -241,12 +249,23 @@ export default async function SeasonTyresPage({ params }: PageProps) {
             </div>
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Icon className="h-40 w-40 text-stone-300 dark:text-white/10" />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 p-6 backdrop-blur-sm">
-                  <h3 className="text-xl font-semibold text-stone-900 dark:text-white">{meta.h1}</h3>
-                  <p className="text-sm text-stone-500 dark:text-stone-400">
+                <Image
+                  src={seasonHeroImages[season]}
+                  alt={meta.h1}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`rounded-full ${seasonBgLight[season]} p-2`}>
+                      <Icon className={`h-5 w-5 ${seasonTextColors[season]}`} />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">{meta.h1}</h3>
+                  </div>
+                  <p className="text-sm text-white/80">
                     {seasonTyres.length} моделей у каталозі
                   </p>
                 </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { type Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
@@ -103,13 +104,24 @@ export default async function PassengerTyresPage() {
             </div>
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Car className="h-40 w-40 text-stone-300 dark:text-white/10" />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
-                  <h3 className="text-xl font-semibold text-stone-900 dark:text-white">Легкові шини Bridgestone</h3>
-                  <p className="text-sm text-stone-500 dark:text-stone-400">
-                    Демонстраційний візуал, який буде замінений на офіційні фото в фінальній версії.
+                <Image
+                  src="/images/hero/hero-passenger.jpg"
+                  alt="Легкові шини Bridgestone"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="rounded-full bg-blue-500/15 p-2">
+                      <Car className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">Легкові шини Bridgestone</h3>
+                  </div>
+                  <p className="text-sm text-white/80">
+                    Комфорт та безпека для щоденних поїздок
                   </p>
                 </div>
               </div>
