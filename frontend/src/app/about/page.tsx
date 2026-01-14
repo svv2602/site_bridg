@@ -189,7 +189,7 @@ export default function AboutPage() {
             </p>
             <div className="relative">
               {/* Timeline line: left on mobile, center on desktop */}
-              <div className="absolute left-6 top-0 h-full w-0.5 bg-primary/30 lg:left-1/2 lg:-translate-x-1/2" />
+              <div className="absolute left-5 top-0 h-full w-0.5 bg-brand/30 lg:left-1/2 lg:-translate-x-1/2" />
               <div className="relative grid gap-8">
                 {[
                   { year: "1931", event: "Заснування компанії в місті Куробе, Японія." },
@@ -204,8 +204,8 @@ export default function AboutPage() {
                   >
                     {/* Desktop: empty spacer for alternating layout */}
                     <div className="hidden lg:block lg:w-1/2" />
-                    {/* Year badge: left-aligned on mobile, centered on desktop */}
-                    <div className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white shadow-lg lg:mx-4">
+                    {/* Year badge: pill shape that adapts to content */}
+                    <div className="relative z-10 flex-shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-lg lg:mx-4">
                       {item.year}
                     </div>
                     {/* Event card: with left margin on mobile */}
