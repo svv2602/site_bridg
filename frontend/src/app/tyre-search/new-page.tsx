@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+
 import {
   type Season,
   type Brand,
@@ -46,7 +47,9 @@ interface SizeOption {
 }
 
 export default function TyreSearchPage() {
-  const [mode, setMode] = useState<SearchMode>("car");
+  const searchParams = useSearchParams();
+  const initialMode = searchParams.get("mode") === "size" ? "size" : "car";
+  const [mode, setMode] = useState<SearchMode>(initialMode);
   const [width, setWidth] = useState("");
   const [aspectRatio, setAspectRatio] = useState("");
   const [diameter, setDiameter] = useState("");
@@ -69,6 +72,12 @@ export default function TyreSearchPage() {
       return [...prev, brand];
     });
   }
+
+  // Синхронізація mode з URL параметром
+  useEffect(() => {
+    const urlMode = searchParams.get("mode") === "size" ? "size" : "car";
+    setMode(urlMode);
+  }, [searchParams]);
 
   // Динамічні опції з бази даних
   const [widthOptions, setWidthOptions] = useState<SizeOption[]>([]);
@@ -157,10 +166,10 @@ export default function TyreSearchPage() {
       {/* Hero */}
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            
+            
+            
             className="mx-auto flex max-w-5xl flex-col gap-6 text-left md:flex-row md:items-center md:justify-between"
           >
             <div>
@@ -194,7 +203,7 @@ export default function TyreSearchPage() {
                 У продакшн‑версії форми будуть підключені до повного каталогу шин та бази авто.
               </p>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
