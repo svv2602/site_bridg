@@ -147,8 +147,8 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
           </p>
         </div>
 
-        {/* EU Label - fixed height container */}
-        <div className="mb-3 h-[1.75rem]">
+        {/* EU Label - fixed height for default, auto height for compact */}
+        <div className={variant === "compact" ? "" : "mb-3 h-[1.75rem]"}>
           {tyre.euLabel && (
             <EuLabelGroup
               wetGrip={tyre.euLabel.wetGrip as "A" | "B" | "C" | "D" | "E"}
@@ -159,7 +159,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
           )}
         </div>
 
-        {/* Technologies - fixed height container */}
+        {/* Technologies - fixed height container (not shown in compact) */}
         {variant !== "compact" && (
           <div className="mb-3 h-[1.5rem]">
             {tyre.technologies && tyre.technologies.length > 0 && (
@@ -172,6 +172,9 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
             )}
           </div>
         )}
+
+        {/* Spacer for compact variant to push sizes to bottom */}
+        {variant === "compact" && <div className="flex-1 min-h-3" />}
 
         {/* Sizes Preview - push to bottom */}
         {variant !== "compact" && tyre.sizes.length > 0 && (
@@ -197,30 +200,32 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
           </div>
         )}
 
-        {/* Compact variant: show matching sizes as badges or sizes count */}
-        {variant === "compact" && (matchingSizes ? (
-          <div className="mt-auto pt-2">
-            <div className="flex flex-wrap gap-1.5">
-              {matchingSizes.slice(0, 2).map((size) => (
-                <span
-                  key={size}
-                  className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
-                >
-                  {size}
-                </span>
-              ))}
-              {matchingSizes.length > 2 && (
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                  +{matchingSizes.length - 2}
-                </span>
-              )}
-            </div>
+        {/* Compact variant: sizes in separate container */}
+        {variant === "compact" && (
+          <div className="border-t border-border pt-3">
+            {matchingSizes ? (
+              <div className="flex flex-wrap gap-1.5">
+                {matchingSizes.slice(0, 2).map((size) => (
+                  <span
+                    key={size}
+                    className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
+                  >
+                    {size}
+                  </span>
+                ))}
+                {matchingSizes.length > 2 && (
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                    +{matchingSizes.length - 2}
+                  </span>
+                )}
+              </div>
+            ) : tyre.sizes.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {tyre.sizes.length} розмірів
+              </p>
+            )}
           </div>
-        ) : tyre.sizes.length > 0 && (
-          <div className="mt-auto pt-2 text-xs text-muted-foreground">
-            {tyre.sizes.length} розмірів
-          </div>
-        ))}
+        )}
       </div>
     </Link>
   );
