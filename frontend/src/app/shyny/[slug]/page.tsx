@@ -88,12 +88,12 @@ export default async function TyreModelPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
       />
-      {faqSchema && (
+      {faqSchema ? (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(faqSchema) }}
         />
-      )}
+      ) : null}
       {/* Hero - Silver (light) / Dark (dark theme) */}
       <section className="border-b border-stone-200 dark:border-stone-800 bg-gradient-to-br from-stone-100 via-stone-50 to-white dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -196,7 +196,7 @@ export default async function TyreModelPage({
       </section>
 
       {/* Full Description - Full Width */}
-      {model.fullDescription && (
+      {model.fullDescription ? (
         <section className="border-b border-border bg-stone-50 dark:bg-stone-900/50 py-12 md:py-16">
           <div className="container mx-auto max-w-4xl px-4 md:px-8">
             <h2 className="mb-6 text-2xl font-bold md:text-3xl">Про модель {model.name}</h2>
@@ -210,7 +210,7 @@ export default async function TyreModelPage({
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* Key Benefits - Full Width */}
       {model.keyBenefits && model.keyBenefits.length > 0 && (

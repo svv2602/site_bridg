@@ -165,6 +165,7 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
 }
 
 // Helper to render JSON-LD script tag content
-export function jsonLdScript(schema: object): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function jsonLdScript(schema: any): string {
   return JSON.stringify(schema);
 }

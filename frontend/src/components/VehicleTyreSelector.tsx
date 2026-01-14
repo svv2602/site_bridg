@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Car,
   Calendar,
@@ -584,42 +583,37 @@ export function VehicleTyreSelector() {
       </div>
 
       {/* Інформація про комплектацію */}
-      <AnimatePresence>
-        {selectedKit && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="rounded-xl border border-stone-700 bg-stone-800/50 p-4"
-          >
-            <h4 className="mb-2 text-sm font-semibold text-stone-50">
-              Параметри кріплення коліс
-            </h4>
-            <div className="flex flex-wrap gap-4 text-sm text-stone-400">
-              {selectedKit.pcd && (
-                <span>
-                  PCD: <strong className="text-stone-50">{selectedKit.pcd}</strong>
-                </span>
-              )}
-              {selectedKit.boltCount && (
-                <span>
-                  Болтів: <strong className="text-stone-50">{selectedKit.boltCount}</strong>
-                </span>
-              )}
-              {selectedKit.dia && (
-                <span>
-                  DIA: <strong className="text-stone-50">{selectedKit.dia}</strong>
-                </span>
-              )}
-              {selectedKit.boltSize && (
-                <span>
-                  Болт: <strong className="text-stone-50">{selectedKit.boltSize}</strong>
-                </span>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {selectedKit && (
+        <div
+          className="rounded-xl border border-stone-700 bg-stone-800/50 p-4 animate-fade-in"
+        >
+          <h4 className="mb-2 text-sm font-semibold text-stone-50">
+            Параметри кріплення коліс
+          </h4>
+          <div className="flex flex-wrap gap-4 text-sm text-stone-400">
+            {selectedKit.pcd && (
+              <span>
+                PCD: <strong className="text-stone-50">{selectedKit.pcd}</strong>
+              </span>
+            )}
+            {selectedKit.boltCount && (
+              <span>
+                Болтів: <strong className="text-stone-50">{selectedKit.boltCount}</strong>
+              </span>
+            )}
+            {selectedKit.dia && (
+              <span>
+                DIA: <strong className="text-stone-50">{selectedKit.dia}</strong>
+              </span>
+            )}
+            {selectedKit.boltSize && (
+              <span>
+                Болт: <strong className="text-stone-50">{selectedKit.boltSize}</strong>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Кнопка пошуку */}
       <div className="flex items-center gap-4">
@@ -652,14 +646,8 @@ export function VehicleTyreSelector() {
       )}
 
       {/* Результати */}
-      <AnimatePresence>
-        {searchResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
-          >
+      {searchResult && (
+        <div className="space-y-6 animate-fade-in">
             {/* Інформація про авто */}
             <div className="rounded-xl border border-stone-700 bg-stone-800 p-6">
               <h3 className="mb-4 text-xl font-bold text-stone-50">
@@ -728,18 +716,17 @@ export function VehicleTyreSelector() {
                 </h3>
                 <div className="grid gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-3">
                   {filteredTyres.map((tyre, idx) => (
-                    <motion.div
+                    <div
                       key={tyre.slug}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.1 }}
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${idx * 0.1}s` }}
                     >
                       <TyreCard
                         tyre={tyre}
                         variant="compact"
                         matchingSizes={tyre.matchingSizes}
                       />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -763,9 +750,8 @@ export function VehicleTyreSelector() {
               </div>
             );
             })()}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

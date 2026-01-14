@@ -3,6 +3,42 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'standalone', // Required for Docker deployment
 
+  // CDN cache headers for static assets
+  async headers() {
+    return [
+      {
+        // Static images - cache for 1 year (immutable)
+        source: '/:path*.(svg|jpg|jpeg|png|webp|avif|ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Fonts - cache for 1 year
+        source: '/:path*.(woff|woff2|ttf|otf)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // JS/CSS chunks - cache for 1 year (hashed filenames)
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+
   // Redirects from old URLs to new ones (SEO-friendly 301)
   async redirects() {
     return [
@@ -20,6 +56,8 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Enable AVIF (best compression) + WebP as fallback
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'http',

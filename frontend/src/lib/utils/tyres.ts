@@ -62,6 +62,34 @@ export const seasonTextColors: Record<Season, string> = {
   allseason: "text-amber-500",
 };
 
+// Season background colors with transparency (for icon containers)
+export const seasonBgLight: Record<Season, string> = {
+  summer: "bg-emerald-500/15",
+  winter: "bg-sky-500/15",
+  allseason: "bg-amber-500/15",
+};
+
+// Feature icon colors (for benefits/features lists)
+export const featureIconColors = {
+  // By icon name
+  car: { bg: "bg-blue-500/15", text: "text-blue-500" },
+  shield: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
+  zap: { bg: "bg-amber-500/15", text: "text-amber-500" },
+  star: { bg: "bg-purple-500/15", text: "text-purple-500" },
+  mountain: { bg: "bg-orange-500/15", text: "text-orange-500" },
+  thermometer: { bg: "bg-red-500/15", text: "text-red-500" },
+  weight: { bg: "bg-slate-500/15", text: "text-slate-500" },
+  gauge: { bg: "bg-cyan-500/15", text: "text-cyan-500" },
+  truck: { bg: "bg-indigo-500/15", text: "text-indigo-500" },
+  globe: { bg: "bg-teal-500/15", text: "text-teal-500" },
+  users: { bg: "bg-pink-500/15", text: "text-pink-500" },
+  phone: { bg: "bg-green-500/15", text: "text-green-500" },
+  mapPin: { bg: "bg-rose-500/15", text: "text-rose-500" },
+  award: { bg: "bg-yellow-500/15", text: "text-yellow-500" },
+} as const;
+
+export type FeatureIconKey = keyof typeof featureIconColors;
+
 // Vehicle type labels
 export const vehicleTypeLabels: Record<string, string> = {
   passenger: "Легкові",

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { type TyreModel, type Season } from "@/lib/data";
-import { seasonLabels, SeasonIcons } from "@/lib/utils/tyres";
+import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
 
 interface SeasonCategoryCardProps {
   season: Season;
@@ -29,8 +29,8 @@ export function SeasonCategoryCard({
     <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-primary/10 p-2">
-            <Icon className="h-5 w-5" aria-hidden="true" />
+          <div className={`rounded-full ${seasonBgLight[season]} p-2`}>
+            <Icon className={`h-5 w-5 ${seasonTextColors[season]}`} aria-hidden="true" />
           </div>
           <h3 className="text-xl font-bold">{seasonLabels[season]}</h3>
         </div>

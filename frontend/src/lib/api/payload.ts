@@ -153,18 +153,27 @@ interface PayloadResponse<T> {
   hasPrevPage: boolean;
 }
 
+// Cache TTL constants (in seconds)
+const CACHE_TTL = {
+  SHORT: 300,      // 5 min - for frequently changing data
+  MEDIUM: 3600,    // 1 hour - for product data (tyres, articles)
+  LONG: 86400,     // 24 hours - for rarely changing data (technologies)
+} as const;
+
 // Fetch helpers
 async function fetchPayload<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit & { revalidate?: number }
 ): Promise<PayloadResponse<T>> {
+  const { revalidate = CACHE_TTL.MEDIUM, ...fetchOptions } = options || {};
+
   const response = await fetch(`${PAYLOAD_URL}/api/${endpoint}`, {
-    ...options,
+    ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...options?.headers,
+      ...fetchOptions?.headers,
     },
-    next: { revalidate: 60 },
+    next: { revalidate },
   });
 
   if (!response.ok) {
@@ -417,9 +426,11 @@ export async function getPayloadDealers(params?: {
   return data.docs;
 }
 
-// Technologies API
+// Technologies API (rarely changes - use long cache)
 export async function getPayloadTechnologies(): Promise<PayloadTechnology[]> {
-  const data = await fetchPayload<PayloadTechnology>('technologies?limit=100');
+  const data = await fetchPayload<PayloadTechnology>('technologies?limit=100', {
+    revalidate: CACHE_TTL.LONG,
+  });
   return data.docs;
 }
 
@@ -460,12 +471,13 @@ export async function getPayloadVehicleFitmentByCarParams(
   return fitments[0] || null;
 }
 
-// Seasonal content
+// Seasonal content (may change for promotions - use short cache)
 export async function getSeasonalContent() {
   try {
     // Try to get active seasonal content from CMS
     const data = await fetchPayload<PayloadSeasonalContent>(
-      'seasonal-content?where[isActive][equals]=true&limit=1'
+      'seasonal-content?where[isActive][equals]=true&limit=1',
+      { revalidate: CACHE_TTL.SHORT }
     );
 
     if (data.docs.length > 0) {

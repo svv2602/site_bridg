@@ -44,21 +44,25 @@ const features = [
     icon: Shield,
     title: "Безпека на першому місці",
     description: "Технології, що забезпечують надійне зчеплення в будь-яких умовах.",
+    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
   },
   {
     icon: Zap,
     title: "Економія палива",
     description: "Знижений опір коченню для зменшення витрат на пального.",
+    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
   },
   {
     icon: Users,
     title: "Експертна підтримка",
     description: "Консультації від офіційних дилерів та сервісних центрів.",
+    color: { bg: "bg-pink-500/15", text: "text-pink-500" },
   },
   {
     icon: Globe,
     title: "Глобальна якість",
     description: "Продукція, що відповідає міжнародним стандартам безпеки.",
+    color: { bg: "bg-teal-500/15", text: "text-teal-500" },
   },
 ];
 
@@ -131,8 +135,8 @@ export default async function Home() {
                 delay={idx * 0.1}
                 className="rounded-2xl border border-border bg-card p-6 text-center shadow-lg"
               >
-                <div className="mx-auto mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <feat.icon className="h-6 w-6 text-primary" />
+                <div className={`mx-auto mb-4 inline-flex rounded-full ${feat.color.bg} p-3`}>
+                  <feat.icon className={`h-6 w-6 ${feat.color.text}`} />
                 </div>
                 <h3 className="mb-2 text-xl font-bold">{feat.title}</h3>
                 <p className="text-sm text-muted-foreground">{feat.description}</p>

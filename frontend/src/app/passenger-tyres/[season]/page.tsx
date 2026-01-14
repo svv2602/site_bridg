@@ -6,7 +6,7 @@ import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-react";
-import { seasonLabels, SeasonIcons } from "@/lib/utils/tyres";
+import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
 
 // URL slug to internal season mapping
 const slugToSeason: Record<string, Season> = {
@@ -47,21 +47,25 @@ const seasonMeta: Record<
         icon: Thermometer,
         title: "Для температур вище +7°C",
         description: "Оптимальна еластичність гуми в теплу пору року.",
+        color: { bg: "bg-red-500/15", text: "text-red-500" },
       },
       {
         icon: Zap,
         title: "Знижений опір коченню",
         description: "Економія палива до 5% порівняно з всесезонними.",
+        color: { bg: "bg-amber-500/15", text: "text-amber-500" },
       },
       {
         icon: Shield,
         title: "Відмінне гальмування",
         description: "Скорочення гальмівного шляху на сухій дорозі.",
+        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
       },
       {
         icon: Car,
         title: "Тиха їзда",
         description: "Оптимізований протектор для низького рівня шуму.",
+        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
       },
     ],
   },
@@ -78,21 +82,25 @@ const seasonMeta: Record<
         icon: Snowflake,
         title: "Позначка 3PMSF",
         description: "Сертифіковані для суворих зимових умов.",
+        color: { bg: "bg-sky-500/15", text: "text-sky-500" },
       },
       {
         icon: Shield,
         title: "Зчеплення на льоду",
         description: "Мікро-ламелі для контролю на слизькій поверхні.",
+        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
       },
       {
         icon: Thermometer,
         title: "М'яка гумова суміш",
         description: "Зберігає еластичність при морозі до -40°C.",
+        color: { bg: "bg-red-500/15", text: "text-red-500" },
       },
       {
         icon: Car,
         title: "Відведення сльоти",
         description: "Глибокі канали для відведення снігу та води.",
+        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
       },
     ],
   },
@@ -109,21 +117,25 @@ const seasonMeta: Record<
         icon: Cloud,
         title: "Цілорічна експлуатація",
         description: "Не потребують сезонної заміни шин.",
+        color: { bg: "bg-amber-500/15", text: "text-amber-500" },
       },
       {
         icon: Shield,
         title: "Позначка M+S",
         description: "Підходять для легкої зими та літа.",
+        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
       },
       {
         icon: Zap,
         title: "Економія коштів",
         description: "Один комплект замість двох сезонних.",
+        color: { bg: "bg-purple-500/15", text: "text-purple-500" },
       },
       {
         icon: Car,
         title: "Збалансовані характеристики",
         description: "Прийнятні показники в різних умовах.",
+        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
       },
     ],
   },
@@ -208,8 +220,8 @@ export default async function SeasonTyresPage({ params }: PageProps) {
               <ul className="mb-8 space-y-3 text-sm">
                 {meta.features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1.5">
-                      <feat.icon className="h-4 w-4 text-stone-700 dark:text-white" />
+                    <div className={`mt-1 rounded-full ${feat.color.bg} p-1.5`}>
+                      <feat.icon className={`h-4 w-4 ${feat.color.text}`} />
                     </div>
                     <div>
                       <p className="font-medium text-stone-900 dark:text-white">{feat.title}</p>
@@ -306,8 +318,8 @@ export default async function SeasonTyresPage({ params }: PageProps) {
                     href={`/passenger-tyres/${seasonToSlug[s]}`}
                     className="flex items-center gap-4 rounded-xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-md"
                   >
-                    <div className="rounded-full bg-primary/10 p-3">
-                      <SIcon className="h-6 w-6" />
+                    <div className={`rounded-full ${seasonBgLight[s]} p-3`}>
+                      <SIcon className={`h-6 w-6 ${seasonTextColors[s]}`} />
                     </div>
                     <div>
                       <h3 className="font-semibold">{seasonLabels[s]}</h3>

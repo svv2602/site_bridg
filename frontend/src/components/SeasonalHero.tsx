@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, Car, Shield, MapPin, Zap, Sun, Snowflake } from 'lucide-react';
@@ -41,6 +40,7 @@ interface SeasonalHeroProps {
 export function SeasonalHero({ children }: SeasonalHeroProps) {
   const [seasonalData, setSeasonalData] = useState<SeasonalData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     async function fetchSeasonalData() {
@@ -55,6 +55,8 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
       }
     }
     fetchSeasonalData();
+    // Trigger animation after mount
+    requestAnimationFrame(() => setIsVisible(true));
   }, []);
 
   const SeasonIcon = seasonalData.featuredSeason === 'winter' ? Snowflake : Sun;
@@ -63,11 +65,13 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
     <section className="hero-adaptive relative py-8 md:py-12 overflow-hidden">
       <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
-          <motion.div
-            initial={{ opacity: 0, x: -18 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
             className="space-y-5"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0)' : 'translateX(-18px)',
+              transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+            }}
           >
             {/* Season badge */}
             <div className="hero-badge-adaptive">
@@ -111,26 +115,26 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
 
             <ul className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 md:text-sm">
               <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
-                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
-                  <Car className="h-3 w-3 text-stone-700 dark:text-white" />
+                <div className="mt-1 rounded-full bg-blue-500/15 p-1">
+                  <Car className="h-3 w-3 text-blue-500" />
                 </div>
                 <span>{t('hero.searchBySize')}</span>
               </li>
               <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
-                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
-                  <Shield className="h-3 w-3 text-stone-700 dark:text-white" />
+                <div className="mt-1 rounded-full bg-emerald-500/15 p-1">
+                  <Shield className="h-3 w-3 text-emerald-500" />
                 </div>
                 <span>{t('hero.catalogDescription')}</span>
               </li>
               <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
-                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
-                  <MapPin className="h-3 w-3 text-stone-700 dark:text-white" />
+                <div className="mt-1 rounded-full bg-rose-500/15 p-1">
+                  <MapPin className="h-3 w-3 text-rose-500" />
                 </div>
                 <span>{t('hero.dealersMap')}</span>
               </li>
               <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
-                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
-                  <Zap className="h-3 w-3 text-stone-700 dark:text-white" />
+                <div className="mt-1 rounded-full bg-amber-500/15 p-1">
+                  <Zap className="h-3 w-3 text-amber-500" />
                 </div>
                 <span>{t('hero.tyreAdvice')}</span>
               </li>
@@ -146,14 +150,16 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
                 {seasonalData.ctaText}
               </Link>
             )}
-          </motion.div>
+          </div>
 
           {/* Right side - Quick Search */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
             className="space-y-6"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0)' : 'translateX(20px)',
+              transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+            }}
           >
             {/* Season visual card with tyre image */}
             <div className={`hero-card-adaptive relative h-64 overflow-hidden lg:h-80 ${seasonalData.featuredSeason ? `bg-gradient-to-br ${seasonalData.gradient}` : ''}`}>
@@ -190,7 +196,7 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
 
             {/* Quick Search Form passed as children */}
             {children}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

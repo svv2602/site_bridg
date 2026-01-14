@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
@@ -116,10 +116,10 @@ export default function ContactsPage() {
       {/* Hero */}
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            
+            
+            
             className="mx-auto max-w-4xl text-left"
           >
             <Breadcrumb
@@ -140,7 +140,7 @@ export default function ContactsPage() {
               запитання щодо продукції Bridgestone. Скористайтеся контактами нижче або формою зворотного
               зв&apos;язку.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -149,11 +149,11 @@ export default function ContactsPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {contactMethods.map((method, idx) => (
-              <motion.div
+              <div
                 key={method.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                
+                
+                
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg hover:border-primary/30"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
@@ -179,7 +179,7 @@ export default function ContactsPage() {
                     {method.action} <Send className="h-4 w-4" />
                   </a>
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -190,10 +190,10 @@ export default function ContactsPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
+            <div
+              
+              
+              
               className="rounded-2xl border border-border bg-card p-8 shadow-lg"
             >
               <h2 className="mb-6 text-2xl font-bold">Надішліть нам повідомлення</h2>
@@ -332,14 +332,14 @@ export default function ContactsPage() {
                   </button>
                 </form>
               )}
-            </motion.div>
+            </div>
 
             {/* FAQ & Map */}
             <div className="space-y-8">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+              <div
+                
+                
+                
                 className="rounded-2xl border border-border bg-gradient-to-br from-card to-secondary/5 p-8"
               >
                 <h3 className="mb-6 text-2xl font-bold">Часті запитання</h3>
@@ -360,12 +360,12 @@ export default function ContactsPage() {
                 >
                   Перейти до всіх питань <ArrowRight className="h-4 w-4" />
                 </Link>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
+              <div
+                
+                
+                
                 className="overflow-hidden rounded-2xl border border-border bg-gradient-to-tr from-primary/5 to-secondary/5 p-8"
               >
                 <h3 className="mb-4 text-2xl font-bold">Ми на карті</h3>
@@ -384,7 +384,7 @@ export default function ContactsPage() {
                     </Link>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -393,10 +393,10 @@ export default function ContactsPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            
+            
+            
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Потрібна негайна допомога?</h3>
@@ -420,7 +420,7 @@ export default function ContactsPage() {
                 Написати в Telegram
               </a>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

@@ -25,21 +25,25 @@ const features = [
     icon: Car,
     title: "Комфорт та керованість",
     description: "Оптимальна жорсткість та форма протектора для комфортної їзди.",
+    color: { bg: "bg-blue-500/15", text: "text-blue-500" },
   },
   {
     icon: Shield,
     title: "Безпека на мокрій дорозі",
     description: "Глибокі дренажні канали для швидкого відведення води.",
+    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
   },
   {
     icon: Zap,
     title: "Економія палива",
     description: "Знижений опір коченню завдяки спеціальним матеріалам.",
+    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
   },
   {
     icon: Star,
     title: "Довговічність",
     description: "Міцна конструкція та стійкість до зносу на українських дорогах.",
+    color: { bg: "bg-purple-500/15", text: "text-purple-500" },
   },
 ];
 
@@ -78,8 +82,8 @@ export default async function PassengerTyresPage() {
               <ul className="mb-8 space-y-3 text-sm">
                 {features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1.5">
-                      <feat.icon className="h-4 w-4 text-stone-700 dark:text-white" />
+                    <div className={`mt-1 rounded-full ${feat.color.bg} p-1.5`}>
+                      <feat.icon className={`h-4 w-4 ${feat.color.text}`} />
                     </div>
                     <div>
                       <p className="font-medium text-stone-900 dark:text-white">{feat.title}</p>

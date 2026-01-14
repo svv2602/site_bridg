@@ -25,21 +25,25 @@ const features = [
     icon: Car,
     title: "Посилена конструкція",
     description: "Каркас, розрахований на великі навантаження та складні дорожні умови.",
+    color: { bg: "bg-blue-500/15", text: "text-blue-500" },
   },
   {
     icon: Shield,
     title: "Захист від пошкоджень",
     description: "Технології захисту боковини та протектора від каміння та ударів.",
+    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
   },
   {
     icon: Zap,
     title: "Висока прохідність",
     description: "Малюнок протектора, що забезпечує зчеплення на гравії, снігу та бруді.",
+    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
   },
   {
     icon: Mountain,
     title: "Стабільність на швидкості",
     description: "Оптимізована форма плеча для стабільної поведінки на трасі.",
+    color: { bg: "bg-orange-500/15", text: "text-orange-500" },
   },
 ];
 
@@ -77,8 +81,8 @@ export default async function SuvTyresPage() {
               <ul className="mb-8 space-y-3 text-sm">
                 {features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1.5">
-                      <feat.icon className="h-4 w-4 text-stone-700 dark:text-white" />
+                    <div className={`mt-1 rounded-full ${feat.color.bg} p-1.5`}>
+                      <feat.icon className={`h-4 w-4 ${feat.color.text}`} />
                     </div>
                     <div>
                       <p className="font-medium text-stone-900 dark:text-white">{feat.title}</p>

@@ -2,13 +2,28 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { type Dealer } from "@/lib/data";
 import { getDealers } from "@/lib/api/dealers";
 import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
-import { DealersMap } from "@/components/DealersMap";
 import { Breadcrumb, ErrorState } from "@/components/ui";
+
+// Lazy load Google Maps component (saves ~30KB initial bundle)
+const DealersMap = dynamic(
+  () => import("@/components/DealersMap").then((mod) => mod.DealersMap),
+  {
+    loading: () => (
+      <div className="flex h-full min-h-[300px] items-center justify-center rounded-xl bg-stone-100 dark:bg-stone-800">
+        <div className="flex items-center gap-2 text-stone-500">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Завантаження карти...</span>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
@@ -104,10 +119,10 @@ export default function DealersPage() {
       {/* Hero */}
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
+            
+            
+            
             className="mx-auto flex max-w-4xl flex-col gap-4 text-left md:gap-5"
           >
             <Breadcrumb
@@ -126,7 +141,7 @@ export default function DealersPage() {
             <p className="hero-text-adaptive max-w-2xl text-sm md:text-base">
               Фільтруйте офіційні точки продажу та сервісні партнери Bridgestone по всій Україні.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -231,9 +246,9 @@ export default function DealersPage() {
               <span className="ml-3 text-muted-foreground">Завантаження дилерів...</span>
             </div>
           ) : filteredDealers.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <div
+              
+              
               className="rounded-2xl border border-border bg-card p-12 text-center"
             >
               <Search className="mx-auto h-12 w-12 text-muted" />
@@ -241,15 +256,15 @@ export default function DealersPage() {
               <p className="mt-2 text-muted-foreground">
                 Спробуйте змінити параметри пошуку або обрати інше місто.
               </p>
-            </motion.div>
+            </div>
           ) : (
             <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
               {filteredDealers.map((dealer, idx) => (
-                <motion.article
+                <article
                   key={dealer.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  
+                  
+                  
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className="p-6">
@@ -342,10 +357,10 @@ export default function DealersPage() {
                     </div>
 
                     {expandedDealer === dealer.id && (
-                      <motion.div
+                      <div
                         id={`dealer-details-${dealer.id}`}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
+                        
+                        
                         className="mt-6 space-y-3 border-t border-border pt-6 text-sm"
                       >
                         <p className="font-medium">Додаткова інформація</p>
@@ -359,10 +374,10 @@ export default function DealersPage() {
                           <li>Сервіс «шини на винос»</li>
                           <li>Гарантія на послуги</li>
                         </ul>
-                      </motion.div>
+                      </div>
                     )}
                   </div>
-                </motion.article>
+                </article>
               ))}
             </div>
           )}
@@ -372,10 +387,10 @@ export default function DealersPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            
+            
+            
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>
@@ -398,7 +413,7 @@ export default function DealersPage() {
                 Заповнити форму
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

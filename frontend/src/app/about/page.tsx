@@ -1,15 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Globe, Award, Shield, Users, Target, Zap, Phone } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-};
 
 const stats = [
   { label: "Країн присутності", value: "150+", icon: Globe },
@@ -47,12 +40,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="hero-adaptive relative overflow-hidden py-12 md:py-16">
         <div className="container relative mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto max-w-4xl text-left"
-          >
+          <div className="mx-auto max-w-4xl text-left animate-fade-in">
             <Breadcrumb
               className="hero-breadcrumb-adaptive mb-2"
               items={[
@@ -85,7 +73,7 @@ export default function AboutPage() {
                 Зв&apos;язатися з нами
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -94,11 +82,11 @@ export default function AboutPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, idx) => (
-              <motion.div
+              <div
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                
+                
+                
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
                 <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
@@ -106,7 +94,7 @@ export default function AboutPage() {
                 </div>
                 <div className="text-3xl font-bold text-secondary">{stat.value}</div>
                 <div className="mt-2 text-sm text-muted-foreground">{stat.label}</div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -116,7 +104,7 @@ export default function AboutPage() {
       <section id="mission" className="py-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
-            <motion.div {...fadeInUp}>
+            <div>
               <h2 className="mb-6 text-3xl font-bold">Наша місія</h2>
               <p className="mb-6 text-lg text-muted-foreground">
                 «Служити суспільству з максимальною якістю» — це не просто слова.
@@ -149,8 +137,8 @@ export default function AboutPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
-            <motion.div {...fadeInUp} transition={{ delay: 0.2 }}>
+            </div>
+            <div >
               <h2 className="mb-6 text-3xl font-bold">Наші цінності</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {values.map((value) => (
@@ -166,7 +154,7 @@ export default function AboutPage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -174,12 +162,7 @@ export default function AboutPage() {
       {/* History */}
       <section className="py-16 bg-gradient-to-b from-card to-background">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="mx-auto max-w-4xl text-center"
-          >
+          <div className="mx-auto max-w-4xl text-center animate-fade-in">
             <h2 className="mb-4 text-3xl font-bold">Історія, яка формує майбутнє</h2>
             <p className="mb-10 text-lg text-muted-foreground">
               За понад 90 років Bridgestone пройшов шлях від невеликої японської мануфактури
@@ -218,17 +201,17 @@ export default function AboutPage() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            
+            
+            
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Готові дізнатися більше?</h3>
@@ -251,7 +234,7 @@ export default function AboutPage() {
                 Зателефонувати
               </a>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
