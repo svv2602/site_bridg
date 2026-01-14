@@ -195,8 +195,34 @@ export default async function TyreModelPage({
         </div>
       </section>
 
+      {/* Full Description - Full Width */}
+      {model.fullDescription && (
+        <section className="border-b border-border bg-stone-50 dark:bg-stone-900/50 py-12 md:py-16">
+          <div className="container mx-auto max-w-4xl px-4 md:px-8">
+            <h2 className="mb-6 text-2xl font-bold md:text-3xl">Про модель {model.name}</h2>
+            <div className="prose prose-lg max-w-none">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <LexicalRenderer
+                content={model.fullDescription as any}
+                variant="product"
+                leadParagraph
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Key Benefits - Full Width */}
+      {model.keyBenefits && model.keyBenefits.length > 0 && (
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto max-w-7xl px-4 md:px-8">
+            <KeyBenefits benefits={model.keyBenefits} />
+          </div>
+        </section>
+      )}
+
       {/* Specs & usage */}
-      <section className="py-12">
+      <section className="py-12 border-t border-border">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
@@ -250,24 +276,6 @@ export default async function TyreModelPage({
                     </div>
                   </div>
                 </div>
-              )}
-
-              {/* Full Description */}
-              {model.fullDescription ? (
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                  <h2 className="mb-4 text-xl font-bold">Про модель {model.name}</h2>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  <LexicalRenderer
-                    content={model.fullDescription as any}
-                    variant="product"
-                    leadParagraph
-                  />
-                </div>
-              ) : null}
-
-              {/* Key Benefits */}
-              {model.keyBenefits && model.keyBenefits.length > 0 && (
-                <KeyBenefits benefits={model.keyBenefits} />
               )}
             </div>
 
