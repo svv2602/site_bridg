@@ -71,8 +71,8 @@ export function SizesByDiameter({ sizes, modelSlug }: SizesByDiameterProps) {
               onClick={() => setActiveDiameter(diameter)}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground hover:bg-stone-200 dark:hover:bg-stone-700"
+                  ? "bg-primary text-primary-text"
+                  : "bg-stone-200 text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
               }`}
             >
               R{diameter}
