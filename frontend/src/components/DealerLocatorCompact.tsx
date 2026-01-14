@@ -62,7 +62,7 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
         <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
           {/* Left: Search form */}
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-stone-200 px-3 py-1 text-xs font-medium text-stone-700 dark:bg-stone-700 dark:text-stone-200">
               <Navigation className="h-3 w-3" />
               Офіційна мережа
             </div>

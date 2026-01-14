@@ -192,7 +192,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
                 </span>
               ))}
               {tyre.sizes.length > 3 && (
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                <span className="rounded-full bg-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                   +{tyre.sizes.length - 3}
                 </span>
               )}
@@ -214,7 +214,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
                   </span>
                 ))}
                 {matchingSizes.length > 2 && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                  <span className="rounded-full bg-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                     +{matchingSizes.length - 2}
                   </span>
                 )}

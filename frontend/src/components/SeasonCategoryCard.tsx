@@ -34,7 +34,7 @@ export function SeasonCategoryCard({
           </div>
           <h3 className="text-xl font-bold">{seasonLabels[season]}</h3>
         </div>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+        <span className="rounded-full bg-stone-200 px-3 py-1 text-sm font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
           {items.length} моделей
         </span>
       </div>

@@ -163,7 +163,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 <Link
                   key={tag}
                   href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  className="rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                  className="rounded-full bg-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                 >
                   #{tag}
                 </Link>

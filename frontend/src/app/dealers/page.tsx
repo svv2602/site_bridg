@@ -257,10 +257,10 @@ export default function DealersPage() {
                       <div>
                         <span
                           className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${dealer.type === "official"
-                              ? "bg-primary/10 text-primary"
+                              ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
                               : dealer.type === "partner"
-                                ? "bg-secondary/10 text-secondary"
-                                : "bg-green-500/10 text-green-600"
+                                ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200"
+                                : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
                             }`}
                         >
                           {dealer.type === "official"

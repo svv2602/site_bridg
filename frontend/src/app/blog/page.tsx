@@ -85,7 +85,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {searchQuery && (
                 <Link
                   href={activeTag ? `/blog?tag=${activeTag}` : "/blog"}
-                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/20"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text hover:bg-primary-hover"
                 >
                   Пошук: &quot;{searchQuery}&quot;
                   <X className="h-3 w-3" />
@@ -94,7 +94,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {activeTag && (
                 <Link
                   href={searchQuery ? `/blog?search=${searchQuery}` : "/blog"}
-                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/20"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text hover:bg-primary-hover"
                 >
                   #{activeTag}
                   <X className="h-3 w-3" />

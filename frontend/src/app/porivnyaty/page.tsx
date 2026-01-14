@@ -102,12 +102,12 @@ export default function ComparisonSelectionPage() {
                 {selectedTyres.map((tyre) => (
                   <span
                     key={tyre.slug}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-text rounded-full text-sm font-medium"
                   >
                     {tyre.name}
                     <button
                       onClick={() => toggleTyre(tyre)}
-                      className="hover:bg-primary/20 rounded-full p-0.5"
+                      className="hover:bg-primary-hover rounded-full p-0.5"
                       aria-label={`Видалити ${tyre.name}`}
                     >
                       <X className="h-3.5 w-3.5" />

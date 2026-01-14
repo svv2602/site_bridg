@@ -258,7 +258,7 @@ export default async function Home() {
                 delay={idx * 0.1}
                 className="rounded-2xl border border-border bg-card p-6 shadow-lg"
               >
-                <div className="mb-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <div className="mb-4 inline-flex rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                   {article.category}
                 </div>
                 <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
@@ -279,7 +279,7 @@ export default async function Home() {
       <section className="border-y border-border bg-stone-50 py-12 dark:bg-stone-900/50">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8 text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-stone-200 px-4 py-1.5 text-sm font-medium text-stone-700 dark:bg-stone-700 dark:text-stone-200">
               <Award className="h-4 w-4" />
               Незалежні тести
             </div>

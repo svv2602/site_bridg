@@ -191,7 +191,7 @@ export default async function TechnologyPage() {
                           </div>
                         </div>
                         {tyres.length > 0 && (
-                          <div className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+                          <div className="rounded-full bg-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                             Використовується в {tyres.length} моделях
                           </div>
                         )}
@@ -210,7 +210,7 @@ export default async function TechnologyPage() {
                               >
                                 <div className="mb-2 flex items-center justify-between">
                                   <h5 className="font-bold">{tyre.name}</h5>
-                                  <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                                  <span className="rounded-full bg-stone-200 px-2 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                                     {tyre.season === "summer"
                                       ? "Літо"
                                       : tyre.season === "winter"

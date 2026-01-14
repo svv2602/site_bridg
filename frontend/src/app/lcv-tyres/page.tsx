@@ -209,7 +209,7 @@ export default async function LcvTyresPage() {
                           </span>
                         ))}
                         {model.sizes.length > 3 && (
-                          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                          <span className="rounded-full bg-stone-200 px-3 py-1 text-xs font-medium text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                             +{model.sizes.length - 3}
                           </span>
                         )}
