@@ -67,7 +67,7 @@ export function SeasonCategoryCard({
       {hasMore && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-medium text-primary hover:bg-muted transition-colors"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-stone-300 bg-stone-100 py-3 text-sm font-medium text-stone-700 hover:bg-stone-200 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700 transition-colors"
         >
           {showAll ? (
             <>
