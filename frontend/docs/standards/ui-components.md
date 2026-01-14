@@ -281,6 +281,72 @@ interface MatchingTyre extends TyreModel {
 }
 ```
 
+## Badge Contrast Standards
+
+**CRITICAL:** Never use `bg-primary/10 text-primary` or `bg-muted text-muted-foreground` for badges — these combinations have poor contrast in both themes.
+
+### Correct Badge Patterns
+
+**Neutral badges (tags, counts, categories):**
+```tsx
+// CORRECT: Explicit stone colors with dark mode variants
+<span className="rounded-full bg-stone-200 px-3 py-1 text-sm font-medium text-stone-700 dark:bg-stone-700 dark:text-stone-200">
+  #tag
+</span>
+
+// INCORRECT: Low contrast in both themes
+<span className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
+<span className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
+```
+
+**Active/selected state badges:**
+```tsx
+// CORRECT: Solid primary background
+<span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
+  Active filter
+</span>
+
+// INCORRECT: Transparent primary (low contrast)
+<span className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
+```
+
+**Semantic color badges (status, type indicators):**
+```tsx
+// CORRECT: Explicit light/dark variants
+<span className="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:bg-red-900 dark:text-red-200">
+  Офіційний дилер
+</span>
+
+<span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900 dark:text-green-200">
+  Сервісний центр
+</span>
+
+// INCORRECT: Opacity-based backgrounds
+<span className="bg-green-500/10 text-green-600">
+```
+
+**Count badges (+N more):**
+```tsx
+// CORRECT
+<span className="rounded-full bg-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
+  +{count}
+</span>
+
+// INCORRECT
+<span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+```
+
+### Badge Color Reference
+
+| Type | Light Theme | Dark Theme |
+|------|-------------|------------|
+| Neutral | `bg-stone-200 text-stone-700` | `bg-stone-700 text-stone-200` |
+| Active | `bg-primary text-primary-text` | Same |
+| Success | `bg-green-100 text-green-700` | `bg-green-900 text-green-200` |
+| Warning | `bg-orange-100 text-orange-700` | `bg-orange-900 text-orange-200` |
+| Error/Official | `bg-red-100 text-red-700` | `bg-red-900 text-red-200` |
+| Info | `bg-blue-100 text-blue-700` | `bg-blue-900 text-blue-200` |
+
 ## Season Badge Colors
 
 Use consistent badge classes for season indicators:
@@ -306,7 +372,8 @@ When creating new card components, verify:
 - [ ] Card container has `h-full` for equal heights in grid
 - [ ] Title uses `font-medium`, `mb-3`, `text-foreground`, `decoration-1` on hover
 - [ ] All text elements have explicit color (`text-foreground` or `text-muted-foreground`)
-- [ ] Badges have explicit text colors for light/dark theme
+- [ ] **Badges use explicit stone colors, NOT `bg-muted` or `bg-primary/10`**
+- [ ] **Badges have both light and dark theme colors (e.g., `dark:bg-stone-700 dark:text-stone-200`)**
 - [ ] Content sections have `min-h-[X]` for optional content
 - [ ] Bottom actions use `mt-auto` for consistent positioning
 - [ ] Images have proper `object-contain` or `object-cover`
