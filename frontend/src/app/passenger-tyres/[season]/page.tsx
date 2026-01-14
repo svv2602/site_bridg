@@ -186,55 +186,55 @@ export default async function SeasonTyresPage({ params }: PageProps) {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
               <Breadcrumb
-                className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+                className="hero-breadcrumb-adaptive mb-2"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Легкові шини", href: "/passenger-tyres" },
                   { label: seasonLabels[season] },
                 ]}
               />
-              <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
+              <h1 className="hero-title-adaptive mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 {meta.h1}
-                <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+                <span className="hero-subtitle-adaptive mt-1 block text-base font-normal md:text-lg">
                   {meta.subtitle}
                 </span>
               </h1>
-              <p className="hero-text mb-6 max-w-xl text-sm md:text-base">{meta.heroText}</p>
-              <ul className="mb-8 space-y-3 text-sm text-hero-foreground">
+              <p className="hero-text-adaptive mb-6 max-w-xl text-sm md:text-base">{meta.heroText}</p>
+              <ul className="mb-8 space-y-3 text-sm">
                 {meta.features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 rounded-full bg-hero-accent p-1.5">
-                      <feat.icon className="h-4 w-4 text-hero-foreground" />
+                    <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1.5">
+                      <feat.icon className="h-4 w-4 text-stone-700 dark:text-white" />
                     </div>
                     <div>
-                      <p className="font-medium">{feat.title}</p>
-                      <p className="text-xs text-hero-muted md:text-sm">{feat.description}</p>
+                      <p className="font-medium text-stone-900 dark:text-white">{feat.title}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 md:text-sm">{feat.description}</p>
                     </div>
                   </li>
                 ))}
               </ul>
               <div className="flex flex-wrap gap-4">
-                <Link href="/tyre-search" className="hero-btn-primary">
+                <Link href="/tyre-search" className="hero-btn-primary-adaptive">
                   Підібрати шини
                 </Link>
-                <Link href="#catalog" className="hero-btn-secondary">
+                <Link href="#catalog" className="hero-btn-secondary-adaptive">
                   Переглянути каталог
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="hero-card relative h-80 overflow-hidden lg:h-full">
+              <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Icon className="h-40 w-40 text-white/10" />
+                  <Icon className="h-40 w-40 text-stone-300 dark:text-white/10" />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 p-6 backdrop-blur-sm">
-                  <h3 className="text-xl font-semibold text-hero-foreground">{meta.h1}</h3>
-                  <p className="text-sm text-hero-muted">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 p-6 backdrop-blur-sm">
+                  <h3 className="text-xl font-semibold text-stone-900 dark:text-white">{meta.h1}</h3>
+                  <p className="text-sm text-stone-500 dark:text-stone-400">
                     {seasonTyres.length} моделей у каталозі
                   </p>
                 </div>

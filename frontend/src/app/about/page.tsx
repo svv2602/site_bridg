@@ -45,7 +45,7 @@ export default function AboutPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
-      <section className="hero-dark relative overflow-hidden border-b border-hero-border py-12 md:py-16 hero-grid-pattern">
+      <section className="hero-adaptive relative overflow-hidden py-12 md:py-16">
         <div className="container relative mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -54,19 +54,19 @@ export default function AboutPage() {
             className="mx-auto max-w-4xl text-left"
           >
             <Breadcrumb
-              className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+              className="hero-breadcrumb-adaptive mb-2"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Про бренд Bridgestone" },
               ]}
             />
-            <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
+            <h1 className="hero-title-adaptive mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
               Bridgestone — світовий виробник шин
-              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+              <span className="hero-subtitle-adaptive mt-1 block text-base font-normal md:text-lg">
                 технічний лідер з глобальною присутністю у більш ніж 150 країнах світу
               </span>
             </h1>
-            <p className="hero-text mb-6 max-w-2xl text-sm md:text-base">
+            <p className="hero-text-adaptive mb-6 max-w-2xl text-sm md:text-base">
               Від перших заводів у Японії до сучасних дослідницьких центрів у різних регіонах —
               Bridgestone поєднує інженерний досвід, інновації та суворі стандарти якості,
               щоб забезпечувати безпеку і комфорт мільйонам водіїв.
@@ -74,13 +74,13 @@ export default function AboutPage() {
             <div className="flex flex-wrap gap-4">
               <a
                 href="#mission"
-                className="hero-btn-primary"
+                className="hero-btn-primary-adaptive"
               >
                 Дізнатися більше
               </a>
               <Link
                 href="/contacts"
-                className="hero-btn-secondary"
+                className="hero-btn-secondary-adaptive"
               >
                 Зв&apos;язатися з нами
               </Link>

@@ -36,23 +36,23 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl text-left">
             <Breadcrumb
-              className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+              className="hero-breadcrumb-adaptive mb-2"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Блог" },
               ]}
             />
-            <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="hero-title-adaptive mb-4 text-3xl font-semibold tracking-tight md:text-4xl">
               Блог Bridgestone Україна
-              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+              <span className="hero-subtitle-adaptive mt-1 block text-base font-normal md:text-lg">
                 статті, поради, огляди та новини
               </span>
             </h1>
-            <p className="hero-text mb-6 max-w-2xl text-sm md:text-base">
+            <p className="hero-text-adaptive mb-6 max-w-2xl text-sm md:text-base">
               Корисна інформація для водіїв: як обрати шини, результати тестів,
               технології Bridgestone та поради щодо експлуатації.
             </p>

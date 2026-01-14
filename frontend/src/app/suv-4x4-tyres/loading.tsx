@@ -4,14 +4,14 @@ export default function Loading() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero skeleton */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="animate-pulse">
-            <div className="h-4 w-32 rounded bg-hero-accent mb-4" />
-            <div className="h-10 w-2/3 rounded bg-hero-accent mb-2" />
-            <div className="h-6 w-1/2 rounded bg-hero-accent mb-6" />
-            <div className="h-4 w-full max-w-xl rounded bg-hero-accent mb-2" />
-            <div className="h-4 w-4/5 max-w-xl rounded bg-hero-accent" />
+            <div className="h-4 w-32 rounded bg-stone-200 dark:bg-white/10 mb-4" />
+            <div className="h-10 w-2/3 rounded bg-stone-200 dark:bg-white/10 mb-2" />
+            <div className="h-6 w-1/2 rounded bg-stone-200 dark:bg-white/10 mb-6" />
+            <div className="h-4 w-full max-w-xl rounded bg-stone-200 dark:bg-white/10 mb-2" />
+            <div className="h-4 w-4/5 max-w-xl rounded bg-stone-200 dark:bg-white/10" />
           </div>
         </div>
       </section>

@@ -94,41 +94,41 @@ export default async function TyreModelPage({
           dangerouslySetInnerHTML={{ __html: jsonLdScript(faqSchema) }}
         />
       )}
-      {/* Hero */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12">
+      {/* Hero - Silver (light) / Dark (dark theme) */}
+      <section className="border-b border-stone-200 dark:border-stone-800 bg-gradient-to-br from-stone-100 via-stone-50 to-white dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
               <Breadcrumb
-                className="mb-3 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+                className="mb-3 text-stone-500 dark:text-stone-400 [&_a:hover]:text-stone-900 dark:[&_a:hover]:text-white [&_span]:text-stone-700 dark:[&_span]:text-stone-200"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Каталог шин", href: "/passenger-tyres" },
                   { label: model.name },
                 ]}
               />
-              <div className="hero-badge mb-3 text-[11px] uppercase tracking-wide">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/50 px-4 py-1.5 text-[11px] uppercase tracking-wide text-stone-600 dark:text-stone-300 shadow-sm">
                 <Car className="h-3 w-3" />
                 <span>Модель шини Bridgestone</span>
               </div>
-              <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.7rem]">
+              <h1 className="mb-4 text-3xl font-semibold tracking-tight text-stone-900 dark:text-white md:text-4xl lg:text-[2.7rem]">
                 {model.name}
-                <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+                <span className="mt-1 block text-base font-normal text-stone-500 dark:text-stone-400 md:text-lg">
                   {seasonLabels[model.season]} для {formatVehicleTypes(model)}
                 </span>
               </h1>
-              <p className="hero-text mb-6 max-w-xl text-sm md:text-base">
+              <p className="mb-6 max-w-xl text-sm text-stone-600 dark:text-stone-300 md:text-base">
                 {model.shortDescription}
               </p>
               <div className="mb-6 flex flex-wrap gap-3 text-xs">
-                <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
+                <span className="rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/50 px-3 py-1 text-stone-700 dark:text-stone-200 shadow-sm">
                   Сезонність: {seasonLabels[model.season]}
                 </span>
-                <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
+                <span className="rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/50 px-3 py-1 text-stone-700 dark:text-stone-200 shadow-sm">
                   Тип авто: {formatVehicleTypes(model)}
                 </span>
                 {model.technologies && model.technologies.length > 0 && (
-                  <span className="rounded-full bg-hero-accent px-3 py-1 text-hero-foreground">
+                  <span className="rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/50 px-3 py-1 text-stone-700 dark:text-stone-200 shadow-sm">
                     Технології: {model.technologies.length}
                   </span>
                 )}
@@ -136,21 +136,21 @@ export default async function TyreModelPage({
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/dealers"
-                  className="hero-btn-primary inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2 rounded-full bg-stone-900 dark:bg-white px-6 py-3 font-semibold text-white dark:text-stone-900 shadow-lg transition-all hover:bg-stone-800 dark:hover:bg-stone-100"
                 >
                   <MapPin className="h-4 w-4" />
                   Знайти дилера
                 </Link>
                 <Link
                   href="/tyre-search"
-                  className="hero-btn-secondary inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2 rounded-full border border-stone-300 dark:border-stone-600 bg-white dark:bg-transparent px-6 py-3 font-semibold text-stone-900 dark:text-white transition-all hover:bg-stone-50 dark:hover:bg-stone-800"
                 >
                   Підібрати розмір
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="hero-card relative aspect-square min-h-[400px] overflow-hidden bg-gradient-to-br from-muted/50 to-muted lg:min-h-[500px]">
+              <div className="relative aspect-square min-h-[400px] overflow-hidden rounded-3xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-white to-stone-100 dark:from-stone-800 dark:to-stone-900 shadow-xl lg:min-h-[500px]">
                 {model.imageUrl ? (
                   <Image
                     src={model.imageUrl}
@@ -182,9 +182,9 @@ export default async function TyreModelPage({
                   </div>
                 )}
                 {!model.imageUrl && (
-                  <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
-                    <h3 className="text-lg font-semibold text-hero-foreground">Фото незабаром</h3>
-                    <p className="text-sm text-hero-muted">
+                  <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm p-6">
+                    <h3 className="text-lg font-semibold text-stone-900 dark:text-white">Фото незабаром</h3>
+                    <p className="text-sm text-stone-500 dark:text-stone-400">
                       Зображення моделі {model.name} буде додано найближчим часом.
                     </p>
                   </div>

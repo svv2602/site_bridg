@@ -2,12 +2,12 @@ export default function BlogLoading() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero skeleton */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl">
-            <div className="mb-2 h-4 w-32 animate-pulse rounded bg-stone-700" />
-            <div className="mb-4 h-10 w-3/4 animate-pulse rounded bg-stone-700" />
-            <div className="h-5 w-1/2 animate-pulse rounded bg-stone-700" />
+            <div className="mb-2 h-4 w-32 animate-pulse rounded bg-stone-200 dark:bg-white/10" />
+            <div className="mb-4 h-10 w-3/4 animate-pulse rounded bg-stone-200 dark:bg-white/10" />
+            <div className="h-5 w-1/2 animate-pulse rounded bg-stone-200 dark:bg-white/10" />
           </div>
         </div>
       </section>

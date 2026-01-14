@@ -60,7 +60,7 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
   const SeasonIcon = seasonalData.featuredSeason === 'winter' ? Snowflake : Sun;
 
   return (
-    <section className="hero-dark relative border-b border-hero-border py-8 md:py-12 hero-glow hero-grid-pattern overflow-hidden">
+    <section className="hero-adaptive relative py-8 md:py-12 overflow-hidden">
       <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
           <motion.div
@@ -70,7 +70,7 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             className="space-y-5"
           >
             {/* Season badge */}
-            <div className="hero-badge">
+            <div className="hero-badge-adaptive">
               {seasonalData.featuredSeason ? (
                 <>
                   <SeasonIcon className="h-4 w-4" />
@@ -85,15 +85,15 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             </div>
 
             {/* Dynamic Title */}
-            <h1 className="hero-title text-3xl md:text-4xl lg:text-[2.9rem]">
+            <h1 className="hero-title-adaptive text-3xl md:text-4xl lg:text-[2.9rem]">
               {isLoading ? (
-                <span className="animate-pulse bg-white/20 rounded inline-block">
+                <span className="animate-pulse bg-stone-300 dark:bg-white/20 rounded inline-block">
                   Технічний контроль на кожному кілометрі
                 </span>
               ) : (
                 seasonalData.heroTitle
               )}
-              <span className="hero-subtitle mt-1 block text-base md:text-lg">
+              <span className="hero-subtitle-adaptive mt-1 block text-base md:text-lg">
                 {isLoading ? (
                   <span className="animate-pulse">
                     літні, зимові та всесезонні шини під ваш стиль водіння
@@ -104,33 +104,33 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
               </span>
             </h1>
 
-            <p className="hero-text max-w-xl text-sm md:text-base">
+            <p className="hero-text-adaptive max-w-xl text-sm md:text-base">
               Оберіть шини, які підходять саме вам — за розміром, сезоном
               або маркою автомобіля. Офіційна гарантія та мережа дилерів по всій Україні.
             </p>
 
             <ul className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 md:text-sm">
-              <li className="flex items-start gap-3 text-hero-muted">
-                <div className="mt-1 rounded-full bg-hero-accent p-1">
-                  <Car className="h-3 w-3" />
+              <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
+                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
+                  <Car className="h-3 w-3 text-stone-700 dark:text-white" />
                 </div>
                 <span>{t('hero.searchBySize')}</span>
               </li>
-              <li className="flex items-start gap-3 text-hero-muted">
-                <div className="mt-1 rounded-full bg-hero-accent p-1">
-                  <Shield className="h-3 w-3" />
+              <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
+                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
+                  <Shield className="h-3 w-3 text-stone-700 dark:text-white" />
                 </div>
                 <span>{t('hero.catalogDescription')}</span>
               </li>
-              <li className="flex items-start gap-3 text-hero-muted">
-                <div className="mt-1 rounded-full bg-hero-accent p-1">
-                  <MapPin className="h-3 w-3" />
+              <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
+                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
+                  <MapPin className="h-3 w-3 text-stone-700 dark:text-white" />
                 </div>
                 <span>{t('hero.dealersMap')}</span>
               </li>
-              <li className="flex items-start gap-3 text-hero-muted">
-                <div className="mt-1 rounded-full bg-hero-accent p-1">
-                  <Zap className="h-3 w-3" />
+              <li className="flex items-start gap-3 text-stone-500 dark:text-stone-400">
+                <div className="mt-1 rounded-full bg-stone-200 dark:bg-white/10 p-1">
+                  <Zap className="h-3 w-3 text-stone-700 dark:text-white" />
                 </div>
                 <span>{t('hero.tyreAdvice')}</span>
               </li>
@@ -156,7 +156,7 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             className="space-y-6"
           >
             {/* Season visual card with tyre image */}
-            <div className={`hero-card relative h-64 overflow-hidden lg:h-80 ${seasonalData.featuredSeason ? `bg-gradient-to-br ${seasonalData.gradient}` : ''}`}>
+            <div className={`hero-card-adaptive relative h-64 overflow-hidden lg:h-80 ${seasonalData.featuredSeason ? `bg-gradient-to-br ${seasonalData.gradient}` : ''}`}>
               {/* Tyre image */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative h-48 w-48 md:h-56 md:w-56 lg:h-64 lg:w-64 transform transition-transform duration-500 hover:scale-105">
@@ -170,15 +170,15 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
                   />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
-                <h3 className="text-xl font-semibold text-hero-foreground">
+              <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
+                <h3 className="text-xl font-semibold text-stone-900 dark:text-white">
                   {seasonalData.featuredSeason === 'summer'
                     ? t('hero.readyForSummer')
                     : seasonalData.featuredSeason === 'winter'
                     ? t('hero.readyForWinter')
                     : t('hero.readyForAny')}
                 </h3>
-                <p className="text-sm text-hero-muted">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
                   {seasonalData.featuredSeason === 'summer'
                     ? t('hero.summerDescription')
                     : seasonalData.featuredSeason === 'winter'

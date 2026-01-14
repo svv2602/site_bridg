@@ -82,50 +82,50 @@ export default async function TechnologyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       {/* Hero */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
               <Breadcrumb
-                className="mb-2 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+                className="hero-breadcrumb-adaptive mb-2"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Технології та інновації" },
                 ]}
               />
-              <h1 className="hero-title mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
+              <h1 className="hero-title-adaptive mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 Технології Bridgestone
-                <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+                <span className="hero-subtitle-adaptive mt-1 block text-base font-normal md:text-lg">
                   безпека, комфорт та ефективність у реальних дорожніх умовах
                 </span>
               </h1>
-              <p className="hero-text mb-6 max-w-xl text-sm md:text-base">
+              <p className="hero-text-adaptive mb-6 max-w-xl text-sm md:text-base">
                 Інженери Bridgestone працюють з гумовими сумішами, рисунком протектора та конструкцією каркаса,
                 щоб шина поводилася стабільно від літньої спеки до зимових опадів.
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
                   href="#technologies"
-                  className="hero-btn-primary"
+                  className="hero-btn-primary-adaptive"
                 >
                   Дізнатися більше
                 </a>
                 <Link
                   href="/passenger-tyres"
-                  className="hero-btn-secondary"
+                  className="hero-btn-secondary-adaptive"
                 >
                   Переглянути шини
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <div className="hero-card relative h-80 overflow-hidden lg:h-full">
+              <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Cpu className="h-40 w-40 text-white/10" aria-hidden="true" />
+                  <Cpu className="h-40 w-40 text-stone-300 dark:text-white/10" aria-hidden="true" />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 border-t border-hero-border bg-black/50 backdrop-blur-sm p-6">
-                  <h3 className="text-xl font-semibold text-hero-foreground">Технології у дії</h3>
-                  <p className="text-sm text-hero-muted">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
+                  <h3 className="text-xl font-semibold text-stone-900 dark:text-white">Технології у дії</h3>
+                  <p className="text-sm text-stone-500 dark:text-stone-400">
                     {technologies.length} унікальних технологій для різних умов експлуатації.
                   </p>
                 </div>

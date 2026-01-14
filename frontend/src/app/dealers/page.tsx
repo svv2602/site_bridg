@@ -102,7 +102,7 @@ export default function DealersPage() {
         />
       ))}
       {/* Hero */}
-      <section className="hero-dark border-b border-hero-border py-8 md:py-12 hero-grid-pattern">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -111,19 +111,19 @@ export default function DealersPage() {
             className="mx-auto flex max-w-4xl flex-col gap-4 text-left md:gap-5"
           >
             <Breadcrumb
-              className="mb-1 text-hero-muted [&_a:hover]:text-hero-foreground [&_span]:text-hero-foreground"
+              className="hero-breadcrumb-adaptive mb-1"
               items={[
                 { label: "Головна", href: "/" },
                 { label: "Дилери / Де купити" },
               ]}
             />
-            <h1 className="hero-title text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="hero-title-adaptive text-3xl font-semibold tracking-tight md:text-4xl">
               Пошук офіційних дилерів Bridgestone
-              <span className="hero-subtitle mt-1 block text-base font-normal md:text-lg">
+              <span className="hero-subtitle-adaptive mt-1 block text-base font-normal md:text-lg">
                 використовуйте технічний пошук за містом, адресою та типом точки
               </span>
             </h1>
-            <p className="hero-text max-w-2xl text-sm md:text-base">
+            <p className="hero-text-adaptive max-w-2xl text-sm md:text-base">
               Фільтруйте офіційні точки продажу та сервісні партнери Bridgestone по всій Україні.
             </p>
           </motion.div>
