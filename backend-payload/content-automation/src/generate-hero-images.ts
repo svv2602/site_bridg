@@ -27,110 +27,77 @@ interface HeroImageConfig {
 }
 
 const heroImages: HeroImageConfig[] = [
-  // Season pages
+  // Season pages - square format for hero cards
   {
     filename: "hero-summer.jpg",
-    size: "1792x1024",
-    prompt: `Cinematic automotive photography, summer road trip scene.
-
-Modern sedan or SUV driving on a scenic highway during golden hour.
-Warm sunlight, clear blue sky, green trees and fields along the road.
-The car is in motion, showing dynamic movement.
-Emphasis on the wheels and tires gripping the dry asphalt.
-
-Technical: Shot with Sony A7R V, 70-200mm lens, motion blur on background.
-Professional color grading, warm tones, high dynamic range.
-Style: Premium automotive magazine quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names on car.
-Clean composition, focus on the driving experience in summer conditions.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of a modern silver sedan driving on a European highway in summer.
+Bright sunny day, blue sky with white clouds, lush green trees along the road.
+The car is captured from a 3/4 front angle, showing the full vehicle profile.
+Dry asphalt road, professional automotive photography lighting.
+Shot with Canon EOS R5, 85mm f/1.4 lens, natural daylight.
+Hyperrealistic, 8K quality, no distortion, correct car proportions.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
   {
     filename: "hero-winter.jpg",
-    size: "1792x1024",
-    prompt: `Cinematic automotive photography, winter driving scene.
-
-Modern SUV or crossover confidently driving on a snowy mountain road.
-Fresh snow on the road and trees, cold blue winter light, overcast sky.
-Tire tracks in snow showing excellent grip.
-The vehicle is in control, demonstrating winter tire performance.
-
-Technical: Shot with professional camera, wide angle lens.
-Cool color grading, blue and white tones, sharp details.
-Style: Premium automotive magazine quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names.
-Atmospheric winter mood, emphasis on safety and control in winter conditions.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of a dark gray SUV driving on a snowy mountain road in winter.
+Fresh snow covering the road and pine trees, overcast sky, cold winter atmosphere.
+The SUV is captured from the side-front angle, showing confident winter driving.
+Visible tire tracks in fresh snow, demonstrating grip and control.
+Shot with Sony A7R IV, 70-200mm lens, natural winter light.
+Hyperrealistic, 8K quality, correct vehicle proportions, no distortion.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
   {
     filename: "hero-allseason.jpg",
-    size: "1792x1024",
-    prompt: `Cinematic automotive photography, autumn driving scene.
-
-Modern car driving on a wet road with fallen autumn leaves.
-Dramatic sky with clouds, rain just stopped, wet reflective asphalt.
-Golden and orange autumn foliage along the road.
-The car shows stability on the wet surface.
-
-Technical: Shot with professional camera, medium telephoto lens.
-Rich autumn colors, moody atmospheric lighting.
-Style: Premium automotive magazine quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names.
-Transitional weather conditions, showing all-season tire versatility.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of a modern crossover on a wet autumn road.
+Rainy weather just stopped, wet reflective asphalt, fallen orange and yellow leaves.
+Moody autumn sky with dramatic clouds, trees with colorful foliage.
+The car is captured from 3/4 angle, showing stability on wet surface.
+Shot with Nikon Z9, 50mm lens, natural overcast lighting.
+Hyperrealistic, 8K quality, correct proportions, photojournalistic style.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
 
-  // Vehicle type pages
+  // Vehicle type pages - square format
   {
     filename: "hero-passenger.jpg",
-    size: "1792x1024",
-    prompt: `Premium automotive photography of a modern sedan on the road.
-
-Elegant executive sedan (like Mercedes E-class or BMW 5 series style)
-driving on a well-maintained highway. Professional photoshoot quality.
-Focus on the sleek design and premium tires.
-Daytime lighting, clean background, urban or suburban setting.
-
-Technical: Professional automotive photography, sharp focus on the car.
-Neutral color grading, balanced exposure.
-Style: Car advertisement quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names.
-Emphasize comfort, elegance, and daily commuting reliability.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of an elegant silver sedan on a clean city street.
+Modern executive car similar to Audi A6 or BMW 5 series styling.
+Daytime urban setting, modern architecture in background, clean sidewalks.
+The sedan captured from 3/4 front angle showing sleek design.
+Professional automotive photography, soft shadows, balanced exposure.
+Shot with Phase One XF camera, 80mm lens, studio-quality natural light.
+Hyperrealistic, 8K quality, perfect proportions, showroom finish.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
   {
     filename: "hero-suv.jpg",
-    size: "1792x1024",
-    prompt: `Dynamic automotive photography of a modern SUV in action.
-
-Premium SUV or crossover (like BMW X5 or Audi Q7 style) on a scenic mountain road.
-The vehicle shows capability and adventure spirit.
-Dramatic landscape background, slight dust or dynamic movement.
-Emphasis on the robust tires and ground clearance.
-
-Technical: Professional automotive photography, dynamic angle.
-Rich colors, dramatic lighting, high contrast.
-Style: Adventure automotive magazine quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names.
-Show versatility - capable on various terrains while maintaining road comfort.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of a premium black SUV on a scenic mountain viewpoint.
+Large luxury SUV similar to BMW X5 or Volvo XC90 styling.
+Dramatic mountain landscape background, golden hour sunlight.
+The SUV captured from 3/4 angle showing robust stance and ground clearance.
+Adventure spirit with professional automotive photography quality.
+Shot with Canon EOS R5, 35mm wide angle, warm golden light.
+Hyperrealistic, 8K quality, correct proportions, magazine cover quality.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
   {
     filename: "hero-lcv.jpg",
-    size: "1792x1024",
-    prompt: `Professional photography of a modern delivery van or light commercial vehicle.
-
-Clean white or silver van (like Mercedes Sprinter or Ford Transit style)
-driving in an urban business district. Professional business context.
-The vehicle is well-maintained, showing reliability for commercial use.
-Focus on durability and professional appearance.
-
-Technical: Professional commercial photography, clean composition.
-Bright, professional lighting, urban environment.
-Style: Commercial fleet advertising quality, photorealistic.
-
-Requirements: No text, no logos, no watermarks, no visible brand names.
-Emphasize reliability, efficiency, and professional business transport.`,
+    size: "1024x1024",
+    prompt: `Ultra-realistic photograph of a white delivery van in an urban business district.
+Modern commercial van similar to Mercedes Sprinter or Ford Transit styling.
+Clean city environment, modern office buildings, professional business context.
+The van captured from 3/4 front angle, showing practical design.
+Bright daylight, professional commercial photography style.
+Shot with Sony A7R IV, 50mm lens, clean natural lighting.
+Hyperrealistic, 8K quality, correct proportions, fleet advertising quality.
+CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
   },
 ];
 
