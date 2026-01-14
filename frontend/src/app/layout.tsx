@@ -107,18 +107,7 @@ export default function RootLayout({
                   <span>Гаряча лінія: 0 800 123 456</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <ThemeToggle />
-                <div className="flex items-center gap-2">
-                  <Link href="#" className="hover:text-primary">
-                    UA
-                  </Link>
-                  <span className="text-muted">|</span>
-                  <Link href="#" className="hover:text-primary">
-                    EN
-                  </Link>
-                </div>
-              </div>
+              <ThemeToggle />
             </div>
           </div>
 
