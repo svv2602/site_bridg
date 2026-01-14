@@ -155,42 +155,42 @@ export default function TyreSearchPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
+      <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mx-auto flex max-w-5xl flex-col gap-6 text-left text-stone-50 md:flex-row md:items-center md:justify-between"
+            className="mx-auto flex max-w-5xl flex-col gap-6 text-left md:flex-row md:items-center md:justify-between"
           >
             <div>
               <Breadcrumb
-                className="mb-3"
+                className="hero-breadcrumb-adaptive mb-3"
                 items={[
                   { label: "Головна", href: "/" },
                   { label: "Пошук шин" },
                 ]}
               />
-              <h1 className="mb-3 text-3xl font-semibold tracking-tight md:text-4xl">
+              <h1 className="hero-title-adaptive mb-3 text-3xl font-semibold tracking-tight md:text-4xl">
                 Технічний підбір шин
-                <span className="block text-base font-normal text-stone-300 md:text-lg">
+                <span className="hero-subtitle-adaptive block text-base font-normal md:text-lg">
                   за розміром або за вашим автомобілем
                 </span>
               </h1>
-              <p className="max-w-xl text-sm text-stone-300 md:text-base">
+              <p className="hero-text-adaptive max-w-xl text-sm md:text-base">
                 Введіть параметри, а ми підберемо відповідні моделі шин Bridgestone з демонстраційної бази.
                 Інтерфейс оформлений у більш «технічному» стилі на основі референсів Goodyear.
               </p>
             </div>
-            <div className="hidden gap-3 rounded-2xl border border-stone-700 bg-stone-900/60 p-4 text-xs text-stone-300 shadow-lg md:flex md:flex-col">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">
+            <div className="hidden gap-3 rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-100/80 dark:bg-stone-900/60 p-4 text-xs text-stone-600 dark:text-stone-300 shadow-lg md:flex md:flex-col">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
                 Режим підбору
               </span>
               <p>
                 Оберіть пошук за <span className="font-semibold">типорозміром</span> або
                 <span className="font-semibold"> за авто</span>, заповніть поля й запустіть пошук.
               </p>
-              <p className="text-[11px] text-stone-500">
+              <p className="text-[11px] text-stone-400 dark:text-stone-500">
                 У продакшн‑версії форми будуть підключені до повного каталогу шин та бази авто.
               </p>
             </div>
