@@ -348,14 +348,14 @@ export default function TyreSearchPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    <div className="flex items-center gap-2 text-sm text-stone-300">
+                      <CheckCircle className="h-4 w-4 text-green-400" />
                       <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
                     </div>
                     <button
                       type="submit"
                       disabled={!width || !aspectRatio || !diameter || searching}
-                      className="w-full rounded-full bg-stone-50 py-3 text-base font-semibold text-stone-900 shadow-lg ring-2 ring-stone-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full rounded-full bg-white py-3 text-base font-semibold text-stone-900 shadow-lg ring-2 ring-stone-300 hover:ring-stone-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {searching ? (
                         <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />

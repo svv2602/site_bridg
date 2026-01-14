@@ -63,7 +63,7 @@ export function MainHeader() {
           {/* Search CTA */}
           <Link
             href="/tyre-search"
-            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-text shadow-md transition-all hover:bg-primary-hover hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-silver focus:ring-offset-2 focus:ring-offset-stone-900"
+            className="hidden items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-900 shadow-md ring-1 ring-stone-300 transition-all hover:ring-stone-400 hover:shadow-lg sm:flex focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-stone-900"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Пошук шин</span>
