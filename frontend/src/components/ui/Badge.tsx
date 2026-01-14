@@ -28,9 +28,9 @@ const variantStyles: Record<BadgeVariant, string> = {
   top3: "bg-blue-500 text-blue-950 border-blue-600",
   category: "bg-stone-200 text-stone-800 border-stone-300 dark:bg-stone-700 dark:text-stone-100 dark:border-stone-600",
   eco: "bg-emerald-500 text-emerald-950 border-emerald-600",
-  summer: "bg-gradient-to-r from-orange-500 to-yellow-500 text-white border-orange-600",
+  summer: "bg-gradient-to-r from-emerald-500 to-teal-400 text-white border-emerald-600",
   winter: "bg-gradient-to-r from-blue-500 to-cyan-400 text-white border-blue-600",
-  allseason: "bg-gradient-to-r from-emerald-500 to-teal-400 text-white border-emerald-600",
+  allseason: "bg-gradient-to-r from-orange-500 to-amber-400 text-white border-orange-600",
   default: "bg-stone-100 text-stone-800 border-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:border-stone-700",
 };
 

@@ -48,17 +48,18 @@ export const SeasonIcons = {
 } as const;
 
 // Season colors for badges and accents
+// Літо = зелений, Зима = синій, Всесезон = оранжевий
 export const seasonColors: Record<Season, string> = {
-  summer: "bg-amber-500",
+  summer: "bg-emerald-500",
   winter: "bg-sky-500",
-  allseason: "bg-emerald-500",
+  allseason: "bg-amber-500",
 };
 
 // Season text colors
 export const seasonTextColors: Record<Season, string> = {
-  summer: "text-amber-500",
+  summer: "text-emerald-500",
   winter: "text-sky-400",
-  allseason: "text-emerald-500",
+  allseason: "text-amber-500",
 };
 
 // Vehicle type labels

@@ -18,7 +18,7 @@ const tyreCategories = [
     name: "Літні шини",
     description: "Для теплої пори року, оптимальні для сухого та мокрого асфальту.",
     icon: Sun,
-    color: "from-orange-500 to-yellow-500",
+    color: "from-emerald-500 to-teal-400",
     href: "/passenger-tyres/summer",
   },
   {
@@ -34,7 +34,7 @@ const tyreCategories = [
     name: "Всесезонні шини",
     description: "Компромісне рішення для помірного клімату без екстремальних умов.",
     icon: Cloud,
-    color: "from-gray-500 to-gray-300",
+    color: "from-orange-500 to-amber-400",
     href: "/passenger-tyres/all-season",
   },
 ];

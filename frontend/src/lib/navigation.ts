@@ -5,6 +5,7 @@ export interface MegaMenuItem {
   href: string;
   icon?: LucideIcon;
   description?: string;
+  iconColor?: string; // Tailwind text color class
 }
 
 export interface MegaMenuColumn {
@@ -27,18 +28,21 @@ export const tyresMenuData: MegaMenuData = {
           label: 'Літні шини',
           href: '/passenger-tyres/summer',
           icon: Sun,
+          iconColor: 'text-emerald-400',
           description: 'Для теплої пори року',
         },
         {
           label: 'Зимові шини',
           href: '/passenger-tyres/winter',
           icon: Snowflake,
+          iconColor: 'text-sky-400',
           description: 'Для снігу та льоду',
         },
         {
           label: 'Всесезонні',
           href: '/passenger-tyres/all-season',
           icon: Cloud,
+          iconColor: 'text-amber-400',
           description: 'Цілорічне використання',
         },
       ],

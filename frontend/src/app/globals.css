@@ -1117,8 +1117,9 @@ textarea:focus-visible {
    REDESIGN 2026: Season Badge Styles
    ====================================== */
 
+/* Літо = зелений (emerald) */
 .badge-summer {
-  background: linear-gradient(135deg, #fb923c, #ea580c);
+  background: linear-gradient(135deg, #34d399, #059669);
   color: white;
   padding: 0.375rem 0.75rem;
   border-radius: 12px;
@@ -1126,6 +1127,7 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
+/* Зима = синій (sky/blue) */
 .badge-winter {
   background: linear-gradient(135deg, #38bdf8, #0284c7);
   color: white;
@@ -1135,8 +1137,9 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
+/* Всесезон = оранжевий (amber/orange) */
 .badge-allseason {
-  background: linear-gradient(135deg, #34d399, #059669);
+  background: linear-gradient(135deg, #fb923c, #ea580c);
   color: white;
   padding: 0.375rem 0.75rem;
   border-radius: 12px;

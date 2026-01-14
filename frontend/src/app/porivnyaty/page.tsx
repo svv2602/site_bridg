@@ -9,11 +9,12 @@ import { getTyreModels } from "@/lib/api/tyres";
 import { Breadcrumb } from "@/components/ui";
 import { seasonLabelsShort } from "@/lib/utils/tyres";
 
+// Літо = зелений, Зима = синій, Всесезон = оранжевий
 const seasonBadgeColors: Record<Season, string> = {
-  summer: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+  summer: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
   winter: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
   allseason:
-    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
 };
 
 export default function ComparisonSelectionPage() {
