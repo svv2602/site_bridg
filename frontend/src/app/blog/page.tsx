@@ -114,10 +114,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             <div className="flex flex-wrap gap-2">
               <Link
                 href={searchQuery ? `/blog?search=${searchQuery}` : "/blog"}
-                className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+                className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                   !activeTag
                     ? "bg-primary text-primary-text"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    : "bg-stone-200 text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                 }`}
               >
                 Усі
@@ -126,10 +126,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 <Link
                   key={tag}
                   href={`/blog?tag=${encodeURIComponent(tag)}${searchQuery ? `&search=${searchQuery}` : ""}`}
-                  className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+                  className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                     activeTag === tag
                       ? "bg-primary text-primary-text"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "bg-stone-200 text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                   }`}
                 >
                   #{tag}
@@ -202,7 +202,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           <Link
                             key={tag}
                             href={`/blog?tag=${encodeURIComponent(tag)}`}
-                            className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20"
+                            className="rounded-full bg-stone-200 px-3 py-1 text-xs font-medium text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                           >
                             #{tag}
                           </Link>
