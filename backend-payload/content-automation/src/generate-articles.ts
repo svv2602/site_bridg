@@ -216,7 +216,8 @@ async function generateAndUploadImages(
   topic: string,
   season: "summer" | "winter" | "allseason",
   contexts: string[],
-  client: ReturnType<typeof getPayloadClient>
+  client: ReturnType<typeof getPayloadClient>,
+  forceRegenerate: boolean = false
 ): Promise<{
   heroImageId: number | null;
   contentImageUrls: string[];
@@ -238,6 +239,7 @@ async function generateAndUploadImages(
       const uploadResult = await client.uploadImageFromUrl(heroImage.url, {
         alt: heroImage.alt,
         filename: `article-hero-${generateSlug(topic)}.png`,
+        force: forceRegenerate,
       });
 
       if (uploadResult) {
@@ -263,6 +265,7 @@ async function generateAndUploadImages(
         const uploadResult = await client.uploadImageFromUrl(img.url, {
           alt: img.alt,
           filename: `article-content-${generateSlug(topic)}-${uploadedIds.length + 1}.png`,
+          force: forceRegenerate,
         });
 
         if (uploadResult) {
@@ -336,12 +339,16 @@ async function publishArticle(
 
 interface GenerateOptions {
   skipImages?: boolean;
+  forceImages?: boolean;
   articlesFilter?: (keyof typeof ARTICLE_PROMPTS)[];
 }
 
 async function main(options: GenerateOptions = {}) {
   console.log("=".repeat(50));
   console.log("Article Generation with Images");
+  if (options.forceImages) {
+    console.log("🔄 Force mode: will regenerate all images");
+  }
   console.log("=".repeat(50));
 
   const client = getPayloadClient();
@@ -377,7 +384,8 @@ async function main(options: GenerateOptions = {}) {
           article.title,
           season,
           article.imageContexts || [],
-          client
+          client,
+          options.forceImages || false
         );
         heroImageId = images.heroImageId;
         contentImageUrls = images.contentImageUrls;
@@ -396,9 +404,10 @@ async function main(options: GenerateOptions = {}) {
 // Parse CLI args
 const args = process.argv.slice(2);
 const skipImages = args.includes("--skip-images") || args.includes("--text-only");
+const forceImages = args.includes("--force") || args.includes("--force-images");
 const filterArg = args.find(a => a.startsWith("--only="));
 const articlesFilter = filterArg
   ? filterArg.split("=")[1].split(",") as (keyof typeof ARTICLE_PROMPTS)[]
   : undefined;
 
-main({ skipImages, articlesFilter }).catch(console.error);
+main({ skipImages, forceImages, articlesFilter }).catch(console.error);

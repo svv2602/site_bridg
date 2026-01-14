@@ -1,0 +1,1852 @@
+[
+  {
+    "name": "BLIZZAK LM005",
+    "sourceSlug": "blizzak-lm005",
+    "canonicalSlug": "blizzak-lm005",
+    "season": "winter",
+    "sizes": [
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 20,
+        "loadIndex": "95",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "100",
+        "speedIndex": "T"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "101",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "101",
+        "speedIndex": "T"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "109",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "111",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "106",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "113",
+        "speedIndex": "V"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "112",
+        "speedIndex": "V"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "88",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "93",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "93",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "91",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "98",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "96",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "91",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "94",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "94",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "98",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "97",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "102",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "106",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "97",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "106",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "108",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "111",
+        "speedIndex": "H"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "110",
+        "speedIndex": "H"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "114",
+        "speedIndex": "H"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "116",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "96",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "96",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "105",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "102",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "105",
+        "speedIndex": "H"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "107",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "H"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "109",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 19,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 50,
+        "diameter": 16,
+        "loadIndex": "88",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "87",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "91",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "89",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 16,
+        "loadIndex": "87",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "91",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "91",
+        "speedIndex": "T"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "94",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "92",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "96",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 16,
+        "loadIndex": "95",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "97",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "99",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16,
+        "loadIndex": "102",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16,
+        "loadIndex": "100",
+        "speedIndex": "T"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "99",
+        "speedIndex": "H"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 16,
+        "loadIndex": "111",
+        "speedIndex": "T"
+      },
+      {
+        "width": 175,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "88",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 55,
+        "diameter": 15,
+        "loadIndex": "86",
+        "speedIndex": "H"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 55,
+        "diameter": 15,
+        "loadIndex": "82",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 15,
+        "loadIndex": "84",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 15,
+        "loadIndex": "88",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "88",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "92",
+        "speedIndex": "T"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 50,
+        "diameter": 15,
+        "loadIndex": "86",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 55,
+        "diameter": 15,
+        "loadIndex": "85",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 15,
+        "loadIndex": "88",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "91",
+        "speedIndex": "H"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "91",
+        "speedIndex": "T"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "95",
+        "speedIndex": "T"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 15,
+        "loadIndex": "94",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 70,
+        "diameter": 15,
+        "loadIndex": "96",
+        "speedIndex": "T"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "93",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "92",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "92",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "102",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "101",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "107",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18,
+        "loadIndex": "110",
+        "speedIndex": "H"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "97",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "109",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "112",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "114",
+        "speedIndex": "H"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "105",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "107",
+        "speedIndex": "V"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "109",
+        "speedIndex": "V"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "113",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "107",
+        "speedIndex": "V"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "111",
+        "speedIndex": "V"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "111",
+        "speedIndex": "V"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "115",
+        "speedIndex": "V"
+      },
+      {
+        "width": 155,
+        "aspectRatio": 65,
+        "diameter": 14,
+        "loadIndex": "79",
+        "speedIndex": "T"
+      },
+      {
+        "width": 165,
+        "aspectRatio": 65,
+        "diameter": 14,
+        "loadIndex": "79",
+        "speedIndex": "T"
+      },
+      {
+        "width": 165,
+        "aspectRatio": 70,
+        "diameter": 14,
+        "loadIndex": "85",
+        "speedIndex": "T"
+      },
+      {
+        "width": 175,
+        "aspectRatio": 65,
+        "diameter": 14,
+        "loadIndex": "82",
+        "speedIndex": "T"
+      },
+      {
+        "width": 175,
+        "aspectRatio": 70,
+        "diameter": 14,
+        "loadIndex": "88",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 60,
+        "diameter": 14,
+        "loadIndex": "82",
+        "speedIndex": "T"
+      },
+      {
+        "width": 185,
+        "aspectRatio": 65,
+        "diameter": 14,
+        "loadIndex": "86",
+        "speedIndex": "T"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 22,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      }
+    ],
+    "euLabel": {
+      "fuelEfficiency": "C",
+      "wetGrip": "A",
+      "noiseDb": 71
+    },
+    "description": "Bridgestone Blizzak LM005 – флагманські зимові шини для безпечного руху містом і трасою\n\nBridgestone Blizzak LM005 – це преміальні зимові шини для легкових авто, універсалів і компактних кросоверів. Модель розроблена для стабільності на мокрій дорозі, впевненого зчеплення на снігу та максимального контролю в зимових міських і трасових умовах. LM005 стала однією з найпопулярніших шин у Європі завдяки високим показникам у незалежних випробуваннях Auto Bild та TyreReviews.\n\n\nОсобливості та технології Bridgestone Blizzak LM005\n\nBlizzak LM005 поєднує асиметричний протектор, інноваційну гумову суміш та посилену конструкцію, що забезпечує відмінне зчеплення в холодну пору року.\n\nАсиметричний малюнок протектора\n\nBridgestone LM005 має асиметричний дизайн протектора, який забезпечує оптимальний баланс між зчепленням, керованістю та ефективним водовідведенням. Ключові елементи:\n\n\n\tМає направлений (directional) малюнок протектора, щоб ефективно відводити воду, сльоту й сніг\n\tВелика щільність ламелей (sipes) у поєднанні з технологією гумової суміші NanoPro-Tech™, що дозволяє шині залишатись гнучкою при низьких температурах і забезпечувати зчеплення на снігу/льоду.\n\tБічні плечові канавки (lateral grooves) спеціально для «захоплення» снігу й покращення зчеплення в плечових ділянках.\n\tЦентральна зона з більшим «вільним простором» (void), щоб покращити дренаж води і поглинання снігу.\n\n\nУ тестах Auto Bild LM005 неодноразово отримувала найвищі оцінки за гальмування на мокрій дорозі – одна з найкращих у своєму класі.\n\n\n\nГумова суміш із технологією NanoPro-Tech™\n\nУ складі використано суміш з високим вмістом силіки та технологію NanoPro-Tech™, яка покращує еластичність гуми в мороз і забезпечує:\n\n\n\tкороткий гальмівний шлях на мокрому покритті;\n\tстабільне зчеплення при низьких температурах;\n\tзменшення тепловтрат та енергоефективність.\n\n\nТакий склад дозволяє шині залишатися м’якою навіть під час різких температурних перепадів.\n\nКомфорт і рівень шуму\n\nBridgestone Blizzak LM005 демонструє низький рівень шуму 70–72 дБ залежно від розміру, що підтверджено європейським маркуванням EU Label.\n\nОптимізована жорсткість блоків і продумана геометрія протектора роблять їзду плавною та комфортною, особливо під час руху по міських дорогах і трасі.\n\n\nПереваги та можливі обмеження\n\nПереваги LM005:\n\n\n\t✅ Одні з найкращих показників на мокрій дорозі серед зимових шин\n\t✅ Висока ефективність гальмування на снігу й мокрому покритті\n\t✅ Асиметричний протектор для стабільної керованості\n\t✅ Технологія NanoPro-Tech™ для еластичності в мороз\n\t✅ Комфортна й тиха робота (70–72 дБ)\n\t✅ Сертифікація 3PMSF та M+S – повна придатність до зими\n\n\nМожливі обмеження:\n\n\n\t❌ На глибокому снігу поступається шинам з агресивнішим зимовим протектором\n\t❌ Не підходить для бездоріжжя та екстремальних умов\n\t❌ Ціна вища, ніж у бюджетних моделей\n\n\n\nРозміри та сумісність\n\nBridgestone Blizzak LM005 виробляється у понад 100 типорозмірах – від 14 до 21 дюйма, підходить для більшості легкових авто та компактних кросоверів.\n\n\n\tПриклади доступних розмірів Bridgestone Blizzak LM005\n\t\n\t\t\n\t\t\tТипорозмір\n\t\t\tEU Label (мокре / опір / шум)\n\t\t\tАвто\n\t\t\n\t\t\n\t\t\t195/65 R15 91T\n\t\t\tB / C / 71 дБ\n\t\t\tVolkswagen Golf, Skoda Octavia\n\t\t\n\t\t\n\t\t\t205/55 R16 91H\n\t\t\tA / B / 72 дБ\n\t\t\tToyota Corolla, Hyundai i30, Ford Focus\n\t\t\n\t\t\n\t\t\t215/60 R16 95H\n\t\t\tB / B / 72 дБ\n\t\t\tNissan Qashqai, Opel Astra\n\t\t\n\t\t\n\t\t\t225/45 R17 94V XL\n\t\t\tB / C / 72 дБ\n\t\t\tAudi A4, BMW 3 Series\n\t\t\n\t\t\n\t\t\t235/50 R18 101V XL\n\t\t\tB / C / 72 дБ\n\t\t\tMazda CX-5, Mercedes GLC, Skoda Kodiaq\n\t\t\n\t\n\n\n* Повний перелік доступний у картці товару.\n\n\nЧому варто купити Bridgestone Blizzak LM005 в Prokoleso.ua\n\n\n\t✔ Оригінальна продукція з офіційною гарантією\n\t✔ Великий вибір розмірів у наявності\n\t✔ Швидка доставка по всій Україні\n\t✔ Професійний підбір шин під ваше авто\n\t✔ Регулярні акції та вигідні пропозиції\n\n\nЗамовляйте Bridgestone Blizzak LM005 – надійні зимові шини з відмінним зчепленням та високим рівнем безпеки у складних умовах.",
+    "imageUrl": "https://prokoleso.ua/storage/tmp_media/catalog_models/1954/image/gallery_image-w463-h463-q100-frame_bridgestone-blizzak-lm005.png",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/blizzak-lm005/",
+    "scrapedAt": "2026-01-12T12:33:29.126Z",
+    "aiGenerated": true,
+    "publishedToPayload": true,
+    "publishedAt": "2026-01-12T13:36:55.603Z",
+    "brand": "bridgestone",
+    "skippedReason": "Already has content in DB"
+  },
+  {
+    "name": "Blizzak 6 ENLITEN",
+    "sourceSlug": "blizzak-6",
+    "canonicalSlug": "blizzak-6-enliten",
+    "season": "winter",
+    "sizes": [
+      {
+        "width": 205,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "88",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "93",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "93",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "94",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 17,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "101",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "106",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 17,
+        "loadIndex": "97",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 17,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "106",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "108",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "111",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 17,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "114",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 65,
+        "diameter": 17,
+        "loadIndex": "116",
+        "speedIndex": "V"
+      },
+      {
+        "width": 195,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "93",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "91",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "96",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 65,
+        "diameter": 16,
+        "loadIndex": "99",
+        "speedIndex": "H"
+      },
+      {
+        "width": 205,
+        "aspectRatio": 80,
+        "diameter": 16,
+        "loadIndex": "104",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "99",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 65,
+        "diameter": 16,
+        "loadIndex": "102",
+        "speedIndex": "H"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 70,
+        "diameter": 16,
+        "loadIndex": "104",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 16,
+        "loadIndex": "99",
+        "speedIndex": "H"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 16,
+        "loadIndex": "104",
+        "speedIndex": "H"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 70,
+        "diameter": 16,
+        "loadIndex": "111",
+        "speedIndex": "H"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "96",
+        "speedIndex": "W"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 35,
+        "diameter": 19,
+        "loadIndex": "91",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "96",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "99",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "98",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "102",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 19,
+        "loadIndex": "96",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "100",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "104",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "107",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 19,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "109",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 19,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 55,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 19,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "100",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "104",
+        "speedIndex": "W"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "99",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "103",
+        "speedIndex": "W"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "101",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "109",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 20,
+        "loadIndex": "113",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "108",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 20,
+        "loadIndex": "102",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "106",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 50,
+        "diameter": 20,
+        "loadIndex": "113",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "108",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "112",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 20,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 45,
+        "diameter": 20,
+        "loadIndex": "114",
+        "speedIndex": "W"
+      },
+      {
+        "width": 305,
+        "aspectRatio": 40,
+        "diameter": 20,
+        "loadIndex": "112",
+        "speedIndex": "W"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 20,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "93",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "92",
+        "speedIndex": "V"
+      },
+      {
+        "width": 215,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "92",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "102",
+        "speedIndex": "V"
+      },
+      {
+        "width": 225,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "95",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "98",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "101",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "107",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 65,
+        "diameter": 18,
+        "loadIndex": "110",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "97",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "100",
+        "speedIndex": "V"
+      },
+      {
+        "width": 245,
+        "aspectRatio": 50,
+        "diameter": 18,
+        "loadIndex": "104",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 18,
+        "loadIndex": "99",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 45,
+        "diameter": 18,
+        "loadIndex": "103",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 55,
+        "diameter": 18,
+        "loadIndex": "109",
+        "speedIndex": "V"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "112",
+        "speedIndex": "V"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 60,
+        "diameter": 18,
+        "loadIndex": "114",
+        "speedIndex": "V"
+      },
+      {
+        "width": 235,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "101",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "98",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "102",
+        "speedIndex": "W"
+      },
+      {
+        "width": 255,
+        "aspectRatio": 50,
+        "diameter": 21,
+        "loadIndex": "109",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "101",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "105",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "103",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "107",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 21,
+        "loadIndex": "113",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "107",
+        "speedIndex": "W"
+      },
+      {
+        "width": 295,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 305,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "109",
+        "speedIndex": "W"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 35,
+        "diameter": 21,
+        "loadIndex": "111",
+        "speedIndex": "W"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 40,
+        "diameter": 21,
+        "loadIndex": "115",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 35,
+        "diameter": 22,
+        "loadIndex": "102",
+        "speedIndex": "W"
+      },
+      {
+        "width": 265,
+        "aspectRatio": 40,
+        "diameter": 22,
+        "loadIndex": "106",
+        "speedIndex": "W"
+      },
+      {
+        "width": 275,
+        "aspectRatio": 35,
+        "diameter": 22,
+        "loadIndex": "104",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 35,
+        "diameter": 22,
+        "loadIndex": "106",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 40,
+        "diameter": 22,
+        "loadIndex": "110",
+        "speedIndex": "W"
+      },
+      {
+        "width": 285,
+        "aspectRatio": 45,
+        "diameter": 22,
+        "loadIndex": "114",
+        "speedIndex": "W"
+      },
+      {
+        "width": 315,
+        "aspectRatio": 30,
+        "diameter": 22,
+        "loadIndex": "107",
+        "speedIndex": "W"
+      },
+      {
+        "width": 325,
+        "aspectRatio": 35,
+        "diameter": 22,
+        "loadIndex": "114",
+        "speedIndex": "W"
+      }
+    ],
+    "euLabel": {
+      "fuelEfficiency": "C",
+      "wetGrip": "B",
+      "noiseDb": 70
+    },
+    "description": "Bridgestone Blizzak 6: огляд, особливості та основні переваги\n\nBridgestone Blizzak 6 — це сучасні зимові шини преміум-класу, створені для стабільного зчеплення та впевненого керування в холодний сезон. Модель належить до нового покоління лінійки Blizzak та розроблена з урахуванням потреб водіїв, які часто стикаються зі снігом, льодом та змінними погодними умовами.\n\n\nОсновні переваги Bridgestone Blizzak 6\n\nBlizzak 6 отримали низку покращень у порівнянні з попередніми моделями серії, забезпечуючи підвищену стабільність та надійність взимку. Серед ключових особливостей:\n\n\n\tВпевнене зчеплення на снігу та льоду — оптимізована гумова суміш та сучасна конструкція ламелей допомагають утримувати автомобіль навіть на слизьких покриттях.\n\tПокращена поведінка на мокрій дорозі — ефективна система канавок сприяє швидкому відведенню води та снігової каші.\n\tКомфорт під час руху — шумопоглинальний дизайн протектора зменшує вібрації та робить поїздки тихішими.\n\tСтійкість до зношування — посилена формула гуми забезпечує довший термін експлуатації.\n\tСтабільність у різних зимових умовах — збалансовані характеристики дозволяють шинам адаптуватися до температурних змін.\n\n\n\nКлючові технологічні рішення\n\nУ моделі Bridgestone Blizzak 6 використано сучасні інженерні підходи, спрямовані на покращення зчеплення, гальмування та керованості. Основний акцент зроблено на:\n\n\n\t✅оновленій формулі зимової гумової суміші, яка зберігає еластичність за мінусових температур;\n\t✅модернізованій системі ламелей для підвищення кількості зчепних крайок;\n\t✅поліпшеному дизайні дренажних канавок, що сприяють стабільності на мокрих та сльотавих дорогах.\n\n\nЦі рішення забезпечують збалансовані характеристики без використання агресивних або вузькоспеціалізованих технологій, що часто застосовуються у скандинавських моделях.\n\n\nДизайн протектора\n\nПротектор Bridgestone Blizzak 6 створено з урахуванням найпоширеніших зимових сценаріїв. Він включає:\n\n\n\n\n\tспрямований малюнок протектора для кращого зчеплення на снігу;\n\tвелику кількість ламелей, що формують додаткові зчепні кромки;\n\tпоглиблені дренажні канавки для ефективного відведення води;\n\tпосилену боковину для підвищеної стійкості до механічних впливів.\n\n\n\nДоступні розміри та сумісність\n\nBridgestone Blizzak 6 випускається у широкому діапазоні типорозмірів, що підходять для більшості легкових автомобілів та кросоверів. Перед купівлею рекомендуємо перевірити сумісність із конкретною моделлю авто.\n\nПопулярні розміри: 205/55 R16, 225/50 R17, 235/45 R18, 255/40 R19 та інші.\n\n\nТести та відгуки\n\nОскільки Bridgestone Blizzak 6 — новинка останнього сезону, інформація про незалежні тести оновлюється. Відомо, що модель отримує високі оцінки за зчеплення на снігу та стабільність керування, а також демонструє збалансовані результати у різних зимових умовах.\n\n👉 Читайте докладний огляд моделі у нашій статті.\n\nВодії відзначають передбачувану поведінку, стабільність при гальмуванні та комфортний рівень шуму.\n\n\nДе купити Bridgestone Blizzak 6 в Україні?\n\nProKoleso.ua пропонує широкий асортимент зимових шин Bridgestone за вигідними цінами. Доступна доставка по всій Україні: Київ, Львів, Дніпро, Харків, Одеса та інші міста.\n\nСпособи оплати: готівкою, карткою або безготівковим розрахунком.\n\n\nBridgestone Blizzak 6 — це сучасні, надійні та збалансовані зимові шини, що поєднують впевнене зчеплення, оптимізований протектор та довговічність. Вони стануть чудовим вибором для тих, хто цінує безпеку та комфорт взимку.",
+    "imageUrl": "https://prokoleso.ua/storage/tmp_media/catalog_models/1982/image/gallery_image-w463-h463-q100-frame_blizzak-6.png",
+    "sourceUrl": "https://prokoleso.ua/ua/shiny/bridgestone/blizzak-6/",
+    "scrapedAt": "2026-01-12T12:33:36.929Z",
+    "aiGenerated": true,
+    "publishedToPayload": true,
+    "publishedAt": "2026-01-13T20:18:06.794Z",
+    "brand": "bridgestone",
+    "skippedReason": "Already has content in DB"
+  }
+]

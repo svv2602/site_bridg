@@ -452,7 +452,263 @@
       "latencyMs": 48537,
       "success": true,
       "timestamp": "2026-01-13T13:28:55.365Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 927,
+      "outputTokens": 1939,
+      "cost": 0.0006727,
+      "latencyMs": 55441,
+      "success": true,
+      "timestamp": "2026-01-13T20:07:17.153Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 927,
+      "outputTokens": 1980,
+      "cost": 0.00068418,
+      "latencyMs": 56132,
+      "success": true,
+      "timestamp": "2026-01-13T20:10:05.685Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 610,
+      "outputTokens": 217,
+      "cost": 0.00014616,
+      "latencyMs": 7471,
+      "success": true,
+      "timestamp": "2026-01-13T20:10:13.157Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 1000,
+      "outputTokens": 1985,
+      "cost": 0.0006958,
+      "latencyMs": 56167,
+      "success": true,
+      "timestamp": "2026-01-13T20:14:55.927Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 933,
+      "outputTokens": 1847,
+      "cost": 0.00064778,
+      "latencyMs": 52366,
+      "success": true,
+      "timestamp": "2026-01-13T20:17:44.292Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 621,
+      "outputTokens": 208,
+      "cost": 0.00014518000000000002,
+      "latencyMs": 6992,
+      "success": true,
+      "timestamp": "2026-01-13T20:17:51.288Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 940,
+      "outputTokens": 1946,
+      "cost": 0.0006764800000000001,
+      "latencyMs": 50116,
+      "success": true,
+      "timestamp": "2026-01-13T20:21:34.718Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 633,
+      "outputTokens": 244,
+      "cost": 0.00015694,
+      "latencyMs": 7522,
+      "success": true,
+      "timestamp": "2026-01-13T20:21:42.243Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 940,
+      "outputTokens": 2193,
+      "cost": 0.0007456400000000001,
+      "latencyMs": 63875,
+      "success": true,
+      "timestamp": "2026-01-13T20:24:54.455Z"
+    },
+    {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "taskType": "content-generation",
+      "inputTokens": 598,
+      "outputTokens": 212,
+      "cost": 0.00014308000000000002,
+      "latencyMs": 7297,
+      "success": true,
+      "timestamp": "2026-01-13T20:25:01.756Z"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "taskType": "content-generation",
+      "inputTokens": 11,
+      "outputTokens": 4,
+      "cost": 0.000029999999999999997,
+      "latencyMs": 1726,
+      "success": true,
+      "timestamp": "2026-01-13T21:20:14.220Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-2",
+      "taskType": "image-article",
+      "cost": 0.05,
+      "latencyMs": 13976,
+      "success": true,
+      "timestamp": "2026-01-13T21:38:47.862Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-2",
+      "taskType": "image-article",
+      "cost": 0.05,
+      "latencyMs": 12698,
+      "success": true,
+      "timestamp": "2026-01-13T22:01:48.474Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-2",
+      "taskType": "image-article",
+      "cost": 0.05,
+      "latencyMs": 14355,
+      "success": true,
+      "timestamp": "2026-01-13T22:04:05.432Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-2",
+      "taskType": "image-article",
+      "cost": 0.05,
+      "latencyMs": 12347,
+      "success": true,
+      "timestamp": "2026-01-13T22:06:20.246Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-2",
+      "taskType": "image-article",
+      "cost": 0.05,
+      "latencyMs": 14545,
+      "success": true,
+      "timestamp": "2026-01-13T22:08:31.925Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 25465,
+      "success": true,
+      "timestamp": "2026-01-14T08:59:47.699Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 20794,
+      "success": true,
+      "timestamp": "2026-01-14T09:00:08.659Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 23025,
+      "success": true,
+      "timestamp": "2026-01-14T09:00:31.757Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 19197,
+      "success": true,
+      "timestamp": "2026-01-14T09:00:51.058Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 39813,
+      "success": true,
+      "timestamp": "2026-01-14T09:35:20.832Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 19674,
+      "success": true,
+      "timestamp": "2026-01-14T09:35:43.564Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 19397,
+      "success": true,
+      "timestamp": "2026-01-14T09:36:03.108Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 30037,
+      "success": true,
+      "timestamp": "2026-01-14T09:36:33.250Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 38765,
+      "success": true,
+      "timestamp": "2026-01-14T10:59:33.751Z"
+    },
+    {
+      "provider": "openai-dalle",
+      "model": "dall-e-3",
+      "taskType": "image-article",
+      "cost": 0.04,
+      "latencyMs": 19254,
+      "success": true,
+      "timestamp": "2026-01-14T11:10:22.067Z"
     }
   ],
-  "lastUpdated": "2026-01-13T13:28:55.365Z"
+  "lastUpdated": "2026-01-14T11:10:22.067Z"
 }

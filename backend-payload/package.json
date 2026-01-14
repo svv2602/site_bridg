@@ -15,6 +15,7 @@
     "automation:publish": "tsx content-automation/src/scheduler.ts publish",
     "automation:full": "tsx content-automation/src/scheduler.ts run-full",
     "automation:daemon": "tsx content-automation/src/index.ts",
+    "automation:image": "tsx content-automation/src/regenerate-image.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -44,7 +45,8 @@
     "payload": "^3.70.0",
     "puppeteer": "^24.34.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
