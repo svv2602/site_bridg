@@ -18,6 +18,8 @@ export const Media: CollectionConfig = {
   },
   upload: {
     staticDir: 'media',
+    focalPoint: true,
+    crop: true,
     imageSizes: [
       {
         name: 'thumbnail',
@@ -123,5 +125,6 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+    update: ({ req }) => !!req.user,
   },
 };
