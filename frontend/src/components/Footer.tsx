@@ -27,16 +27,19 @@ const socialLinks = [
     href: 'https://www.facebook.com/BridgestoneUkraine',
     label: 'Bridgestone у Facebook',
     icon: Facebook,
+    color: 'text-[#1877F2]',
   },
   {
     href: 'https://www.instagram.com/bridgestone_ukraine',
     label: 'Bridgestone в Instagram',
     icon: Instagram,
+    color: 'text-[#E4405F]',
   },
   {
     href: 'https://www.youtube.com/@bridgestone',
     label: 'Bridgestone на YouTube',
     icon: Youtube,
+    color: 'text-[#FF0000]',
   },
 ];
 
@@ -70,9 +73,9 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="rounded-full bg-stone-200 p-2.5 text-stone-600 transition-colors hover:bg-primary hover:text-white dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-primary"
+                  className="rounded-full bg-stone-200 p-2.5 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700"
                 >
-                  <social.icon className="h-5 w-5" />
+                  <social.icon className={`h-5 w-5 ${social.color}`} />
                 </a>
               ))}
             </div>

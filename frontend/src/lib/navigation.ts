@@ -1,4 +1,4 @@
-import { Sun, Snowflake, Cloud, Car, Truck, Search, type LucideIcon } from 'lucide-react';
+import { Sun, Snowflake, Cloud, Car, Truck, Search, Mountain, type LucideIcon } from 'lucide-react';
 
 export interface MegaMenuItem {
   label: string;
@@ -54,18 +54,21 @@ export const tyresMenuData: MegaMenuData = {
           label: 'Легкові',
           href: '/passenger-tyres',
           icon: Car,
+          iconColor: 'text-blue-400',
           description: 'Седани та хетчбеки',
         },
         {
           label: 'SUV / 4x4',
           href: '/suv-4x4-tyres',
-          icon: Car,
+          icon: Mountain,
+          iconColor: 'text-orange-400',
           description: 'Кросовери та позашляховики',
         },
         {
           label: 'Комерційні',
           href: '/lcv-tyres',
           icon: Truck,
+          iconColor: 'text-slate-400',
           description: 'Вантажні та мікроавтобуси',
         },
       ],
@@ -77,12 +80,14 @@ export const tyresMenuData: MegaMenuData = {
           label: 'За типорозміром',
           href: '/tyre-search?mode=size',
           icon: Search,
+          iconColor: 'text-purple-400',
           description: '205/55 R16 тощо',
         },
         {
           label: 'За автомобілем',
           href: '/tyre-search?mode=car',
           icon: Car,
+          iconColor: 'text-cyan-400',
           description: 'Марка, модель, рік',
         },
       ],

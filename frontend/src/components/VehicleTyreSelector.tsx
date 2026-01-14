@@ -153,7 +153,7 @@ function SelectField({
           {label}
         </label>
         <div className="relative">
-          <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" />
+          <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
           {loading ? (
             <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-800">
               <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -186,7 +186,7 @@ function SelectField({
         {label} <span className="text-xs text-stone-400">({options.length})</span>
       </label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400 z-10" />
+        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary z-10" />
         {loading ? (
           <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-800">
             <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -260,7 +260,7 @@ function SelectFieldSimple({
         {label}
       </label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
         {loading ? (
           <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -333,7 +333,7 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
         {isOEM ? (
           <CheckCircle className="h-5 w-5 text-green-400" />
         ) : (
-          <Info className="h-5 w-5 text-stone-400" />
+          <Info className="h-5 w-5 text-blue-400" />
         )}
         <span
           className={`text-sm font-semibold ${
@@ -732,7 +732,7 @@ export function VehicleTyreSelector() {
               </div>
             ) : (
               <div className="rounded-xl border border-stone-700 bg-stone-800/50 p-8 text-center">
-                <AlertCircle className="mx-auto h-12 w-12 text-stone-400" />
+                <AlertCircle className="mx-auto h-12 w-12 text-amber-400" />
                 <h3 className="mt-4 text-lg font-semibold text-stone-50">
                   Шин Bridgestone для цих розмірів наразі немає в каталозі
                 </h3>
@@ -744,7 +744,7 @@ export function VehicleTyreSelector() {
                   href="/dealers"
                   className="mt-4 inline-flex items-center gap-2 rounded-full border border-stone-50 px-6 py-2 font-semibold text-stone-50 transition-colors hover:bg-stone-50/10"
                 >
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4 text-primary" />
                   Знайти дилера
                 </Link>
               </div>

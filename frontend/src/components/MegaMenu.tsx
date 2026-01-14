@@ -122,7 +122,7 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
                           onClick={handleLinkClick}
                         >
                           {item.icon && (
-                            <div className="mt-0.5 rounded-lg bg-stone-800 p-2">
+                            <div className={`mt-0.5 rounded-lg p-2 ${item.iconColor?.replace('text-', 'bg-').replace('-400', '-500/20') || 'bg-primary/20'}`}>
                               <item.icon className={`h-4 w-4 ${item.iconColor || 'text-primary'}`} />
                             </div>
                           )}

@@ -25,7 +25,7 @@ function DealerCardCompact({ dealer }: { dealer: Dealer }) {
           className="flex-shrink-0 rounded-full p-2 text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-primary transition-colors"
           aria-label={`Зателефонувати ${dealer.name}`}
         >
-          <Phone className="h-4 w-4" />
+          <Phone className="h-4 w-4 text-green-500" />
         </a>
       )}
     </div>
@@ -63,7 +63,7 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
           {/* Left: Search form */}
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-stone-200 px-3 py-1 text-xs font-medium text-stone-700 dark:bg-stone-700 dark:text-stone-200">
-              <Navigation className="h-3 w-3" />
+              <Navigation className="h-3 w-3 text-primary" />
               Офіційна мережа
             </div>
             <h2 className="mb-4 text-2xl font-bold md:text-3xl">
@@ -76,7 +76,7 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
             {/* Search input */}
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
                 <input
                   type="text"
                   placeholder="Київ, Львів, Одеса..."
@@ -112,7 +112,7 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
               </>
             ) : (
               <div className="rounded-xl border border-stone-200 dark:border-stone-700 bg-card p-6 text-center">
-                <MapPin className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+                <MapPin className="mx-auto mb-2 h-8 w-8 text-primary/50" />
                 <p className="text-sm text-muted-foreground">
                   Дилерів за запитом &ldquo;{query}&rdquo; не знайдено
                 </p>
