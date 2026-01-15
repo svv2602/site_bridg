@@ -187,7 +187,7 @@ export function QuickSearchForm() {
     setIsSearching(true);
     // Зберігаємо параметри в sessionStorage замість URL
     const searchData = {
-      mode: 'size',
+      mode: 'size' as const,
       width,
       aspectRatio,
       diameter,

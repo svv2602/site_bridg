@@ -73,6 +73,7 @@ export default function TyreSearchPage() {
   const [initialSearchDone, setInitialSearchDone] = useState(false);
   const [storedParams, setStoredParams] = useState<StoredSearchParams | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const hasReadStorage = useRef(false);
 
   // Filter results by selected brands
   const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
@@ -90,6 +91,13 @@ export default function TyreSearchPage() {
 
   // Читання параметрів з sessionStorage при монтуванні
   useEffect(() => {
+    // Захист від подвійного виконання в React Strict Mode
+    if (hasReadStorage.current) return;
+    hasReadStorage.current = true;
+
+    // Перевірка що ми на клієнті
+    if (typeof window === 'undefined') return;
+
     const stored = sessionStorage.getItem('tyreSearchParams');
     if (stored) {
       try {
@@ -103,12 +111,13 @@ export default function TyreSearchPage() {
             if (params.aspectRatio) setAspectRatio(params.aspectRatio);
             if (params.diameter) setDiameter(params.diameter);
             if (params.season) setSeason(params.season);
+            // Очищаємо тільки для mode='size', для 'car' залишаємо для VehicleTyreSelector
+            sessionStorage.removeItem('tyreSearchParams');
           }
+        } else {
+          sessionStorage.removeItem('tyreSearchParams');
         }
-        // Очищаємо після читання
-        sessionStorage.removeItem('tyreSearchParams');
       } catch (e) {
-        console.error('Error parsing stored search params:', e);
         sessionStorage.removeItem('tyreSearchParams');
       }
     }
@@ -541,7 +550,11 @@ export default function TyreSearchPage() {
                     role="tabpanel"
                     aria-labelledby="car-search-tab"
                   >
-                    <VehicleTyreSelector />
+                    <VehicleTyreSelector
+                      initialMake={storedParams?.mode === 'car' ? storedParams.make : undefined}
+                      initialModel={storedParams?.mode === 'car' ? storedParams.model : undefined}
+                      initialYear={storedParams?.mode === 'car' ? storedParams.year : undefined}
+                    />
                   </div>
                 )}
               </div>

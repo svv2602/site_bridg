@@ -422,17 +422,13 @@ function TyreSizeCard({ sizes, type, selectedSize, onSizeClick }: TyreSizeCardPr
   );
 }
 
-// Тип даних з sessionStorage
-interface StoredCarSearchParams {
-  mode: 'car';
-  make?: string;
-  model?: string;
-  year?: string;
-  season?: string;
-  timestamp?: number;
+interface VehicleTyreSelectorProps {
+  initialMake?: string;
+  initialModel?: string;
+  initialYear?: string;
 }
 
-export function VehicleTyreSelector() {
+export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: VehicleTyreSelectorProps) {
   // Стан вибору
   const [brandId, setBrandId] = useState("");
   const [modelId, setModelId] = useState("");
@@ -447,27 +443,10 @@ export function VehicleTyreSelector() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
-  // Стан ініціалізації з sessionStorage
-  const [storedParams, setStoredParams] = useState<StoredCarSearchParams | null>(null);
-  const [initStep, setInitStep] = useState<'idle' | 'brand' | 'model' | 'year' | 'done'>('idle');
-
-  // Читання параметрів з sessionStorage при монтуванні
-  useEffect(() => {
-    const stored = sessionStorage.getItem('tyreSearchParams');
-    if (stored) {
-      try {
-        const params = JSON.parse(stored);
-        if (params.mode === 'car' && params.timestamp && Date.now() - params.timestamp < 5 * 60 * 1000) {
-          setStoredParams(params as StoredCarSearchParams);
-          setInitStep('brand');
-        }
-        sessionStorage.removeItem('tyreSearchParams');
-      } catch (e) {
-        console.error('Error parsing stored search params:', e);
-        sessionStorage.removeItem('tyreSearchParams');
-      }
-    }
-  }, []);
+  // Стан ініціалізації з props
+  const [initStep, setInitStep] = useState<'idle' | 'brand' | 'model' | 'year' | 'done'>(
+    initialMake ? 'brand' : 'idle'
+  );
 
   // Fetching даних для селектів
   const { data: brands, loading: brandsLoading } = useFetch<CarBrand[]>(
@@ -488,39 +467,39 @@ export function VehicleTyreSelector() {
       : null
   );
 
-  // Ініціалізація з sessionStorage - крок 1: вибір марки
+  // Ініціалізація з props - крок 1: вибір марки
   useEffect(() => {
-    if (initStep !== 'brand' || !brands || !storedParams?.make) return;
-    const brand = brands.find(b => b.name.toLowerCase() === storedParams.make!.toLowerCase());
+    if (initStep !== 'brand' || !brands || !initialMake) return;
+    const brand = brands.find(b => b.name.toLowerCase() === initialMake.toLowerCase());
     if (brand) {
       setBrandId(String(brand.id));
       setInitStep('model');
     } else {
       setInitStep('done');
     }
-  }, [initStep, brands, storedParams]);
+  }, [initStep, brands, initialMake]);
 
-  // Ініціалізація з sessionStorage - крок 2: вибір моделі
+  // Ініціалізація з props - крок 2: вибір моделі
   useEffect(() => {
-    if (initStep !== 'model' || !models || !storedParams?.model) return;
-    const model = models.find(m => m.name.toLowerCase() === storedParams.model!.toLowerCase());
+    if (initStep !== 'model' || !models || !initialModel) return;
+    const model = models.find(m => m.name.toLowerCase() === initialModel.toLowerCase());
     if (model) {
       setModelId(String(model.id));
       setInitStep('year');
     } else {
       setInitStep('done');
     }
-  }, [initStep, models, storedParams]);
+  }, [initStep, models, initialModel]);
 
-  // Ініціалізація з sessionStorage - крок 3: вибір року
+  // Ініціалізація з props - крок 3: вибір року
   useEffect(() => {
-    if (initStep !== 'year' || !years || !storedParams?.year) return;
-    const yearNum = parseInt(storedParams.year);
+    if (initStep !== 'year' || !years || !initialYear) return;
+    const yearNum = parseInt(initialYear);
     if (years.includes(yearNum)) {
-      setYear(storedParams.year);
+      setYear(initialYear);
     }
     setInitStep('done');
-  }, [initStep, years, storedParams]);
+  }, [initStep, years, initialYear]);
 
   // Скидання залежних полів (тільки якщо не ініціалізація)
   useEffect(() => {
