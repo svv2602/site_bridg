@@ -276,13 +276,13 @@ export default async function TechnologyPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
               >
                 Замовити консультацію
               </Link>
               <Link
                 href="/passenger-tyres"
-                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 Переглянути каталог
               </Link>

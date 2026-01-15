@@ -40,7 +40,7 @@ const seasonMeta: Record<
     h1: string;
     subtitle: string;
     heroText: string;
-    features: { icon: typeof Sun; title: string; description: string }[];
+    features: { icon: typeof Sun; title: string; description: string; color: { bg: string; text: string } }[];
   }
 > = {
   summer: {
@@ -375,13 +375,13 @@ export default async function SeasonTyresPage({ params }: PageProps) {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contacts"
-                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
               >
                 Отримати консультацію
               </Link>
               <Link
                 href="/dealers"
-                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+                className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 Знайти дилера
               </Link>

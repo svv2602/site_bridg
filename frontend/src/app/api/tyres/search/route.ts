@@ -8,6 +8,7 @@ import { searchTyresBySize } from '@/lib/api/tyres';
  *   - width: ширина (обов'язково)
  *   - height: висота профілю (обов'язково)
  *   - diameter: діаметр (обов'язково)
+ *   - season: сезон (опційно: summer, winter, allseason)
  */
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
     const width = searchParams.get('width');
     const height = searchParams.get('height');
     const diameter = searchParams.get('diameter');
+    const season = searchParams.get('season') as 'summer' | 'winter' | 'allseason' | null;
 
     if (!width || !height || !diameter) {
       return NextResponse.json(
@@ -32,6 +34,7 @@ export async function GET(request: Request) {
       width: w,
       aspectRatio: h,
       diameter: d,
+      season: season || undefined,
     });
 
     return NextResponse.json({

@@ -144,7 +144,7 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             {seasonalData.featuredSeason && !isLoading && (
               <Link
                 href={seasonalData.ctaLink}
-                className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${seasonalData.gradient} px-6 py-3 text-sm font-semibold text-white shadow-lg hover:opacity-90 transition-opacity`}
+                className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-stone-700 hover:scale-105 hover:shadow-xl dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
               >
                 <SeasonIcon className="h-4 w-4" />
                 {seasonalData.ctaText}

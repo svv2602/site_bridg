@@ -21,6 +21,9 @@ import {
   MapPin,
   Database,
   Loader2,
+  Sun,
+  Snowflake,
+  Cloud,
 } from "lucide-react";
 import { VehicleTyreSelector } from "@/components/VehicleTyreSelector";
 import { TyreCard } from "@/components/TyreCard";
@@ -48,16 +51,20 @@ interface SizeOption {
 
 export default function TyreSearchPage() {
   const searchParams = useSearchParams();
-  const initialMode = searchParams.get("mode") === "size" ? "size" : "car";
+  // Support both "mode" and "tab" params for backwards compatibility
+  const initialMode = (searchParams.get("mode") || searchParams.get("tab")) === "car" ? "car" : "size";
   const [mode, setMode] = useState<SearchMode>(initialMode);
   const [width, setWidth] = useState("");
   const [aspectRatio, setAspectRatio] = useState("");
   const [diameter, setDiameter] = useState("");
+  const [season, setSeason] = useState<string>("");
   const [results, setResults] = useState<TyreModel[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchedSize, setSearchedSize] = useState("");
+  const [searchedSeason, setSearchedSeason] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Brand[]>(["bridgestone", "firestone"]);
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
 
   // Filter results by selected brands
   const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
@@ -73,10 +80,21 @@ export default function TyreSearchPage() {
     });
   }
 
-  // Синхронізація mode з URL параметром
+  // Синхронізація mode та параметрів форми з URL
   useEffect(() => {
-    const urlMode = searchParams.get("mode") === "size" ? "size" : "car";
+    const urlMode = (searchParams.get("mode") || searchParams.get("tab")) === "car" ? "car" : "size";
     setMode(urlMode);
+
+    // Read size params from URL
+    const urlWidth = searchParams.get("width");
+    const urlAspectRatio = searchParams.get("aspectRatio");
+    const urlDiameter = searchParams.get("diameter");
+    const urlSeason = searchParams.get("season");
+
+    if (urlWidth) setWidth(urlWidth);
+    if (urlAspectRatio) setAspectRatio(urlAspectRatio);
+    if (urlDiameter) setDiameter(urlDiameter);
+    if (urlSeason) setSeason(urlSeason);
   }, [searchParams]);
 
   // Динамічні опції з бази даних
@@ -103,12 +121,9 @@ export default function TyreSearchPage() {
   useEffect(() => {
     if (!width) {
       setAspectOptions([]);
-      setAspectRatio("");
       return;
     }
     setLoadingAspects(true);
-    setAspectRatio("");
-    setDiameter("");
     fetch(`/api/tyres/sizes?type=height&width=${width}`)
       .then(res => res.json())
       .then(json => {
@@ -122,11 +137,9 @@ export default function TyreSearchPage() {
   useEffect(() => {
     if (!width || !aspectRatio) {
       setDiameterOptions([]);
-      setDiameter("");
       return;
     }
     setLoadingDiameters(true);
-    setDiameter("");
     fetch(`/api/tyres/sizes?type=diameter&width=${width}&height=${aspectRatio}`)
       .then(res => res.json())
       .then(json => {
@@ -136,15 +149,32 @@ export default function TyreSearchPage() {
       .finally(() => setLoadingDiameters(false));
   }, [width, aspectRatio]);
 
-  async function handleSizeSearch(e: FormEvent) {
-    e.preventDefault();
+  // Авто-пошук при завантаженні сторінки з URL параметрами
+  useEffect(() => {
+    if (initialSearchDone) return;
+
+    const urlWidth = searchParams.get("width");
+    const urlAspectRatio = searchParams.get("aspectRatio");
+    const urlDiameter = searchParams.get("diameter");
+
+    // Only auto-search if we have all required params from URL
+    if (urlWidth && urlAspectRatio && urlDiameter && width && aspectRatio && diameter && !loadingWidths && !loadingAspects && !loadingDiameters) {
+      setInitialSearchDone(true);
+      performSearch();
+    }
+  }, [width, aspectRatio, diameter, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, searchParams]);
+
+  async function performSearch() {
     if (!width || !aspectRatio || !diameter) return;
 
     setSearching(true);
     setSearchedSize(`${width}/${aspectRatio} R${diameter}`);
+    setSearchedSeason(season);
 
     try {
-      const res = await fetch(`/api/tyres/search?width=${width}&height=${aspectRatio}&diameter=${diameter}`);
+      let url = `/api/tyres/search?width=${width}&height=${aspectRatio}&diameter=${diameter}`;
+      if (season) url += `&season=${season}`;
+      const res = await fetch(url);
       const json = await res.json();
 
       if (json.data?.tyres) {
@@ -159,6 +189,11 @@ export default function TyreSearchPage() {
       setSearching(false);
       setHasSearched(true);
     }
+  }
+
+  async function handleSizeSearch(e: FormEvent) {
+    e.preventDefault();
+    performSearch();
   }
 
   return (
@@ -357,6 +392,63 @@ export default function TyreSearchPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Сезон (опційно) */}
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-stone-100">
+                        Сезон <span className="text-stone-500">(опційно)</span>
+                      </label>
+                      <div className="grid grid-cols-4 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSeason("")}
+                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                            season === ""
+                              ? "border-primary bg-primary/20 text-white"
+                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
+                          }`}
+                        >
+                          Всі
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSeason("summer")}
+                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                            season === "summer"
+                              ? "border-amber-500 bg-amber-500/20 text-amber-400"
+                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
+                          }`}
+                        >
+                          <Sun className="h-4 w-4" />
+                          Літні
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSeason("winter")}
+                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                            season === "winter"
+                              ? "border-blue-500 bg-blue-500/20 text-blue-400"
+                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
+                          }`}
+                        >
+                          <Snowflake className="h-4 w-4" />
+                          Зимові
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSeason("allseason")}
+                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
+                            season === "allseason"
+                              ? "border-teal-500 bg-teal-500/20 text-teal-400"
+                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
+                          }`}
+                        >
+                          <Cloud className="h-4 w-4" />
+                          Всесезон
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="flex items-center gap-2 text-sm text-stone-300">
                       <CheckCircle className="h-4 w-4 text-green-400" />
                       <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
@@ -382,11 +474,20 @@ export default function TyreSearchPage() {
                         aria-atomic="true"
                       >
                         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <h3 className="text-xl font-bold text-stone-50">
-                            Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}
+                          <h3 className="text-xl font-bold text-stone-50 flex flex-wrap items-center gap-2">
+                            <span>Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}</span>
                             {searchedSize && (
-                              <span className="ml-3 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
+                              <span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
                                 {searchedSize}
+                              </span>
+                            )}
+                            {searchedSeason && (
+                              <span className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                searchedSeason === "summer" ? "bg-amber-500/20 text-amber-400" :
+                                searchedSeason === "winter" ? "bg-blue-500/20 text-blue-400" :
+                                "bg-teal-500/20 text-teal-400"
+                              }`}>
+                                {searchedSeason === "summer" ? "Літні" : searchedSeason === "winter" ? "Зимові" : "Всесезонні"}
                               </span>
                             )}
                           </h3>
