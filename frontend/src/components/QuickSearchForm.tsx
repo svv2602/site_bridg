@@ -256,24 +256,24 @@ export function QuickSearchForm() {
     }
   };
 
-  // Styles matching tyre-search page (always dark)
-  const cardClass = "rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]";
-  const labelClass = "mb-2 block text-sm font-medium text-stone-100";
-  const inputClass = "w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary";
-  const buttonClass = "w-full rounded-full bg-white py-3 text-base font-semibold text-stone-900 shadow-lg hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2";
-  const loadingClass = "flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900";
+  // Adaptive styles - light theme like footer, dark theme as before
+  const cardClass = "rounded-2xl border border-stone-200 bg-stone-50 p-6 text-foreground shadow-lg dark:border-stone-800 dark:bg-stone-900/95 dark:text-stone-50 dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)]";
+  const labelClass = "mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100";
+  const inputClass = "w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50";
+  const buttonClass = "w-full rounded-full bg-brand py-3 text-base font-semibold text-white shadow-lg hover:bg-brand/90 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2";
+  const loadingClass = "flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900";
 
   return (
     <div className={cardClass}>
-      <h2 className="text-xl font-semibold text-stone-50">Знайдіть ідеальні шини</h2>
-      <p className="mt-1 text-sm text-stone-400">
+      <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-50">Знайдіть ідеальні шини</h2>
+      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
         За розміром на боковині шини або за маркою вашого авто
       </p>
 
       <div
         role="tablist"
         aria-label="Спосіб пошуку шин"
-        className="mt-4 inline-flex rounded-full bg-stone-800 p-1 ring-1 ring-stone-700"
+        className="mt-4 inline-flex rounded-full bg-stone-200 p-1 ring-1 ring-stone-300 dark:bg-stone-800 dark:ring-stone-700"
       >
         <button
           type="button"
@@ -284,8 +284,8 @@ export function QuickSearchForm() {
           aria-controls="size-panel"
           className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
             activeTab === 'size'
-              ? 'bg-stone-50 text-stone-900'
-              : 'text-stone-300 hover:text-stone-50'
+              ? 'bg-white text-stone-900 shadow-sm dark:bg-stone-50'
+              : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('size')}
           onKeyDown={handleTabKeyDown}
@@ -302,8 +302,8 @@ export function QuickSearchForm() {
           aria-controls="car-panel"
           className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
             activeTab === 'car'
-              ? 'bg-stone-50 text-stone-900'
-              : 'text-stone-300 hover:text-stone-50'
+              ? 'bg-white text-stone-900 shadow-sm dark:bg-stone-50'
+              : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('car')}
           onKeyDown={handleTabKeyDown}
@@ -321,7 +321,7 @@ export function QuickSearchForm() {
           className="mt-6 space-y-4"
           onSubmit={handleSizeSearch}
         >
-          <p className="mb-4 text-xs text-stone-400">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
+          <p className="mb-4 text-xs text-stone-500 dark:text-stone-400">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className={labelClass}>Ширина</label>

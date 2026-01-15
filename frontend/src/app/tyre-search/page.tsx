@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import TyreSearchPage from "./new-page";
 
 export const metadata: Metadata = {
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TyreSearchPage />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <TyreSearchPage />
+    </Suspense>
+  );
 }

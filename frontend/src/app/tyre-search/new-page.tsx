@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useState, useEffect, useRef, useCallback } from "react";
 
 import {
@@ -60,7 +61,10 @@ interface StoredSearchParams {
 }
 
 export default function TyreSearchPage() {
-  const [mode, setMode] = useState<SearchMode>("size");
+  const searchParams = useSearchParams();
+  const urlMode = searchParams.get('mode') as SearchMode | null;
+
+  const [mode, setMode] = useState<SearchMode>(urlMode === 'car' ? 'car' : 'size');
   const [width, setWidth] = useState("");
   const [aspectRatio, setAspectRatio] = useState("");
   const [diameter, setDiameter] = useState("");
@@ -75,6 +79,13 @@ export default function TyreSearchPage() {
   const [storedParams, setStoredParams] = useState<StoredSearchParams | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const hasReadStorage = useRef(false);
+
+  // Оновлення mode при зміні URL параметрів (навігація в межах сторінки)
+  useEffect(() => {
+    if (urlMode === 'car' || urlMode === 'size') {
+      setMode(urlMode);
+    }
+  }, [urlMode]);
 
   // Filter results by selected brands
   const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
@@ -289,13 +300,13 @@ export default function TyreSearchPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Search Panel */}
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 text-foreground shadow-lg dark:border-stone-800 dark:bg-stone-900/95 dark:text-stone-50 dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="text-2xl font-bold">Оберіть спосіб пошуку</h2>
+                  <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-50">Оберіть спосіб пошуку</h2>
                   <div
                     role="tablist"
                     aria-label="Спосіб пошуку шин"
-                    className="inline-flex rounded-full bg-stone-800 p-1 ring-1 ring-stone-700"
+                    className="inline-flex rounded-full bg-stone-200 p-1 ring-1 ring-stone-300 dark:bg-stone-800 dark:ring-stone-700"
                   >
                     <button
                       type="button"
@@ -305,8 +316,8 @@ export default function TyreSearchPage() {
                       aria-controls="size-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "size"
-                          ? "bg-stone-50 text-stone-900"
-                          : "text-stone-300 hover:text-stone-50"
+                          ? "bg-white text-stone-900 shadow-sm dark:bg-stone-50"
+                          : "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-50"
                       }`}
                       onClick={() => setMode("size")}
                     >
@@ -321,8 +332,8 @@ export default function TyreSearchPage() {
                       aria-controls="car-search-panel"
                       className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
                         mode === "car"
-                          ? "bg-stone-50 text-stone-900"
-                          : "text-stone-300 hover:text-stone-50"
+                          ? "bg-white text-stone-900 shadow-sm dark:bg-stone-50"
+                          : "text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-50"
                       }`}
                       onClick={() => setMode("car")}
                     >
@@ -343,18 +354,18 @@ export default function TyreSearchPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                       {/* Ширина */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
                           Ширина {widthOptions.length > 0 && <span className="text-stone-500">({widthOptions.length})</span>}
                         </label>
                         <div className="relative">
                           <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingWidths ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                               <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary"
+                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
                               value={width}
                               onChange={(e) => setWidth(e.target.value)}
                               required
@@ -373,18 +384,18 @@ export default function TyreSearchPage() {
 
                       {/* Висота профілю */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
                           Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500">({aspectOptions.length})</span>}
                         </label>
                         <div className="relative">
                           <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingAspects ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                               <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
                               value={aspectRatio}
                               onChange={(e) => setAspectRatio(e.target.value)}
                               disabled={!width}
@@ -404,18 +415,18 @@ export default function TyreSearchPage() {
 
                       {/* Діаметр */}
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-100">
+                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
                           Діаметр {diameterOptions.length > 0 && <span className="text-stone-500">({diameterOptions.length})</span>}
                         </label>
                         <div className="relative">
                           <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                           {loadingDiameters ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900">
+                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                               <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
                             </div>
                           ) : (
                             <select
-                              className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
                               value={diameter}
                               onChange={(e) => setDiameter(e.target.value)}
                               disabled={!aspectRatio}
@@ -436,13 +447,13 @@ export default function TyreSearchPage() {
 
                     {/* Сезон (опційно) */}
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-stone-100">
+                      <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
                         Сезонність <span className="text-stone-500">(опційно)</span>
                       </label>
                       <div className="relative">
                         <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                         <select
-                          className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary"
+                          className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
                           value={season}
                           onChange={(e) => setSeason(e.target.value)}
                         >
@@ -455,14 +466,14 @@ export default function TyreSearchPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-stone-300">
-                      <CheckCircle className="h-4 w-4 text-green-400" />
+                    <div className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
+                      <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
                       <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
                     </div>
                     <button
                       type="submit"
                       disabled={!width || !aspectRatio || !diameter || searching}
-                      className="w-full rounded-full bg-white py-3 text-base font-semibold text-stone-900 shadow-lg ring-2 ring-stone-300 hover:ring-stone-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full rounded-full bg-brand py-3 text-base font-semibold text-white shadow-lg hover:bg-brand/90 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {searching ? (
                         <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
@@ -476,12 +487,12 @@ export default function TyreSearchPage() {
                     {hasSearched && (
                       <div
                         ref={resultsRef}
-                        className="mt-8 border-t border-stone-700 pt-6"
+                        className="mt-8 border-t border-stone-300 pt-6 dark:border-stone-700"
                         aria-live="polite"
                         aria-atomic="true"
                       >
                         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <h3 className="text-xl font-bold text-stone-50 flex flex-wrap items-center gap-2">
+                          <h3 className="text-xl font-bold text-stone-900 dark:text-stone-50 flex flex-wrap items-center gap-2">
                             <span>Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}</span>
                             {searchedSize && (
                               <span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
@@ -501,7 +512,7 @@ export default function TyreSearchPage() {
                           {/* Brand filter */}
                           {results.length > 0 && (
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-stone-400">Бренд:</span>
+                              <span className="text-xs text-stone-500 dark:text-stone-400">Бренд:</span>
                               {(["bridgestone", "firestone"] as Brand[]).map(brand => (
                                 <button
                                   key={brand}
@@ -510,7 +521,7 @@ export default function TyreSearchPage() {
                                   className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                                     selectedBrands.includes(brand)
                                       ? `${brandColors[brand].bg} text-white`
-                                      : "bg-stone-700 text-stone-400 hover:bg-stone-600"
+                                      : "bg-stone-200 text-stone-600 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-400 dark:hover:bg-stone-600"
                                   }`}
                                 >
                                   {brandLabels[brand]}
@@ -520,9 +531,9 @@ export default function TyreSearchPage() {
                           )}
                         </div>
                         {filteredResults.length === 0 ? (
-                          <div className="rounded-xl border border-stone-700 bg-stone-800/50 p-6 text-center">
-                            <Search className="mx-auto h-10 w-10 text-stone-500" />
-                            <p className="mt-3 text-stone-400">
+                          <div className="rounded-xl border border-stone-300 bg-stone-100 p-6 text-center dark:border-stone-700 dark:bg-stone-800/50">
+                            <Search className="mx-auto h-10 w-10 text-stone-400 dark:text-stone-500" />
+                            <p className="mt-3 text-stone-600 dark:text-stone-400">
                               {results.length === 0
                                 ? `Шин для розміру ${searchedSize} не знайдено в каталозі.`
                                 : `Шин обраних брендів для розміру ${searchedSize} не знайдено.`
