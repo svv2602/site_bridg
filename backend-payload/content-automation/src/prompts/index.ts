@@ -27,11 +27,20 @@ SEO-ОПТИМІЗАЦІЯ НАЗВ:
 
 const INTERLINKING_RULES = `
 ПЕРЕЛІНКОВКА:
-- Додавай 2-3 внутрішні посилання на релевантні сторінки
-- Формат: <a href="/shyny/model-slug">Назва моделі</a>
-- Формат: <a href="/advice/article-slug">Назва статті</a>
+- ВАЖЛИВО: Використовуй ТІЛЬКИ посилання, які явно надані у секції "ПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ"
+- Якщо посилання не надані - НЕ додавай жодних посилань на моделі шин чи статті
+- Дозволені категорійні посилання (можна використовувати завжди):
+  - /passenger-tyres - легкові шини
+  - /passenger-tyres/summer - літні шини
+  - /passenger-tyres/winter - зимові шини
+  - /passenger-tyres/all-season - всесезонні шини
+  - /suv-4x4-tyres - шини для SUV
+  - /lcv-tyres - комерційні шини
+  - /tyre-search - пошук шин
+  - /dealers - де купити
+- Формат посилань: <a href="/шлях">Текст посилання</a>
 - Посилання мають бути органічно вплетені в текст
-- НЕ роби окремий блок "Схожі товари" - тільки природні посилання в тексті`;
+- НЕ вигадуй slug-и для конкретних моделей шин чи статей`;
 
 // ============ LABELS & TRANSLATIONS ============
 
@@ -255,7 +264,7 @@ export function getTireDescriptionPrompt(
   const relatedItemsSection = relatedItems?.length
     ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):
 ${relatedItems.map((item) => {
-  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/advice/${item.slug}`;
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/blog/${item.slug}`;
   return `- ${item.name}: ${url}`;
 }).join("\n")}`
     : "";
@@ -308,7 +317,7 @@ export function getArticlePrompt(
   const relatedItemsSection = relatedItems?.length
     ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):
 ${relatedItems.map((item) => {
-  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/advice/${item.slug}`;
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/blog/${item.slug}`;
   return `- ${item.name}: ${url}`;
 }).join("\n")}`
     : "";
