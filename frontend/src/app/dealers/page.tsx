@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { type Dealer } from "@/lib/data";
 import { getDealers } from "@/lib/api/dealers";
@@ -150,63 +151,81 @@ export default function DealersPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
-                <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
-                <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-                  <div className="flex-1">
-                    <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">
-                      Місто або адреса
-                    </label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-                      <input
-                        type="text"
-                        id="city-search"
-                        placeholder="Наприклад, Київ, Львів..."
-                        value={cityQuery}
-                        onChange={(e) => setCityQuery(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary"
-                      />
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
+                <div className="p-6">
+                  <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
+                  <div className="mb-6 flex flex-col gap-4 sm:flex-row">
+                    <div className="flex-1">
+                      <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">
+                        Місто або адреса
+                      </label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                        <input
+                          type="text"
+                          id="city-search"
+                          placeholder="Наприклад, Київ, Львів..."
+                          value={cityQuery}
+                          onChange={(e) => setCityQuery(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+                    <div className="sm:w-48">
+                      <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-foreground">Тип точки</label>
+                      <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                        <select
+                          id="dealer-type"
+                          value={selectedType}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary"
+                        >
+                          {dealerTypes.map((type) => (
+                            <option key={type.key} value={type.key}>
+                              {type.label}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                      </div>
                     </div>
                   </div>
-                  <div className="sm:w-48">
-                    <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-foreground">Тип точки</label>
-                    <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-                      <select
-                        id="dealer-type"
-                        value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary"
-                      >
-                        {dealerTypes.map((type) => (
-                          <option key={type.key} value={type.key}>
-                            {type.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Знайдено дилерів:{" "}
+                        <span className="text-2xl font-bold text-foreground">
+                          {isLoading ? "..." : filteredDealers.length}
+                        </span>
+                      </p>
                     </div>
+                    <button
+                      onClick={() => {
+                        setCityQuery("");
+                        setSelectedType("all");
+                      }}
+                      className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+                    >
+                      Скинути фільтри
+                    </button>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Знайдено дилерів:{" "}
-                      <span className="text-2xl font-bold text-foreground">
-                        {isLoading ? "..." : filteredDealers.length}
-                      </span>
+                {/* Service image - hidden on mobile, fills remaining space on desktop */}
+                <div className="relative mt-auto hidden min-h-[180px] flex-1 lg:block">
+                  <Image
+                    src="/images/hero/hero-lcv.jpg"
+                    alt="Шинний сервіс Bridgestone"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 0vw, 66vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-sm font-medium text-white">
+                      Професійний шиномонтаж та сервіс у офіційних дилерів
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCityQuery("");
-                      setSelectedType("all");
-                    }}
-                    className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-                  >
-                    Скинути фільтри
-                  </button>
                 </div>
               </div>
             </div>
