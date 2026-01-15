@@ -43,6 +43,7 @@ export interface TestResult {
 }
 
 export interface TyreModel {
+  id?: number;
   slug: string;
   name: string;
   brand: Brand;

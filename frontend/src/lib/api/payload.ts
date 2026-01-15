@@ -521,6 +521,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
   } : {};
 
   return {
+    id: typeof tyre.id === 'string' ? parseInt(tyre.id, 10) : tyre.id,
     slug: tyre.slug,
     name: tyre.name,
     brand: tyre.brand || 'bridgestone', // Default to bridgestone for existing data
