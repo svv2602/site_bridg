@@ -113,7 +113,7 @@ export function CookiesBanner() {
           </div>
           <button
             onClick={handleReject}
-            className="rounded-full p-1 hover:bg-card focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rounded-full p-1 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-primary dark:hover:bg-stone-700"
             aria-label="Закрити"
           >
             <X className="h-4 w-4 text-muted-foreground" />
@@ -135,7 +135,7 @@ export function CookiesBanner() {
           </button>
           <button
             onClick={handleReject}
-            className="flex-1 rounded-full border border-border bg-transparent px-6 py-2.5 text-sm font-semibold hover:bg-card focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="flex-1 rounded-full border border-stone-300 bg-transparent px-6 py-2.5 text-sm font-semibold hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-stone-600 dark:hover:bg-stone-700"
           >
             Тільки необхідні
           </button>
