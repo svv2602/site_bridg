@@ -190,17 +190,31 @@ npm run test:coverage  # With coverage report
 2. **API layer**: Frontend uses `lib/api/payload.ts` for all CMS data
 3. **Fallback data**: If Payload CMS unavailable, mock data is used
 4. **Dynamic routes**: `/shyny/[slug]` and `/advice/[slug]` use `generateStaticParams()`
-5. **Styling**: Dark hero sections (zinc-900), cards with border-border bg-card
+5. **Styling**: Use `hero-adaptive` or `hero-dark` classes for hero sections, `bg-card border-border` for cards
 
-## UI Component Standards
+## UI Development Standards
 
-See detailed standards in `frontend/docs/standards/ui-components.md`.
+Full standards documentation: `frontend/docs/standards/INDEX.md` (20+ files).
 
-Key rules:
-- **Hover lift cards**: Grids with `hover:-translate-y-1` cards must have `pt-2`
-- **Equal card heights**: Use `h-full` on card container + `min-h-[X]` for optional sections
-- **Carousel spacing**: Use `-ml-4` on flex container + `pl-4` on items
-- **Carousel overflow**: Use `overflow-x-clip overflow-y-visible` for hover effects
+Use `/standards` skill when working on UI components.
+
+### Key Files
+
+| Standard | Description |
+|----------|-------------|
+| `COLOR_SYSTEM.md` | Stone palette, CSS variables, contrast rules |
+| `BUTTON_STANDARDS.md` | Button variants, states, explicit colors |
+| `CARD_STYLING.md` | Card structure, hover effects, equal heights |
+| `DARK_MODE.md` | Theme switching, hero-adaptive classes |
+| `CHECKLISTS.md` | Pre-commit and code review checklists |
+
+### Critical Rules
+
+1. **Colors**: Use `stone-*` palette, NEVER `zinc-*` or `gray-*`. Always provide `dark:` variants.
+2. **Badges**: Use explicit colors `bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200`, NEVER `bg-muted text-muted-foreground`.
+3. **Buttons**: Secondary buttons need explicit stone colors, not `border-border hover:bg-card`.
+4. **Cards**: Grids with `hover:-translate-y-1` must have `pt-2`. Use `h-full` + `mt-auto` for equal heights.
+5. **Hero sections**: Use `hero-adaptive` class for theme-switching heroes, `hero-dark` for always-dark.
 
 ## Language
 
