@@ -78,6 +78,7 @@ export interface Config {
     'seasonal-content': SeasonalContent;
     'provider-settings': ProviderSetting;
     'task-routing': TaskRouting;
+    reviews: Review;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     'seasonal-content': SeasonalContentSelect<false> | SeasonalContentSelect<true>;
     'provider-settings': ProviderSettingsSelect<false> | ProviderSettingsSelect<true>;
     'task-routing': TaskRoutingSelect<false> | TaskRoutingSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -633,6 +635,42 @@ export interface TaskRouting {
   createdAt: string;
 }
 /**
+ * Відгуки користувачів про шини
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  tyre: number | Tyre;
+  authorName: string;
+  authorCity?: string | null;
+  rating: number;
+  title: string;
+  content: string;
+  pros?:
+    | {
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  cons?:
+    | {
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  vehicleInfo?: string | null;
+  usagePeriod?: string | null;
+  isPublished?: boolean | null;
+  /**
+   * Автоматично встановлюється при генерації
+   */
+  isGenerated?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -699,6 +737,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'task-routing';
         value: number | TaskRouting;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1067,6 +1109,36 @@ export interface TaskRoutingSelect<T extends boolean = true> {
   maxRetries?: T;
   timeoutMs?: T;
   maxCost?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  tyre?: T;
+  authorName?: T;
+  authorCity?: T;
+  rating?: T;
+  title?: T;
+  content?: T;
+  pros?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  cons?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  vehicleInfo?: T;
+  usagePeriod?: T;
+  isPublished?: T;
+  isGenerated?: T;
   updatedAt?: T;
   createdAt?: T;
 }

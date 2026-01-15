@@ -1,6 +1,13 @@
 // Schema.org structured data generators for SEO
 
 import type { TyreModel, Dealer, Article, Season, FAQ } from "./data";
+import type { Review } from "@/components/ReviewCard";
+
+// Review stats interface
+export interface ReviewStats {
+  totalCount: number;
+  averageRating: number;
+}
 
 const seasonLabels: Record<Season, string> = {
   summer: "Літні шини",
@@ -161,6 +168,100 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
       contactType: "customer service",
       availableLanguage: ["Ukrainian"],
     },
+  };
+}
+
+// AggregateRating schema for products with reviews
+export function generateAggregateRatingSchema(stats: ReviewStats) {
+  if (!stats || stats.totalCount === 0) {
+    return null;
+  }
+
+  return {
+    "@type": "AggregateRating",
+    ratingValue: stats.averageRating,
+    reviewCount: stats.totalCount,
+    bestRating: 5,
+    worstRating: 1,
+  };
+}
+
+// Individual Review schema
+export function generateReviewSchema(review: Review, baseUrl: string = "https://bridgestone.ua") {
+  return {
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rating,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    author: {
+      "@type": "Person",
+      name: review.authorName,
+    },
+    reviewBody: review.content,
+    name: review.title,
+    ...(review.createdAt && { datePublished: review.createdAt }),
+    publisher: {
+      "@type": "Organization",
+      name: "Bridgestone Ukraine",
+      url: baseUrl,
+    },
+  };
+}
+
+// Product schema with reviews - enhanced version
+export function generateProductSchemaWithReviews(
+  tyre: TyreModel,
+  reviews: Review[],
+  stats: ReviewStats,
+  baseUrl: string = "https://bridgestone.ua"
+) {
+  const aggregateRating = generateAggregateRatingSchema(stats);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: tyre.name,
+    description: tyre.shortDescription,
+    brand: {
+      "@type": "Brand",
+      name: "Bridgestone",
+    },
+    category: `${seasonLabels[tyre.season]} > Шини`,
+    url: `${baseUrl}/shyny/${tyre.slug}`,
+    ...(tyre.imageUrl && {
+      image: tyre.imageUrl.startsWith("http") ? tyre.imageUrl : `${baseUrl}${tyre.imageUrl}`,
+    }),
+    offers: {
+      "@type": "AggregateOffer",
+      availability: "https://schema.org/InStock",
+      priceCurrency: "UAH",
+    },
+    ...(aggregateRating && { aggregateRating }),
+    ...(reviews.length > 0 && {
+      review: reviews.slice(0, 5).map((r) => generateReviewSchema(r, baseUrl)),
+    }),
+    ...(tyre.euLabel && {
+      additionalProperty: [
+        tyre.euLabel.wetGrip && {
+          "@type": "PropertyValue",
+          name: "Зчеплення на мокрій дорозі",
+          value: tyre.euLabel.wetGrip,
+        },
+        tyre.euLabel.fuelEfficiency && {
+          "@type": "PropertyValue",
+          name: "Економія пального",
+          value: tyre.euLabel.fuelEfficiency,
+        },
+        tyre.euLabel.noiseDb && {
+          "@type": "PropertyValue",
+          name: "Рівень шуму",
+          value: `${tyre.euLabel.noiseDb} dB`,
+        },
+      ].filter(Boolean),
+    }),
   };
 }
 

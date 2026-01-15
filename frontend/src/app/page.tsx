@@ -7,6 +7,7 @@ import { ProductCarousel } from "@/components/ProductCarousel";
 import { VehicleTypeCard, vehicleTypesData } from "@/components/VehicleTypeCard";
 import { DealerLocatorCompact } from "@/components/DealerLocatorCompact";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
+import { ReviewsSection } from "@/components/ReviewsSection";
 import { getTyreModels } from "@/lib/api/tyres";
 import { getDealers } from "@/lib/api/dealers";
 import { getLatestArticles } from "@/lib/api/articles";
@@ -191,7 +192,7 @@ export default async function Home() {
                     </div>
                     <Link
                       href={cat.href}
-                      className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-semibold hover:bg-card"
+                      className="rounded-full border border-stone-300 bg-transparent px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
                     >
                       Обрати шини
                     </Link>
@@ -223,7 +224,7 @@ export default async function Home() {
                         <div className="mt-3 flex flex-wrap gap-2">
                           <Link
                             href={`/shyny/${tyre.slug}`}
-                            className="rounded-full border border-border bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold hover:bg-card"
+                            className="rounded-full border border-stone-300 bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
                           >
                             Дізнатися більше
                           </Link>
@@ -344,6 +345,13 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Reviews */}
+      <ReviewsSection
+        limit={6}
+        title="Відгуки покупців"
+        showTyreName
+      />
 
       {/* Dealer Locator */}
       <DealerLocatorCompact initialDealers={allDealers} />

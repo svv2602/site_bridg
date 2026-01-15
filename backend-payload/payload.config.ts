@@ -17,6 +17,7 @@ import {
   SeasonalContent,
   ProviderSettings,
   TaskRouting,
+  Reviews,
 } from './src/collections';
 import {
   removeBackgroundsEndpoint,
@@ -43,6 +44,11 @@ import {
   regenerateImageStatusEndpoint,
   generatePromptEndpoint,
 } from './src/endpoints/imageRegeneration';
+import {
+  generateReviewsEndpoint,
+  generateReviewsStatusEndpoint,
+  reviewStatsEndpoint,
+} from './src/endpoints/reviewGeneration';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -78,6 +84,7 @@ export default buildConfig({
     SeasonalContent,
     ProviderSettings,
     TaskRouting,
+    Reviews,
   ],
   endpoints: [
     removeBackgroundsEndpoint,
@@ -97,6 +104,9 @@ export default buildConfig({
     generatePromptEndpoint,
     regenerateImageStatusEndpoint,
     regenerateImageEndpoint,
+    generateReviewsEndpoint,
+    generateReviewsStatusEndpoint,
+    reviewStatsEndpoint,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',

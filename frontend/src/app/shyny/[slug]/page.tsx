@@ -6,7 +6,8 @@ import { Car, MapPin, ChevronRight, Truck, ArrowLeft } from "lucide-react";
 import { type TyreModel } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
-import { generateProductSchema, generateBreadcrumbSchema, generateFAQSchema, jsonLdScript } from "@/lib/schema";
+import { generateProductSchemaWithReviews, generateBreadcrumbSchema, generateFAQSchema, jsonLdScript } from "@/lib/schema";
+import { getReviewsByTyre, getReviewStats } from "@/lib/api/reviews";
 import { EuLabelBadge } from "@/components/ui/EuLabelBadge";
 import { FAQSection } from "@/components/FAQSection";
 import { TestResultsSection } from "@/components/TestResultsSection";
@@ -14,6 +15,7 @@ import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { KeyBenefits } from "@/components/KeyBenefits";
 import { Breadcrumb } from "@/components/ui";
 import { SizesByDiameter } from "@/components/SizesByDiameter";
+import { ReviewsSectionWithMore } from "@/components/ReviewsSectionWithMore";
 import { seasonLabels, SeasonIcons, formatVehicleTypes, getSiteUrl } from "@/lib/utils/tyres";
 
 function buildTitle(model: TyreModel): string {
@@ -69,8 +71,14 @@ export default async function TyreModelPage({
         m.vehicleTypes.some((type) => model.vehicleTypes.includes(type))),
   ).slice(0, 3);
 
+  // Fetch reviews and stats for schema.org and display (stable, not randomized)
+  const [reviews, reviewStats] = await Promise.all([
+    model.id ? getReviewsByTyre(model.id, 6, false) : Promise.resolve([]),
+    model.id ? getReviewStats(model.id) : Promise.resolve({ totalCount: 0, averageRating: 0 }),
+  ]);
+
   const siteUrl = getSiteUrl();
-  const productSchema = generateProductSchema(model);
+  const productSchema = generateProductSchemaWithReviews(model, reviews, reviewStats, siteUrl);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: `${siteUrl}/` },
     { name: "Каталог шин", url: `${siteUrl}/passenger-tyres` },
@@ -349,6 +357,18 @@ export default async function TyreModelPage({
       {/* Test Results */}
       {model.testResults && model.testResults.length > 0 && (
         <TestResultsSection results={model.testResults} tireName={model.name} />
+      )}
+
+      {/* Reviews */}
+      {model.id && reviewStats.totalCount > 0 && (
+        <div className="border-t border-border">
+          <ReviewsSectionWithMore
+            initialReviews={reviews}
+            tyreId={model.id}
+            totalCount={reviewStats.totalCount}
+            title={`Відгуки про ${model.name}`}
+          />
+        </div>
       )}
 
       {/* FAQ */}

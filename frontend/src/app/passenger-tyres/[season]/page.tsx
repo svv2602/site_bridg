@@ -8,6 +8,7 @@ import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-react";
 import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 // Hero images for each season
 const seasonHeroImages: Record<Season, string> = {
@@ -321,6 +322,17 @@ export default async function SeasonTyresPage({ params }: PageProps) {
           )}
         </div>
       </section>
+
+      {/* Reviews */}
+      <div className="border-t border-border">
+        <ReviewsSection
+          season={season}
+          limit={6}
+          title={`Відгуки про ${seasonLabels[season].toLowerCase()}`}
+          showTyreName
+          showAllLink
+        />
+      </div>
 
       {/* Related Seasons */}
       <section className="border-t border-border bg-card py-12">

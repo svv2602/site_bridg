@@ -130,6 +130,16 @@ export const Tyres: CollectionConfig = {
         },
       },
     },
+    // Generate Reviews Button
+    {
+      name: 'generateReviews',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '/src/components/GenerateReviewsButton',
+        },
+      },
+    },
     {
       name: 'shortDescription',
       type: 'textarea',

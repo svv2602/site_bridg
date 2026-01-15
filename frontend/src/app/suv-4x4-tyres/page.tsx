@@ -8,6 +8,7 @@ import { SeasonCategoryCard } from "@/components/SeasonCategoryCard";
 import { Breadcrumb } from "@/components/ui";
 import { Car, Shield, Zap, Mountain } from "lucide-react";
 import { groupBySeason } from "@/lib/utils/tyres";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 export const metadata: Metadata = {
   title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
@@ -173,6 +174,16 @@ export default async function SuvTyresPage() {
           />
         </div>
       </section>
+
+      {/* Reviews */}
+      <div className="border-t border-border">
+        <ReviewsSection
+          vehicleType="suv"
+          limit={3}
+          title="Відгуки про шини для SUV"
+          showTyreName
+        />
+      </div>
 
       {/* CTA */}
       <section className="py-16">

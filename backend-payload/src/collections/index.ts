@@ -9,3 +9,4 @@ export { ContactSubmissions } from './ContactSubmissions';
 export { SeasonalContent } from './SeasonalContent';
 export { ProviderSettings } from './ProviderSettings';
 export { TaskRouting } from './TaskRouting';
+export { Reviews } from './Reviews';

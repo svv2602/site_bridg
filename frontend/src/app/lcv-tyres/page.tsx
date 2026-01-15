@@ -7,6 +7,7 @@ import { SeasonCategoryCard } from "@/components/SeasonCategoryCard";
 import { Breadcrumb } from "@/components/ui";
 import { Truck, Shield, Zap, ChevronRight, Weight, Gauge } from "lucide-react";
 import { seasonLabels, groupBySeason } from "@/lib/utils/tyres";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 const features = [
   {
@@ -252,6 +253,16 @@ export default async function LcvTyresPage() {
           </div>
         </section>
       )}
+
+      {/* Reviews */}
+      <div className="border-t border-border">
+        <ReviewsSection
+          vehicleType="van"
+          limit={3}
+          title="Відгуки про комерційні шини"
+          showTyreName
+        />
+      </div>
 
       {/* CTA */}
       <section className="py-16">
