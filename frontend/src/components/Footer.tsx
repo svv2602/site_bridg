@@ -196,7 +196,7 @@ export function Footer() {
               <Link href="/terms" className="hover:text-primary">
                 Умови використання
               </Link>
-              <Link href="/sitemap" className="hover:text-primary">
+              <Link href="/karta-saitu" className="hover:text-primary">
                 Карта сайту
               </Link>
             </div>

@@ -111,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((article) => article.slug)
       .map((article) => ({
         url: `${BASE_URL}/blog/${article.slug}`,
-        lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),
+        lastModified: article.publishedAt ? new Date(article.publishedAt) : new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.5,
       }));

@@ -54,8 +54,7 @@ export async function generateMetadata(
       type: 'article',
       locale: 'uk_UA',
       siteName: 'Bridgestone Україна',
-      publishedTime: article.createdAt,
-      modifiedTime: article.updatedAt,
+      publishedTime: article.publishedAt,
       // @ts-expect-error: featuredImage може бути в CMS-моделі
       images: article.featuredImage ? [{ url: article.featuredImage, alt: article.title }] : undefined,
     },
