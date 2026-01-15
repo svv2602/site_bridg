@@ -14,7 +14,7 @@ const features = [
     icon: Weight,
     title: "Висока вантажопідйомність",
     description: "Посилена конструкція для перевезення важких вантажів.",
-    color: { bg: "bg-slate-500/15", text: "text-slate-500" },
+    color: { bg: "bg-stone-500/15", text: "text-stone-500" },
   },
   {
     icon: Shield,
@@ -106,8 +106,8 @@ export default async function LcvTyresPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="rounded-full bg-slate-500/15 p-2">
-                      <Truck className="h-5 w-5 text-slate-400" />
+                    <div className="rounded-full bg-stone-500/15 p-2">
+                      <Truck className="h-5 w-5 text-stone-400" />
                     </div>
                     <h3 className="text-xl font-semibold text-white">Комерційні шини Bridgestone</h3>
                   </div>
