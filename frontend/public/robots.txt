@@ -1,0 +1,15 @@
+# Bridgestone Ukraine - robots.txt
+# https://bridgestone.ua
+
+User-agent: *
+Allow: /
+
+# Disallow admin and API paths
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow internal Next.js paths
+Disallow: /_next/
+
+# Sitemap location
+Sitemap: https://bridgestone.ua/sitemap.xml

@@ -3,9 +3,35 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'standalone', // Required for Docker deployment
 
-  // CDN cache headers for static assets
+  // Security and cache headers
   async headers() {
     return [
+      {
+        // Security headers for all routes
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(self)',
+          },
+        ],
+      },
       {
         // Static images - cache for 1 year (immutable)
         source: '/:path*.(svg|jpg|jpeg|png|webp|avif|ico)',

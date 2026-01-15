@@ -37,14 +37,14 @@ export interface SeasonalContent {
   timestamp: string;
 }
 
-// Default featured tyres by season
+// Default featured tyres by season (slugs synced with mock data and seed.ts)
 const DEFAULT_FEATURED_TYRES: Record<string, FeaturedTyre[]> = {
   summer: [
     {
-      name: "Bridgestone Turanza 6",
-      slug: "turanza-6",
+      name: "Bridgestone Turanza T005",
+      slug: "turanza-t005",
       tag: "Літня • Легковий авто",
-      description: "Преміальний комфорт і безпека на мокрій дорозі з технологією ENLITEN.",
+      description: "Відмінне зчеплення на мокрій дорозі та низький рівень шуму.",
       rating: 4.9,
       season: "summer",
     },
@@ -57,11 +57,11 @@ const DEFAULT_FEATURED_TYRES: Record<string, FeaturedTyre[]> = {
       season: "summer",
     },
     {
-      name: "Bridgestone Ecopia EP150",
-      slug: "ecopia-ep150",
-      tag: "Літня • Економний",
-      description: "Економія палива без компромісів у безпеці.",
-      rating: 4.6,
+      name: "Bridgestone Dueler H/P Sport",
+      slug: "dueler-hp-sport",
+      tag: "Літня • SUV",
+      description: "Спортивні шини для преміум SUV та кросоверів.",
+      rating: 4.7,
       season: "summer",
     },
   ],
@@ -83,38 +83,38 @@ const DEFAULT_FEATURED_TYRES: Record<string, FeaturedTyre[]> = {
       season: "winter",
     },
     {
-      name: "Bridgestone Noranza 001",
-      slug: "noranza-001",
-      tag: "Зимова • Шипована",
-      description: "Надійне зчеплення на льоду для північних умов.",
+      name: "Bridgestone Turanza T005",
+      slug: "turanza-t005",
+      tag: "Літня • Легковий авто",
+      description: "Комфортні шини для щоденних поїздок (готуйтесь до літа!).",
       rating: 4.7,
-      season: "winter",
+      season: "summer",
     },
   ],
   allseason: [
     {
-      name: "Bridgestone Weather Control A005",
-      slug: "weather-control-a005",
+      name: "Bridgestone Weather Control A005 EVO",
+      slug: "weather-control-a005-evo",
       tag: "Всесезонна • Легковий",
-      description: "Цілорічне рішення з акцентом на дощову та змінну погоду.",
+      description: "Цілорічне рішення з сертифікацією 3PMSF.",
+      rating: 4.8,
+      season: "allseason",
+    },
+    {
+      name: "Bridgestone Blizzak LM005",
+      slug: "blizzak-lm005",
+      tag: "Зимова • Легковий / SUV",
+      description: "Відмінне зчеплення на снігу та мокрому асфальті.",
+      rating: 4.9,
+      season: "winter",
+    },
+    {
+      name: "Bridgestone Dueler H/P Sport",
+      slug: "dueler-hp-sport",
+      tag: "Літня • SUV",
+      description: "Спортивні шини для преміум SUV та кросоверів.",
       rating: 4.7,
-      season: "allseason",
-    },
-    {
-      name: "Bridgestone Turanza All Season 6",
-      slug: "turanza-all-season-6",
-      tag: "Всесезонна • Преміум",
-      description: "Преміальний комфорт протягом усього року.",
-      rating: 4.6,
-      season: "allseason",
-    },
-    {
-      name: "Bridgestone Dueler A/T 001",
-      slug: "dueler-at-001",
-      tag: "Всесезонна • SUV",
-      description: "Універсальні шини для SUV на будь-якій дорозі.",
-      rating: 4.5,
-      season: "allseason",
+      season: "summer",
     },
   ],
 };
