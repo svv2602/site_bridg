@@ -1,5 +1,5 @@
 "use client";
 
 export function AnimatedMain({ children }: { children: React.ReactNode }) {
-  return <main className="flex-1">{children}</main>;
+  return <main id="main" className="flex-1">{children}</main>;
 }

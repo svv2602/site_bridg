@@ -73,7 +73,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="rounded-full bg-stone-200 p-2.5 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700"
+                  className="flex items-center justify-center rounded-full bg-stone-200 p-3 min-w-11 min-h-11 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700"
                 >
                   <social.icon className={`h-5 w-5 ${social.color}`} />
                 </a>

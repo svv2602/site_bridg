@@ -22,7 +22,7 @@ function DealerCardCompact({ dealer }: { dealer: Dealer }) {
       {dealer.phone && (
         <a
           href={`tel:${dealer.phone}`}
-          className="flex-shrink-0 rounded-full p-2 text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-primary transition-colors"
+          className="flex-shrink-0 flex items-center justify-center rounded-full p-2 min-w-11 min-h-11 text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-primary transition-colors"
           aria-label={`Зателефонувати ${dealer.name}`}
         >
           <Phone className="h-4 w-4 text-green-500" />
@@ -80,6 +80,7 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
                 <input
                   type="text"
                   placeholder="Київ, Львів, Одеса..."
+                  aria-label="Пошук дилера за містом або адресою"
                   className="w-full rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 py-3 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}

@@ -324,7 +324,7 @@ export function QuickSearchForm() {
           <p className="mb-4 text-xs text-stone-500 dark:text-stone-400">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className={labelClass}>Ширина</label>
+              <label htmlFor="tyre-width" className={labelClass}>Ширина</label>
               <div className="relative">
                 <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                 {loadingWidths ? (
@@ -333,6 +333,7 @@ export function QuickSearchForm() {
                   </div>
                 ) : (
                   <select
+                    id="tyre-width"
                     value={width}
                     onChange={(e) => {
                       setWidth(e.target.value);
@@ -351,7 +352,7 @@ export function QuickSearchForm() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Профіль</label>
+              <label htmlFor="tyre-aspect-ratio" className={labelClass}>Профіль</label>
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                 {loadingHeights ? (
@@ -360,6 +361,7 @@ export function QuickSearchForm() {
                   </div>
                 ) : (
                   <select
+                    id="tyre-aspect-ratio"
                     value={aspectRatio}
                     onChange={(e) => {
                       setAspectRatio(e.target.value);
@@ -378,7 +380,7 @@ export function QuickSearchForm() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Діаметр</label>
+              <label htmlFor="tyre-diameter" className={labelClass}>Діаметр</label>
               <div className="relative">
                 <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                 {loadingDiameters ? (
@@ -387,6 +389,7 @@ export function QuickSearchForm() {
                   </div>
                 ) : (
                   <select
+                    id="tyre-diameter"
                     value={diameter}
                     onChange={(e) => setDiameter(e.target.value)}
                     disabled={!aspectRatio}
@@ -403,10 +406,11 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Сезонність</label>
+            <label htmlFor="tyre-season" className={labelClass}>Сезонність</label>
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
               <select
+                id="tyre-season"
                 value={season}
                 onChange={(e) => setSeason(e.target.value)}
                 className={inputClass}
@@ -443,7 +447,7 @@ export function QuickSearchForm() {
           onSubmit={handleCarSearch}
         >
           <div>
-            <label className={labelClass}>Марка авто</label>
+            <label htmlFor="car-brand" className={labelClass}>Марка авто</label>
             <div className="relative">
               <Car className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
               {loadingBrands ? (
@@ -452,6 +456,7 @@ export function QuickSearchForm() {
                 </div>
               ) : (
                 <select
+                  id="car-brand"
                   value={brandId}
                   onChange={(e) => {
                     setBrandId(e.target.value);
@@ -471,7 +476,7 @@ export function QuickSearchForm() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelClass}>Модель</label>
+              <label htmlFor="car-model" className={labelClass}>Модель</label>
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                 {loadingModels ? (
@@ -480,6 +485,7 @@ export function QuickSearchForm() {
                   </div>
                 ) : (
                   <select
+                    id="car-model"
                     value={modelId}
                     onChange={(e) => {
                       setModelId(e.target.value);
@@ -498,7 +504,7 @@ export function QuickSearchForm() {
               </div>
             </div>
             <div>
-              <label className={labelClass}>Рік</label>
+              <label htmlFor="car-year" className={labelClass}>Рік</label>
               <div className="relative">
                 <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
                 {loadingYears ? (
@@ -507,6 +513,7 @@ export function QuickSearchForm() {
                   </div>
                 ) : (
                   <select
+                    id="car-year"
                     value={year}
                     onChange={(e) => {
                       setYear(e.target.value);
@@ -526,7 +533,7 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Комплектація</label>
+            <label htmlFor="car-kit" className={labelClass}>Комплектація</label>
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
               {loadingKits ? (
@@ -535,6 +542,7 @@ export function QuickSearchForm() {
                 </div>
               ) : (
                 <select
+                  id="car-kit"
                   value={kitId}
                   onChange={(e) => setKitId(e.target.value)}
                   disabled={!year}
@@ -550,10 +558,11 @@ export function QuickSearchForm() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Тип шини</label>
+            <label htmlFor="car-tyre-season" className={labelClass}>Тип шини</label>
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
               <select
+                id="car-tyre-season"
                 value={carSeason}
                 onChange={(e) => setCarSeason(e.target.value)}
                 className={inputClass}

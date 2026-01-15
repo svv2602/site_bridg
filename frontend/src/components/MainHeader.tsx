@@ -74,7 +74,7 @@ export function MainHeader() {
             <button
               type="button"
               onClick={() => setOpen((prev) => !prev)}
-              className="rounded-full border border-stone-700 p-2 transition-colors hover:bg-stone-800 lg:border-transparent"
+              className="flex items-center justify-center rounded-full border border-stone-700 p-2 min-w-11 min-h-11 transition-colors hover:bg-stone-800 lg:border-transparent"
               aria-expanded={open}
               aria-label={open ? "Закрити меню" : "Відкрити меню"}
             >
