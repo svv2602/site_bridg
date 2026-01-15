@@ -1,363 +1,405 @@
-# Система Цветов — Stone Palette
+# Система Цветов — Mini Design System 2026
 
-**Версия:** 1.0
-**Дата:** 2026-01-11
-
----
-
-## Основное Правило
-
-> **ЗАПРЕЩЕНО использовать hardcoded цвета (HEX, RGB) и холодные палитры (zinc, gray, slate)**
-
-**Всегда используйте:**
-1. Tailwind CSS классы с stone palette (`text-stone-500`, `bg-stone-900`)
-2. CSS переменные (`var(--foreground)`, `var(--primary)`)
-3. Semantic классы (`text-foreground`, `bg-card`, `border-border`)
+**Версия:** 2.0
+**Дата:** 2026-01-15
+**Статус:** Обновлено
 
 ---
 
-## Запрещённые Цвета
+## Основная Концепція
 
-### Холодные палитры (ЗАПРЕЩЕНЫ)
+> **Primary = Silver (CTAs), Brand = Red (лого/alerts)**
+
+Система побудована на премиальній темній темі з сріблястими акцентами. Червоний Bridgestone використовується ТІЛЬКИ для brand елементів.
+
+---
+
+## Заборонені Патерни
+
+### КРИТИЧНО — Ніколи не використовуйте:
 
 ```typescript
-// ЗАПРЕЩЕНО — холодные серые тона
-text-zinc-400, text-zinc-500, text-zinc-600
-text-gray-400, text-gray-500, text-gray-600
-text-slate-400, text-slate-500, text-slate-600
-bg-zinc-800, bg-zinc-900
-bg-gray-100, bg-gray-200
+// ЗАБОРОНЕНО — низький контраст
+bg-muted text-muted-foreground    // Обидва приглушені
+bg-primary/10 text-primary        // Прозорий фон
+hover:bg-muted                    // Hover без контрасту
+hover:bg-card                     // Неявний hover
 
-// ИСПОЛЬЗУЙТЕ — тёплые stone тона
-text-stone-400, text-stone-500, text-stone-600
-bg-stone-800, bg-stone-900
-bg-stone-100, bg-stone-200
+// ЗАБОРОНЕНО — холодні палітри
+text-zinc-*, bg-zinc-*
+text-gray-*, bg-gray-*
+text-slate-*, bg-slate-*
 ```
 
-### Таблица замен
+### Таблиця Замін
 
-| Запрещено | Замена |
-|-----------|--------|
-| `text-zinc-400` | `text-stone-400` или `text-muted-foreground` |
-| `text-zinc-500` | `text-stone-500` или `text-muted-foreground` |
-| `text-zinc-100` | `text-stone-100` или `text-foreground` |
-| `bg-zinc-800` | `bg-stone-800` |
-| `bg-zinc-900` | `bg-stone-900` |
-| `border-zinc-700` | `border-stone-700` или `border-border` |
-| `bg-gray-50` | `bg-stone-50` или `bg-muted/50` |
+| Заборонено | Заміна |
+|------------|--------|
+| `bg-muted text-muted-foreground` | `bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200` |
+| `bg-primary/10 text-primary` | `bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200` |
+| `hover:bg-muted` | `hover:bg-stone-100 dark:hover:bg-stone-700` |
+| `hover:bg-card` | `hover:bg-stone-100 dark:hover:bg-stone-700` |
+| `border-border` (для кнопок) | `border-stone-300 dark:border-stone-600` |
 
 ---
 
-## CSS Переменные
+## CSS Змінні (globals.css)
 
-### Базовые Цвета (globals.css)
+### Light Theme
 
 ```css
 :root {
-  /* Основные */
-  --background: oklch(98.5% 0.002 75);      /* Светлый тёплый фон */
-  --foreground: oklch(14% 0.004 75);        /* Тёмный текст */
+  /* Core */
+  --background: var(--stone-50);        /* #fafaf9 */
+  --foreground: var(--stone-900);       /* #1c1917 */
 
-  /* Карточки */
-  --card: oklch(100% 0 0);                  /* Белый */
-  --card-foreground: oklch(14% 0.004 75);
+  /* Primary = Silver (для CTAs) */
+  --primary: var(--silver-accent);      /* #D7D9DC */
+  --primary-hover: var(--silver-hover); /* #FFFFFF */
+  --primary-text: var(--black-base);    /* #0E0E0E */
 
-  /* Muted (приглушённый) */
-  --muted: oklch(96% 0.003 75);
-  --muted-foreground: oklch(45% 0.01 75);
+  /* Brand = Red (тільки лого/alerts) */
+  --brand: var(--bridgestone-red);      /* #e30613 */
+  --brand-dark: var(--bridgestone-red-dark);
 
-  /* Primary (Bridgestone красный) */
-  --primary: oklch(55% 0.22 25);            /* #E31937 */
-  --primary-foreground: oklch(100% 0 0);    /* Белый текст */
+  /* Cards */
+  --card: #ffffff;
+  --card-foreground: var(--stone-900);
+  --border: var(--stone-200);           /* #e7e5e4 */
 
-  /* Границы */
-  --border: oklch(90% 0.005 75);
-}
-
-.dark {
-  --background: oklch(14% 0.005 75);        /* stone-950 */
-  --foreground: oklch(96% 0.003 75);
-  --card: oklch(18% 0.006 75);              /* stone-900 */
-  --muted: oklch(22% 0.006 75);
-  --muted-foreground: oklch(65% 0.01 75);
-  --border: oklch(28% 0.008 75);
+  /* Muted */
+  --muted: var(--stone-500);
+  --muted-foreground: var(--stone-700);
 }
 ```
 
-### Сезонные Badge Цвета
+### Dark Theme
 
 ```css
-/* Летние шины — синий */
-.badge-summer {
-  background: oklch(55% 0.18 250);
-  color: white;
-}
+:root[data-theme="dark"] {
+  /* Core */
+  --background: var(--black-base);      /* #0E0E0E */
+  --foreground: var(--text-primary);    /* #E0E0E0 */
 
-/* Зимние шины — голубой */
-.badge-winter {
-  background: oklch(65% 0.15 220);
-  color: oklch(20% 0.02 220);
-}
+  /* Primary = Silver */
+  --primary: var(--silver-accent);
+  --primary-text: var(--black-base);
 
-/* Всесезонные — зелёный */
-.badge-allseason {
-  background: oklch(55% 0.15 145);
-  color: white;
+  /* Cards */
+  --card: var(--graphite);              /* #24282C */
+  --card-foreground: var(--text-primary);
+  --border: var(--border-dark);         /* #2F3438 */
+
+  /* Muted */
+  --muted: var(--text-secondary);       /* #8B8F94 */
+  --muted-foreground: var(--text-muted); /* #6F7378 */
 }
+```
+
+### Нові Токени
+
+```css
+/* Dark Palette */
+--black-base: #0E0E0E;
+--wet-asphalt: #1C1F22;
+--graphite: #24282C;
+--graphite-hover: #2A2F34;
+
+/* Silver Accent System */
+--silver-accent: #D7D9DC;
+--silver-hover: #FFFFFF;
+--silver-muted: #BFC3C7;
+--border-dark: #2F3438;
+
+/* Text Hierarchy (dark theme) */
+--text-primary: #E0E0E0;
+--text-secondary: #8B8F94;
+--text-muted: #6F7378;
 ```
 
 ---
 
-## Использование в Коде
+## Використання в Коді
 
-### 1. Tailwind Классы (Рекомендуется)
-
-```typescript
-// ПРАВИЛЬНО — semantic классы
-<div className="bg-background text-foreground">
-  <h1 className="text-2xl font-bold">Заголовок</h1>
-  <p className="text-muted-foreground">Описание</p>
-</div>
-
-// ПРАВИЛЬНО — stone palette
-<header className="bg-stone-900 text-stone-100">
-  <nav className="border-b border-stone-800">
-    {/* ... */}
-  </nav>
-</header>
-
-// НЕПРАВИЛЬНО — zinc/gray
-<header className="bg-zinc-900 text-zinc-100">
-```
-
-### 2. Hero Секции (Тёмный Фон)
+### 1. Primary Кнопки (Silver)
 
 ```typescript
-// Используйте hero-* классы из globals.css
-<section className="hero-dark">
-  <h1 className="hero-title">Заголовок</h1>
-  <p className="hero-text">Текст</p>
-  <button className="hero-btn-primary">Кнопка</button>
-</section>
-```
-
-### 3. Кнопки
-
-```typescript
-// Primary — красная (Bridgestone brand)
-<button className="bg-primary text-primary-foreground hover:bg-primary/90">
+// ПРАВИЛЬНО — срібляста кнопка
+<button className="bg-primary text-primary-text hover:bg-primary-hover">
   Знайти дилера
 </button>
 
-// Secondary — stone
-<button className="bg-stone-800 text-stone-100 hover:bg-stone-700">
+// Результат: сріблястий фон, чорний текст
+```
+
+### 2. Brand Елементи (Red) — ТІЛЬКИ для спеціальних випадків
+
+```typescript
+// Тільки для лого, alerts, promo badges
+<span className="bg-brand text-white">Акція</span>
+
+// CSS клас
+<button className="btn-brand">Спеціальна пропозиція</button>
+```
+
+### 3. Secondary Кнопки — Явні Stone Кольори
+
+```typescript
+// ПРАВИЛЬНО
+<button className="border-stone-300 text-stone-700 hover:bg-stone-100
+                   dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700">
   Детальніше
 </button>
 
-// Ghost
-<button className="hover:bg-stone-100 dark:hover:bg-stone-800">
-  Скасувати
-</button>
+// НЕПРАВИЛЬНО
+<button className="border-border text-foreground hover:bg-muted">
 ```
 
-### 4. Карточки
+### 4. Badges — Явні Кольори
 
 ```typescript
-// Светлая тема
-<div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-  <h3 className="font-semibold text-card-foreground">Заголовок</h3>
-  <p className="text-muted-foreground">Описание</p>
-</div>
+// Neutral badge
+<span className="bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200">
+  Тег
+</span>
 
-// Тёмная тема автоматически применит тёмные цвета
+// Active badge
+<span className="bg-primary text-primary-text">
+  Активний
+</span>
+
+// Semantic badges
+<span className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200">
+  Сервіс
+</span>
+```
+
+### 5. Cards
+
+```typescript
+<div className="border border-border bg-card text-card-foreground">
+  <h3 className="text-foreground">Заголовок</h3>
+  <p className="text-muted-foreground">Опис</p>
+</div>
 ```
 
 ---
 
-## Запрет Одинакового Цвета Фона и Текста
+## Hero Секції
 
-> **КРИТИЧНО:** Никогда не используйте одинаковый цвет для `bg-X` и `text-X`
+### Адаптивний Hero (змінюється з темою)
 
 ```typescript
-// ЗАПРЕЩЕНО — текст невидим!
-<div className="bg-primary text-primary">...</div>
-<div className="bg-stone-500 text-stone-500">...</div>
-
-// ПРАВИЛЬНО — контрастный текст
-<div className="bg-primary text-primary-foreground">...</div>
-<div className="bg-stone-500 text-white">...</div>
-
-// ПРАВИЛЬНО — прозрачный фон + цветной текст
-<div className="bg-primary/10 text-primary">...</div>
+<section className="hero-adaptive">
+  <h1 className="hero-title-adaptive">Заголовок</h1>
+  <p className="hero-text-adaptive">Текст</p>
+  <button className="hero-btn-primary-adaptive">CTA</button>
+  <button className="hero-btn-secondary-adaptive">Secondary</button>
+</section>
 ```
 
-### Таблица Контрастных Пар
-
-| Фон | Текст |
-|-----|-------|
-| `bg-primary` | `text-primary-foreground` (белый) |
-| `bg-stone-900` | `text-stone-100` |
-| `bg-stone-100` | `text-stone-900` |
-| `bg-card` | `text-card-foreground` |
-| `bg-muted` | `text-muted-foreground` |
-
----
-
-## Тёмная Тема
-
-### Автоматическое Переключение
+### Завжди Темний Hero
 
 ```typescript
-// CSS переменные автоматически меняются в .dark
-<div className="bg-background text-foreground">
-  {/* Светлая: bg = светлый, text = тёмный */}
-  {/* Тёмная: bg = тёмный, text = светлый */}
-</div>
-```
-
-### Явные Тёмные Стили
-
-```typescript
-// Когда нужны разные стили для тем
-<div className="bg-white dark:bg-stone-900">
-  <span className="text-stone-900 dark:text-stone-100">
-    Текст
-  </span>
-</div>
-```
-
-### Hero Секции Всегда Тёмные
-
-```typescript
-// Hero секции имеют тёмный фон независимо от темы
-<section className="bg-stone-900 text-stone-100">
-  {/* Всегда тёмный */}
+<section className="hero-dark">
+  <h1 className="hero-title">Заголовок</h1>
+  <p className="hero-text">Текст</p>
+  <button className="hero-btn-primary">CTA</button>
 </section>
 ```
 
 ---
 
-## Shadows (Тёплые Тени)
+## Season Кольори
+
+Визначені в `lib/utils/tyres.ts`:
+
+| Сезон | Background | Text | Light BG (icons) |
+|-------|-----------|------|------------------|
+| Summer | `bg-emerald-500` | `text-emerald-500` | `bg-emerald-500/15` |
+| Winter | `bg-sky-500` | `text-sky-400` | `bg-sky-500/15` |
+| Allseason | `bg-amber-500` | `text-amber-500` | `bg-amber-500/15` |
+
+### Season Badge (Gradient)
 
 ```css
-/* Тёплые тени с коричневым оттенком */
-.shadow-warm-sm {
-  box-shadow: 0 1px 2px rgba(120, 90, 60, 0.08);
+/* Літо — зелений (emerald gradient) */
+.badge-summer {
+  background: linear-gradient(135deg, #34d399, #059669);
+  color: white;
 }
 
-.shadow-warm {
-  box-shadow: 0 4px 12px rgba(120, 90, 60, 0.1);
+/* Зима — синій (sky gradient) */
+.badge-winter {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: white;
 }
 
-.shadow-warm-lg {
-  box-shadow: 0 12px 32px rgba(120, 90, 60, 0.12);
+/* Всесезон — оранжевий (amber gradient) */
+.badge-allseason {
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+  color: white;
 }
 ```
 
+### Season Icon Container
+
 ```typescript
-// Использование
-<div className="shadow-warm hover:shadow-warm-lg transition-shadow">
-  Карточка с тёплой тенью
+// Іконка сезону з кольоровим фоном
+<div className="rounded-full bg-emerald-500/15 p-2">
+  <Sun className="h-5 w-5 text-emerald-500" />
 </div>
 ```
 
 ---
 
-## Контрастность WCAG AA
+## Feature Icon Кольори
 
-### Минимальные Требования
+Стандартизовані в `lib/utils/tyres.ts`. Для контейнерів іконок:
 
-- **Обычный текст:** 4.5:1
-- **Крупный текст (≥18px):** 3:1
-- **UI компоненты:** 3:1
+| Icon | Background | Text |
+|------|-----------|------|
+| car | `bg-blue-500/15` | `text-blue-500` |
+| shield | `bg-emerald-500/15` | `text-emerald-500` |
+| zap | `bg-amber-500/15` | `text-amber-500` |
+| thermometer | `bg-red-500/15` | `text-red-500` |
+| star | `bg-purple-500/15` | `text-purple-500` |
+| globe | `bg-teal-500/15` | `text-teal-500` |
+| users | `bg-pink-500/15` | `text-pink-500` |
+| mapPin | `bg-rose-500/15` | `text-rose-500` |
 
-### Гарантированные Пары
+---
+
+## Feature List Pattern
+
+Для списків переваг/фіч з іконками:
 
 ```typescript
-// Всегда достаточный контраст
-bg-primary + text-primary-foreground     // 4.5:1+
-bg-stone-900 + text-stone-100            // 4.5:1+
-bg-card + text-card-foreground           // 4.5:1+
-bg-muted + text-foreground               // 4.5:1+
+<ul className="space-y-3 text-sm">
+  {features.map((feat) => (
+    <li className="flex items-start gap-3">
+      {/* Icon container */}
+      <div className={`mt-1 rounded-full ${feat.color.bg} p-1.5`}>
+        <feat.icon className={`h-4 w-4 ${feat.color.text}`} />
+      </div>
+
+      {/* Text */}
+      <div>
+        <p className="font-medium text-stone-900 dark:text-white">
+          {feat.title}
+        </p>
+        <p className="text-xs text-stone-500 dark:text-stone-400 md:text-sm">
+          {feat.description}
+        </p>
+      </div>
+    </li>
+  ))}
+</ul>
+```
+
+**Важливо:** Для тексту в feature lists використовуються **явні stone кольори з dark: варіантами**, НЕ семантичні класи.
+
+---
+
+## CTA Секції (Завжди Темні)
+
+CTA блоки використовують `bg-graphite` і завжди темні:
+
+```typescript
+<section className="py-16">
+  <div className="container mx-auto max-w-4xl px-4 text-center">
+    <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
+      <h3 className="mb-4 text-3xl font-bold">Заголовок</h3>
+      <p className="mb-8 text-lg opacity-90">Опис</p>
+
+      <div className="flex flex-wrap justify-center gap-4">
+        {/* Primary - білий */}
+        <Link
+          href="/contacts"
+          className="rounded-full bg-white px-8 py-3 font-semibold text-graphite hover:bg-stone-100"
+        >
+          Primary CTA
+        </Link>
+
+        {/* Secondary - прозорий з білою рамкою */}
+        <Link
+          href="/dealers"
+          className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white hover:bg-white/10"
+        >
+          Secondary CTA
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
 ```
 
 ---
 
-## Примеры
+## Контрастність WCAG AA
 
-### Статусная Карточка
+### Мінімальні Вимоги
 
-```typescript
-interface StatusColors {
-  success: string;
-  warning: string;
-  error: string;
-}
+- **Звичайний текст:** 4.5:1
+- **Великий текст (≥18px):** 3:1
+- **UI компоненти:** 3:1
 
-const statusColors: StatusColors = {
-  success: 'bg-green-500/10 text-green-600 border-green-500/20',
-  warning: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-  error: 'bg-red-500/10 text-red-600 border-red-500/20',
-};
-
-function StatusBadge({ status }: { status: keyof StatusColors }) {
-  return (
-    <span className={cn(
-      'rounded-full px-3 py-1 text-sm font-medium border',
-      statusColors[status]
-    )}>
-      {status}
-    </span>
-  );
-}
-```
-
-### Навигация
+### Гарантовані Пари
 
 ```typescript
-// MainHeader.tsx
-<header className="bg-stone-900/95 backdrop-blur-sm border-b border-stone-800">
-  <nav className="flex items-center gap-1">
-    {links.map(link => (
-      <Link
-        key={link.href}
-        href={link.href}
-        className="px-3 py-2 text-sm font-medium text-stone-300
-                   hover:bg-stone-800 hover:text-stone-100
-                   rounded-lg transition-colors"
-      >
-        {link.label}
-      </Link>
-    ))}
-  </nav>
-</header>
+// Light theme
+bg-card + text-foreground              // ✓
+bg-stone-200 + text-stone-700          // ✓
+bg-primary + text-primary-text         // ✓
+
+// Dark theme
+bg-graphite + text-primary             // ✓
+bg-stone-700 + text-stone-200          // ✓
 ```
 
 ---
 
-## Чеклист Перед Коммитом
+## Тіні
 
-- [ ] Нет HEX цветов (`#3b82f6`)
-- [ ] Нет zinc/gray/slate классов
-- [ ] Используется stone palette или semantic классы
-- [ ] Проверена контрастность (4.5:1 для текста)
-- [ ] Проверена тёмная тема
-- [ ] Hero секции используют hero-* классы
+```css
+/* Теплі тіні (stone tint) */
+--shadow-color: 28, 25, 23;
+--shadow-sm: 0 1px 2px rgba(var(--shadow-color), 0.05);
+--shadow-md: 0 4px 16px rgba(var(--shadow-color), 0.1);
+--shadow-lg: 0 8px 32px rgba(var(--shadow-color), 0.12);
 
-### Команды для Проверки
+/* Glow ефекти — срібляста, не червона */
+--shadow-glow: 0 0 40px rgba(215, 217, 220, 0.25);
+--shadow-glow-brand: 0 0 40px rgba(227, 6, 19, 0.3); /* тільки для brand */
+```
+
+---
+
+## Чеклист Перед Комітом
+
+- [ ] Немає `bg-muted text-muted-foreground` комбінацій
+- [ ] Немає `bg-primary/10 text-primary` (opacity backgrounds)
+- [ ] Немає `hover:bg-muted` або `hover:bg-card`
+- [ ] Кнопки мають явні stone кольори з `dark:` варіантами
+- [ ] Немає zinc/gray/slate класів
+- [ ] Primary використовується для CTAs (silver)
+- [ ] Brand використовується тільки для лого/alerts
+- [ ] Hero секції використовують `hero-adaptive` або `hero-dark`
+
+### Команди для Перевірки
 
 ```bash
-# Найти zinc/gray/slate
-grep -r "zinc-\|gray-\|slate-" src/
-
-# Найти HEX цвета
-grep -rE "#[0-9a-fA-F]{3,6}" src/
+# Знайти заборонені патерни
+rg "bg-muted.*text-muted-foreground" frontend/src/
+rg "bg-primary/10.*text-primary" frontend/src/
+rg "hover:bg-muted|hover:bg-card" frontend/src/
+rg "zinc-|gray-|slate-" frontend/src/
 ```
 
 ---
 
-## Связанные Документы
+## Пов'язані Документи
 
-- [Структура Компонентов](./COMPONENT_STRUCTURE.md)
-- [Тёмная Тема](./DARK_MODE.md)
-- [Карточки](./CARD_STYLING.md)
+- [Кнопки](./BUTTON_STANDARDS.md)
+- [Темна Тема](./DARK_MODE.md)
+- [Картки](./CARD_STYLING.md)

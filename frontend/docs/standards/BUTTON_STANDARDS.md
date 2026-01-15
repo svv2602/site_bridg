@@ -1,51 +1,74 @@
-# Стандарты Кнопок
+# Стандарти Кнопок
 
-**Версия:** 1.0
-**Дата:** 2026-01-11
+**Версія:** 2.0
+**Дата:** 2026-01-15
+**Статус:** Оновлено
 
 ---
 
-## Варианты Кнопок
+## Основні Правила
 
-### Primary — Главное Действие
+> **Primary = Silver кнопки для CTAs**
+> **Secondary кнопки мають явні stone кольори з dark: варіантами**
+> **ЗАБОРОНЕНО: hover:bg-muted, hover:bg-card, border-border без dark:**
+
+---
+
+## Варіанти Кнопок
+
+### Primary — Головна Дія (Silver)
 
 ```typescript
 <button className="rounded-full bg-primary px-6 py-2.5
-                   text-sm font-semibold text-white
-                   transition-colors hover:bg-primary/90
-                   focus:outline-none focus:ring-2 focus:ring-primary/50">
+                   text-sm font-semibold text-primary-text
+                   transition-colors hover:bg-primary-hover">
   Знайти дилера
 </button>
 ```
 
-**Использование:** CTA, форма поиска, главное действие на странице
+**Результат:** Сріблястий фон (#D7D9DC), чорний текст, білий hover.
 
-### Secondary — Вторичное Действие
+### Secondary — Вторинна Дія (Явні Stone Кольори)
 
 ```typescript
-<button className="rounded-full border border-border bg-transparent
-                   px-6 py-2.5 text-sm font-semibold text-foreground
-                   transition-colors hover:bg-muted
-                   focus:outline-none focus:ring-2 focus:ring-border">
+// ПРАВИЛЬНО — явні кольори для обох тем
+<button className="rounded-full border border-stone-300 bg-transparent
+                   px-6 py-2.5 text-sm font-semibold text-stone-700
+                   transition-colors hover:bg-stone-100
+                   dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700">
   Детальніше
 </button>
+
+// НЕПРАВИЛЬНО — неявні кольори
+<button className="border border-border hover:bg-muted text-foreground">
 ```
 
-**Использование:** Альтернативное действие, отмена, "Дізнатися більше"
-
-### Ghost — Минимальный Стиль
+### Ghost — Мінімальний Стиль
 
 ```typescript
 <button className="rounded-lg px-4 py-2 text-sm font-medium
-                   text-muted-foreground transition-colors
-                   hover:bg-muted hover:text-foreground">
+                   text-stone-600 transition-colors
+                   hover:bg-stone-100 hover:text-stone-900
+                   dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100">
   Скасувати
 </button>
 ```
 
-**Использование:** Навигация, третичные действия
+### Brand — Червона (ТІЛЬКИ для спеціальних випадків)
 
-### Danger — Удаление
+```typescript
+// Використовувати ТІЛЬКИ для промо, alerts, brand елементів
+<button className="rounded-full bg-brand px-6 py-2.5
+                   text-sm font-semibold text-white
+                   transition-colors hover:bg-brand-dark">
+  Акція
+</button>
+
+// Або CSS клас
+<button className="btn-brand">Спеціальна пропозиція</button>
+```
+
+### Danger — Видалення
 
 ```typescript
 <button className="rounded-full bg-red-500 px-6 py-2.5
@@ -55,73 +78,59 @@
 </button>
 ```
 
-**Использование:** Удаление, деструктивные действия
-
 ---
 
-## Размеры
+## Розміри
 
 ### Small (sm)
 
 ```typescript
 <button className="rounded-full px-3 py-1.5 text-xs font-semibold">
-  Текст
-</button>
 ```
 
 ### Default
 
 ```typescript
 <button className="rounded-full px-4 py-2 text-sm font-semibold">
-  Текст
-</button>
 ```
 
 ### Large (lg)
 
 ```typescript
 <button className="rounded-full px-6 py-2.5 text-base font-semibold">
-  Текст
-</button>
-```
-
-### Full Width
-
-```typescript
-<button className="w-full rounded-full px-4 py-2.5 text-sm font-semibold">
-  Текст
-</button>
 ```
 
 ---
 
-## Кнопки с Иконками
+## Кнопки з Іконками
 
-### Иконка Слева
+### Іконка Зліва
 
 ```typescript
 <button className="inline-flex items-center gap-2 rounded-full
-                   bg-primary px-4 py-2 text-sm font-semibold text-white">
+                   bg-primary px-4 py-2 text-sm font-semibold text-primary-text">
   <Search className="h-4 w-4" />
   Пошук шин
 </button>
 ```
 
-### Иконка Справа
+### Іконка Справа
 
 ```typescript
 <Link className="inline-flex items-center gap-1 text-sm
-                 font-medium text-primary hover:underline">
+                 font-medium text-stone-600 hover:text-stone-900 hover:underline
+                 dark:text-stone-400 dark:hover:text-stone-100">
   Детальніше
   <ChevronRight className="h-4 w-4" />
 </Link>
 ```
 
-### Только Иконка (Icon Button)
+### Тільки Іконка (Icon Button)
 
 ```typescript
-<button className="rounded-full p-2 text-muted-foreground
-                   hover:bg-muted hover:text-foreground
+<button className="rounded-full p-2 text-stone-500
+                   hover:bg-stone-100 hover:text-stone-700
+                   dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-200
                    transition-colors"
         aria-label="Меню">
   <Menu className="h-5 w-5" />
@@ -130,14 +139,14 @@
 
 ---
 
-## Состояния
+## Стани
 
 ### Disabled
 
 ```typescript
 <button disabled
         className="rounded-full bg-primary px-4 py-2
-                   text-sm font-semibold text-white
+                   text-sm font-semibold text-primary-text
                    disabled:opacity-50 disabled:cursor-not-allowed">
   Завантаження...
 </button>
@@ -148,7 +157,7 @@
 ```typescript
 <button disabled
         className="inline-flex items-center gap-2 rounded-full
-                   bg-primary px-4 py-2 text-sm font-semibold text-white
+                   bg-primary px-4 py-2 text-sm font-semibold text-primary-text
                    disabled:opacity-70">
   <Loader2 className="h-4 w-4 animate-spin" />
   Пошук...
@@ -158,152 +167,127 @@
 ### Focus
 
 ```typescript
-// Обязательно добавляйте focus стили!
-className="focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+// Silver focus ring замість red
+className="focus:outline-none focus:ring-2 focus:ring-silver/50 focus:ring-offset-2"
+
+// Або використовуйте глобальні focus-visible стилі з globals.css
 ```
 
 ---
 
-## Hero Кнопки (Тёмный Фон)
+## Hero Кнопки
 
-```css
-/* globals.css */
-.hero-btn-primary {
-  @apply inline-flex items-center gap-2 rounded-full
-         bg-primary px-6 py-3 text-sm font-semibold text-white
-         shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl;
-}
-
-.hero-btn-secondary {
-  @apply inline-flex items-center gap-2 rounded-full
-         border border-stone-600 bg-stone-800/50 px-6 py-3
-         text-sm font-semibold text-stone-100
-         transition-all hover:bg-stone-700;
-}
-```
+### Адаптивні (змінюються з темою)
 
 ```typescript
-<div className="flex flex-wrap gap-4">
-  <Link href="/dealers" className="hero-btn-primary">
+<section className="hero-adaptive">
+  <Link href="/dealers" className="hero-btn-primary-adaptive">
     <MapPin className="h-4 w-4" />
+    Знайти дилера
+  </Link>
+  <Link href="/tyre-search" className="hero-btn-secondary-adaptive">
+    Підібрати розмір
+  </Link>
+</section>
+```
+
+### Завжди Темні
+
+```typescript
+<section className="hero-dark">
+  <Link href="/dealers" className="hero-btn-primary">
     Знайти дилера
   </Link>
   <Link href="/tyre-search" className="hero-btn-secondary">
     Підібрати розмір
   </Link>
-</div>
+</section>
 ```
 
 ---
 
-## Адаптивность
-
-### Проблема: Кнопки Выходят за Границы
+## Toggle Кнопки (Tabs, Filters)
 
 ```typescript
-// НЕПРАВИЛЬНО — кнопки могут вылезти
-<div className="flex gap-2">
-  <button className="px-4 py-2">Длинный текст кнопки</button>
-  <button className="px-4 py-2">Ещё одна</button>
-</div>
+// ПРАВИЛЬНО — явні кольори для active/inactive станів
+<button className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+  isActive
+    ? "bg-primary text-primary-text"
+    : "bg-stone-200 text-stone-700 hover:bg-stone-300
+       dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+}`}>
 
-// ПРАВИЛЬНО — кнопки переносятся
+// НЕПРАВИЛЬНО — muted backgrounds
+<button className={`... ${isActive ? "bg-primary" : "bg-muted hover:bg-muted/80"}`}>
+```
+
+---
+
+## Pagination
+
+```typescript
+// Active page
+<button className="bg-primary text-primary-text rounded-lg px-3 py-1.5">
+
+// Inactive page
+<button className="border border-stone-300 bg-white text-stone-700
+                   hover:bg-stone-100 rounded-lg px-3 py-1.5
+                   dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200
+                   dark:hover:bg-stone-700">
+
+// Disabled (prev/next)
+<span className="border border-stone-200 bg-stone-100 text-stone-400
+                 cursor-not-allowed rounded-lg px-3 py-1.5
+                 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-500">
+```
+
+---
+
+## Адаптивність
+
+### Перенос Кнопок
+
+```typescript
+// ПРАВИЛЬНО — flex-wrap для переносу на мобільних
 <div className="flex flex-wrap gap-2">
-  <button className="flex-1 min-w-[80px] px-3 py-1.5
-                     text-xs sm:text-sm">
-    Длинный текст
-  </button>
-  <button className="flex-1 min-w-[80px] px-3 py-1.5
-                     text-xs sm:text-sm">
-    Ещё одна
-  </button>
+  <button className="flex-1 min-w-[80px] ...">Кнопка 1</button>
+  <button className="flex-1 min-w-[80px] ...">Кнопка 2</button>
+</div>
+
+// НЕПРАВИЛЬНО — кнопки вилазять за межі
+<div className="flex gap-2">
+  <button>Довгий текст кнопки</button>
 </div>
 ```
 
-### Скрытие Текста на Мобильных
+### Responsive Text
 
 ```typescript
-<button className="inline-flex items-center gap-1.5 rounded-full
-                   bg-primary px-4 py-2 text-sm font-semibold text-white">
-  <Search className="h-4 w-4" />
-  <span className="hidden md:inline">Пошук шин</span>
+<button className="... text-xs sm:text-sm">
+  <span className="hidden sm:inline">Пошук шин</span>
+  <span className="sm:hidden">Пошук</span>
 </button>
 ```
 
 ---
 
-## Link vs Button
-
-```typescript
-// Button — для действий
-<button onClick={handleSubmit}>Відправити</button>
-<button onClick={() => setOpen(!open)}>Відкрити меню</button>
-
-// Link — для навигации
-<Link href="/dealers">Де купити</Link>
-<Link href={`/shyny/${slug}`}>Детальніше</Link>
-```
-
----
-
-## Accessibility
-
-```typescript
-// Всегда добавляйте для icon buttons
-<button aria-label="Закрити меню">
-  <X className="h-5 w-5" />
-</button>
-
-// aria-expanded для toggle buttons
-<button aria-expanded={isOpen} aria-controls="menu">
-  Меню
-</button>
-
-// Disabled состояние
-<button disabled aria-disabled="true">
-  Недоступно
-</button>
-```
-
----
-
-## Примеры Использования
-
-### Форма Поиска
-
-```typescript
-<form onSubmit={handleSubmit} className="space-y-4">
-  {/* Поля формы */}
-
-  <button type="submit"
-          disabled={isSearching}
-          className="hero-btn-primary w-full">
-    {isSearching ? (
-      <>
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Пошук...
-      </>
-    ) : (
-      'Знайти шини'
-    )}
-  </button>
-</form>
-```
-
-### Карточка с Двумя Кнопками
+## Картка з Двома Кнопками
 
 ```typescript
 <div className="mt-auto pt-4 flex flex-wrap gap-2">
   <Link href={`/shyny/${slug}`}
-        className="flex-1 min-w-[80px] rounded-full border border-border
-                   px-3 py-1.5 text-center text-xs sm:text-sm
-                   font-semibold hover:bg-muted">
+        className="flex-1 min-w-[80px] rounded-full
+                   border border-stone-300 px-3 py-1.5
+                   text-center text-xs sm:text-sm font-semibold
+                   text-stone-700 hover:bg-stone-100
+                   dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700">
     Детальніше
   </Link>
   <Link href="/dealers"
         className="flex-1 min-w-[80px] flex items-center justify-center
                    gap-1 rounded-full bg-primary px-3 py-1.5
-                   text-xs sm:text-sm font-semibold text-white">
+                   text-xs sm:text-sm font-semibold text-primary-text
+                   hover:bg-primary-hover">
     <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
     Купити
   </Link>
@@ -314,20 +298,36 @@ className="focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offs
 
 ## Чеклист
 
-- [ ] Правильный вариант (primary/secondary/ghost)
-- [ ] `rounded-full` для скруглений
-- [ ] `font-semibold` для текста
-- [ ] Focus стили (ring)
-- [ ] Disabled стили если нужно
-- [ ] Loading состояние для форм
+- [ ] **Primary** використовує `bg-primary text-primary-text` (silver)
+- [ ] **Secondary** має явні stone кольори: `border-stone-300 text-stone-700 dark:...`
+- [ ] **Немає** `hover:bg-muted` або `hover:bg-card`
+- [ ] **Немає** `border-border` без dark: варіанту для кнопок
+- [ ] `rounded-full` для скруглень
+- [ ] `font-semibold` для тексту
 - [ ] `aria-label` для icon buttons
-- [ ] `flex-wrap` в контейнере для мобильных
-- [ ] `min-w-[80px]` если кнопки в ряд
+- [ ] `flex-wrap` + `min-w-[80px]` для мобільних
 
 ---
 
-## Связанные Документы
+## Заборонені Патерни
 
-- [Система Цветов](./COLOR_SYSTEM.md)
-- [Карточки](./CARD_STYLING.md)
+```typescript
+// ЗАБОРОНЕНО
+hover:bg-muted                    // Низький контраст
+hover:bg-card                     // Неявний hover
+border-border text-foreground     // Потребує dark: варіанти
+bg-muted/80                       // Opacity backgrounds
+
+// ПРАВИЛЬНО
+hover:bg-stone-100 dark:hover:bg-stone-700
+border-stone-300 dark:border-stone-600
+text-stone-700 dark:text-stone-200
+```
+
+---
+
+## Пов'язані Документи
+
+- [Система Кольорів](./COLOR_SYSTEM.md)
+- [Картки](./CARD_STYLING.md)
 - [Accessibility](./ACCESSIBILITY.md)

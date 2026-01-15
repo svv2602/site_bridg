@@ -700,6 +700,103 @@ html {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
+/* Adaptive hero form card (search form) */
+.hero-adaptive .hero-form-card-adaptive {
+  background: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-card-adaptive {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Adaptive hero form title */
+.hero-adaptive .hero-form-title-adaptive {
+  color: #1c1917;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-title-adaptive {
+  color: #ffffff;
+}
+
+/* Adaptive hero form text/labels */
+.hero-adaptive .hero-form-text-adaptive {
+  color: #57534e;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-text-adaptive {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Adaptive hero tabs container */
+.hero-adaptive .hero-tabs-adaptive {
+  background: #f5f5f4;
+  border-radius: 9999px;
+  padding: 0.25rem;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tabs-adaptive {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Adaptive hero tab button (inactive) */
+.hero-adaptive .hero-tab-adaptive {
+  color: #78716c;
+  transition: color 0.2s;
+}
+
+.hero-adaptive .hero-tab-adaptive:hover {
+  color: #1c1917;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-adaptive {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-adaptive:hover {
+  color: #ffffff;
+}
+
+/* Adaptive hero tab button (active) */
+.hero-adaptive .hero-tab-active-adaptive {
+  background: #ffffff;
+  color: #1c1917;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-active-adaptive {
+  background: #ffffff;
+  color: #1c1917;
+}
+
+/* Adaptive hero input */
+.hero-adaptive .hero-input-adaptive {
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  color: #1c1917;
+  border-radius: 0.75rem;
+}
+
+.hero-adaptive .hero-input-adaptive:focus {
+  border-color: #a8a29e;
+  outline: none;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-input-adaptive {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-input-adaptive:focus {
+  border-color: var(--silver-accent);
+}
+
 /* Adaptive breadcrumb colors */
 .hero-adaptive .hero-breadcrumb-adaptive {
   color: #78716c;
