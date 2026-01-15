@@ -152,6 +152,23 @@ export default function DealersPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
+                {/* Service image at top - hidden on mobile */}
+                <div className="relative hidden min-h-[180px] flex-1 lg:block">
+                  <Image
+                    src="/images/hero/hero-lcv.jpg"
+                    alt="Шинний сервіс Bridgestone"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 0vw, 66vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 p-4">
+                    <p className="text-sm font-medium text-white">
+                      Професійний шиномонтаж та сервіс у офіційних дилерів
+                    </p>
+                  </div>
+                </div>
+                {/* Search form */}
                 <div className="p-6">
                   <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
                   <div className="mb-6 flex flex-col gap-4 sm:flex-row">
@@ -209,22 +226,6 @@ export default function DealersPage() {
                     >
                       Скинути фільтри
                     </button>
-                  </div>
-                </div>
-                {/* Service image - hidden on mobile, fills remaining space on desktop */}
-                <div className="relative mt-auto hidden min-h-[180px] flex-1 lg:block">
-                  <Image
-                    src="/images/hero/hero-lcv.jpg"
-                    alt="Шинний сервіс Bridgestone"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 0vw, 66vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-sm font-medium text-white">
-                      Професійний шиномонтаж та сервіс у офіційних дилерів
-                    </p>
                   </div>
                 </div>
               </div>
