@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useState, useEffect, useRef } from "react";
+import { FormEvent, useState, useEffect, useRef, useCallback } from "react";
 
 import {
   type Season,
@@ -147,22 +147,8 @@ export default function TyreSearchPage() {
       .finally(() => setLoadingDiameters(false));
   }, [width, aspectRatio]);
 
-  // Авто-пошук при завантаженні сторінки з URL параметрами
-  useEffect(() => {
-    if (initialSearchDone) return;
-
-    const urlWidth = searchParams.get("width");
-    const urlAspectRatio = searchParams.get("aspectRatio");
-    const urlDiameter = searchParams.get("diameter");
-
-    // Only auto-search if we have all required params from URL
-    if (urlWidth && urlAspectRatio && urlDiameter && width && aspectRatio && diameter && !loadingWidths && !loadingAspects && !loadingDiameters) {
-      setInitialSearchDone(true);
-      performSearch();
-    }
-  }, [width, aspectRatio, diameter, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, searchParams]);
-
-  async function performSearch() {
+  // Функція пошуку (визначена перед useEffect що її використовує)
+  const performSearch = useCallback(async () => {
     if (!width || !aspectRatio || !diameter) return;
 
     setSearching(true);
@@ -191,7 +177,33 @@ export default function TyreSearchPage() {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
-  }
+  }, [width, aspectRatio, diameter, season]);
+
+  // Авто-пошук при завантаженні сторінки з URL параметрами
+  useEffect(() => {
+    if (initialSearchDone) return;
+    if (loadingWidths || loadingAspects || loadingDiameters) return;
+
+    const urlWidth = searchParams.get("width");
+    const urlAspectRatio = searchParams.get("aspectRatio");
+    const urlDiameter = searchParams.get("diameter");
+
+    // Перевіряємо що є всі параметри в URL
+    if (!urlWidth || !urlAspectRatio || !urlDiameter) return;
+
+    // Перевіряємо що опції завантажені і містять потрібні значення
+    const hasWidth = widthOptions.some(o => o.value === parseInt(urlWidth));
+    const hasAspect = aspectOptions.some(o => o.value === parseInt(urlAspectRatio));
+    const hasDiameter = diameterOptions.some(o => o.value === parseInt(urlDiameter));
+
+    if (hasWidth && hasAspect && hasDiameter && width && aspectRatio && diameter) {
+      setInitialSearchDone(true);
+      // Використовуємо setTimeout щоб React встиг оновити DOM
+      setTimeout(() => {
+        performSearch();
+      }, 0);
+    }
+  }, [width, aspectRatio, diameter, widthOptions, aspectOptions, diameterOptions, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, searchParams, performSearch]);
 
   async function handleSizeSearch(e: FormEvent) {
     e.preventDefault();
