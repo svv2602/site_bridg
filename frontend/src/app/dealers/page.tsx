@@ -341,7 +341,7 @@ export default function DealersPage() {
                         onClick={() => setExpandedDealer(expandedDealer === dealer.id ? null : dealer.id)}
                         aria-expanded={expandedDealer === dealer.id}
                         aria-controls={`dealer-details-${dealer.id}`}
-                        className="rounded-full border border-border bg-transparent px-4 py-2 text-sm font-medium hover:bg-card"
+                        className="rounded-full border border-stone-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-stone-100 dark:border-stone-600 dark:hover:bg-stone-700"
                       >
                         {expandedDealer === dealer.id ? "Менше" : "Детальніше"}
                       </button>
