@@ -214,8 +214,8 @@ export default async function Home() {
                       direction="right"
                       className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
                     >
-                      <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Star className="h-6 w-6 text-primary" />
+                      <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-purple-500/15 flex items-center justify-center">
+                        <Star className="h-6 w-6 text-purple-500" />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold">{tyre.name}</h3>
