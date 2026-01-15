@@ -21,6 +21,11 @@ interface ModelOption {
   name: string;
 }
 
+interface KitOption {
+  id: number;
+  name: string;
+}
+
 export function QuickSearchForm() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<SearchTab>('size');
@@ -43,15 +48,18 @@ export function QuickSearchForm() {
   const [brandId, setBrandId] = useState('');
   const [modelId, setModelId] = useState('');
   const [year, setYear] = useState('');
+  const [kitId, setKitId] = useState('');
   const [carSeason, setCarSeason] = useState('');
 
   // Car options (fetched from API)
   const [brands, setBrands] = useState<BrandOption[]>([]);
   const [models, setModels] = useState<ModelOption[]>([]);
   const [years, setYears] = useState<number[]>([]);
+  const [kits, setKits] = useState<KitOption[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
   const [loadingModels, setLoadingModels] = useState(false);
   const [loadingYears, setLoadingYears] = useState(false);
+  const [loadingKits, setLoadingKits] = useState(false);
 
   // Search loading state
   const [isSearching, setIsSearching] = useState(false);
@@ -182,6 +190,29 @@ export function QuickSearchForm() {
     fetchYears();
   }, [modelId]);
 
+  // Fetch kits when model and year change
+  useEffect(() => {
+    if (!modelId || !year) {
+      setKits([]);
+      setKitId('');
+      return;
+    }
+
+    async function fetchKits() {
+      setLoadingKits(true);
+      try {
+        const res = await fetch(`/api/vehicles/kits?modelId=${modelId}&year=${year}`);
+        const data = await res.json();
+        setKits(data.data || []);
+      } catch (error) {
+        console.error('Error fetching kits:', error);
+      } finally {
+        setLoadingKits(false);
+      }
+    }
+    fetchKits();
+  }, [modelId, year]);
+
   const handleSizeSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
@@ -203,12 +234,14 @@ export function QuickSearchForm() {
     setIsSearching(true);
     const selectedBrand = brands.find(b => b.id === parseInt(brandId));
     const selectedModel = models.find(m => m.id === parseInt(modelId));
+    const selectedKit = kits.find(k => k.id === parseInt(kitId));
     // Зберігаємо параметри в sessionStorage замість URL
     const searchData = {
       mode: 'car',
       make: selectedBrand?.name || '',
       model: selectedModel?.name || '',
       year,
+      kit: selectedKit?.name || '',
       season: carSeason,
       timestamp: Date.now(),
     };
@@ -475,7 +508,10 @@ export function QuickSearchForm() {
                 ) : (
                   <select
                     value={year}
-                    onChange={(e) => setYear(e.target.value)}
+                    onChange={(e) => {
+                      setYear(e.target.value);
+                      setKitId('');
+                    }}
                     disabled={!modelId}
                     className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
                   >
@@ -487,6 +523,30 @@ export function QuickSearchForm() {
                 )}
                 <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
               </div>
+            </div>
+          </div>
+          <div>
+            <label className={labelClass}>Комплектація</label>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              {loadingKits ? (
+                <div className={loadingClass}>
+                  <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                </div>
+              ) : (
+                <select
+                  value={kitId}
+                  onChange={(e) => setKitId(e.target.value)}
+                  disabled={!year}
+                  className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  <option value="">Оберіть комплектацію</option>
+                  {kits.map((kit) => (
+                    <option key={kit.id} value={kit.id}>{kit.name}</option>
+                  ))}
+                </select>
+              )}
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
             </div>
           </div>
           <div>

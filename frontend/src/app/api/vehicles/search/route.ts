@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const kitId = searchParams.get('kitId');
+    const season = searchParams.get('season') || undefined;
 
     if (!kitId) {
       return NextResponse.json(
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const result = await searchVehicleTyres(kitIdNum);
+    const result = await searchVehicleTyres(kitIdNum, season);
 
     if (!result) {
       return NextResponse.json(

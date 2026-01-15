@@ -13,6 +13,7 @@ import {
   Loader2,
   Info,
   MapPin,
+  Filter,
 } from "lucide-react";
 import { TyreCard } from "@/components/TyreCard";
 import type {
@@ -426,14 +427,19 @@ interface VehicleTyreSelectorProps {
   initialMake?: string;
   initialModel?: string;
   initialYear?: string;
+  initialKit?: string;
+  initialSeason?: string;
 }
 
-export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: VehicleTyreSelectorProps) {
+export function VehicleTyreSelector({ initialMake, initialModel, initialYear, initialKit, initialSeason }: VehicleTyreSelectorProps) {
+  console.log('[VehicleSelector] Rendered with props:', { initialMake, initialModel, initialYear, initialKit, initialSeason });
+
   // Стан вибору
   const [brandId, setBrandId] = useState("");
   const [modelId, setModelId] = useState("");
   const [year, setYear] = useState("");
   const [kitId, setKitId] = useState("");
+  const [season, setSeason] = useState(initialSeason || "");
 
   // Результати пошуку
   const [searchResult, setSearchResult] = useState<VehicleSearchResult | null>(
@@ -444,9 +450,14 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   // Стан ініціалізації з props
-  const [initStep, setInitStep] = useState<'idle' | 'brand' | 'model' | 'year' | 'done'>(
+  const [initStep, setInitStep] = useState<'idle' | 'brand' | 'model' | 'year' | 'kit' | 'done'>(
     initialMake ? 'brand' : 'idle'
   );
+
+  // Refs для відстеження попередніх значень (для визначення чи це зміна користувачем)
+  const prevBrandIdRef = useRef(brandId);
+  const prevModelIdRef = useRef(modelId);
+  const prevYearRef = useRef(year);
 
   // Fetching даних для селектів
   const { data: brands, loading: brandsLoading } = useFetch<CarBrand[]>(
@@ -469,8 +480,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
 
   // Ініціалізація з props - крок 1: вибір марки
   useEffect(() => {
+    console.log('[VehicleSelector] Init step 1 check:', { initStep, brandsCount: brands?.length, initialMake });
     if (initStep !== 'brand' || !brands || !initialMake) return;
     const brand = brands.find(b => b.name.toLowerCase() === initialMake.toLowerCase());
+    console.log('[VehicleSelector] Found brand:', brand);
     if (brand) {
       setBrandId(String(brand.id));
       setInitStep('model');
@@ -481,8 +494,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
 
   // Ініціалізація з props - крок 2: вибір моделі
   useEffect(() => {
+    console.log('[VehicleSelector] Init step 2 check:', { initStep, modelsCount: models?.length, initialModel });
     if (initStep !== 'model' || !models || !initialModel) return;
     const model = models.find(m => m.name.toLowerCase() === initialModel.toLowerCase());
+    console.log('[VehicleSelector] Found model:', model);
     if (model) {
       setModelId(String(model.id));
       setInitStep('year');
@@ -493,17 +508,40 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
 
   // Ініціалізація з props - крок 3: вибір року
   useEffect(() => {
+    console.log('[VehicleSelector] Init step 3 check:', { initStep, yearsCount: years?.length, initialYear });
     if (initStep !== 'year' || !years || !initialYear) return;
     const yearNum = parseInt(initialYear);
+    console.log('[VehicleSelector] Checking year:', yearNum, 'in', years);
     if (years.includes(yearNum)) {
       setYear(initialYear);
+      // Якщо є initialKit, переходимо до вибору комплектації
+      setInitStep(initialKit ? 'kit' : 'done');
+    } else {
+      setInitStep('done');
+    }
+  }, [initStep, years, initialYear, initialKit]);
+
+  // Ініціалізація з props - крок 4: вибір комплектації
+  useEffect(() => {
+    console.log('[VehicleSelector] Init step 4 check:', { initStep, kitsCount: kits?.length, initialKit });
+    if (initStep !== 'kit' || !kits || !initialKit) return;
+    const kit = kits.find(k => k.name.toLowerCase() === initialKit.toLowerCase());
+    console.log('[VehicleSelector] Found kit:', kit);
+    if (kit) {
+      setKitId(String(kit.id));
     }
     setInitStep('done');
-  }, [initStep, years, initialYear]);
+  }, [initStep, kits, initialKit]);
 
-  // Скидання залежних полів (тільки якщо не ініціалізація)
+  // Скидання залежних полів (тільки при зміні користувачем, не під час ініціалізації)
   useEffect(() => {
+    // Перевіряємо чи brandId справді змінився
+    if (prevBrandIdRef.current === brandId) return;
+    prevBrandIdRef.current = brandId;
+
+    // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
+    console.log('[VehicleSelector] Resetting model/year/kit due to brand change');
     setModelId("");
     setYear("");
     setKitId("");
@@ -511,14 +549,26 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
   }, [brandId, initStep]);
 
   useEffect(() => {
+    // Перевіряємо чи modelId справді змінився
+    if (prevModelIdRef.current === modelId) return;
+    prevModelIdRef.current = modelId;
+
+    // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
+    console.log('[VehicleSelector] Resetting year/kit due to model change');
     setYear("");
     setKitId("");
     setSearchResult(null);
   }, [modelId, initStep]);
 
   useEffect(() => {
+    // Перевіряємо чи year справді змінився
+    if (prevYearRef.current === year) return;
+    prevYearRef.current = year;
+
+    // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
+    console.log('[VehicleSelector] Resetting kit due to year change');
     setKitId("");
     setSearchResult(null);
   }, [year, initStep]);
@@ -555,7 +605,11 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
     setSearchError(null);
 
     try {
-      const res = await fetch(`/api/vehicles/search?kitId=${kitId}`);
+      let url = `/api/vehicles/search?kitId=${kitId}`;
+      if (season) {
+        url += `&season=${season}`;
+      }
+      const res = await fetch(url);
       const json = await res.json();
 
       if (json.error) {
@@ -568,7 +622,26 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
     } finally {
       setSearching(false);
     }
-  }, [kitId]);
+  }, [kitId, season]);
+
+  // Ref для відстеження чи вже виконали автопошук
+  const autoSearchDoneRef = useRef(false);
+
+  // Автоматичний пошук після завершення ініціалізації з головної сторінки
+  useEffect(() => {
+    // Виконуємо тільки один раз після ініціалізації
+    if (autoSearchDoneRef.current) return;
+
+    // Чекаємо завершення ініціалізації та наявності kitId
+    if (initStep !== 'done' || !kitId) return;
+
+    // Перевіряємо що це була ініціалізація з props (не ручний вибір)
+    if (!initialKit) return;
+
+    console.log('[VehicleSelector] Auto-search triggered after initialization');
+    autoSearchDoneRef.current = true;
+    handleSearch();
+  }, [initStep, kitId, initialKit, handleSearch]);
 
   // Опції для селектів
   const brandOptions =
@@ -579,6 +652,12 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
     years?.map((y) => ({ value: String(y), label: String(y) })) ?? [];
   const kitOptions =
     kits?.map((k) => ({ value: String(k.id), label: k.name })) ?? [];
+  const seasonOptions = [
+    { value: "", label: "Не важливо" },
+    { value: "summer", label: "Літні" },
+    { value: "winter", label: "Зимові" },
+    { value: "allseason", label: "Всесезонні" },
+  ];
 
   // Вибрана комплектація
   const selectedKit = kits?.find((k) => String(k.id) === kitId);
@@ -627,6 +706,14 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear }: 
           loading={kitsLoading}
           icon={Settings}
           placeholder="Оберіть комплектацію"
+        />
+        <SelectField
+          label="Сезонність"
+          value={season}
+          onChange={setSeason}
+          options={seasonOptions}
+          icon={Filter}
+          placeholder="Не важливо"
         />
       </div>
 

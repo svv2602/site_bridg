@@ -55,6 +55,7 @@ interface StoredSearchParams {
   make?: string;
   model?: string;
   year?: string;
+  kit?: string;
   timestamp?: number;
 }
 
@@ -104,6 +105,7 @@ export default function TyreSearchPage() {
         const params: StoredSearchParams = JSON.parse(stored);
         // Перевіряємо що дані свіжі (не старші 5 хвилин)
         if (params.timestamp && Date.now() - params.timestamp < 5 * 60 * 1000) {
+          console.log('[TyreSearchPage] Loaded params from sessionStorage:', params);
           setStoredParams(params);
           setMode(params.mode || 'size');
           if (params.mode === 'size') {
@@ -111,9 +113,9 @@ export default function TyreSearchPage() {
             if (params.aspectRatio) setAspectRatio(params.aspectRatio);
             if (params.diameter) setDiameter(params.diameter);
             if (params.season) setSeason(params.season);
-            // Очищаємо тільки для mode='size', для 'car' залишаємо для VehicleTyreSelector
-            sessionStorage.removeItem('tyreSearchParams');
           }
+          // Очищаємо sessionStorage - для 'car' дані передаються через props
+          sessionStorage.removeItem('tyreSearchParams');
         } else {
           sessionStorage.removeItem('tyreSearchParams');
         }
@@ -550,11 +552,17 @@ export default function TyreSearchPage() {
                     role="tabpanel"
                     aria-labelledby="car-search-tab"
                   >
-                    <VehicleTyreSelector
-                      initialMake={storedParams?.mode === 'car' ? storedParams.make : undefined}
-                      initialModel={storedParams?.mode === 'car' ? storedParams.model : undefined}
-                      initialYear={storedParams?.mode === 'car' ? storedParams.year : undefined}
-                    />
+                    {(() => {
+                      const props = {
+                        initialMake: storedParams?.mode === 'car' ? storedParams.make : undefined,
+                        initialModel: storedParams?.mode === 'car' ? storedParams.model : undefined,
+                        initialYear: storedParams?.mode === 'car' ? storedParams.year : undefined,
+                        initialKit: storedParams?.mode === 'car' ? storedParams.kit : undefined,
+                        initialSeason: storedParams?.mode === 'car' ? storedParams.season : undefined,
+                      };
+                      console.log('[TyreSearchPage] VehicleTyreSelector props:', props);
+                      return <VehicleTyreSelector {...props} />;
+                    })()}
                   </div>
                 )}
               </div>

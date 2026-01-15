@@ -187,10 +187,16 @@ export async function getKitFullInfo(kitId: number): Promise<VehicleInfo | null>
  * Знайти шини Bridgestone, що підходять до розмірів
  */
 export async function findMatchingBridgestoneTyres(
-  tyreSizes: GroupedTyreSizes
+  tyreSizes: GroupedTyreSizes,
+  season?: string
 ): Promise<MatchingTyre[]> {
   // Отримуємо всі шини з каталогу Bridgestone
-  const allTyres = await getTyreModels();
+  let allTyres = await getTyreModels();
+
+  // Фільтруємо по сезону якщо вказано
+  if (season) {
+    allTyres = allTyres.filter(tyre => tyre.season === season);
+  }
 
   // Збираємо унікальні розміри (OEM + tuning)
   const allSizes = [...tyreSizes.oem, ...tyreSizes.tuning];
@@ -234,7 +240,7 @@ export async function findMatchingBridgestoneTyres(
 /**
  * Повний пошук: інформація про авто + розміри + підходящі шини Bridgestone
  */
-export async function searchVehicleTyres(kitId: number): Promise<VehicleSearchResult | null> {
+export async function searchVehicleTyres(kitId: number, season?: string): Promise<VehicleSearchResult | null> {
   // Отримуємо інформацію про авто
   const vehicle = await getKitFullInfo(kitId);
   if (!vehicle) return null;
@@ -243,7 +249,7 @@ export async function searchVehicleTyres(kitId: number): Promise<VehicleSearchRe
   const tyreSizes = await getTyreSizes(kitId);
 
   // Знаходимо підходящі шини Bridgestone
-  const matchingTyres = await findMatchingBridgestoneTyres(tyreSizes);
+  const matchingTyres = await findMatchingBridgestoneTyres(tyreSizes, season);
 
   return {
     vehicle,
