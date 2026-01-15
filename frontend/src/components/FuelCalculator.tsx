@@ -194,7 +194,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
       )}
 
       {!savings && (
-        <div className="bg-muted/50 rounded-lg p-4 text-center text-muted-foreground">
+        <div className="rounded-lg bg-stone-200 p-4 text-center text-stone-700 dark:bg-stone-700 dark:text-stone-200">
           <p className="text-sm">
             Оберіть клас для порівняння, щоб побачити економію
           </p>
