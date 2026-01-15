@@ -21,9 +21,6 @@ import {
   MapPin,
   Database,
   Loader2,
-  Sun,
-  Snowflake,
-  Cloud,
 } from "lucide-react";
 import { VehicleTyreSelector } from "@/components/VehicleTyreSelector";
 import { TyreCard } from "@/components/TyreCard";
@@ -396,56 +393,21 @@ export default function TyreSearchPage() {
                     {/* Сезон (опційно) */}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-stone-100">
-                        Сезон <span className="text-stone-500">(опційно)</span>
+                        Сезонність <span className="text-stone-500">(опційно)</span>
                       </label>
-                      <div className="grid grid-cols-4 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setSeason("")}
-                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
-                            season === ""
-                              ? "border-primary bg-primary/20 text-white"
-                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
-                          }`}
+                      <div className="relative">
+                        <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                        <select
+                          className="w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary"
+                          value={season}
+                          onChange={(e) => setSeason(e.target.value)}
                         >
-                          Всі
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSeason("summer")}
-                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
-                            season === "summer"
-                              ? "border-amber-500 bg-amber-500/20 text-amber-400"
-                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
-                          }`}
-                        >
-                          <Sun className="h-4 w-4" />
-                          Літні
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSeason("winter")}
-                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
-                            season === "winter"
-                              ? "border-blue-500 bg-blue-500/20 text-blue-400"
-                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
-                          }`}
-                        >
-                          <Snowflake className="h-4 w-4" />
-                          Зимові
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSeason("allseason")}
-                          className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors ${
-                            season === "allseason"
-                              ? "border-teal-500 bg-teal-500/20 text-teal-400"
-                              : "border-stone-700 bg-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-300"
-                          }`}
-                        >
-                          <Cloud className="h-4 w-4" />
-                          Всесезон
-                        </button>
+                          <option value="">Не важливо</option>
+                          <option value="summer">Літні</option>
+                          <option value="winter">Зимові</option>
+                          <option value="allseason">Всесезонні</option>
+                        </select>
+                        <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
                       </div>
                     </div>
 
