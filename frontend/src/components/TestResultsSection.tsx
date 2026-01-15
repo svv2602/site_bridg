@@ -16,8 +16,8 @@ export function TestResultsSection({ results, tireName }: TestResultsSectionProp
     <section className="py-12 bg-gradient-to-b from-muted/30 to-background">
       <div className="container mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <FlaskConical className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/15">
+            <FlaskConical className="h-5 w-5 text-purple-500" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Результати незалежних тестів</h2>

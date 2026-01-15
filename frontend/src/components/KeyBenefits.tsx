@@ -22,8 +22,8 @@ export function KeyBenefits({
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-          <Star className="h-5 w-5 text-primary" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/15">
+          <Star className="h-5 w-5 text-purple-500" />
         </div>
         <h2 className="text-xl font-bold">{title}</h2>
       </div>

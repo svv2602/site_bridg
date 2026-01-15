@@ -5,10 +5,10 @@ import { Globe, Award, Shield, Users, Target, Zap, Phone } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
 
 const stats = [
-  { label: "Країн присутності", value: "150+", icon: Globe },
-  { label: "Років на ринку", value: "90+", icon: Award },
-  { label: "Дослідницьких центрів", value: "12", icon: Zap },
-  { label: "Сертифікатів якості", value: "ISO 9001", icon: Shield },
+  { label: "Країн присутності", value: "150+", icon: Globe, color: { bg: "bg-teal-500/15", text: "text-teal-500" } },
+  { label: "Років на ринку", value: "90+", icon: Award, color: { bg: "bg-yellow-500/15", text: "text-yellow-500" } },
+  { label: "Дослідницьких центрів", value: "12", icon: Zap, color: { bg: "bg-amber-500/15", text: "text-amber-500" } },
+  { label: "Сертифікатів якості", value: "ISO 9001", icon: Shield, color: { bg: "bg-emerald-500/15", text: "text-emerald-500" } },
 ];
 
 const values = [
@@ -16,21 +16,25 @@ const values = [
     icon: Shield,
     title: "Безпека",
     description: "Пріоритет номер один у кожній шині Bridgestone.",
+    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
   },
   {
     icon: Target,
     title: "Точність",
     description: "Інженерна точність та контроль якості на всіх етапах.",
+    color: { bg: "bg-orange-500/15", text: "text-orange-500" },
   },
   {
     icon: Users,
     title: "Клієнтоорієнтованість",
     description: "Розуміння потреб водіїв та пропозиція оптимальних рішень.",
+    color: { bg: "bg-pink-500/15", text: "text-pink-500" },
   },
   {
     icon: Globe,
     title: "Екологічність",
     description: "Інновації для зменшення впливу на довкілля.",
+    color: { bg: "bg-teal-500/15", text: "text-teal-500" },
   },
 ];
 
@@ -89,8 +93,8 @@ export default function AboutPage() {
                 
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
-                <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <stat.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+                <div className={`mb-4 inline-flex rounded-full ${stat.color.bg} p-3`}>
+                  <stat.icon className={`h-6 w-6 ${stat.color.text}`} aria-hidden="true" />
                 </div>
                 <div className="text-3xl font-bold text-secondary">{stat.value}</div>
                 <div className="mt-2 text-sm text-muted-foreground">{stat.label}</div>
@@ -113,8 +117,8 @@ export default function AboutPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="mt-1 rounded-full bg-primary/10 p-2">
-                    <Target className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <div className="mt-1 rounded-full bg-orange-500/15 p-2">
+                    <Target className="h-5 w-5 text-orange-500" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Інновації для безпеки</h4>
@@ -125,8 +129,8 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="mt-1 rounded-full bg-primary/10 p-2">
-                    <Globe className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <div className="mt-1 rounded-full bg-teal-500/15 p-2">
+                    <Globe className="h-5 w-5 text-teal-500" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Відповідальність перед планетою</h4>
@@ -144,10 +148,10 @@ export default function AboutPage() {
                 {values.map((value) => (
                   <div
                     key={value.title}
-                    className="rounded-xl border border-border bg-card p-5 transition-colors hover:bg-primary/5"
+                    className="rounded-xl border border-border bg-card p-5 transition-colors hover:bg-stone-100 dark:hover:bg-stone-800"
                   >
-                    <div className="mb-3 inline-flex rounded-full bg-primary/10 p-2">
-                      <value.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <div className={`mb-3 inline-flex rounded-full ${value.color.bg} p-2`}>
+                      <value.icon className={`h-5 w-5 ${value.color.text}`} aria-hidden="true" />
                     </div>
                     <h4 className="mb-2 font-semibold">{value.title}</h4>
                     <p className="text-sm text-muted-foreground">{value.description}</p>

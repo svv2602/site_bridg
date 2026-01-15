@@ -235,7 +235,7 @@ export default async function LcvTyresPage() {
                     <div className="mt-auto flex gap-2">
                       <Link
                         href={`/shyny/${model.slug}`}
-                        className="flex-1 rounded-full border border-primary bg-transparent py-2.5 text-sm font-semibold text-primary hover:bg-primary/10 text-center"
+                        className="flex-1 rounded-full border border-primary bg-transparent py-2.5 text-sm font-semibold text-primary hover:bg-stone-100 dark:hover:bg-stone-700 text-center"
                       >
                         Детальніше
                       </Link>

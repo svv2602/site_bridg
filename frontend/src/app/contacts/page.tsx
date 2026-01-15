@@ -14,6 +14,7 @@ const contactMethods = [
     subtitle: "Безкоштовно з усіх телефонів",
     action: "Зателефонувати",
     href: "tel:0800123456",
+    color: { bg: "bg-green-500/15", text: "text-green-500" },
   },
   {
     icon: Mail,
@@ -22,6 +23,7 @@ const contactMethods = [
     subtitle: "Відповідь протягом 24 годин",
     action: "Написати",
     href: "mailto:support@bridgestone.ua",
+    color: { bg: "bg-blue-500/15", text: "text-blue-500" },
   },
   {
     icon: MapPin,
@@ -30,6 +32,7 @@ const contactMethods = [
     subtitle: "Пн‑Пт 9:00–18:00",
     action: "Знайти дилера",
     href: "/dealers",
+    color: { bg: "bg-rose-500/15", text: "text-rose-500" },
   },
   {
     icon: Clock,
@@ -38,6 +41,7 @@ const contactMethods = [
     subtitle: "Сб‑Нд: вихідні",
     action: "Наші контакти",
     href: "#contact-form",
+    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
   },
 ];
 
@@ -156,8 +160,8 @@ export default function ContactsPage() {
                 
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg hover:border-primary/30"
               >
-                <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <method.icon className="h-6 w-6 text-primary" />
+                <div className={`mb-4 inline-flex rounded-full ${method.color.bg} p-3`}>
+                  <method.icon className={`h-6 w-6 ${method.color.text}`} />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold">{method.title}</h3>
                 <p className="mb-1 break-all text-xl font-bold text-secondary md:text-2xl">
@@ -378,7 +382,7 @@ export default function ContactsPage() {
                     </p>
                     <Link
                       href="/dealers"
-                      className="mt-4 inline-block rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-primary/10"
+                      className="mt-4 inline-block rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-stone-100 dark:hover:bg-stone-700"
                     >
                       Відкрити карту
                     </Link>

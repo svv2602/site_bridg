@@ -80,7 +80,7 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
       {/* Native share button for mobile */}
       <button
         onClick={handleNativeShare}
-        className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary lg:hidden"
+        className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary lg:hidden"
         aria-label="Поділитися статтею"
         type="button"
       >
@@ -95,7 +95,7 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`rounded-full p-2 text-muted-foreground transition-colors hover:bg-primary/10 ${link.color}`}
+            className={`rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 ${link.color}`}
             aria-label={`Поділитися в ${link.name}`}
           >
             <link.icon className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
         {/* Copy link button */}
         <button
           onClick={handleCopyLink}
-          className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+          className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary"
           aria-label={copied ? "Посилання скопійовано" : "Копіювати посилання"}
           type="button"
         >

@@ -517,7 +517,7 @@ export default function TyreSearchPage() {
                 </p>
                 <Link
                   href="/dealers"
-                  className="block w-full rounded-full border border-primary bg-transparent py-2.5 text-center text-sm font-semibold text-primary hover:bg-primary/10"
+                  className="block w-full rounded-full border border-primary bg-transparent py-2.5 text-center text-sm font-semibold text-primary hover:bg-stone-100 dark:hover:bg-stone-700"
                 >
                   Знайти дилера
                 </Link>

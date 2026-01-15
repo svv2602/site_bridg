@@ -106,8 +106,8 @@ export function CookiesBanner() {
       <div className="rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2">
-              <Cookie className="h-5 w-5 text-primary" />
+            <div className="rounded-full bg-amber-500/15 p-2">
+              <Cookie className="h-5 w-5 text-amber-500" />
             </div>
             <h3 className="text-lg font-semibold">Cookies</h3>
           </div>

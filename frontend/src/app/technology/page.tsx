@@ -30,21 +30,25 @@ const benefits = [
     icon: Shield,
     title: "Підвищена безпека",
     description: "Технології, що забезпечують стабільність на мокрій дорозі та зменшують гальмівний шлях.",
+    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
   },
   {
     icon: Zap,
     title: "Енергоефективність",
     description: "Зниження опору кочення для економії палива та зменшення викидів CO₂.",
+    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
   },
   {
     icon: Wind,
     title: "Комфорт водіння",
     description: "Інновації для зниження шуму та вібрацій, що покращують комфорт у салоні.",
+    color: { bg: "bg-sky-500/15", text: "text-sky-500" },
   },
   {
     icon: Droplets,
     title: "Довговічність",
     description: "Міцні матеріали та конструкції, що продовжують термін служби шини.",
+    color: { bg: "bg-blue-500/15", text: "text-blue-500" },
   },
 ];
 
@@ -145,8 +149,8 @@ export default async function TechnologyPage() {
                 key={benefit.title}
                 className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
-                <div className="mb-4 inline-flex rounded-full bg-primary/10 p-3">
-                  <benefit.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+                <div className={`mb-4 inline-flex rounded-full ${benefit.color.bg} p-3`}>
+                  <benefit.icon className={`h-6 w-6 ${benefit.color.text}`} aria-hidden="true" />
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground">{benefit.description}</p>
@@ -180,7 +184,7 @@ export default async function TechnologyPage() {
                     <div className="p-8">
                       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="rounded-full bg-primary/10 p-3">
+                          <div className="rounded-full bg-purple-500/15 p-3 text-purple-500">
                             {techIcons[tech.slug] || techIcons.default}
                           </div>
                           <div>
@@ -234,7 +238,7 @@ export default async function TechnologyPage() {
                             <div className="mt-6 text-center">
                               <Link
                                 href={`/passenger-tyres?technology=${tech.slug}`}
-                                className="rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-primary/10"
+                                className="rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-stone-100 dark:hover:bg-stone-700"
                               >
                                 Показати ще {tyres.length - 3} моделей
                               </Link>

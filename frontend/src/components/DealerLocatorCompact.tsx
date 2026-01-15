@@ -12,8 +12,8 @@ interface DealerLocatorCompactProps {
 function DealerCardCompact({ dealer }: { dealer: Dealer }) {
   return (
     <div className="flex items-center gap-4 rounded-xl border border-stone-200 dark:border-stone-700 bg-card p-4 transition-colors hover:border-primary/30">
-      <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
-        <MapPin className="h-5 w-5 text-primary" />
+      <div className="flex-shrink-0 rounded-full bg-rose-500/15 p-2">
+        <MapPin className="h-5 w-5 text-rose-500" />
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-semibold text-sm truncate">{dealer.name}</h4>
