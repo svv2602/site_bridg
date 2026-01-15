@@ -155,18 +155,12 @@ export default function DealersPage() {
                 {/* Service image at top - hidden on mobile */}
                 <div className="relative hidden min-h-[180px] flex-1 lg:block">
                   <Image
-                    src="/images/hero/hero-lcv.jpg"
-                    alt="Шинний сервіс Bridgestone"
+                    src="/images/hero/hero-dealer-service.jpg"
+                    alt="Професійний шиномонтаж Bridgestone"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 0vw, 66vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 p-4">
-                    <p className="text-sm font-medium text-white">
-                      Професійний шиномонтаж та сервіс у офіційних дилерів
-                    </p>
-                  </div>
                 </div>
                 {/* Search form */}
                 <div className="p-6">
