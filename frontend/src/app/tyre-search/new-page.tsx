@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { FormEvent, useState, useEffect, useRef, useCallback } from "react";
 
 import {
@@ -46,11 +45,21 @@ interface SizeOption {
   count: number;
 }
 
+// Тип даних з sessionStorage
+interface StoredSearchParams {
+  mode: 'size' | 'car';
+  width?: string;
+  aspectRatio?: string;
+  diameter?: string;
+  season?: string;
+  make?: string;
+  model?: string;
+  year?: string;
+  timestamp?: number;
+}
+
 export default function TyreSearchPage() {
-  const searchParams = useSearchParams();
-  // Support both "mode" and "tab" params for backwards compatibility
-  const initialMode = (searchParams.get("mode") || searchParams.get("tab")) === "car" ? "car" : "size";
-  const [mode, setMode] = useState<SearchMode>(initialMode);
+  const [mode, setMode] = useState<SearchMode>("size");
   const [width, setWidth] = useState("");
   const [aspectRatio, setAspectRatio] = useState("");
   const [diameter, setDiameter] = useState("");
@@ -62,6 +71,7 @@ export default function TyreSearchPage() {
   const [searchedSeason, setSearchedSeason] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Brand[]>(["bridgestone", "firestone"]);
   const [initialSearchDone, setInitialSearchDone] = useState(false);
+  const [storedParams, setStoredParams] = useState<StoredSearchParams | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Filter results by selected brands
@@ -78,22 +88,31 @@ export default function TyreSearchPage() {
     });
   }
 
-  // Синхронізація mode та параметрів форми з URL
+  // Читання параметрів з sessionStorage при монтуванні
   useEffect(() => {
-    const urlMode = (searchParams.get("mode") || searchParams.get("tab")) === "car" ? "car" : "size";
-    setMode(urlMode);
-
-    // Read size params from URL
-    const urlWidth = searchParams.get("width");
-    const urlAspectRatio = searchParams.get("aspectRatio");
-    const urlDiameter = searchParams.get("diameter");
-    const urlSeason = searchParams.get("season");
-
-    if (urlWidth) setWidth(urlWidth);
-    if (urlAspectRatio) setAspectRatio(urlAspectRatio);
-    if (urlDiameter) setDiameter(urlDiameter);
-    if (urlSeason) setSeason(urlSeason);
-  }, [searchParams]);
+    const stored = sessionStorage.getItem('tyreSearchParams');
+    if (stored) {
+      try {
+        const params: StoredSearchParams = JSON.parse(stored);
+        // Перевіряємо що дані свіжі (не старші 5 хвилин)
+        if (params.timestamp && Date.now() - params.timestamp < 5 * 60 * 1000) {
+          setStoredParams(params);
+          setMode(params.mode || 'size');
+          if (params.mode === 'size') {
+            if (params.width) setWidth(params.width);
+            if (params.aspectRatio) setAspectRatio(params.aspectRatio);
+            if (params.diameter) setDiameter(params.diameter);
+            if (params.season) setSeason(params.season);
+          }
+        }
+        // Очищаємо після читання
+        sessionStorage.removeItem('tyreSearchParams');
+      } catch (e) {
+        console.error('Error parsing stored search params:', e);
+        sessionStorage.removeItem('tyreSearchParams');
+      }
+    }
+  }, []);
 
   // Динамічні опції з бази даних
   const [widthOptions, setWidthOptions] = useState<SizeOption[]>([]);
@@ -179,22 +198,19 @@ export default function TyreSearchPage() {
     }
   }, [width, aspectRatio, diameter, season]);
 
-  // Авто-пошук при завантаженні сторінки з URL параметрами
+  // Авто-пошук при завантаженні сторінки з sessionStorage параметрами
   useEffect(() => {
     if (initialSearchDone) return;
     if (loadingWidths || loadingAspects || loadingDiameters) return;
+    if (!storedParams || storedParams.mode !== 'size') return;
 
-    const urlWidth = searchParams.get("width");
-    const urlAspectRatio = searchParams.get("aspectRatio");
-    const urlDiameter = searchParams.get("diameter");
-
-    // Перевіряємо що є всі параметри в URL
-    if (!urlWidth || !urlAspectRatio || !urlDiameter) return;
+    // Перевіряємо що є всі параметри
+    if (!storedParams.width || !storedParams.aspectRatio || !storedParams.diameter) return;
 
     // Перевіряємо що опції завантажені і містять потрібні значення
-    const hasWidth = widthOptions.some(o => o.value === parseInt(urlWidth));
-    const hasAspect = aspectOptions.some(o => o.value === parseInt(urlAspectRatio));
-    const hasDiameter = diameterOptions.some(o => o.value === parseInt(urlDiameter));
+    const hasWidth = widthOptions.some(o => o.value === parseInt(storedParams.width!));
+    const hasAspect = aspectOptions.some(o => o.value === parseInt(storedParams.aspectRatio!));
+    const hasDiameter = diameterOptions.some(o => o.value === parseInt(storedParams.diameter!));
 
     if (hasWidth && hasAspect && hasDiameter && width && aspectRatio && diameter) {
       setInitialSearchDone(true);
@@ -203,7 +219,7 @@ export default function TyreSearchPage() {
         performSearch();
       }, 0);
     }
-  }, [width, aspectRatio, diameter, widthOptions, aspectOptions, diameterOptions, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, searchParams, performSearch]);
+  }, [width, aspectRatio, diameter, widthOptions, aspectOptions, diameterOptions, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, storedParams, performSearch]);
 
   async function handleSizeSearch(e: FormEvent) {
     e.preventDefault();

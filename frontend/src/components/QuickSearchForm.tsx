@@ -185,26 +185,35 @@ export function QuickSearchForm() {
   const handleSizeSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    const params = new URLSearchParams();
-    if (width) params.set('width', width);
-    if (aspectRatio) params.set('aspectRatio', aspectRatio);
-    if (diameter) params.set('diameter', diameter);
-    if (season) params.set('season', season);
-    router.push(`/tyre-search?${params.toString()}`);
+    // Зберігаємо параметри в sessionStorage замість URL
+    const searchData = {
+      mode: 'size',
+      width,
+      aspectRatio,
+      diameter,
+      season,
+      timestamp: Date.now(),
+    };
+    sessionStorage.setItem('tyreSearchParams', JSON.stringify(searchData));
+    router.push('/tyre-search');
   };
 
   const handleCarSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    const params = new URLSearchParams();
     const selectedBrand = brands.find(b => b.id === parseInt(brandId));
     const selectedModel = models.find(m => m.id === parseInt(modelId));
-    if (selectedBrand) params.set('make', selectedBrand.name);
-    if (selectedModel) params.set('model', selectedModel.name);
-    if (year) params.set('year', year);
-    if (carSeason) params.set('season', carSeason);
-    params.set('tab', 'car');
-    router.push(`/tyre-search?${params.toString()}`);
+    // Зберігаємо параметри в sessionStorage замість URL
+    const searchData = {
+      mode: 'car',
+      make: selectedBrand?.name || '',
+      model: selectedModel?.name || '',
+      year,
+      season: carSeason,
+      timestamp: Date.now(),
+    };
+    sessionStorage.setItem('tyreSearchParams', JSON.stringify(searchData));
+    router.push('/tyre-search');
   };
 
   const handleTabKeyDown = (e: React.KeyboardEvent) => {
