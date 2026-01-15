@@ -78,7 +78,7 @@ export const featureIconColors = {
   star: { bg: "bg-purple-500/15", text: "text-purple-500" },
   mountain: { bg: "bg-orange-500/15", text: "text-orange-500" },
   thermometer: { bg: "bg-red-500/15", text: "text-red-500" },
-  weight: { bg: "bg-slate-500/15", text: "text-slate-500" },
+  weight: { bg: "bg-stone-500/15", text: "text-stone-500" },
   gauge: { bg: "bg-cyan-500/15", text: "text-cyan-500" },
   truck: { bg: "bg-indigo-500/15", text: "text-indigo-500" },
   globe: { bg: "bg-teal-500/15", text: "text-teal-500" },
