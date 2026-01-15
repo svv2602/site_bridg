@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, useRef } from "react";
 
 import {
   type Season,
@@ -62,6 +62,7 @@ export default function TyreSearchPage() {
   const [searchedSeason, setSearchedSeason] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Brand[]>(["bridgestone", "firestone"]);
   const [initialSearchDone, setInitialSearchDone] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Filter results by selected brands
   const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
@@ -185,6 +186,10 @@ export default function TyreSearchPage() {
     } finally {
       setSearching(false);
       setHasSearched(true);
+      // Scroll to results after DOM updates
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
   }
 
@@ -431,6 +436,7 @@ export default function TyreSearchPage() {
                     {/* Результати пошуку за розміром - відразу після форми */}
                     {hasSearched && (
                       <div
+                        ref={resultsRef}
                         className="mt-8 border-t border-stone-700 pt-6"
                         aria-live="polite"
                         aria-atomic="true"
