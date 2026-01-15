@@ -68,7 +68,7 @@ export const tyresMenuData: MegaMenuData = {
           label: 'Комерційні',
           href: '/lcv-tyres',
           icon: Truck,
-          iconColor: 'text-slate-400',
+          iconColor: 'text-stone-400',
           description: 'Вантажні та мікроавтобуси',
         },
       ],
