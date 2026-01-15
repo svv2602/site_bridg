@@ -146,7 +146,7 @@ export default function DealersPage() {
       </section>
 
       {/* Search & Filters */}
-      <section className="py-8">
+      <section className="pt-8 pb-4">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -230,9 +230,9 @@ export default function DealersPage() {
       </section>
 
       {/* Dealers List */}
-      <section className="py-8">
+      <section className="pb-8">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-8 text-3xl font-bold">Список дилерів</h2>
+          <h2 className="mb-4 text-2xl font-bold">Результати пошуку</h2>
 
           {error ? (
             <ErrorState
