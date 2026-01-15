@@ -24,8 +24,8 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
     <section className="py-12">
       <div className="container mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <HelpCircle className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/15">
+            <HelpCircle className="h-5 w-5 text-blue-500" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Часті запитання</h2>
