@@ -48,6 +48,17 @@ export async function generateMetadata({
       model.seoDescription ||
       model.shortDescription ||
       `Детальна інформація про шини ${model.name} Bridgestone: доступні розміри, індекси навантаження та швидкості, рекомендовані умови використання.`,
+    alternates: {
+      canonical: `/shyny/${slug}`,
+    },
+    openGraph: {
+      title: model.seoTitle || buildTitle(model),
+      description: model.shortDescription || `Шини ${model.name} від Bridgestone`,
+      type: 'website',
+      locale: 'uk_UA',
+      siteName: 'Bridgestone Україна',
+      images: model.imageUrl ? [{ url: model.imageUrl, alt: model.name }] : undefined,
+    },
   };
 }
 

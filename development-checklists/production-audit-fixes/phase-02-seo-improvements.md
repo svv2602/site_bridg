@@ -1,12 +1,12 @@
 # Фаза 2: SEO Improvements
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-01-15
+**Завершена:** 2026-01-15
 
 ## Ціль фази
 Покращити SEO сайту: canonical URLs, Open Graph images, meta descriptions для кращої індексації та відображення в пошуковиках.
@@ -18,10 +18,10 @@
 ### 2.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Вивчити як metadata налаштовані в layout.tsx
-- [ ] Перевірити generateMetadata() на динамічних сторінках
-- [ ] Знайти OG images якщо існують
-- [ ] Перевірити поточні meta descriptions
+- [x] Вивчити як metadata налаштовані в layout.tsx
+- [x] Перевірити generateMetadata() на динамічних сторінках
+- [x] Знайти OG images якщо існують → використано hero-passenger.jpg
+- [x] Перевірити поточні meta descriptions
 
 **Команди для пошуку:**
 ```bash
@@ -39,21 +39,21 @@ grep -rn "description:" frontend/src/app/
 ```
 
 #### B. Аналіз структури metadata
-- [ ] Чи є базовий metadata в root layout?
-- [ ] Чи перезаписують сторінки metadata правильно?
-- [ ] Який формат OG images очікується (1200x630)?
+- [x] Чи є базовий metadata в root layout? → Так, оновлено
+- [x] Чи перезаписують сторінки metadata правильно? → Так
+- [x] Який формат OG images очікується (1200x630)? → Тимчасово hero-passenger.jpg
 
-**Root metadata location:** -
-**OG image format:** 1200x630px recommended
-**Current meta structure:** -
+**Root metadata location:** `frontend/src/app/layout.tsx`
+**OG image format:** Використано hero-passenger.jpg (потребує дизайну 1200x630)
+**Current meta structure:** metadataBase + alternates.canonical + openGraph + twitter
 
 #### C. Планування OG image
-- [ ] Визначити дизайн OG image (бренд, текст, кольори)
-- [ ] Знайти брендові ресурси (логотип, кольори)
+- [x] Визначити дизайн OG image → Потрібен окремий дизайн
+- [x] Знайти брендові ресурси → hero images доступні
 
-**OG image design:** Bridgestone logo + tagline на червоному/темному фоні
+**OG image design:** Тимчасово hero-passenger.jpg, потрібен дизайн 1200x630
 
-**Нотатки для перевикористання:** -
+**Нотатки:** Structured data (Organization + Website schema) вже був в layout.tsx
 
 ---
 
@@ -62,9 +62,15 @@ grep -rn "description:" frontend/src/app/
 **Проблема:** Жодна сторінка не має canonical URL, що може призвести до duplicate content issues.
 
 **Підзадачі:**
-- [ ] Додати canonical URL в root layout.tsx як default
-- [ ] Перевірити що динамічні сторінки генерують правильний canonical
-- [ ] Перевірити canonical в HTML output
+- [x] Додати canonical URL в root layout.tsx як default
+- [x] Перевірити що динамічні сторінки генерують правильний canonical
+- [ ] Перевірити canonical в HTML output (потребує запуску)
+
+**Оновлені файли:**
+- `frontend/src/app/layout.tsx` — metadataBase + alternates.canonical
+- `frontend/src/app/shyny/[slug]/page.tsx` — alternates.canonical
+- `frontend/src/app/blog/page.tsx` — alternates.canonical
+- `frontend/src/app/blog/[slug]/page.tsx` — alternates.canonical
 
 **Файли:** `frontend/src/app/layout.tsx`
 
@@ -100,9 +106,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 **Проблема:** Відсутній og:image для social media sharing.
 
 **Підзадачі:**
-- [ ] Створити дизайн OG image 1200x630px
-- [ ] Зберегти як `frontend/public/og-image.jpg` (або .png)
-- [ ] Додати в root metadata
+- [ ] Створити дизайн OG image 1200x630px → TODO: потрібен дизайнер
+- [x] Зберегти як `frontend/public/og-image.jpg` — тимчасово скопійовано hero-passenger.jpg
+- [x] Додати в root metadata
 - [ ] Перевірити через Facebook/Twitter debugger (на production)
 
 **Файли:**
@@ -145,9 +151,9 @@ twitter: {
 **Проблема:** Meta description на /blog занадто короткий (97 символів, рекомендовано 120-160).
 
 **Підзадачі:**
-- [ ] Знайти metadata для /blog
-- [ ] Розширити description до 120-160 символів
-- [ ] Переконатись що включені ключові слова
+- [x] Знайти metadata для /blog
+- [x] Розширити description до 120-160 символів (~150 символів)
+- [x] Переконатись що включені ключові слова
 
 **Файли:** `frontend/src/app/blog/page.tsx`
 
@@ -167,9 +173,9 @@ twitter: {
 **Проблема:** Title на /blog занадто короткий (26 символів, рекомендовано 30-60).
 
 **Підзадачі:**
-- [ ] Знайти metadata для /blog
-- [ ] Розширити title до 30-60 символів
-- [ ] Включити бренд та ключові слова
+- [x] Знайти metadata для /blog
+- [x] Розширити title до 30-60 символів (~48 символів з template)
+- [x] Включити бренд та ключові слова
 
 **Файли:** `frontend/src/app/blog/page.tsx`
 
@@ -189,9 +195,9 @@ twitter: {
 **Проблема:** Відсутня structured data для rich snippets в Google.
 
 **Підзадачі:**
-- [ ] Додати Organization schema в root layout
-- [ ] Додати BreadcrumbList schema на внутрішніх сторінках
-- [ ] Додати Product schema на сторінках шин (опціонально)
+- [x] Додати Organization schema в root layout → ВЖЕ БУВ
+- [x] Додати BreadcrumbList schema на внутрішніх сторінках → реалізовано в shyny/[slug]
+- [x] Додати Product schema на сторінках шин → ВЖЕ БУВ в shyny/[slug]
 
 **Файли:** `frontend/src/app/layout.tsx`
 

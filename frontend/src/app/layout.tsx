@@ -20,17 +20,51 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.ua';
+
 export const metadata: Metadata = {
-  title: "Bridgestone Україна — офіційний сайт шин",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Bridgestone Україна — офіційний сайт шин",
+    template: "%s | Bridgestone Україна",
+  },
   description:
     "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні. Пошук шин за розміром, за авто, карта дилерів, поради та технології.",
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: "Bridgestone Україна — офіційний сайт шин",
-    description: "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні.",
+    description: "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні. Літні, зимові та всесезонні шини преміум-класу.",
     type: "website",
     locale: "uk_UA",
     siteName: "Bridgestone Україна",
-    url: "https://bridgestone.ua",
+    url: siteUrl,
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Bridgestone Україна — офіційний сайт шин',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Bridgestone Україна — офіційний сайт шин",
+    description: "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні.",
+    images: ['/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

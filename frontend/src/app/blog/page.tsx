@@ -5,11 +5,14 @@ import { getArticlesPaginated, getArticleTags } from "@/lib/api/articles";
 import { Breadcrumb, Pagination } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "Блог — Bridgestone Україна",
-  description: "Статті, поради, огляди та новини про шини Bridgestone. Корисна інформація для українських водіїв.",
+  title: "Блог про шини та автомобілі",
+  description: "Блог Bridgestone Україна: поради з вибору шин, огляди новинок, сезонні рекомендації, безпека на дорозі та експертні статті про автомобільні шини.",
+  alternates: {
+    canonical: '/blog',
+  },
   openGraph: {
-    title: "Блог — Bridgestone Україна",
-    description: "Статті, поради, огляди та новини про шини Bridgestone. Корисна інформація для українських водіїв.",
+    title: "Блог про шини та автомобілі | Bridgestone Україна",
+    description: "Поради з вибору шин, огляди новинок, сезонні рекомендації та експертні статті про автомобільні шини від Bridgestone.",
     type: "website",
     locale: "uk_UA",
     siteName: "Bridgestone Україна",

@@ -36,13 +36,29 @@ export async function generateMetadata(
     // @ts-expect-error: seoTitle/seoDescription закладені в CMS‑моделі, але відсутні в мок‑даних
     article.seoTitle ?? `${article.title} — Блог Bridgestone Україна`;
 
+  const description =
+    // @ts-expect-error: seoDescription закладене в CMS‑моделі, але відсутнє в мок‑даних
+    article.seoDescription ??
+    article.previewText ??
+    "Корисні статті про шини Bridgestone в Україні.";
+
   return {
     title,
-    description:
-      // @ts-expect-error: seoDescription закладене в CMS‑моделі, але відсутнє в мок‑даних
-      article.seoDescription ??
-      article.previewText ??
-      "Корисні статті про шини Bridgestone в Україні.",
+    description,
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      locale: 'uk_UA',
+      siteName: 'Bridgestone Україна',
+      publishedTime: article.createdAt,
+      modifiedTime: article.updatedAt,
+      // @ts-expect-error: featuredImage може бути в CMS-моделі
+      images: article.featuredImage ? [{ url: article.featuredImage, alt: article.title }] : undefined,
+    },
   };
 }
 
