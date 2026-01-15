@@ -66,8 +66,8 @@ function DealerInfoContent({ dealer }: { dealer: Dealer }) {
               : "Сервісний центр"}
         </span>
       </div>
-      <h3 className="font-bold text-gray-900">{dealer.name}</h3>
-      <div className="mt-2 space-y-1 text-sm text-gray-600">
+      <h3 className="font-bold text-stone-900">{dealer.name}</h3>
+      <div className="mt-2 space-y-1 text-sm text-stone-600">
         <div className="flex items-center gap-1">
           <MapPin className="h-3 w-3" />
           <span>{dealer.city}, {dealer.address}</span>
