@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Ruler, Car, Filter, ChevronRight } from 'lucide-react';
 
 type SearchTab = 'size' | 'car';
 
@@ -214,17 +214,24 @@ export function QuickSearchForm() {
     }
   };
 
+  // Styles matching tyre-search page (always dark)
+  const cardClass = "rounded-2xl border border-stone-800 bg-stone-900/95 p-6 text-stone-50 shadow-[0_18px_40px_rgba(0,0,0,0.45)]";
+  const labelClass = "mb-2 block text-sm font-medium text-stone-100";
+  const inputClass = "w-full appearance-none rounded-xl border border-stone-700 bg-stone-900 py-3 pl-10 pr-8 text-sm text-stone-50 outline-none focus:border-primary";
+  const buttonClass = "w-full rounded-full bg-white py-3 text-base font-semibold text-stone-900 shadow-lg hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2";
+  const loadingClass = "flex h-12 w-full items-center justify-center rounded-xl border border-stone-700 bg-stone-900";
+
   return (
-    <div className="hero-card p-6">
-      <h2 className="text-xl font-semibold text-hero-foreground">Знайдіть ідеальні шини</h2>
-      <p className="mt-1 text-sm text-hero-muted">
+    <div className={cardClass}>
+      <h2 className="text-xl font-semibold text-stone-50">Знайдіть ідеальні шини</h2>
+      <p className="mt-1 text-sm text-stone-400">
         За розміром на боковині шини або за маркою вашого авто
       </p>
 
       <div
         role="tablist"
         aria-label="Спосіб пошуку шин"
-        className="mt-4 flex rounded-full bg-hero-accent p-1 text-sm font-medium"
+        className="mt-4 inline-flex rounded-full bg-stone-800 p-1 ring-1 ring-stone-700"
       >
         <button
           type="button"
@@ -233,14 +240,15 @@ export function QuickSearchForm() {
           tabIndex={activeTab === 'size' ? 0 : -1}
           aria-selected={activeTab === 'size'}
           aria-controls="size-panel"
-          className={`flex-1 rounded-full px-4 py-2 transition-colors ${
+          className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
             activeTab === 'size'
-              ? 'bg-white text-stone-900'
-              : 'text-hero-muted hover:text-hero-foreground'
+              ? 'bg-stone-50 text-stone-900'
+              : 'text-stone-300 hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('size')}
           onKeyDown={handleTabKeyDown}
         >
+          <Ruler className="h-4 w-4" aria-hidden="true" />
           За розміром
         </button>
         <button
@@ -250,14 +258,15 @@ export function QuickSearchForm() {
           tabIndex={activeTab === 'car' ? 0 : -1}
           aria-selected={activeTab === 'car'}
           aria-controls="car-panel"
-          className={`flex-1 rounded-full px-4 py-2 transition-colors ${
+          className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
             activeTab === 'car'
-              ? 'bg-white text-stone-900'
-              : 'text-hero-muted hover:text-hero-foreground'
+              ? 'bg-stone-50 text-stone-900'
+              : 'text-stone-300 hover:text-stone-50'
           }`}
           onClick={() => setActiveTab('car')}
           onKeyDown={handleTabKeyDown}
         >
+          <Car className="h-4 w-4" aria-hidden="true" />
           За авто
         </button>
       </div>
@@ -270,75 +279,108 @@ export function QuickSearchForm() {
           className="mt-6 space-y-4"
           onSubmit={handleSizeSearch}
         >
-          <p className="mb-2 text-xs text-hero-muted">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
+          <p className="mb-4 text-xs text-stone-400">Наприклад: 205/55 R16 — знайдіть на боковині шини</p>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Ширина</label>
-              <select
-                value={width}
-                onChange={(e) => {
-                  setWidth(e.target.value);
-                  setAspectRatio('');
-                  setDiameter('');
-                }}
-                disabled={loadingWidths}
-                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="">{loadingWidths ? 'Завантаження...' : '205'}</option>
-                {widths.map((w) => (
-                  <option key={w.value} value={w.value}>{w.value}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Ширина</label>
+              <div className="relative">
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                {loadingWidths ? (
+                  <div className={loadingClass}>
+                    <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                  </div>
+                ) : (
+                  <select
+                    value={width}
+                    onChange={(e) => {
+                      setWidth(e.target.value);
+                      setAspectRatio('');
+                      setDiameter('');
+                    }}
+                    className={inputClass}
+                  >
+                    <option value="">Ширина</option>
+                    {widths.map((w) => (
+                      <option key={w.value} value={w.value}>{w.value}</option>
+                    ))}
+                  </select>
+                )}
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Профіль</label>
-              <select
-                value={aspectRatio}
-                onChange={(e) => {
-                  setAspectRatio(e.target.value);
-                  setDiameter('');
-                }}
-                disabled={!width || loadingHeights}
-                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="">{loadingHeights ? 'Завантаження...' : '55'}</option>
-                {heights.map((h) => (
-                  <option key={h.value} value={h.value}>{h.value}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Профіль</label>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                {loadingHeights ? (
+                  <div className={loadingClass}>
+                    <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                  </div>
+                ) : (
+                  <select
+                    value={aspectRatio}
+                    onChange={(e) => {
+                      setAspectRatio(e.target.value);
+                      setDiameter('');
+                    }}
+                    disabled={!width}
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    <option value="">Профіль</option>
+                    {heights.map((h) => (
+                      <option key={h.value} value={h.value}>{h.value}</option>
+                    ))}
+                  </select>
+                )}
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Діаметр</label>
-              <select
-                value={diameter}
-                onChange={(e) => setDiameter(e.target.value)}
-                disabled={!aspectRatio || loadingDiameters}
-                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="">{loadingDiameters ? 'Завантаження...' : 'R16'}</option>
-                {diameters.map((d) => (
-                  <option key={d.value} value={d.value}>R{d.value}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Діаметр</label>
+              <div className="relative">
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                {loadingDiameters ? (
+                  <div className={loadingClass}>
+                    <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                  </div>
+                ) : (
+                  <select
+                    value={diameter}
+                    onChange={(e) => setDiameter(e.target.value)}
+                    disabled={!aspectRatio}
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    <option value="">Діаметр</option>
+                    {diameters.map((d) => (
+                      <option key={d.value} value={d.value}>R{d.value}</option>
+                    ))}
+                  </select>
+                )}
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              </div>
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-hero-muted">Сезонність</label>
-            <select
-              value={season}
-              onChange={(e) => setSeason(e.target.value)}
-              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-            >
-              <option value="">Не важливо</option>
-              <option value="summer">Літні</option>
-              <option value="winter">Зимові</option>
-              <option value="all-season">Всесезонні</option>
-            </select>
+            <label className={labelClass}>Сезонність</label>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <select
+                value={season}
+                onChange={(e) => setSeason(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">Не важливо</option>
+                <option value="summer">Літні</option>
+                <option value="winter">Зимові</option>
+                <option value="all-season">Всесезонні</option>
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+            </div>
           </div>
           <button
             type="submit"
             disabled={isSearching}
-            className="hero-btn-primary mt-2 w-full flex items-center justify-center gap-2"
+            className={buttonClass}
           >
             {isSearching ? (
               <>
@@ -359,73 +401,106 @@ export function QuickSearchForm() {
           onSubmit={handleCarSearch}
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-hero-muted">Марка авто</label>
-            <select
-              value={brandId}
-              onChange={(e) => {
-                setBrandId(e.target.value);
-                setModelId('');
-                setYear('');
-              }}
-              disabled={loadingBrands}
-              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-            >
-              <option value="">{loadingBrands ? 'Завантаження...' : 'Оберіть марку'}</option>
-              {brands.map((brand) => (
-                <option key={brand.id} value={brand.id}>{brand.name}</option>
-              ))}
-            </select>
+            <label className={labelClass}>Марка авто</label>
+            <div className="relative">
+              <Car className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              {loadingBrands ? (
+                <div className={loadingClass}>
+                  <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                </div>
+              ) : (
+                <select
+                  value={brandId}
+                  onChange={(e) => {
+                    setBrandId(e.target.value);
+                    setModelId('');
+                    setYear('');
+                  }}
+                  className={inputClass}
+                >
+                  <option value="">Оберіть марку</option>
+                  {brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>{brand.name}</option>
+                  ))}
+                </select>
+              )}
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Модель</label>
-              <select
-                value={modelId}
-                onChange={(e) => {
-                  setModelId(e.target.value);
-                  setYear('');
-                }}
-                disabled={!brandId || loadingModels}
-                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="">{loadingModels ? 'Завантаження...' : 'Оберіть модель'}</option>
-                {models.map((model) => (
-                  <option key={model.id} value={model.id}>{model.name}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Модель</label>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                {loadingModels ? (
+                  <div className={loadingClass}>
+                    <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                  </div>
+                ) : (
+                  <select
+                    value={modelId}
+                    onChange={(e) => {
+                      setModelId(e.target.value);
+                      setYear('');
+                    }}
+                    disabled={!brandId}
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    <option value="">Модель</option>
+                    {models.map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
+                  </select>
+                )}
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-hero-muted">Рік випуску</label>
-              <select
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                disabled={!modelId || loadingYears}
-                className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="">{loadingYears ? 'Завантаження...' : 'Рік'}</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Рік</label>
+              <div className="relative">
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                {loadingYears ? (
+                  <div className={loadingClass}>
+                    <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
+                  </div>
+                ) : (
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    disabled={!modelId}
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+                  >
+                    <option value="">Рік</option>
+                    {years.map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                )}
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              </div>
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-hero-muted">Тип шини</label>
-            <select
-              value={carSeason}
-              onChange={(e) => setCarSeason(e.target.value)}
-              className="hero-input w-full rounded-xl px-3 py-2 text-sm"
-            >
-              <option value="">Не важливо</option>
-              <option value="summer">Літня</option>
-              <option value="winter">Зимова</option>
-              <option value="all-season">Всесезонна</option>
-            </select>
+            <label className={labelClass}>Тип шини</label>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <select
+                value={carSeason}
+                onChange={(e) => setCarSeason(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">Не важливо</option>
+                <option value="summer">Літня</option>
+                <option value="winter">Зимова</option>
+                <option value="all-season">Всесезонна</option>
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+            </div>
           </div>
           <button
             type="submit"
             disabled={isSearching}
-            className="hero-btn-primary mt-2 w-full flex items-center justify-center gap-2"
+            className={buttonClass}
           >
             {isSearching ? (
               <>
