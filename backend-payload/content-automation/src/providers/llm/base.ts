@@ -82,17 +82,61 @@ Respond with valid JSON only. No explanations or markdown.`;
 
     try {
       // Try to extract JSON from response
-      const jsonMatch = response.content.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        throw new Error("No JSON found in response");
+      const content = response.content.trim();
+
+      // First, try to parse the entire content as JSON
+      try {
+        const data = JSON.parse(content) as T;
+        return { data, response };
+      } catch {
+        // Not valid JSON, try to extract
       }
 
-      const data = JSON.parse(jsonMatch[0]) as T;
-      return { data, response };
+      // Try to find a JSON array first
+      const arrayMatch = content.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        try {
+          const data = JSON.parse(arrayMatch[0]) as T;
+          return { data, response };
+        } catch {
+          // Array match wasn't valid JSON
+        }
+      }
+
+      // Try to find a single JSON object
+      const objectMatch = content.match(/\{[\s\S]*?\}/);
+      if (objectMatch) {
+        try {
+          const data = JSON.parse(objectMatch[0]) as T;
+          return { data, response };
+        } catch {
+          // Single object match wasn't valid JSON
+        }
+      }
+
+      // Try to extract multiple JSON objects and combine into array
+      // This handles cases where LLM returns separate objects instead of an array
+      const objects: unknown[] = [];
+      const objectRegex = /\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g;
+      let match;
+      while ((match = objectRegex.exec(content)) !== null) {
+        try {
+          objects.push(JSON.parse(match[0]));
+        } catch {
+          // Skip invalid objects
+        }
+      }
+
+      if (objects.length > 0) {
+        logger.info(`Extracted ${objects.length} separate JSON objects from response`);
+        return { data: objects as T, response };
+      }
+
+      throw new Error("No valid JSON found in response");
     } catch (error) {
       logger.error(`Failed to parse JSON response from ${this.name}`, {
         error: error instanceof Error ? error.message : String(error),
-        content: response.content.slice(0, 200),
+        content: response.content.slice(0, 500),
       });
       throw new Error(`Failed to parse JSON: ${error}`);
     }
