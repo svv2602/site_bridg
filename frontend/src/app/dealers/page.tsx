@@ -211,8 +211,8 @@ export default function DealersPage() {
               </div>
             </div>
 
-            {/* Interactive Map */}
-            <div className="rounded-2xl border border-border bg-card p-6">
+            {/* Interactive Map - hidden on mobile to show results immediately */}
+            <div className="hidden rounded-2xl border border-border bg-card p-6 lg:block">
               <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
                 <MapPin className="h-5 w-5 text-primary" />
                 Інтерактивна карта
