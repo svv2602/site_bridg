@@ -43,6 +43,9 @@ services:
     volumes:
       - ./backend-payload/media:/app/media
       - ./backend-payload/db_size_auto:/app/db_size_auto:ro
+      - ./backend-payload/logs:/app/logs
+      - ./backend-payload/data:/app/data
+      - ./backend-payload/content-automation/data:/app/content-automation/data
     ports:
       - "3001:3001"
     depends_on:
