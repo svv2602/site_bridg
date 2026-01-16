@@ -167,8 +167,9 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
-    // Skip image optimization for localhost in development
-    unoptimized: process.env.NODE_ENV === 'development',
+    // Skip image optimization in Docker (localhost resolves to private IP)
+    // In production with proper domain, set this to false
+    unoptimized: process.env.NODE_ENV === 'development' || process.env.SKIP_IMAGE_OPTIMIZATION === 'true',
   },
 };
 

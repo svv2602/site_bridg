@@ -8,6 +8,10 @@ WORKDIR /app
 ARG NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3001
 ENV NEXT_PUBLIC_PAYLOAD_URL=$NEXT_PUBLIC_PAYLOAD_URL
 
+# Skip image optimization in Docker (localhost resolves to private IP)
+ARG SKIP_IMAGE_OPTIMIZATION=true
+ENV SKIP_IMAGE_OPTIMIZATION=$SKIP_IMAGE_OPTIMIZATION
+
 COPY package*.json ./
 RUN npm ci
 

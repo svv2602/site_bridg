@@ -68,6 +68,8 @@ services:
       NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
       # Google Maps for dealers page (optional)
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
+      # Skip Next.js image optimization (localhost resolves to private IP in Docker)
+      SKIP_IMAGE_OPTIMIZATION: "true"
     ports:
       - "3010:3010"
     depends_on:
