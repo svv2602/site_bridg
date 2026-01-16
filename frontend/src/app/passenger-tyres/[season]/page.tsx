@@ -10,11 +10,11 @@ import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-rea
 import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
 import { ReviewsSection } from "@/components/ReviewsSection";
 
-// Hero images for each season
+// Hero images for each season (optimized WebP format)
 const seasonHeroImages: Record<Season, string> = {
-  summer: "/images/hero/hero-summer.jpg",
-  winter: "/images/hero/hero-winter.jpg",
-  allseason: "/images/hero/hero-allseason.jpg",
+  summer: "/images/hero/hero-summer.webp",
+  winter: "/images/hero/hero-winter.webp",
+  allseason: "/images/hero/hero-allseason.webp",
 };
 
 // URL slug to internal season mapping

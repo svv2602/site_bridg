@@ -106,7 +106,7 @@ export default async function PassengerTyresPage() {
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <Image
-                  src="/images/hero/hero-passenger.jpg"
+                  src="/images/hero/hero-passenger.webp"
                   alt="Легкові шини Bridgestone"
                   fill
                   className="object-cover"

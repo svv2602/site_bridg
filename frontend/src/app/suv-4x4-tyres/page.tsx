@@ -105,7 +105,7 @@ export default async function SuvTyresPage() {
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <Image
-                  src="/images/hero/hero-suv.jpg"
+                  src="/images/hero/hero-suv.webp"
                   alt="Шини для SUV та 4x4 Bridgestone"
                   fill
                   className="object-cover"

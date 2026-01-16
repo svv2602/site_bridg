@@ -1,13 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone, Award } from "lucide-react";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { VehicleTypeCard, vehicleTypesData } from "@/components/VehicleTypeCard";
-import { DealerLocatorCompact } from "@/components/DealerLocatorCompact";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { ReviewsSection } from "@/components/ReviewsSection";
+
+// Lazy load below-the-fold components
+const DealerLocatorCompact = dynamic(
+  () => import("@/components/DealerLocatorCompact").then(mod => mod.DealerLocatorCompact),
+  {
+    loading: () => (
+      <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
+        <div className="container mx-auto max-w-7xl px-4 md:px-8">
+          <div className="h-64 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+        </div>
+      </section>
+    ),
+  }
+);
 import { getTyreModels } from "@/lib/api/tyres";
 import { getDealers } from "@/lib/api/dealers";
 import { getLatestArticles } from "@/lib/api/articles";

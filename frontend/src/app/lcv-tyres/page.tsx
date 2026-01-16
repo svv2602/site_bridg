@@ -96,7 +96,7 @@ export default async function LcvTyresPage() {
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <Image
-                  src="/images/hero/hero-lcv.jpg"
+                  src="/images/hero/hero-lcv.webp"
                   alt="Шини для комерційних авто Bridgestone"
                   fill
                   className="object-cover"

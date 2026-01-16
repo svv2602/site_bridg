@@ -155,7 +155,7 @@ export default function DealersPage() {
                 {/* Service image at top - hidden on mobile */}
                 <div className="relative hidden min-h-[180px] flex-1 lg:block">
                   <Image
-                    src="/images/hero/hero-dealer-service.jpg"
+                    src="/images/hero/hero-dealer-service.webp"
                     alt="Професійний шиномонтаж Bridgestone"
                     fill
                     className="object-cover"
