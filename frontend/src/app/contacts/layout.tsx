@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Контакти | Bridgestone Україна",
   description: "Зв'яжіться з офіційним представником Bridgestone в Україні. Телефон гарячої лінії, email, форма зворотного зв'язку.",
+  alternates: {
+    canonical: '/contacts',
+  },
   openGraph: {
     title: "Контакти | Bridgestone Україна",
     description: "Зв'яжіться з офіційним представником Bridgestone в Україні.",

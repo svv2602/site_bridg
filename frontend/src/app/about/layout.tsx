@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Про Bridgestone | Офіційний представник в Україні",
   description: "Bridgestone — світовий лідер у виробництві шин. Понад 90 років інновацій та якості. Дізнайтеся про історію, цінності та технології компанії.",
+  alternates: {
+    canonical: '/about',
+  },
   openGraph: {
     title: "Про Bridgestone | Офіційний представник в Україні",
     description: "Bridgestone — світовий лідер у виробництві шин. Понад 90 років інновацій та якості.",

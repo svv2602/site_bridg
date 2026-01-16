@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   output: 'standalone', // Required for Docker deployment
@@ -74,15 +75,62 @@ const nextConfig: NextConfig = {
   // Redirects from old URLs to new ones (SEO-friendly 301)
   async redirects() {
     return [
+      // Legacy blog URL redirects
       {
         source: '/advice',
         destination: '/blog',
-        permanent: true, // 301 redirect
+        permanent: true,
       },
       {
         source: '/advice/:slug',
         destination: '/blog/:slug',
-        permanent: true, // 301 redirect
+        permanent: true,
+      },
+      // Ukrainian URL aliases (for users typing Ukrainian URLs)
+      {
+        source: '/pro-nas',
+        destination: '/about',
+        permanent: true,
+      },
+      {
+        source: '/kontakty',
+        destination: '/contacts',
+        permanent: true,
+      },
+      {
+        source: '/polityka-konfidentsiynosti',
+        destination: '/privacy',
+        permanent: true,
+      },
+      {
+        source: '/umovy-vykorystannya',
+        destination: '/terms',
+        permanent: true,
+      },
+      {
+        source: '/porady',
+        destination: '/blog',
+        permanent: true,
+      },
+      {
+        source: '/porady/:slug',
+        destination: '/blog/:slug',
+        permanent: true,
+      },
+      {
+        source: '/dilery',
+        destination: '/dealers',
+        permanent: true,
+      },
+      {
+        source: '/vidhuky',
+        destination: '/reviews',
+        permanent: true,
+      },
+      {
+        source: '/tekhnolohiyi',
+        destination: '/technology',
+        permanent: true,
       },
     ];
   },
@@ -124,4 +172,26 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Wrap with Sentry (only if DSN is configured)
+export default withSentryConfig(nextConfig, {
+  // Sentry webpack plugin options
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only upload source maps in production with auth token
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+
+  // Upload source maps to Sentry for better stack traces
+  widenClientFileUpload: true,
+
+  // Source maps config - hide from end users but upload to Sentry
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+
+  // Disable logger instrumentation (reduces bundle size)
+  disableLogger: true,
+
+  // Automatically instrument Next.js data fetching
+  automaticVercelMonitors: true,
+});
