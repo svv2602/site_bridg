@@ -4,8 +4,9 @@
  * Client for interacting with the content automation API endpoints.
  */
 
+// Internal API URL for server-side requests (container-to-container in Docker)
 const AUTOMATION_API =
-  process.env.NEXT_PUBLIC_PAYLOAD_URL || "http://localhost:3001";
+  process.env.PAYLOAD_API_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || "http://localhost:3001";
 
 // Types
 export interface AutomationStats {

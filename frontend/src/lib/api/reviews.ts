@@ -1,6 +1,7 @@
 import type { Review } from '@/components/ReviewCard';
 
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
+// Internal API URL for server-side requests (container-to-container in Docker)
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
 
 interface GetReviewsOptions {
   tyreId?: number;
@@ -64,7 +65,7 @@ export async function getReviews(options: GetReviewsOptions = {}): Promise<Revie
     const fetchLimit = season || vehicleType ? 100 : (random ? 50 : limit);
 
     const queryString = whereConditions.join('&');
-    const url = `${PAYLOAD_URL}/api/reviews?${queryString}&limit=${fetchLimit}&depth=1`;
+    const url = `${PAYLOAD_API_URL}/api/reviews?${queryString}&limit=${fetchLimit}&depth=1`;
 
     const response = await fetch(url, {
       next: { revalidate: 60 }, // Cache for 60 seconds
@@ -175,7 +176,7 @@ export async function getReviewStats(tyreId: number): Promise<{
   averageRating: number;
 }> {
   try {
-    const url = `${PAYLOAD_URL}/api/reviews?where[tyre][equals]=${tyreId}&where[isPublished][equals]=true&limit=100`;
+    const url = `${PAYLOAD_API_URL}/api/reviews?where[tyre][equals]=${tyreId}&where[isPublished][equals]=true&limit=100`;
 
     const response = await fetch(url, {
       next: { revalidate: 60 },

@@ -3,6 +3,11 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
+# Build-time args for Next.js public env vars
+# Public URL must be accessible from browser, not internal Docker network
+ARG NEXT_PUBLIC_PAYLOAD_URL=http://localhost:3001
+ENV NEXT_PUBLIC_PAYLOAD_URL=$NEXT_PUBLIC_PAYLOAD_URL
+
 COPY package*.json ./
 RUN npm ci
 

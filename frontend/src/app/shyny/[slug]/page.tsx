@@ -22,11 +22,14 @@ function buildTitle(model: TyreModel): string {
   return `${model.name} — ${seasonLabels[model.season]} Bridgestone`;
 }
 
+// Dynamic rendering - fetch fresh data on each request
+// This ensures we always get data from CMS, not stale build-time data
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
-  const tyres = await getTyreModels();
-  return tyres.map((model) => ({
-    slug: model.slug,
-  }));
+  // Return empty array - pages will be generated on-demand
+  // This avoids build-time dependency on backend being available
+  return [];
 }
 
 export async function generateMetadata({
@@ -169,7 +172,7 @@ export default async function TyreModelPage({
               </div>
             </div>
             <div className="relative">
-              <div className="relative aspect-square min-h-[400px] overflow-hidden rounded-3xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-white to-stone-100 dark:from-stone-800 dark:to-stone-900 shadow-xl lg:min-h-[500px]">
+              <div className="relative aspect-square min-h-[400px] overflow-hidden rounded-3xl border border-stone-200 dark:border-stone-700 bg-transparent shadow-xl lg:min-h-[500px]">
                 {model.imageUrl ? (
                   <Image
                     src={model.imageUrl}

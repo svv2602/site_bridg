@@ -3,6 +3,9 @@
  * Replaces Strapi API for fetching data
  */
 
+// Internal API URL for server-side requests (container-to-container in Docker)
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
+// Public URL for image URLs that browsers will access
 const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
 
 // Types
@@ -167,7 +170,7 @@ async function fetchPayload<T>(
 ): Promise<PayloadResponse<T>> {
   const { revalidate = CACHE_TTL.MEDIUM, ...fetchOptions } = options || {};
 
-  const response = await fetch(`${PAYLOAD_URL}/api/${endpoint}`, {
+  const response = await fetch(`${PAYLOAD_API_URL}/api/${endpoint}`, {
     ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',

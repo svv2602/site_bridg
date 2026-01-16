@@ -57,7 +57,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      NEXT_PUBLIC_PAYLOAD_URL: http://backend:3001
+      # Internal API URL for server-side requests (container-to-container)
+      PAYLOAD_API_URL: http://backend:3001
+      # Public URL for image URLs (accessible from browser)
+      NEXT_PUBLIC_PAYLOAD_URL: http://localhost:3001
       # Vehicles database for tyre search by car
       DATABASE_URL: postgresql://bridgestone:bridgestone@postgres:5432/bridgestone
       # Analytics (optional, set in .env file)
