@@ -537,7 +537,9 @@ export const Dashboard: React.FC<any> = () => {
   // Content Generation functions
   const fetchContentStatus = async (slug: string) => {
     try {
-      const res = await fetch(`/api/content-generation/status/${slug}`)
+      const res = await fetch(`/api/content-generation/status/${slug}`, {
+        credentials: 'include',
+      })
       if (res.ok) {
         setContentStatus(await res.json())
       }
@@ -548,7 +550,9 @@ export const Dashboard: React.FC<any> = () => {
 
   const fetchContentPreview = async (slug: string) => {
     try {
-      const res = await fetch(`/api/content-generation/preview/${slug}`)
+      const res = await fetch(`/api/content-generation/preview/${slug}`, {
+        credentials: 'include',
+      })
       if (res.ok) {
         setContentPreview(await res.json())
       }
@@ -571,6 +575,7 @@ export const Dashboard: React.FC<any> = () => {
       const res = await fetch('/api/content-generation/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           modelSlug: selectedTyreSlug,
           scrape: true,
@@ -599,6 +604,7 @@ export const Dashboard: React.FC<any> = () => {
       const res = await fetch('/api/content-generation/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           modelSlug: selectedTyreSlug,
           fields: contentSelectedFields,
