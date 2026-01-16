@@ -45,6 +45,8 @@ services:
       dockerfile: Dockerfile
     environment:
       NEXT_PUBLIC_PAYLOAD_URL: http://backend:3001
+      # Vehicles database for tyre search by car
+      DATABASE_URL: postgresql://bridgestone:bridgestone@postgres:5432/bridgestone
     ports:
       - "3010:3010"
     depends_on:
