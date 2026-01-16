@@ -30,6 +30,16 @@ services:
       VEHICLES_DB_NAME: bridgestone
       VEHICLES_DB_USER: bridgestone
       VEHICLES_DB_PASSWORD: bridgestone
+      # AI Providers (set in .env file)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # Telegram notifications (optional)
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
     volumes:
       - media_data:/app/media
       - ./backend-payload/db_size_auto:/app/db_size_auto:ro
@@ -47,6 +57,11 @@ services:
       NEXT_PUBLIC_PAYLOAD_URL: http://backend:3001
       # Vehicles database for tyre search by car
       DATABASE_URL: postgresql://bridgestone:bridgestone@postgres:5432/bridgestone
+      # Analytics (optional, set in .env file)
+      NEXT_PUBLIC_GA4_MEASUREMENT_ID: ${NEXT_PUBLIC_GA4_MEASUREMENT_ID:-}
+      NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
+      # Google Maps for dealers page (optional)
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
     ports:
       - "3010:3010"
     depends_on:
