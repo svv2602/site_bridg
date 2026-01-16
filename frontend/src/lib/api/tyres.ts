@@ -1,6 +1,4 @@
 import {
-  MOCK_TYRE_MODELS,
-  MOCK_VEHICLE_FITMENTS,
   type Season,
   type TyreModel,
   type TyreSize,
@@ -33,18 +31,17 @@ export interface CarSearchParams {
 }
 
 /**
- * Повертає всі моделі шин. Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
+ * Повертає всі моделі шин з Payload CMS.
+ * При помилці повертає порожній масив — компоненти повинні обробити цей стан.
  */
 export async function getTyreModels(): Promise<TyreModel[]> {
   try {
     const tyres = await getPayloadTyres();
-    if (tyres.length > 0) {
-      return tyres.map(tyre => transformPayloadTyre(tyre) as TyreModel);
-    }
+    return tyres.map(tyre => transformPayloadTyre(tyre) as TyreModel);
   } catch (error) {
-    console.warn("Payload CMS unavailable, using mock data:", error);
+    console.error("Помилка завантаження шин з CMS:", error);
+    return [];
   }
-  return MOCK_TYRE_MODELS;
 }
 
 /**
@@ -56,12 +53,11 @@ export async function getTyreModelBySlug(slug: string): Promise<TyreModel | null
     if (tyre) {
       return transformPayloadTyre(tyre) as TyreModel;
     }
+    return null;
   } catch (error) {
-    console.warn("Payload CMS unavailable, using mock data:", error);
+    console.error("Помилка завантаження шини з CMS:", error);
+    return null;
   }
-  // Fallback to mock data
-  const model = MOCK_TYRE_MODELS.find((m) => m.slug === slug);
-  return model ?? null;
 }
 
 /**
@@ -86,7 +82,6 @@ export async function searchTyresBySize(params: SizeSearchParams): Promise<TyreM
 
 /**
  * Знаходить фітмент авто (рекомендовані розміри) за маркою, моделлю та роком випуску.
- * Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
  */
 export async function getVehicleFitment(
   params: CarSearchParams,
@@ -104,19 +99,11 @@ export async function getVehicleFitment(
         recommendedSizes: payloadFitment.recommendedSizes ?? [],
       };
     }
+    return null;
   } catch (error) {
-    console.warn("Payload CMS unavailable for vehicle fitments, using mock data:", error);
+    console.error("Помилка завантаження фітменту з CMS:", error);
+    return null;
   }
-
-  // Fallback to mock data
-  const fitment = MOCK_VEHICLE_FITMENTS.find(
-    (v) =>
-      v.make === make &&
-      v.model === model &&
-      v.yearFrom <= year &&
-      (v.yearTo ?? year) >= year,
-  );
-  return fitment ?? null;
 }
 
 /**

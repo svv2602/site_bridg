@@ -1,4 +1,4 @@
-import { MOCK_TECHNOLOGIES, type Technology } from "@/lib/data";
+import { type Technology } from "@/lib/data";
 import { getPayloadTechnologies, type PayloadTechnology } from "./payload";
 
 /**
@@ -14,18 +14,17 @@ function transformPayloadTechnology(tech: PayloadTechnology): Technology {
 }
 
 /**
- * Returns all technologies. Tries Payload CMS first, falls back to mock data.
+ * Повертає всі технології з Payload CMS.
+ * При помилці повертає порожній масив — компоненти повинні обробити цей стан.
  */
 export async function getTechnologies(): Promise<Technology[]> {
   try {
     const technologies = await getPayloadTechnologies();
-    if (technologies.length > 0) {
-      return technologies.map(transformPayloadTechnology);
-    }
+    return technologies.map(transformPayloadTechnology);
   } catch (error) {
-    console.warn("Payload CMS unavailable for technologies, using mock data:", error);
+    console.error("Помилка завантаження технологій з CMS:", error);
+    return [];
   }
-  return MOCK_TECHNOLOGIES;
 }
 
 /**

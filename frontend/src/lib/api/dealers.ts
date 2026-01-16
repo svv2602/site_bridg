@@ -1,4 +1,4 @@
-import { MOCK_DEALERS, type Dealer, type DealerType } from "@/lib/data";
+import { type Dealer, type DealerType } from "@/lib/data";
 import { getPayloadDealers } from "./payload";
 
 export interface DealerSearchParams {
@@ -7,29 +7,28 @@ export interface DealerSearchParams {
 }
 
 /**
- * Повертає повний список дилерів. Спробує отримати з Payload CMS, якщо недоступний — повертає mock дані.
+ * Повертає повний список дилерів з Payload CMS.
+ * При помилці повертає порожній масив — компоненти повинні обробити цей стан.
  */
 export async function getDealers(): Promise<Dealer[]> {
   try {
     const dealers = await getPayloadDealers();
-    if (dealers.length > 0) {
-      return dealers.map(d => ({
-        id: d.id,
-        name: d.name,
-        type: d.type,
-        city: d.city,
-        address: d.address,
-        latitude: d.latitude,
-        longitude: d.longitude,
-        phone: d.phone,
-        website: d.website,
-        workingHours: d.workingHours,
-      }));
-    }
+    return dealers.map(d => ({
+      id: d.id,
+      name: d.name,
+      type: d.type,
+      city: d.city,
+      address: d.address,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      phone: d.phone,
+      website: d.website,
+      workingHours: d.workingHours,
+    }));
   } catch (error) {
-    console.warn("Payload CMS unavailable, using mock data:", error);
+    console.error("Помилка завантаження дилерів з CMS:", error);
+    return [];
   }
-  return MOCK_DEALERS;
 }
 
 /**
