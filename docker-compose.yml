@@ -26,6 +26,7 @@ services:
       NODE_ENV: production
     volumes:
       - media_data:/app/media
+      - ./backend-payload/db_size_auto:/app/db_size_auto:ro
     ports:
       - "3001:3001"
     depends_on:

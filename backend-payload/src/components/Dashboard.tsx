@@ -50,6 +50,108 @@ interface TaskRoute {
   maxCost?: number
 }
 
+interface VehiclesImportProgress {
+  stage: 'idle' | 'preparing' | 'brands' | 'models' | 'kits' | 'sizes' | 'indexing' | 'done' | 'error'
+  currentTable: string
+  processedRows: number
+  totalRows: number
+  startedAt: string | null
+  completedAt: string | null
+  error: string | null
+  stats: {
+    brands: number
+    models: number
+    kits: number
+    tyreSizes: number
+    filteredKits: number
+    filteredSizes: number
+  }
+}
+
+interface VehiclesStatus {
+  progress: VehiclesImportProgress
+  dbStats: {
+    brands: number
+    models: number
+    kits: number
+    tyreSizes: number
+  } | null
+}
+
+// Automation Dashboard interfaces
+interface AutomationStats {
+  tiresProcessed: number
+  articlesCreated: number
+  badgesAssigned: number
+  totalCost: number
+  errorCount: number
+  lastRun: string | null
+}
+
+interface AutomationStatus {
+  status: 'running' | 'idle'
+  nextRun: string
+  timezone: string
+}
+
+interface AutomationJob {
+  id: string
+  type: 'full' | 'scrape' | 'generate' | 'publish'
+  status: 'success' | 'failed' | 'running'
+  startedAt: string
+  completedAt: string | null
+  itemsProcessed: number
+  errors: string[]
+}
+
+// Content Generation interfaces
+interface ContentStatus {
+  modelSlug: string
+  tyreId: string | null
+  tyreExists: boolean
+  hasRawData: boolean
+  hasGeneratedContent: boolean
+  isPublished: boolean
+  rawDataDate: string | null
+  generatedDate: string | null
+}
+
+interface ContentPreviewData {
+  modelSlug: string
+  generated: {
+    shortDescription: string
+    fullDescription: string
+    seoTitle: string
+    seoDescription: string
+    keyBenefits: Array<{ benefit: string }>
+    faqs: Array<{ question: string; answer: string }>
+    metadata: {
+      generatedAt: string
+      provider: string
+      model: string
+      cost: number
+    }
+  }
+  current: {
+    shortDescription: string
+    fullDescription: string
+    seoTitle: string
+    seoDescription: string
+  } | null
+  diff: {
+    hasChanges: boolean
+    fields: string[]
+  }
+  tyreId: string | null
+}
+
+interface TyreModel {
+  id: string
+  name: string
+  slug: string
+  shortDescription?: string
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Dashboard: React.FC<any> = () => {
   const [stats, setStats] = useState<Stats>({
@@ -70,6 +172,27 @@ export const Dashboard: React.FC<any> = () => {
   const [providersLoading, setProvidersLoading] = useState(false)
   const [expandedTask, setExpandedTask] = useState<string | null>(null)
   const [editingRoute, setEditingRoute] = useState<TaskRoute | null>(null)
+  // Vehicles import state
+  const [vehiclesStatus, setVehiclesStatus] = useState<VehiclesStatus | null>(null)
+  const [vehiclesLoading, setVehiclesLoading] = useState(false)
+  const [vehiclesAction, setVehiclesAction] = useState<string | null>(null)
+
+  // Automation Dashboard state
+  const [automationStats, setAutomationStats] = useState<AutomationStats | null>(null)
+  const [automationStatus, setAutomationStatus] = useState<AutomationStatus | null>(null)
+  const [automationJobs, setAutomationJobs] = useState<AutomationJob[]>([])
+  const [automationAction, setAutomationAction] = useState<string | null>(null)
+
+  // Content Generation state
+  const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
+  const [selectedTyreSlug, setSelectedTyreSlug] = useState<string | null>(null)
+  const [contentStatus, setContentStatus] = useState<ContentStatus | null>(null)
+  const [contentPreview, setContentPreview] = useState<ContentPreviewData | null>(null)
+  const [contentAction, setContentAction] = useState<string | null>(null)
+  const [showContentPreview, setShowContentPreview] = useState(false)
+  const [contentSelectedFields, setContentSelectedFields] = useState<string[]>([
+    'shortDescription', 'fullDescription', 'seoTitle', 'seoDescription', 'keyBenefits', 'faqs'
+  ])
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -109,6 +232,32 @@ export const Dashboard: React.FC<any> = () => {
           const data = await providersRes.json()
           setProviders(data.providers || [])
           setTaskRouting(data.taskRouting || [])
+        }
+
+        // Fetch vehicles import status
+        const vehiclesRes = await fetch('/api/import/status')
+        if (vehiclesRes.ok) {
+          const data = await vehiclesRes.json()
+          setVehiclesStatus(data)
+        }
+
+        // Fetch automation stats and status
+        const [automationStatsRes, automationStatusRes] = await Promise.all([
+          fetch('/api/automation/stats'),
+          fetch('/api/automation/status'),
+        ])
+        if (automationStatsRes.ok) {
+          setAutomationStats(await automationStatsRes.json())
+        }
+        if (automationStatusRes.ok) {
+          setAutomationStatus(await automationStatusRes.json())
+        }
+
+        // Fetch tyre models for content generation
+        const tyresListRes = await fetch('/api/tyres?limit=100&sort=name')
+        if (tyresListRes.ok) {
+          const data = await tyresListRes.json()
+          setTyreModels(data.docs || [])
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
@@ -247,6 +396,249 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
+  // Vehicles import functions
+  const fetchVehiclesStatus = async () => {
+    setVehiclesLoading(true)
+    try {
+      const res = await fetch('/api/import/status')
+      if (res.ok) {
+        const data = await res.json()
+        setVehiclesStatus(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch vehicles status:', error)
+    } finally {
+      setVehiclesLoading(false)
+    }
+  }
+
+  const startVehiclesImport = async () => {
+    setVehiclesAction('import')
+    try {
+      const res = await fetch('/api/import/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ minYear: 2005 }),
+      })
+      if (res.ok) {
+        // Start polling for status updates
+        const pollStatus = setInterval(async () => {
+          const statusRes = await fetch('/api/import/status')
+          if (statusRes.ok) {
+            const data = await statusRes.json()
+            setVehiclesStatus(data)
+            if (data.progress.stage === 'done' || data.progress.stage === 'error' || data.progress.stage === 'idle') {
+              clearInterval(pollStatus)
+              setVehiclesAction(null)
+            }
+          }
+        }, 2000)
+      } else {
+        const data = await res.json()
+        alert(`Помилка: ${data.error}`)
+        setVehiclesAction(null)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+      setVehiclesAction(null)
+    }
+  }
+
+  const resetVehiclesTables = async () => {
+    if (!confirm('Ви впевнені, що хочете видалити всі дані автомобілів та створити таблиці заново?')) {
+      return
+    }
+    setVehiclesAction('reset')
+    try {
+      const res = await fetch('/api/import/reset', { method: 'POST' })
+      if (res.ok) {
+        await fetchVehiclesStatus()
+      } else {
+        const data = await res.json()
+        alert(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+    } finally {
+      setVehiclesAction(null)
+    }
+  }
+
+  const isVehiclesImportRunning = vehiclesStatus?.progress.stage &&
+    vehiclesStatus.progress.stage !== 'idle' &&
+    vehiclesStatus.progress.stage !== 'done' &&
+    vehiclesStatus.progress.stage !== 'error'
+
+  const vehiclesStageLabels: Record<VehiclesImportProgress['stage'], string> = {
+    idle: 'Очікування',
+    preparing: 'Підготовка',
+    brands: 'Імпорт марок',
+    models: 'Імпорт моделей',
+    kits: 'Імпорт комплектацій',
+    sizes: 'Імпорт розмірів',
+    indexing: 'Індексація',
+    done: 'Завершено',
+    error: 'Помилка',
+  }
+
+  // Automation functions
+  const refreshAutomation = async () => {
+    try {
+      const [statsRes, statusRes] = await Promise.all([
+        fetch('/api/automation/stats'),
+        fetch('/api/automation/status'),
+      ])
+      if (statsRes.ok) setAutomationStats(await statsRes.json())
+      if (statusRes.ok) setAutomationStatus(await statusRes.json())
+    } catch (error) {
+      console.error('Failed to refresh automation:', error)
+    }
+  }
+
+  const triggerAutomation = async (type: 'full' | 'scrape' | 'generate') => {
+    setAutomationAction(type)
+    try {
+      const res = await fetch('/api/automation/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type }),
+      })
+      if (res.ok) {
+        // Add running job to list
+        const newJob: AutomationJob = {
+          id: Date.now().toString(),
+          type,
+          status: 'running',
+          startedAt: new Date().toISOString(),
+          completedAt: null,
+          itemsProcessed: 0,
+          errors: [],
+        }
+        setAutomationJobs(prev => [newJob, ...prev])
+        setTimeout(refreshAutomation, 3000)
+      } else {
+        const data = await res.json()
+        alert(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+    } finally {
+      setAutomationAction(null)
+    }
+  }
+
+  const automationJobTypeLabels: Record<AutomationJob['type'], string> = {
+    full: 'Повний цикл',
+    scrape: 'Скрапінг',
+    generate: 'Генерація',
+    publish: 'Публікація',
+  }
+
+  // Content Generation functions
+  const fetchContentStatus = async (slug: string) => {
+    try {
+      const res = await fetch(`/api/content-generation/status/${slug}`)
+      if (res.ok) {
+        setContentStatus(await res.json())
+      }
+    } catch (error) {
+      console.error('Failed to fetch content status:', error)
+    }
+  }
+
+  const fetchContentPreview = async (slug: string) => {
+    try {
+      const res = await fetch(`/api/content-generation/preview/${slug}`)
+      if (res.ok) {
+        setContentPreview(await res.json())
+      }
+    } catch (error) {
+      console.error('Failed to fetch content preview:', error)
+    }
+  }
+
+  const handleTyreSelect = async (slug: string) => {
+    setSelectedTyreSlug(slug)
+    setShowContentPreview(false)
+    setContentPreview(null)
+    await fetchContentStatus(slug)
+  }
+
+  const generateContent = async (regenerate = false) => {
+    if (!selectedTyreSlug) return
+    setContentAction('generate')
+    try {
+      const res = await fetch('/api/content-generation/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelSlug: selectedTyreSlug,
+          scrape: true,
+          regenerate,
+        }),
+      })
+      if (res.ok) {
+        await fetchContentStatus(selectedTyreSlug)
+        await fetchContentPreview(selectedTyreSlug)
+        setShowContentPreview(true)
+      } else {
+        const data = await res.json()
+        alert(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+    } finally {
+      setContentAction(null)
+    }
+  }
+
+  const publishContent = async () => {
+    if (!selectedTyreSlug) return
+    setContentAction('publish')
+    try {
+      const res = await fetch('/api/content-generation/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelSlug: selectedTyreSlug,
+          fields: contentSelectedFields,
+        }),
+      })
+      if (res.ok) {
+        await fetchContentStatus(selectedTyreSlug)
+        alert('Контент успішно опубліковано!')
+      } else {
+        const data = await res.json()
+        alert(`Помилка: ${data.error}`)
+      }
+    } catch (error) {
+      alert('Помилка з\'єднання')
+    } finally {
+      setContentAction(null)
+    }
+  }
+
+  const toggleContentField = (field: string) => {
+    setContentSelectedFields(prev =>
+      prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
+    )
+  }
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '—'
+    return new Date(dateStr).toLocaleString('uk-UA', {
+      timeZone: 'Europe/Kyiv',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  const tyresWithContent = tyreModels.filter(t => t.shortDescription).length
+  const tyresWithoutContent = tyreModels.length - tyresWithContent
+
   const llmProviders = providers.filter((p) => p.type === 'llm')
   const imageProviders = providers.filter((p) => p.type === 'image')
   const enabledLlmProviders = llmProviders.filter((p) => p.enabled)
@@ -298,8 +690,122 @@ export const Dashboard: React.FC<any> = () => {
       </div>
 
       <div className="dashboard__section">
-        <h2>Контент-автоматизація</h2>
-        <div className="dashboard__content-automation">
+        <div className="dashboard__section-header">
+          <h2>Автоматизація контенту</h2>
+          <button onClick={refreshAutomation} className="dashboard__refresh-btn" title="Оновити">↻</button>
+        </div>
+
+        {/* Stats row */}
+        <div className="dashboard__automation-stats">
+          <div className="dashboard__automation-stat">
+            <span className="dashboard__automation-value">{automationStats?.tiresProcessed ?? 0}</span>
+            <span className="dashboard__automation-label">Шин оброблено</span>
+          </div>
+          <div className="dashboard__automation-stat">
+            <span className="dashboard__automation-value">{automationStats?.articlesCreated ?? 0}</span>
+            <span className="dashboard__automation-label">Статей</span>
+          </div>
+          <div className="dashboard__automation-stat">
+            <span className="dashboard__automation-value">{automationStats?.badgesAssigned ?? 0}</span>
+            <span className="dashboard__automation-label">Badges</span>
+          </div>
+          <div className="dashboard__automation-stat">
+            <span className="dashboard__automation-value">${(automationStats?.totalCost ?? 0).toFixed(2)}</span>
+            <span className="dashboard__automation-label">Витрати</span>
+          </div>
+          <div className="dashboard__automation-stat">
+            <span className={`dashboard__automation-value ${(automationStats?.errorCount ?? 0) > 0 ? 'dashboard__automation-value--error' : ''}`}>
+              {automationStats?.errorCount ?? 0}
+            </span>
+            <span className="dashboard__automation-label">Помилок</span>
+          </div>
+        </div>
+
+        <div className="dashboard__automation-grid">
+          {/* Schedule info */}
+          <div className="dashboard__automation-schedule">
+            <h3>Розклад</h3>
+            <div className="dashboard__automation-schedule-item">
+              <span className="dashboard__automation-schedule-label">Останній запуск:</span>
+              <span className="dashboard__automation-schedule-value">{formatDate(automationStats?.lastRun ?? null)}</span>
+            </div>
+            <div className="dashboard__automation-schedule-item">
+              <span className="dashboard__automation-schedule-label">Наступний запуск:</span>
+              <span className="dashboard__automation-schedule-value">{formatDate(automationStatus?.nextRun ?? null)}</span>
+            </div>
+            <div className="dashboard__automation-schedule-hint">
+              Автоматичний запуск: щонеділі о 03:00 ({automationStatus?.timezone || 'Europe/Kyiv'})
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="dashboard__automation-actions-panel">
+            <h3>Дії</h3>
+            <div className="dashboard__automation-buttons">
+              <button
+                onClick={() => triggerAutomation('full')}
+                disabled={automationAction !== null}
+                className="dashboard__action dashboard__action--primary"
+              >
+                {automationAction === 'full' ? 'Запуск...' : '▶ Повний цикл'}
+              </button>
+              <div className="dashboard__automation-buttons-row">
+                <button
+                  onClick={() => triggerAutomation('scrape')}
+                  disabled={automationAction !== null}
+                  className="dashboard__action"
+                >
+                  {automationAction === 'scrape' ? '...' : 'Скрапінг'}
+                </button>
+                <button
+                  onClick={() => triggerAutomation('generate')}
+                  disabled={automationAction !== null}
+                  className="dashboard__action"
+                >
+                  {automationAction === 'generate' ? '...' : 'Генерація'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Jobs table */}
+        {automationJobs.length > 0 && (
+          <div className="dashboard__automation-jobs">
+            <h3>Останні запуски</h3>
+            <table className="dashboard__automation-table">
+              <thead>
+                <tr>
+                  <th>Тип</th>
+                  <th>Статус</th>
+                  <th>Початок</th>
+                  <th>Оброблено</th>
+                </tr>
+              </thead>
+              <tbody>
+                {automationJobs.slice(0, 5).map((job) => (
+                  <tr key={job.id}>
+                    <td>{automationJobTypeLabels[job.type]}</td>
+                    <td>
+                      <span className={`dashboard__automation-status dashboard__automation-status--${job.status}`}>
+                        {job.status === 'success' ? '✓ Успішно' : job.status === 'failed' ? '✗ Помилка' : '⏳ В процесі'}
+                      </span>
+                    </td>
+                    <td>{formatDate(job.startedAt)}</td>
+                    <td>{job.itemsProcessed}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Legacy content jobs */}
+        <div className="dashboard__content-jobs">
+          <div className="dashboard__content-jobs-header">
+            <span>Системні завдання</span>
+            <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
+          </div>
           <div className="dashboard__content-actions">
             <button
               onClick={() => runContentAction('scrape')}
@@ -323,25 +829,277 @@ export const Dashboard: React.FC<any> = () => {
               {contentProcessing === 'generate' ? 'Генерація...' : '3. Згенерувати описи'}
             </button>
           </div>
-          <div className="dashboard__content-jobs">
-            <div className="dashboard__content-jobs-header">
-              <span>Останні завдання</span>
-              <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
+          {contentJobs.slice(0, 5).map((job) => (
+            <div key={job.id} className={`dashboard__job dashboard__job--${job.status}`}>
+              <span className="dashboard__job-command">{job.command.split(' ').pop()}</span>
+              <span className={`dashboard__job-status dashboard__job-status--${job.status}`}>
+                {job.status === 'running' ? '⏳' : job.status === 'completed' ? '✓' : '✗'}
+              </span>
+              <span className="dashboard__job-time">
+                {new Date(job.startedAt).toLocaleTimeString('uk-UA')}
+              </span>
             </div>
-            {contentJobs.slice(0, 5).map((job) => (
-              <div key={job.id} className={`dashboard__job dashboard__job--${job.status}`}>
-                <span className="dashboard__job-command">{job.command.split(' ').pop()}</span>
-                <span className={`dashboard__job-status dashboard__job-status--${job.status}`}>
-                  {job.status === 'running' ? '⏳' : job.status === 'completed' ? '✓' : '✗'}
-                </span>
-                <span className="dashboard__job-time">
-                  {new Date(job.startedAt).toLocaleTimeString('uk-UA')}
+          ))}
+          {contentJobs.length === 0 && (
+            <div className="dashboard__job-empty">Немає завдань</div>
+          )}
+        </div>
+      </div>
+
+      {/* AI Content Generation section */}
+      <div className="dashboard__section">
+        <h2>AI Content Generation</h2>
+        <div className="dashboard__content-gen">
+          {/* Stats */}
+          <div className="dashboard__content-gen-stats">
+            <div className="dashboard__content-gen-stat">
+              <span className="dashboard__content-gen-value">{tyreModels.length}</span>
+              <span className="dashboard__content-gen-label">Всього моделей</span>
+            </div>
+            <div className="dashboard__content-gen-stat">
+              <span className="dashboard__content-gen-value dashboard__content-gen-value--success">{tyresWithContent}</span>
+              <span className="dashboard__content-gen-label">З контентом</span>
+            </div>
+            <div className="dashboard__content-gen-stat">
+              <span className="dashboard__content-gen-value dashboard__content-gen-value--warning">{tyresWithoutContent}</span>
+              <span className="dashboard__content-gen-label">Без контенту</span>
+            </div>
+            <div className="dashboard__content-gen-stat">
+              <span className="dashboard__content-gen-value">${(tyresWithoutContent * 0.05).toFixed(2)}</span>
+              <span className="dashboard__content-gen-label">Прибл. вартість</span>
+            </div>
+          </div>
+
+          {/* Model selector */}
+          <div className="dashboard__content-gen-selector">
+            <label>Оберіть модель шини:</label>
+            <select
+              value={selectedTyreSlug || ''}
+              onChange={(e) => e.target.value && handleTyreSelect(e.target.value)}
+              className="dashboard__content-gen-select"
+            >
+              <option value="">— Оберіть модель —</option>
+              {tyreModels.map((tyre) => (
+                <option key={tyre.id} value={tyre.slug}>
+                  {tyre.shortDescription ? '✓ ' : '○ '}{tyre.name} ({tyre.slug})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status info */}
+          {selectedTyreSlug && contentStatus && (
+            <div className="dashboard__content-gen-status">
+              <div className="dashboard__content-gen-status-grid">
+                <div className={`dashboard__content-gen-status-item ${contentStatus.hasRawData ? 'dashboard__content-gen-status-item--ok' : ''}`}>
+                  <span>{contentStatus.hasRawData ? '✓' : '○'}</span>
+                  <span>Raw дані</span>
+                  <span className="dashboard__content-gen-status-date">{formatDate(contentStatus.rawDataDate)}</span>
+                </div>
+                <div className={`dashboard__content-gen-status-item ${contentStatus.hasGeneratedContent ? 'dashboard__content-gen-status-item--ok' : ''}`}>
+                  <span>{contentStatus.hasGeneratedContent ? '✓' : '○'}</span>
+                  <span>Згенеровано</span>
+                  <span className="dashboard__content-gen-status-date">{formatDate(contentStatus.generatedDate)}</span>
+                </div>
+                <div className={`dashboard__content-gen-status-item ${contentStatus.isPublished ? 'dashboard__content-gen-status-item--ok' : ''}`}>
+                  <span>{contentStatus.isPublished ? '✓' : '○'}</span>
+                  <span>Опубліковано</span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="dashboard__content-gen-actions">
+                <button
+                  onClick={() => generateContent(false)}
+                  disabled={contentAction !== null}
+                  className="dashboard__action dashboard__action--primary"
+                >
+                  {contentAction === 'generate' ? 'Генерація...' : 'Генерувати контент'}
+                </button>
+                {contentStatus.hasGeneratedContent && (
+                  <button
+                    onClick={() => generateContent(true)}
+                    disabled={contentAction !== null}
+                    className="dashboard__action"
+                  >
+                    Регенерувати
+                  </button>
+                )}
+                {contentStatus.hasGeneratedContent && (
+                  <button
+                    onClick={async () => { await fetchContentPreview(selectedTyreSlug); setShowContentPreview(true); }}
+                    disabled={contentAction !== null}
+                    className="dashboard__action"
+                  >
+                    Превю
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Content preview */}
+          {showContentPreview && contentPreview && (
+            <div className="dashboard__content-gen-preview">
+              <h3>Превю контенту</h3>
+
+              {/* Field selection */}
+              <div className="dashboard__content-gen-fields">
+                <span>Поля для публікації:</span>
+                {['shortDescription', 'fullDescription', 'seoTitle', 'seoDescription', 'keyBenefits', 'faqs'].map((field) => (
+                  <label key={field} className={`dashboard__content-gen-field ${contentSelectedFields.includes(field) ? 'dashboard__content-gen-field--active' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={contentSelectedFields.includes(field)}
+                      onChange={() => toggleContentField(field)}
+                    />
+                    <span>{field}</span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Preview content */}
+              <div className="dashboard__content-gen-preview-content">
+                <div className="dashboard__content-gen-preview-item">
+                  <strong>Короткий опис:</strong>
+                  <p>{contentPreview.generated.shortDescription}</p>
+                </div>
+                <div className="dashboard__content-gen-preview-item">
+                  <strong>SEO Title:</strong>
+                  <p>{contentPreview.generated.seoTitle}</p>
+                </div>
+                <div className="dashboard__content-gen-preview-item">
+                  <strong>SEO Description:</strong>
+                  <p>{contentPreview.generated.seoDescription}</p>
+                </div>
+                <div className="dashboard__content-gen-preview-item">
+                  <strong>Key Benefits ({contentPreview.generated.keyBenefits.length}):</strong>
+                  <ul>
+                    {contentPreview.generated.keyBenefits.slice(0, 3).map((b, i) => (
+                      <li key={i}>{b.benefit}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="dashboard__content-gen-preview-item">
+                  <strong>FAQs ({contentPreview.generated.faqs.length}):</strong>
+                  <ul>
+                    {contentPreview.generated.faqs.slice(0, 2).map((faq, i) => (
+                      <li key={i}><em>Q: {faq.question}</em></li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="dashboard__content-gen-preview-meta">
+                  Модель: {contentPreview.generated.metadata.model} | Вартість: ${contentPreview.generated.metadata.cost.toFixed(3)}
+                </div>
+              </div>
+
+              {/* Publish button */}
+              <div className="dashboard__content-gen-publish">
+                <button
+                  onClick={publishContent}
+                  disabled={contentAction !== null || contentSelectedFields.length === 0}
+                  className="dashboard__action dashboard__action--primary"
+                >
+                  {contentAction === 'publish' ? 'Публікація...' : `Опублікувати (${contentSelectedFields.length} полів)`}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Help text */}
+          {!selectedTyreSlug && (
+            <div className="dashboard__content-gen-help">
+              <strong>Як використовувати:</strong>
+              <ol>
+                <li>Оберіть модель шини зі списку</li>
+                <li>Натисніть &quot;Генерувати контент&quot; для збору даних та генерації AI</li>
+                <li>Перегляньте превю та виберіть поля</li>
+                <li>Натисніть &quot;Опублікувати&quot; для збереження в CMS</li>
+              </ol>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="dashboard__section">
+        <div className="dashboard__section-header">
+          <h2>База автомобілів</h2>
+          <button onClick={fetchVehiclesStatus} className="dashboard__refresh-btn" title="Оновити">↻</button>
+        </div>
+        <div className="dashboard__vehicles">
+          <div className="dashboard__vehicles-stats">
+            <div className="dashboard__vehicles-stat">
+              <span className="dashboard__vehicles-value">{vehiclesStatus?.dbStats?.brands ?? 0}</span>
+              <span className="dashboard__vehicles-label">Марок</span>
+            </div>
+            <div className="dashboard__vehicles-stat">
+              <span className="dashboard__vehicles-value">{vehiclesStatus?.dbStats?.models ?? 0}</span>
+              <span className="dashboard__vehicles-label">Моделей</span>
+            </div>
+            <div className="dashboard__vehicles-stat">
+              <span className="dashboard__vehicles-value">{vehiclesStatus?.dbStats?.kits ?? 0}</span>
+              <span className="dashboard__vehicles-label">Комплектацій</span>
+            </div>
+            <div className="dashboard__vehicles-stat">
+              <span className="dashboard__vehicles-value">{vehiclesStatus?.dbStats?.tyreSizes ?? 0}</span>
+              <span className="dashboard__vehicles-label">Розмірів шин</span>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          {vehiclesStatus?.progress.stage && vehiclesStatus.progress.stage !== 'idle' && (
+            <div className="dashboard__vehicles-progress">
+              <div className="dashboard__vehicles-progress-header">
+                <span>Прогрес імпорту</span>
+                <span className={`dashboard__vehicles-stage dashboard__vehicles-stage--${vehiclesStatus.progress.stage}`}>
+                  {vehiclesStageLabels[vehiclesStatus.progress.stage]}
                 </span>
               </div>
-            ))}
-            {contentJobs.length === 0 && (
-              <div className="dashboard__job-empty">Немає завдань</div>
-            )}
+              <div className="dashboard__vehicles-progress-bar">
+                {(['brands', 'models', 'kits', 'sizes', 'indexing'] as const).map((stage, index) => {
+                  const stages = ['brands', 'models', 'kits', 'sizes', 'indexing']
+                  const currentIndex = stages.indexOf(vehiclesStatus.progress.stage)
+                  let bgClass = 'dashboard__vehicles-progress-step'
+                  if (vehiclesStatus.progress.stage === 'done') {
+                    bgClass += ' dashboard__vehicles-progress-step--done'
+                  } else if (vehiclesStatus.progress.stage === 'error' && index <= currentIndex) {
+                    bgClass += ' dashboard__vehicles-progress-step--error'
+                  } else if (index < currentIndex) {
+                    bgClass += ' dashboard__vehicles-progress-step--done'
+                  } else if (index === currentIndex && isVehiclesImportRunning) {
+                    bgClass += ' dashboard__vehicles-progress-step--active'
+                  }
+                  return <div key={stage} className={bgClass} />
+                })}
+              </div>
+              <div className="dashboard__vehicles-progress-info">
+                <span>Таблиця: {vehiclesStatus.progress.currentTable || '—'}</span>
+                <span>Рядків: {vehiclesStatus.progress.processedRows.toLocaleString('uk-UA')}</span>
+              </div>
+              {vehiclesStatus.progress.error && (
+                <div className="dashboard__vehicles-error">{vehiclesStatus.progress.error}</div>
+              )}
+            </div>
+          )}
+
+          <div className="dashboard__vehicles-actions">
+            <button
+              onClick={startVehiclesImport}
+              disabled={vehiclesAction !== null || isVehiclesImportRunning}
+              className="dashboard__action dashboard__action--primary"
+            >
+              {vehiclesAction === 'import' || isVehiclesImportRunning ? 'Імпорт...' : 'Запустити імпорт'}
+            </button>
+            <button
+              onClick={resetVehiclesTables}
+              disabled={vehiclesAction !== null || isVehiclesImportRunning}
+              className="dashboard__action dashboard__action--danger"
+            >
+              {vehiclesAction === 'reset' ? 'Скидання...' : 'Скинути таблиці'}
+            </button>
+          </div>
+          <div className="dashboard__vehicles-info">
+            <p>Джерело: CSV файли (db_size_auto/) • Фільтр: авто з 2005 року</p>
           </div>
         </div>
       </div>
@@ -1257,6 +2015,513 @@ export const Dashboard: React.FC<any> = () => {
           margin: 0;
           color: var(--theme-elevation-600);
           font-size: 0.875rem;
+        }
+
+        /* Vehicles import section */
+        .dashboard__vehicles {
+          padding: 1rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 8px;
+        }
+
+        .dashboard__vehicles-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__vehicles-stat {
+          text-align: center;
+          padding: 0.75rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+        }
+
+        .dashboard__vehicles-value {
+          display: block;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--theme-text);
+        }
+
+        .dashboard__vehicles-label {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__vehicles-progress {
+          padding: 1rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__vehicles-progress-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.75rem;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__vehicles-stage {
+          font-weight: 500;
+        }
+
+        .dashboard__vehicles-stage--done {
+          color: #16a34a;
+        }
+
+        .dashboard__vehicles-stage--error {
+          color: #dc2626;
+        }
+
+        .dashboard__vehicles-stage--brands,
+        .dashboard__vehicles-stage--models,
+        .dashboard__vehicles-stage--kits,
+        .dashboard__vehicles-stage--sizes,
+        .dashboard__vehicles-stage--indexing,
+        .dashboard__vehicles-stage--preparing {
+          color: #2563eb;
+        }
+
+        .dashboard__vehicles-progress-bar {
+          display: flex;
+          gap: 4px;
+          margin-bottom: 0.75rem;
+        }
+
+        .dashboard__vehicles-progress-step {
+          flex: 1;
+          height: 6px;
+          background: var(--theme-elevation-200);
+          border-radius: 3px;
+          transition: background 0.3s;
+        }
+
+        .dashboard__vehicles-progress-step--done {
+          background: #16a34a;
+        }
+
+        .dashboard__vehicles-progress-step--error {
+          background: #dc2626;
+        }
+
+        .dashboard__vehicles-progress-step--active {
+          background: #2563eb;
+          animation: pulse 1.5s infinite;
+        }
+
+        .dashboard__vehicles-progress-info {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.75rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__vehicles-error {
+          margin-top: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          background: rgba(220, 38, 38, 0.1);
+          border: 1px solid rgba(220, 38, 38, 0.3);
+          border-radius: 4px;
+          color: #dc2626;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__vehicles-actions {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .dashboard__action--danger {
+          background: #dc2626;
+          border-color: #dc2626;
+          color: white;
+        }
+
+        .dashboard__action--danger:hover {
+          background: #b91c1c;
+        }
+
+        .dashboard__vehicles-info {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-500);
+        }
+
+        .dashboard__vehicles-info p {
+          margin: 0;
+        }
+
+        /* Automation Dashboard styles */
+        .dashboard__automation-stats {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__automation-stat {
+          text-align: center;
+          padding: 0.75rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+        }
+
+        .dashboard__automation-value {
+          display: block;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--theme-text);
+        }
+
+        .dashboard__automation-value--error {
+          color: #dc2626;
+        }
+
+        .dashboard__automation-label {
+          font-size: 0.7rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__automation-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__automation-schedule,
+        .dashboard__automation-actions-panel {
+          padding: 1rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+        }
+
+        .dashboard__automation-schedule h3,
+        .dashboard__automation-actions-panel h3,
+        .dashboard__automation-jobs h3 {
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin: 0 0 0.75rem 0;
+          color: var(--theme-text);
+        }
+
+        .dashboard__automation-schedule-item {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.875rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .dashboard__automation-schedule-label {
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__automation-schedule-value {
+          font-weight: 500;
+          color: var(--theme-text);
+        }
+
+        .dashboard__automation-schedule-hint {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-500);
+          padding: 0.5rem;
+          background: var(--theme-elevation-50);
+          border-radius: 4px;
+          margin-top: 0.5rem;
+        }
+
+        .dashboard__automation-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .dashboard__automation-buttons-row {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .dashboard__automation-jobs {
+          padding: 1rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__automation-table {
+          width: 100%;
+          font-size: 0.8125rem;
+          border-collapse: collapse;
+        }
+
+        .dashboard__automation-table th {
+          text-align: left;
+          padding: 0.5rem;
+          border-bottom: 1px solid var(--theme-elevation-200);
+          color: var(--theme-elevation-600);
+          font-weight: 500;
+        }
+
+        .dashboard__automation-table td {
+          padding: 0.5rem;
+          border-bottom: 1px solid var(--theme-elevation-100);
+        }
+
+        .dashboard__automation-status {
+          font-size: 0.75rem;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+        }
+
+        .dashboard__automation-status--success {
+          background: rgba(22, 163, 74, 0.1);
+          color: #16a34a;
+        }
+
+        .dashboard__automation-status--failed {
+          background: rgba(220, 38, 38, 0.1);
+          color: #dc2626;
+        }
+
+        .dashboard__automation-status--running {
+          background: rgba(37, 99, 235, 0.1);
+          color: #2563eb;
+        }
+
+        /* Content Generation styles */
+        .dashboard__content-gen {
+          padding: 1rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 8px;
+        }
+
+        .dashboard__content-gen-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-stat {
+          text-align: center;
+          padding: 0.75rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+        }
+
+        .dashboard__content-gen-value {
+          display: block;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--theme-text);
+        }
+
+        .dashboard__content-gen-value--success {
+          color: #16a34a;
+        }
+
+        .dashboard__content-gen-value--warning {
+          color: #f59e0b;
+        }
+
+        .dashboard__content-gen-label {
+          font-size: 0.7rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__content-gen-selector {
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-selector label {
+          display: block;
+          font-size: 0.875rem;
+          margin-bottom: 0.5rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__content-gen-select {
+          width: 100%;
+          padding: 0.75rem;
+          background: var(--theme-elevation-100);
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 6px;
+          color: var(--theme-text);
+          font-size: 0.875rem;
+        }
+
+        .dashboard__content-gen-status {
+          padding: 1rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-status-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-status-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.75rem;
+          background: var(--theme-elevation-50);
+          border-radius: 6px;
+          font-size: 0.8125rem;
+          color: var(--theme-elevation-600);
+        }
+
+        .dashboard__content-gen-status-item--ok {
+          background: rgba(22, 163, 74, 0.1);
+          color: #16a34a;
+        }
+
+        .dashboard__content-gen-status-date {
+          font-size: 0.7rem;
+          opacity: 0.8;
+        }
+
+        .dashboard__content-gen-actions {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .dashboard__content-gen-preview {
+          padding: 1rem;
+          background: var(--theme-elevation-100);
+          border-radius: 6px;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-preview h3 {
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin: 0 0 1rem 0;
+        }
+
+        .dashboard__content-gen-fields {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          align-items: center;
+        }
+
+        .dashboard__content-gen-fields > span {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-600);
+          margin-right: 0.5rem;
+        }
+
+        .dashboard__content-gen-field {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.25rem 0.5rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          font-size: 0.75rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .dashboard__content-gen-field:hover {
+          border-color: var(--theme-elevation-300);
+        }
+
+        .dashboard__content-gen-field--active {
+          background: rgba(22, 163, 74, 0.1);
+          border-color: #16a34a;
+        }
+
+        .dashboard__content-gen-field input {
+          cursor: pointer;
+        }
+
+        .dashboard__content-gen-preview-content {
+          background: var(--theme-elevation-50);
+          border-radius: 6px;
+          padding: 1rem;
+        }
+
+        .dashboard__content-gen-preview-item {
+          margin-bottom: 1rem;
+        }
+
+        .dashboard__content-gen-preview-item:last-child {
+          margin-bottom: 0;
+        }
+
+        .dashboard__content-gen-preview-item strong {
+          display: block;
+          font-size: 0.75rem;
+          color: var(--theme-elevation-600);
+          margin-bottom: 0.25rem;
+        }
+
+        .dashboard__content-gen-preview-item p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--theme-text);
+        }
+
+        .dashboard__content-gen-preview-item ul {
+          margin: 0;
+          padding-left: 1.25rem;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__content-gen-preview-item li {
+          margin-bottom: 0.25rem;
+        }
+
+        .dashboard__content-gen-preview-meta {
+          margin-top: 1rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid var(--theme-elevation-200);
+          font-size: 0.75rem;
+          color: var(--theme-elevation-500);
+        }
+
+        .dashboard__content-gen-publish {
+          margin-top: 1rem;
+        }
+
+        .dashboard__content-gen-help {
+          padding: 1rem;
+          background: rgba(37, 99, 235, 0.05);
+          border: 1px solid rgba(37, 99, 235, 0.2);
+          border-radius: 6px;
+        }
+
+        .dashboard__content-gen-help strong {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: #2563eb;
+        }
+
+        .dashboard__content-gen-help ol {
+          margin: 0;
+          padding-left: 1.25rem;
+          font-size: 0.875rem;
+          color: var(--theme-elevation-700);
+        }
+
+        .dashboard__content-gen-help li {
+          margin-bottom: 0.25rem;
         }
       `}</style>
     </div>
