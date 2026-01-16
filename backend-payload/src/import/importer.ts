@@ -405,10 +405,33 @@ export function isImportRunning(): boolean {
 }
 
 /**
+ * Перевірка чи існують таблиці
+ */
+async function tablesExist(): Promise<boolean> {
+  try {
+    const pool = getVehiclesPool();
+    const result = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'car_brands'
+      ) as exists
+    `);
+    return result.rows[0].exists;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Отримання статистики з БД
  */
 export async function getDbStats(): Promise<ImportStats | null> {
   try {
+    // Перевіряємо чи існують таблиці
+    if (!(await tablesExist())) {
+      return null;
+    }
+
     const pool = getVehiclesPool();
 
     const [brandsResult, modelsResult, kitsResult, sizesResult] =
