@@ -49,9 +49,24 @@ import {
   generateReviewsStatusEndpoint,
   reviewStatsEndpoint,
 } from './src/endpoints/reviewGeneration';
+import {
+  healthEndpoint,
+  readinessEndpoint,
+  livenessEndpoint,
+} from './src/endpoints/health';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+// Security: Validate required environment variables in production
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.PAYLOAD_SECRET || process.env.PAYLOAD_SECRET.length < 32) {
+    throw new Error('PAYLOAD_SECRET must be at least 32 characters in production');
+  }
+  if (!process.env.DATABASE_URI) {
+    throw new Error('DATABASE_URI environment variable is required in production');
+  }
+}
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
@@ -107,12 +122,18 @@ export default buildConfig({
     generateReviewsEndpoint,
     generateReviewsStatusEndpoint,
     reviewStatsEndpoint,
+    // Health checks
+    healthEndpoint,
+    readinessEndpoint,
+    livenessEndpoint,
   ],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
+  // Secret must be set via PAYLOAD_SECRET env variable (min 32 chars in production)
+  secret: process.env.PAYLOAD_SECRET || 'dev-only-secret-not-for-production',
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI || 'postgresql://snisar:bridgestone123@localhost:5433/bridgestone',
+      // DATABASE_URI must be set via environment variable in production
+      connectionString: process.env.DATABASE_URI || 'postgresql://bridgestone:bridgestone@localhost:5433/bridgestone',
     },
   }),
   typescript: {
@@ -128,9 +149,15 @@ export default buildConfig({
     defaultLocale: 'uk',
     fallback: true,
   },
+  // CORS: In production, only allow configured origins
   cors: [
-    'http://localhost:3000',
-    'http://localhost:3010',
+    // Development origins (excluded in production if FRONTEND_URL is set)
+    ...(process.env.NODE_ENV !== 'production' || !process.env.FRONTEND_URL
+      ? ['http://localhost:3000', 'http://localhost:3010']
+      : []),
+    // Production frontend URL
+    process.env.FRONTEND_URL || '',
+    // Payload server URL (for admin panel)
     process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
   ].filter(Boolean),
   upload: {
@@ -139,5 +166,8 @@ export default buildConfig({
     },
     useTempFiles: true,
   },
+  // Security: Cookie settings for production
+  cookiePrefix: 'bridgestone',
+  csrf: [], // Empty array enables CSRF protection for all origins
   sharp,
 });

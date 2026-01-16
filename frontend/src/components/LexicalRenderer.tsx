@@ -9,6 +9,7 @@
 "use client";
 
 import Link from "next/link";
+import DOMPurify from "isomorphic-dompurify";
 
 // Lexical Node Types
 interface LexicalTextNode {
@@ -217,11 +218,17 @@ export function LexicalRenderer({
   const proseClasses = getProseClasses(variant, { leadParagraph });
 
   // Handle HTML string from CKEditor
+  // Sanitize to prevent XSS attacks
   if (typeof content === "string") {
+    const sanitizedContent = DOMPurify.sanitize(content, {
+      ADD_TAGS: ["iframe"], // Allow iframes for embedded content
+      ADD_ATTR: ["target", "rel", "allowfullscreen", "frameborder"], // Allow common attrs
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+    });
     return (
       <div
         className={`${proseClasses} ${className}`}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
     );
   }

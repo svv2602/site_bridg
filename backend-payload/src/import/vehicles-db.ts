@@ -3,14 +3,36 @@ import { Pool, PoolClient } from 'pg';
 // Singleton пул підключень до PostgreSQL для бази автомобілів
 let pool: Pool | null = null;
 
+/**
+ * Отримання конфігурації БД з environment variables
+ * Всі credentials повинні бути в .env файлі
+ */
+function getDbConfig() {
+  const host = process.env.VEHICLES_DB_HOST || 'localhost';
+  const port = parseInt(process.env.VEHICLES_DB_PORT || '5433');
+  const database = process.env.VEHICLES_DB_NAME || 'bridgestone_vehicles';
+  const user = process.env.VEHICLES_DB_USER;
+  const password = process.env.VEHICLES_DB_PASSWORD;
+
+  // Validation: credentials required in production
+  if (process.env.NODE_ENV === 'production' && (!user || !password)) {
+    throw new Error(
+      'VEHICLES_DB_USER and VEHICLES_DB_PASSWORD environment variables are required in production'
+    );
+  }
+
+  return { host, port, database, user, password };
+}
+
 export function getVehiclesPool(): Pool {
   if (!pool) {
+    const config = getDbConfig();
     pool = new Pool({
-      host: process.env.VEHICLES_DB_HOST || 'localhost',
-      port: parseInt(process.env.VEHICLES_DB_PORT || '5433'),
-      database: process.env.VEHICLES_DB_NAME || 'bridgestone_vehicles',
-      user: process.env.VEHICLES_DB_USER || 'snisar',
-      password: process.env.VEHICLES_DB_PASSWORD || 'bridgestone123',
+      host: config.host,
+      port: config.port,
+      database: config.database,
+      user: config.user,
+      password: config.password,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
@@ -78,12 +100,13 @@ export async function checkConnection(): Promise<boolean> {
  * Створення бази даних якщо не існує
  */
 export async function ensureDatabase(): Promise<void> {
+  const config = getDbConfig();
   const tempPool = new Pool({
-    host: process.env.VEHICLES_DB_HOST || 'localhost',
-    port: parseInt(process.env.VEHICLES_DB_PORT || '5433'),
+    host: config.host,
+    port: config.port,
     database: 'postgres',
-    user: process.env.VEHICLES_DB_USER || 'snisar',
-    password: process.env.VEHICLES_DB_PASSWORD || 'bridgestone123',
+    user: config.user,
+    password: config.password,
   });
 
   try {
