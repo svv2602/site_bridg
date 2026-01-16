@@ -41,7 +41,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
     volumes:
-      - media_data:/app/media
+      - ./backend-payload/media:/app/media
       - ./backend-payload/db_size_auto:/app/db_size_auto:ro
     ports:
       - "3001:3001"
@@ -69,4 +69,3 @@ services:
 
 volumes:
   postgres_data:
-  media_data:
