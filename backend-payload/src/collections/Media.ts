@@ -1,5 +1,16 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload';
 import { removeBackgroundHook } from '../hooks/removeBackground';
+
+// PostgreSQL enums cannot accept empty strings - convert them to undefined (NULL)
+const sanitizeEnumFields: CollectionBeforeChangeHook = ({ data }) => {
+  const enumFields = ['generationType', 'generationSeason', 'generationSize'];
+  for (const field of enumFields) {
+    if (data[field] === '') {
+      data[field] = undefined;
+    }
+  }
+  return data;
+};
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -121,6 +132,7 @@ export const Media: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [sanitizeEnumFields],
     afterChange: [removeBackgroundHook],
   },
   access: {
