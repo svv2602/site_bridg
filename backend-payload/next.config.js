@@ -10,6 +10,9 @@ const nextConfig = {
     reactCompiler: false,
   },
   outputFileTracingRoot: path.join(__dirname),
+  sassOptions: {
+    silenceDeprecations: ['import'],
+  },
 }
 
 export default withPayload(nextConfig)
