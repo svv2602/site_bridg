@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import path from "path";
 
 const nextConfig: NextConfig = {
   output: 'standalone', // Required for Docker deployment
+  outputFileTracingRoot: path.join(__dirname), // Silence multiple lockfiles warning
 
   // Security and cache headers
   async headers() {
