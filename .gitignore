@@ -1,3 +1,9 @@
 # Skills (installed via npx skills add)
 .agents/
 .claude/skills/
+.cursor/
+.continue/
+.codex/
+.gemini/
+.opencode/
+.qwen/
