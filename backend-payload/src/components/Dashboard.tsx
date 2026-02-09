@@ -292,7 +292,7 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
-  const runContentAction = async (action: 'scrape' | 'import' | 'generate') => {
+  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline') => {
     setContentProcessing(action)
     try {
       const res = await fetch(`/api/content/${action}`, { method: 'POST' })
@@ -303,6 +303,18 @@ export const Dashboard: React.FC<any> = () => {
         if (jobsRes.ok) {
           const jobsData = await jobsRes.json()
           setContentJobs(jobsData.jobs || [])
+        }
+        // After pipeline, also trigger bg removal for any remaining images
+        if (action === 'pipeline') {
+          try {
+            await fetch('/api/remove-backgrounds?all=true', { method: 'POST' })
+            const statusRes = await fetch('/api/remove-backgrounds/status')
+            if (statusRes.ok) {
+              setBgStatus(await statusRes.json())
+            }
+          } catch {
+            // bg removal is best-effort
+          }
         }
       } else {
         alert(`Помилка: ${data.error}`)
@@ -813,6 +825,14 @@ export const Dashboard: React.FC<any> = () => {
             <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
           </div>
           <div className="dashboard__content-actions">
+            <button
+              onClick={() => runContentAction('pipeline')}
+              disabled={contentProcessing !== null}
+              className="dashboard__action dashboard__action--primary"
+              style={{ width: '100%', marginBottom: '8px' }}
+            >
+              {contentProcessing === 'pipeline' ? 'Повний цикл...' : '⚡ Повний цикл'}
+            </button>
             <button
               onClick={() => runContentAction('scrape')}
               disabled={contentProcessing !== null}

@@ -216,6 +216,68 @@ export const contentImportEndpoint: Endpoint = {
 };
 
 /**
+ * POST /api/content/pipeline
+ *
+ * Run full pipeline: scrape → import → generate
+ * Query params:
+ *   - force: Pass --force to scraper (optional, default false)
+ */
+export const contentFullPipelineEndpoint: Endpoint = {
+  path: '/content/pipeline',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const url = new URL(req.url || '', 'http://localhost');
+    const force = url.searchParams.get('force') === 'true';
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+
+    const scrapeCmd = `npx tsx src/scrapers/prokoleso.ts${force ? ' --force' : ''}`;
+    const importCmd = 'npx tsx src/import-tyres.ts';
+    const generateCmd = 'npx tsx src/index.ts --generate';
+    const command = `${scrapeCmd} && ${importCmd} && ${generateCmd}`;
+
+    const jobId = `pipeline-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+    };
+    jobs.set(jobId, job);
+
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 900000, // 15 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        req.payload.logger.info(`Full pipeline completed: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        req.payload.logger.error(`Full pipeline failed: ${error.message}`);
+      });
+
+    return Response.json({
+      message: 'Full pipeline started (scrape → import → generate)',
+      jobId,
+      command,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
+  },
+};
+
+/**
  * GET /api/content/jobs
  *
  * List recent jobs
