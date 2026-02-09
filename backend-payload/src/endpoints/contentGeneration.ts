@@ -16,6 +16,9 @@ interface JobStatus {
   output?: string;
   error?: string;
   command: string;
+  currentStep?: number;
+  totalSteps?: number;
+  stepLabel?: string;
 }
 
 const jobs: Map<string, JobStatus> = new Map();
@@ -240,33 +243,51 @@ export const contentFullPipelineEndpoint: Endpoint = {
     const generateCmd = 'npx tsx src/index.ts --generate';
     const command = `${scrapeCmd} && ${importCmd} && ${generateCmd}`;
 
+    const steps = [
+      { cmd: scrapeCmd, label: 'Скрапінг', step: 1 },
+      { cmd: importCmd, label: 'Імпорт', step: 2 },
+      { cmd: generateCmd, label: 'Генерація', step: 3 },
+    ];
+
     const jobId = `pipeline-${Date.now()}`;
     const job: JobStatus = {
       id: jobId,
       status: 'running',
       startedAt: new Date().toISOString(),
       command,
+      currentStep: 1,
+      totalSteps: 3,
+      stepLabel: steps[0].label,
     };
     jobs.set(jobId, job);
 
-    execAsync(command, {
-      cwd: automationDir,
-      timeout: 900000, // 15 minutes
-      env: { ...process.env },
-    })
-      .then(({ stdout, stderr }) => {
-        job.status = 'completed';
-        job.completedAt = new Date().toISOString();
-        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
-        req.payload.logger.info(`Full pipeline completed: ${jobId}`);
-      })
-      .catch((error) => {
-        job.status = 'failed';
-        job.completedAt = new Date().toISOString();
-        job.error = error.message;
-        job.output = error.stdout || '';
-        req.payload.logger.error(`Full pipeline failed: ${error.message}`);
-      });
+    (async () => {
+      let allOutput = '';
+      for (const { cmd, label, step } of steps) {
+        job.currentStep = step;
+        job.stepLabel = label;
+        try {
+          const { stdout, stderr } = await execAsync(cmd, {
+            cwd: automationDir,
+            timeout: 600000, // 10 minutes per step
+            env: { ...process.env },
+          });
+          allOutput += stdout + (stderr ? `\nSTDERR:\n${stderr}` : '') + '\n';
+        } catch (error: unknown) {
+          const err = error as { message: string; stdout?: string };
+          job.status = 'failed';
+          job.completedAt = new Date().toISOString();
+          job.error = `Крок "${label}" не вдався: ${err.message}`;
+          job.output = allOutput + (err.stdout || '');
+          req.payload.logger.error(`Full pipeline failed at step "${label}": ${err.message}`);
+          return;
+        }
+      }
+      job.status = 'completed';
+      job.completedAt = new Date().toISOString();
+      job.output = allOutput;
+      req.payload.logger.info(`Full pipeline completed: ${jobId}`);
+    })();
 
     return Response.json({
       message: 'Full pipeline started (scrape → import → generate)',

@@ -24,6 +24,9 @@ interface ContentJob {
   completedAt?: string
   command: string
   error?: string
+  currentStep?: number
+  totalSteps?: number
+  stepLabel?: string
 }
 
 interface Provider {
@@ -167,6 +170,7 @@ export const Dashboard: React.FC<any> = () => {
   const [bgMessage, setBgMessage] = useState<string | null>(null)
   const [contentJobs, setContentJobs] = useState<ContentJob[]>([])
   const [contentProcessing, setContentProcessing] = useState<string | null>(null)
+  const [pipelineJob, setPipelineJob] = useState<ContentJob | null>(null)
   const [providers, setProviders] = useState<Provider[]>([])
   const [taskRouting, setTaskRouting] = useState<TaskRoute[]>([])
   const [providersLoading, setProvidersLoading] = useState(false)
@@ -298,23 +302,51 @@ export const Dashboard: React.FC<any> = () => {
       const res = await fetch(`/api/content/${action}`, { method: 'POST' })
       const data = await res.json()
       if (res.ok) {
-        // Refresh jobs list
+        if (action === 'pipeline' && data.jobId) {
+          // Start polling for pipeline progress
+          setPipelineJob({ id: data.jobId, status: 'running', startedAt: new Date().toISOString(), command: data.command || '', currentStep: 1, totalSteps: 3, stepLabel: 'Скрапінг' })
+          const pollInterval = setInterval(async () => {
+            try {
+              const jobRes = await fetch(`/api/content/job/${data.jobId}`)
+              if (jobRes.ok) {
+                const jobData: ContentJob = await jobRes.json()
+                setPipelineJob(jobData)
+                if (jobData.status === 'completed' || jobData.status === 'failed') {
+                  clearInterval(pollInterval)
+                  setContentProcessing(null)
+                  // Refresh jobs list
+                  const jobsRes = await fetch('/api/content/jobs')
+                  if (jobsRes.ok) {
+                    const jobsData = await jobsRes.json()
+                    setContentJobs(jobsData.jobs || [])
+                  }
+                  // Trigger bg removal after pipeline
+                  if (jobData.status === 'completed') {
+                    try {
+                      await fetch('/api/remove-backgrounds?all=true', { method: 'POST' })
+                      const statusRes = await fetch('/api/remove-backgrounds/status')
+                      if (statusRes.ok) {
+                        setBgStatus(await statusRes.json())
+                      }
+                    } catch {
+                      // bg removal is best-effort
+                    }
+                  }
+                  // Clear progress widget after a short delay
+                  setTimeout(() => setPipelineJob(null), 3000)
+                }
+              }
+            } catch {
+              // ignore polling errors
+            }
+          }, 3000)
+          return // don't clear contentProcessing yet
+        }
+        // Non-pipeline actions: refresh jobs immediately
         const jobsRes = await fetch('/api/content/jobs')
         if (jobsRes.ok) {
           const jobsData = await jobsRes.json()
           setContentJobs(jobsData.jobs || [])
-        }
-        // After pipeline, also trigger bg removal for any remaining images
-        if (action === 'pipeline') {
-          try {
-            await fetch('/api/remove-backgrounds?all=true', { method: 'POST' })
-            const statusRes = await fetch('/api/remove-backgrounds/status')
-            if (statusRes.ok) {
-              setBgStatus(await statusRes.json())
-            }
-          } catch {
-            // bg removal is best-effort
-          }
         }
       } else {
         alert(`Помилка: ${data.error}`)
@@ -322,7 +354,9 @@ export const Dashboard: React.FC<any> = () => {
     } catch (error) {
       alert('Помилка з\'єднання')
     } finally {
-      setContentProcessing(null)
+      if (action !== 'pipeline') {
+        setContentProcessing(null)
+      }
     }
   }
 
@@ -825,14 +859,58 @@ export const Dashboard: React.FC<any> = () => {
             <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
           </div>
           <div className="dashboard__content-actions">
-            <button
-              onClick={() => runContentAction('pipeline')}
-              disabled={contentProcessing !== null}
-              className="dashboard__action dashboard__action--primary"
-              style={{ width: '100%', marginBottom: '8px' }}
-            >
-              {contentProcessing === 'pipeline' ? 'Повний цикл...' : '⚡ Повний цикл'}
-            </button>
+            {pipelineJob ? (
+              <div className="dashboard__pipeline-progress">
+                <div className="dashboard__pipeline-steps">
+                  {[
+                    { step: 1, label: 'Скрапінг' },
+                    { step: 2, label: 'Імпорт' },
+                    { step: 3, label: 'Генерація' },
+                  ].map(({ step, label }) => {
+                    const current = pipelineJob.currentStep || 1
+                    const isFailed = pipelineJob.status === 'failed' && current === step
+                    const isCompleted = pipelineJob.status === 'completed' || step < current
+                    const isActive = pipelineJob.status === 'running' && step === current
+                    const isPending = step > current && pipelineJob.status !== 'completed'
+                    let className = 'dashboard__pipeline-step'
+                    if (isFailed) className += ' dashboard__pipeline-step--failed'
+                    else if (isCompleted) className += ' dashboard__pipeline-step--completed'
+                    else if (isActive) className += ' dashboard__pipeline-step--active'
+                    else if (isPending) className += ' dashboard__pipeline-step--pending'
+                    return (
+                      <div key={step} className={className}>
+                        <span className="dashboard__pipeline-step-icon">
+                          {isFailed ? '✗' : isCompleted ? '✓' : isActive ? '⏳' : '○'}
+                        </span>
+                        <span className="dashboard__pipeline-step-label">{label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="dashboard__pipeline-bar">
+                  <div
+                    className={`dashboard__pipeline-bar-fill${pipelineJob.status === 'failed' ? ' dashboard__pipeline-bar-fill--failed' : pipelineJob.status === 'completed' ? ' dashboard__pipeline-bar-fill--completed' : ''}`}
+                    style={{
+                      width: pipelineJob.status === 'completed'
+                        ? '100%'
+                        : `${(((pipelineJob.currentStep || 1) - 1) / 3) * 100 + (pipelineJob.status === 'running' ? 100 / 6 : 0)}%`,
+                    }}
+                  />
+                </div>
+                {pipelineJob.status === 'failed' && pipelineJob.error && (
+                  <div className="dashboard__pipeline-error">{pipelineJob.error}</div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => runContentAction('pipeline')}
+                disabled={contentProcessing !== null}
+                className="dashboard__action dashboard__action--primary"
+                style={{ width: '100%', marginBottom: '8px' }}
+              >
+                ⚡ Повний цикл
+              </button>
+            )}
             <button
               onClick={() => runContentAction('scrape')}
               disabled={contentProcessing !== null}
@@ -1722,6 +1800,82 @@ export const Dashboard: React.FC<any> = () => {
           color: var(--theme-elevation-600);
           font-size: 0.875rem;
           font-style: italic;
+        }
+
+        .dashboard__pipeline-progress {
+          width: 100%;
+          padding: 0.75rem;
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-150);
+          border-radius: 8px;
+          margin-bottom: 8px;
+        }
+
+        .dashboard__pipeline-steps {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+        }
+
+        .dashboard__pipeline-step {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-size: 0.8rem;
+          color: var(--theme-elevation-500);
+          transition: color 0.2s;
+        }
+
+        .dashboard__pipeline-step--active {
+          color: #f59e0b;
+          font-weight: 600;
+        }
+
+        .dashboard__pipeline-step--completed {
+          color: #16a34a;
+        }
+
+        .dashboard__pipeline-step--failed {
+          color: #dc2626;
+          font-weight: 600;
+        }
+
+        .dashboard__pipeline-step--pending {
+          color: var(--theme-elevation-400);
+        }
+
+        .dashboard__pipeline-step-icon {
+          font-size: 0.85rem;
+        }
+
+        .dashboard__pipeline-bar {
+          width: 100%;
+          height: 6px;
+          background: var(--theme-elevation-150);
+          border-radius: 3px;
+          overflow: hidden;
+        }
+
+        .dashboard__pipeline-bar-fill {
+          height: 100%;
+          background: #f59e0b;
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+
+        .dashboard__pipeline-bar-fill--completed {
+          background: #16a34a;
+        }
+
+        .dashboard__pipeline-bar-fill--failed {
+          background: #dc2626;
+        }
+
+        .dashboard__pipeline-error {
+          margin-top: 0.5rem;
+          font-size: 0.75rem;
+          color: #dc2626;
+          word-break: break-word;
         }
 
         .dashboard__section-header {
