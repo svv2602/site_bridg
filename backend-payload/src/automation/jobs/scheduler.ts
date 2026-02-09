@@ -48,16 +48,8 @@ const DEFAULT_TASKS: TaskConfig[] = [
     timezone: 'Europe/Kyiv',
   },
   {
-    taskId: 'articles',
-    label: 'Генерація статей',
-    command: 'generate-articles',
-    enabled: false,
-    cronExpression: '0 4 * * 1',
-    timezone: 'Europe/Kyiv',
-  },
-  {
     taskId: 'smart-articles',
-    label: 'Розумна генерація статей',
+    label: 'Генерація статей',
     command: 'smart-article-pipeline',
     enabled: false,
     cronExpression: '0 5 * * 3',
@@ -83,6 +75,12 @@ function readAllConfigs(): TaskConfig[] {
         timezone: t.timezone,
       });
     }
+
+    // Clean up removed tasks
+    const validIds = DEFAULT_TASKS.map((t) => t.taskId);
+    db.prepare(
+      `DELETE FROM scheduler_tasks WHERE task_id NOT IN (${validIds.map(() => '?').join(',')})`
+    ).run(...validIds);
 
     const rows = db
       .prepare('SELECT task_id, label, command, enabled, cron_expression, timezone FROM scheduler_tasks')
@@ -173,8 +171,6 @@ function getTaskCallback(taskId: string): () => Promise<void> {
   switch (taskId) {
     case 'pipeline':
       return runScheduledPipeline;
-    case 'articles':
-      return runScheduledArticles;
     case 'smart-articles':
       return runScheduledSmartArticles;
     default:
@@ -243,45 +239,6 @@ async function runScheduledPipeline(): Promise<void> {
   job.output = allOutput;
   updateJob(job);
   console.log(`[Scheduler] Pipeline completed: ${jobId}`);
-}
-
-// ---- Articles runner ----
-
-async function runScheduledArticles(): Promise<void> {
-  const automationDir = path.join(process.cwd(), 'content-automation');
-  const command = 'npx tsx src/generate-articles.ts';
-
-  const jobId = `cron-articles-${Date.now()}`;
-  const job: JobStatus = {
-    id: jobId,
-    status: 'running',
-    startedAt: new Date().toISOString(),
-    command,
-  };
-  saveJob(job);
-
-  console.log(`[Scheduler] Cron triggered articles job ${jobId}`);
-
-  try {
-    const { stdout, stderr } = await execAsync(command, {
-      cwd: automationDir,
-      timeout: 600000,
-      env: { ...process.env },
-    });
-    job.status = 'completed';
-    job.completedAt = new Date().toISOString();
-    job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
-    updateJob(job);
-    console.log(`[Scheduler] Articles completed: ${jobId}`);
-  } catch (error: unknown) {
-    const err = error as { message: string; stdout?: string };
-    job.status = 'failed';
-    job.completedAt = new Date().toISOString();
-    job.error = err.message;
-    job.output = err.stdout || '';
-    updateJob(job);
-    console.error(`[Scheduler] Articles failed: ${err.message}`);
-  }
 }
 
 // ---- Smart Articles runner ----

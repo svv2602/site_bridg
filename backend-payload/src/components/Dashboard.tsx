@@ -336,7 +336,7 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
-  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline' | 'articles' | 'smart-pipeline') => {
+  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline' | 'smart-pipeline') => {
     setContentProcessing(action)
     try {
       const res = await fetch(`/api/content/${action}`, { method: 'POST' })
@@ -940,8 +940,7 @@ export const Dashboard: React.FC<any> = () => {
               const isSaving = schedulerSaving === task.taskId
               const taskDescriptions: Record<string, string> = {
                 pipeline: 'Скрапінг даних з ProKoleso, імпорт у базу даних та генерація AI-контенту (описи, SEO, FAQ) для всіх нових шин.',
-                articles: 'Генерація 3 сезонних блог-статей (зимові/літні шини, догляд) з AI-ілюстраціями та публікація в CMS.',
-                'smart-articles': 'Автоматичний пайплайн: сканування джерел тестів (ADAC, Auto Bild) → аналіз нових результатів → планування статей → генерація з перелінковкою на товари → публікація або черга на перевірку.',
+                'smart-articles': 'Сканування джерел тестів (ADAC, Auto Bild) → аналіз нових результатів → планування статей → генерація з перелінковкою на товари → публікація або черга на перевірку.',
               }
               return (
                 <div key={task.taskId} className="dashboard__schedule-task-card">
@@ -1079,14 +1078,6 @@ export const Dashboard: React.FC<any> = () => {
                   {contentProcessing === 'generate' ? '...' : 'Генерація'}
                 </button>
               </div>
-              <button
-                onClick={() => runContentAction('articles')}
-                disabled={contentProcessing !== null}
-                className="dashboard__action"
-                style={{ width: '100%', marginTop: '4px' }}
-              >
-                {contentProcessing === 'articles' ? 'Запуск...' : 'Генерація статей'}
-              </button>
               <button
                 onClick={() => runContentAction('smart-pipeline')}
                 disabled={contentProcessing !== null}
