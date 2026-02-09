@@ -6,7 +6,7 @@
  * Supports multi-brand (Bridgestone & Firestone).
  */
 
-import { llm } from "../providers/index.js";
+import { fallbackLlm } from "../providers/fallback-llm.js";
 import { SYSTEM_PROMPTS } from "../prompts/index.js";
 import { ENV } from "../config/env.js";
 import type { Brand } from "../types/content.js";
@@ -286,7 +286,7 @@ export async function generateComparison(
 
   try {
     const prompt = generateVerdictPrompt(tyres, comparisonTable);
-    const generator = llm.forTask("content-generation");
+    const generator = fallbackLlm.forTask("content-generation");
     const response = await generator.generate(prompt, {
       systemPrompt: SYSTEM_PROMPTS.tireDescription,
       maxTokens: 800,

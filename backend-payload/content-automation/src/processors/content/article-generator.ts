@@ -4,7 +4,7 @@
  * Generates blog articles using LLM with SEO optimization.
  */
 
-import { llm } from "../../providers/index.js";
+import { fallbackLlm } from "../../providers/fallback-llm.js";
 import { SYSTEM_PROMPTS } from "../../prompts/index.js";
 import type { GeneratedArticle } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
@@ -217,7 +217,7 @@ export async function generateArticle(
   });
 
   // Use content-generation routing
-  const generator = llm.forTask("content-generation");
+  const generator = fallbackLlm.forTask("content-generation");
 
   const { data, response } = await generator.generateJSON<ArticleOutput>(prompt, {
     systemPrompt: SYSTEM_PROMPTS.article,

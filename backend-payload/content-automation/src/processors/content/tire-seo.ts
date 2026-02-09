@@ -4,7 +4,7 @@
  * Generates SEO metadata (title, description, keywords) for tire pages.
  */
 
-import { llm } from "../../providers/index.js";
+import { fallbackLlm } from "../../providers/fallback-llm.js";
 import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes } from "../../prompts/index.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -136,7 +136,7 @@ export async function generateTireSEO(
   logger.info(`Generating SEO for ${input.modelName}`);
 
   // Use content-generation routing (DeepSeek available, Groq requires separate key)
-  const generator = llm.forTask("content-generation");
+  const generator = fallbackLlm.forTask("content-generation");
 
   const { data, response } = await generator.generateJSON<SEOOutput>(prompt, {
     systemPrompt: SYSTEM_PROMPTS.tireSEO,

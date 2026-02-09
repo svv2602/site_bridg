@@ -14,7 +14,7 @@
  *   --dry-run          Generate but don't save to database
  */
 
-import { llm } from "./providers/index.js";
+import { fallbackLlm } from "./providers/fallback-llm.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { createLogger } from "./utils/logger.js";
 
@@ -248,7 +248,7 @@ async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Promise<Ge
     const prompt = buildSingleReviewPrompt(tyre, i);
 
     try {
-      const result = await llm.generateJSON<GeneratedReview>(prompt, {
+      const result = await fallbackLlm.generateJSON<GeneratedReview>(prompt, {
         temperature: 0.9,
         maxTokens: 1000,
         taskType: "content-generation",

@@ -5,7 +5,7 @@
  * Supports multi-brand (Bridgestone & Firestone).
  */
 
-import { llm } from "../../providers/index.js";
+import { fallbackLlm } from "../../providers/fallback-llm.js";
 import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand } from "../../prompts/index.js";
 import type { RawTyreContent, GeneratedTyreContent, Brand } from "../../types/content.js";
 import { BRAND_NAMES } from "../../types/content.js";
@@ -175,7 +175,7 @@ export async function generateTireDescription(
   });
 
   // Use task-specific routing with brand-specific system prompt
-  const generator = llm.forTask("content-generation");
+  const generator = fallbackLlm.forTask("content-generation");
   const systemPrompts = getSystemPromptsForBrand(brand);
 
   const { data, response } = await generator.generateJSON<DescriptionOutput>(prompt, {
