@@ -93,7 +93,9 @@ interface AutomationStats {
 
 interface AutomationStatus {
   status: 'running' | 'idle'
-  nextRun: string
+  enabled: boolean
+  cronExpression: string
+  nextRun: string | null
   timezone: string
 }
 
@@ -174,7 +176,9 @@ export const Dashboard: React.FC<any> = () => {
   // Automation Dashboard state
   const [automationStats, setAutomationStats] = useState<AutomationStats | null>(null)
   const [automationStatus, setAutomationStatus] = useState<AutomationStatus | null>(null)
-
+  const [cronInput, setCronInput] = useState('0 3 * * 0')
+  const [cronError, setCronError] = useState<string | null>(null)
+  const [schedulerSaving, setSchedulerSaving] = useState(false)
 
   // Content Generation state
   const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
@@ -243,7 +247,11 @@ export const Dashboard: React.FC<any> = () => {
           setAutomationStats(await automationStatsRes.json())
         }
         if (automationStatusRes.ok) {
-          setAutomationStatus(await automationStatusRes.json())
+          const statusData = await automationStatusRes.json()
+          setAutomationStatus(statusData)
+          if (statusData.cronExpression) {
+            setCronInput(statusData.cronExpression)
+          }
         }
 
         // Fetch tyre models for content generation
@@ -524,10 +532,61 @@ export const Dashboard: React.FC<any> = () => {
         fetch('/api/automation/status'),
       ])
       if (statsRes.ok) setAutomationStats(await statsRes.json())
-      if (statusRes.ok) setAutomationStatus(await statusRes.json())
+      if (statusRes.ok) {
+        const statusData = await statusRes.json()
+        setAutomationStatus(statusData)
+        if (statusData.cronExpression) {
+          setCronInput(statusData.cronExpression)
+        }
+      }
     } catch (error) {
       console.error('Failed to refresh automation:', error)
     }
+  }
+
+  const updateScheduler = async (body: { enabled?: boolean; cronExpression?: string }) => {
+    setSchedulerSaving(true)
+    setCronError(null)
+    try {
+      const res = await fetch('/api/automation/scheduler', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAutomationStatus(data)
+        if (data.cronExpression) setCronInput(data.cronExpression)
+      } else {
+        const err = await res.json()
+        setCronError(err.error || 'Помилка збереження')
+      }
+    } catch {
+      setCronError('Не вдалось зʼєднатися з сервером')
+    } finally {
+      setSchedulerSaving(false)
+    }
+  }
+
+  const cronDescription = (expr: string): string => {
+    const parts = expr.trim().split(/\s+/)
+    if (parts.length !== 5) return expr
+    const [min, hour, , , dow] = parts
+    const dayNames: Record<string, string> = {
+      '0': 'неділю', '1': 'понеділок', '2': 'вівторок', '3': 'середу',
+      '4': 'четвер', '5': "п'ятницю", '6': 'суботу', '7': 'неділю',
+    }
+    if (dow !== '*' && !dow.includes(',') && !dow.includes('-') && !dow.includes('/') &&
+        min !== '*' && !min.includes('/') && hour !== '*' && !hour.includes('/')) {
+      const day = dayNames[dow] || `день ${dow}`
+      return `Щотижня у ${day} о ${hour.padStart(2, '0')}:${min.padStart(2, '0')}`
+    }
+    if (min.startsWith('*/') || hour.startsWith('*/')) {
+      if (min.startsWith('*/')) return `Кожні ${min.slice(2)} хвилин`
+      return `Кожні ${hour.slice(2)} годин`
+    }
+    return expr
   }
 
   // Content Generation functions
@@ -727,16 +786,50 @@ export const Dashboard: React.FC<any> = () => {
           {/* Schedule info */}
           <div className="dashboard__automation-schedule">
             <h3>Розклад</h3>
+            <div className="dashboard__scheduler-toggle">
+              <label className="dashboard__toggle">
+                <input
+                  type="checkbox"
+                  checked={automationStatus?.enabled ?? false}
+                  disabled={schedulerSaving}
+                  onChange={(e) => updateScheduler({ enabled: e.target.checked })}
+                />
+                <span className="dashboard__toggle-slider" />
+              </label>
+              <span className="dashboard__toggle-label">
+                {automationStatus?.enabled ? 'Увімкнено' : 'Вимкнено'}
+              </span>
+            </div>
             <div className="dashboard__automation-schedule-item">
               <span className="dashboard__automation-schedule-label">Останній запуск:</span>
               <span className="dashboard__automation-schedule-value">{formatDate(automationStats?.lastRun ?? null)}</span>
             </div>
             <div className="dashboard__automation-schedule-item">
               <span className="dashboard__automation-schedule-label">Наступний запуск:</span>
-              <span className="dashboard__automation-schedule-value">{formatDate(automationStatus?.nextRun ?? null)}</span>
+              <span className="dashboard__automation-schedule-value">
+                {automationStatus?.enabled ? formatDate(automationStatus?.nextRun ?? null) : '—'}
+              </span>
             </div>
+            <div className="dashboard__cron-input-row">
+              <input
+                type="text"
+                className={`dashboard__cron-input${cronError ? ' dashboard__cron-input--error' : ''}`}
+                value={cronInput}
+                onChange={(e) => { setCronInput(e.target.value); setCronError(null) }}
+                placeholder="0 3 * * 0"
+                disabled={schedulerSaving}
+              />
+              <button
+                className="dashboard__cron-save"
+                disabled={schedulerSaving || cronInput === (automationStatus?.cronExpression ?? '0 3 * * 0')}
+                onClick={() => updateScheduler({ cronExpression: cronInput })}
+              >
+                {schedulerSaving ? '...' : 'Зберегти'}
+              </button>
+            </div>
+            {cronError && <div className="dashboard__cron-error">{cronError}</div>}
             <div className="dashboard__automation-schedule-hint">
-              Автоматичний запуск: щонеділі о 03:00 ({automationStatus?.timezone || 'Europe/Kyiv'})
+              {cronDescription(cronInput)} ({automationStatus?.timezone || 'Europe/Kyiv'})
             </div>
           </div>
 
@@ -2288,6 +2381,118 @@ export const Dashboard: React.FC<any> = () => {
           background: var(--theme-elevation-50);
           border-radius: 4px;
           margin-top: 0.5rem;
+        }
+
+        .dashboard__scheduler-toggle {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .dashboard__toggle {
+          position: relative;
+          display: inline-block;
+          width: 40px;
+          height: 22px;
+          cursor: pointer;
+        }
+
+        .dashboard__toggle input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .dashboard__toggle-slider {
+          position: absolute;
+          inset: 0;
+          background: var(--theme-elevation-200);
+          border-radius: 22px;
+          transition: background 0.2s;
+        }
+
+        .dashboard__toggle-slider::before {
+          content: '';
+          position: absolute;
+          left: 2px;
+          bottom: 2px;
+          width: 18px;
+          height: 18px;
+          background: white;
+          border-radius: 50%;
+          transition: transform 0.2s;
+        }
+
+        .dashboard__toggle input:checked + .dashboard__toggle-slider {
+          background: #22c55e;
+        }
+
+        .dashboard__toggle input:checked + .dashboard__toggle-slider::before {
+          transform: translateX(18px);
+        }
+
+        .dashboard__toggle input:disabled + .dashboard__toggle-slider {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .dashboard__toggle-label {
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: var(--theme-text);
+        }
+
+        .dashboard__cron-input-row {
+          display: flex;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+
+        .dashboard__cron-input {
+          flex: 1;
+          padding: 0.4rem 0.6rem;
+          font-family: monospace;
+          font-size: 0.85rem;
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          background: var(--theme-input-bg);
+          color: var(--theme-text);
+        }
+
+        .dashboard__cron-input:focus {
+          outline: none;
+          border-color: var(--theme-elevation-400);
+        }
+
+        .dashboard__cron-input--error {
+          border-color: #ef4444;
+        }
+
+        .dashboard__cron-save {
+          padding: 0.4rem 0.75rem;
+          font-size: 0.8rem;
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          background: var(--theme-elevation-100);
+          color: var(--theme-text);
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .dashboard__cron-save:hover:not(:disabled) {
+          background: var(--theme-elevation-200);
+        }
+
+        .dashboard__cron-save:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .dashboard__cron-error {
+          color: #ef4444;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
         }
 
         .dashboard__automation-buttons {

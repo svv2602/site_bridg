@@ -1,7 +1,7 @@
 import type { Endpoint } from 'payload';
 import Database from 'better-sqlite3';
 import path from 'path';
-import { getSchedulerStatus } from '../automation/jobs/scheduler';
+import { getSchedulerStatus, setSchedulerConfig } from '../automation/jobs/scheduler';
 
 /**
  * Resolve the path to the content-automation SQLite database.
@@ -111,7 +111,7 @@ export const automationStatsEndpoint: Endpoint = {
 /**
  * GET /api/automation/status
  *
- * Returns scheduler status (next run time, timezone).
+ * Returns scheduler status (next run time, timezone, enabled, cronExpression).
  */
 export const automationStatusEndpoint: Endpoint = {
   path: '/automation/status',
@@ -119,5 +119,42 @@ export const automationStatusEndpoint: Endpoint = {
   handler: async () => {
     const status = getSchedulerStatus();
     return Response.json(status);
+  },
+};
+
+/**
+ * POST /api/automation/scheduler
+ *
+ * Update scheduler config (enable/disable, change cron expression).
+ * Body: { enabled?: boolean, cronExpression?: string }
+ */
+export const automationSchedulerEndpoint: Endpoint = {
+  path: '/automation/scheduler',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let body: { enabled?: boolean; cronExpression?: string };
+    try {
+      body = await req.json!();
+    } catch {
+      return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const { enabled, cronExpression } = body;
+
+    if (enabled === undefined && cronExpression === undefined) {
+      return Response.json({ error: 'Provide at least "enabled" or "cronExpression"' }, { status: 400 });
+    }
+
+    const result = setSchedulerConfig({ enabled, cronExpression });
+
+    if (!result.success) {
+      return Response.json({ error: result.error, status: result.status }, { status: 400 });
+    }
+
+    return Response.json(result.status);
   },
 };

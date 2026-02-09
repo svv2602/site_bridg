@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { getPayload, Payload } from 'payload';
-import { initScheduler } from './automation/jobs/scheduler';
 import config from '../payload.config';
 
 const app = express();
@@ -326,9 +325,6 @@ const start = async () => {
       </html>
     `);
   });
-
-  // Initialize scheduler for cron jobs
-  initScheduler();
 
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on http://localhost:${PORT}`);

@@ -53,12 +53,14 @@ import {
 import {
   automationStatsEndpoint,
   automationStatusEndpoint,
+  automationSchedulerEndpoint,
 } from './src/endpoints/automation';
 import {
   healthEndpoint,
   readinessEndpoint,
   livenessEndpoint,
 } from './src/endpoints/health';
+import { initScheduler } from './src/automation/jobs/scheduler';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -128,9 +130,10 @@ export default buildConfig({
     generateReviewsEndpoint,
     generateReviewsStatusEndpoint,
     reviewStatsEndpoint,
-    // Automation metrics
+    // Automation metrics & scheduler
     automationStatsEndpoint,
     automationStatusEndpoint,
+    automationSchedulerEndpoint,
     // Health checks
     healthEndpoint,
     readinessEndpoint,
@@ -179,4 +182,7 @@ export default buildConfig({
   cookiePrefix: 'bridgestone',
   csrf: [], // Empty array enables CSRF protection for all origins
   sharp,
+  onInit: async () => {
+    initScheduler();
+  },
 });
