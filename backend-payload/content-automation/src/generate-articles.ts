@@ -1,11 +1,11 @@
 /**
  * Generate Blog Articles with Images
  *
- * Creates seasonal guides and tyre-related articles using DeepSeek/OpenAI
+ * Creates seasonal guides and tyre-related articles using LLM (DB-routed provider)
  * Generates and integrates hero and content images using DALL-E
  */
 
-import { createDeepSeekProvider } from "./providers/index.js";
+import { fallbackLlm } from "./providers/fallback-llm.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { generateHeroImage, generateContentImages, type ImageType } from "./processors/content/article-images.js";
 import { createLogger } from "./utils/logger.js";
@@ -183,12 +183,10 @@ async function generateArticle(promptKey: keyof typeof ARTICLE_PROMPTS): Promise
 
   logger.info(`Generating article: ${promptKey}...`);
 
-  const provider = createDeepSeekProvider();
+  const generator = fallbackLlm.forTask("content-generation");
 
   try {
-    const result = await provider.generateChat([
-      { role: "user", content: prompt }
-    ], {
+    const result = await generator.generate(prompt, {
       maxTokens: 5000,
       temperature: 0.7,
     });
