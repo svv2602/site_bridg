@@ -9,15 +9,23 @@ RUN npm ci
 
 # Copy source and build
 COPY . .
+
+# Payload CMS requires PAYLOAD_SECRET (32+ chars) during next build
+# This dummy value is only used at build time; real secret is injected at runtime
+ENV PAYLOAD_SECRET="build-time-dummy-secret-not-used-in-production-32chars"
+ENV DATABASE_URI="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npm run build
+ENV PAYLOAD_SECRET=""
+ENV DATABASE_URI=""
 
 # Production stage
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Install Python and dependencies for rembg
+# Install Python, curl (for healthcheck), and dependencies for rembg
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     python3 \
     python3-pip \
     python3-venv \
@@ -38,6 +46,14 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
+
+# Copy content-automation source (scheduler runs via npx tsx)
+COPY --from=builder /app/content-automation ./content-automation
+
+# Copy Payload source and config (required for Payload runtime)
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/payload.config.ts ./
 
 # Create media directory
 RUN mkdir -p media

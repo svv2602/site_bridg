@@ -1,0 +1,14 @@
+node_modules
+.next
+.venv
+media
+logs
+*.log
+.env
+.env.*
+temp
+.git
+.gitignore
+*.md
+vitest.config.*
+tsconfig.tsbuildinfo
