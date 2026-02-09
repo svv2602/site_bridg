@@ -97,16 +97,6 @@ interface AutomationStatus {
   timezone: string
 }
 
-interface AutomationJob {
-  id: string
-  type: 'full' | 'scrape' | 'generate' | 'publish'
-  status: 'success' | 'failed' | 'running'
-  startedAt: string
-  completedAt: string | null
-  itemsProcessed: number
-  errors: string[]
-}
-
 // Content Generation interfaces
 interface ContentStatus {
   modelSlug: string
@@ -184,8 +174,7 @@ export const Dashboard: React.FC<any> = () => {
   // Automation Dashboard state
   const [automationStats, setAutomationStats] = useState<AutomationStats | null>(null)
   const [automationStatus, setAutomationStatus] = useState<AutomationStatus | null>(null)
-  const [automationJobs, setAutomationJobs] = useState<AutomationJob[]>([])
-  const [automationAction, setAutomationAction] = useState<string | null>(null)
+
 
   // Content Generation state
   const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
@@ -541,45 +530,6 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
-  const triggerAutomation = async (type: 'full' | 'scrape' | 'generate') => {
-    setAutomationAction(type)
-    try {
-      const res = await fetch('/api/automation/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type }),
-      })
-      if (res.ok) {
-        // Add running job to list
-        const newJob: AutomationJob = {
-          id: Date.now().toString(),
-          type,
-          status: 'running',
-          startedAt: new Date().toISOString(),
-          completedAt: null,
-          itemsProcessed: 0,
-          errors: [],
-        }
-        setAutomationJobs(prev => [newJob, ...prev])
-        setTimeout(refreshAutomation, 3000)
-      } else {
-        const data = await res.json()
-        alert(`Помилка: ${data.error}`)
-      }
-    } catch (error) {
-      alert('Помилка з\'єднання')
-    } finally {
-      setAutomationAction(null)
-    }
-  }
-
-  const automationJobTypeLabels: Record<AutomationJob['type'], string> = {
-    full: 'Повний цикл',
-    scrape: 'Скрапінг',
-    generate: 'Генерація',
-    publish: 'Публікація',
-  }
-
   // Content Generation functions
   const fetchContentStatus = async (slug: string) => {
     try {
@@ -794,144 +744,90 @@ export const Dashboard: React.FC<any> = () => {
           <div className="dashboard__automation-actions-panel">
             <h3>Дії</h3>
             <div className="dashboard__automation-buttons">
-              <button
-                onClick={() => triggerAutomation('full')}
-                disabled={automationAction !== null}
-                className="dashboard__action dashboard__action--primary"
-              >
-                {automationAction === 'full' ? 'Запуск...' : '▶ Повний цикл'}
-              </button>
+              {pipelineJob ? (
+                <div className="dashboard__pipeline-progress">
+                  <div className="dashboard__pipeline-steps">
+                    {[
+                      { step: 1, label: 'Скрапінг' },
+                      { step: 2, label: 'Імпорт' },
+                      { step: 3, label: 'Генерація' },
+                    ].map(({ step, label }) => {
+                      const current = pipelineJob.currentStep || 1
+                      const isFailed = pipelineJob.status === 'failed' && current === step
+                      const isCompleted = pipelineJob.status === 'completed' || step < current
+                      const isActive = pipelineJob.status === 'running' && step === current
+                      const isPending = step > current && pipelineJob.status !== 'completed'
+                      let className = 'dashboard__pipeline-step'
+                      if (isFailed) className += ' dashboard__pipeline-step--failed'
+                      else if (isCompleted) className += ' dashboard__pipeline-step--completed'
+                      else if (isActive) className += ' dashboard__pipeline-step--active'
+                      else if (isPending) className += ' dashboard__pipeline-step--pending'
+                      return (
+                        <div key={step} className={className}>
+                          <span className="dashboard__pipeline-step-icon">
+                            {isFailed ? '✗' : isCompleted ? '✓' : isActive ? '⏳' : '○'}
+                          </span>
+                          <span className="dashboard__pipeline-step-label">{label}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="dashboard__pipeline-bar">
+                    <div
+                      className={`dashboard__pipeline-bar-fill${pipelineJob.status === 'failed' ? ' dashboard__pipeline-bar-fill--failed' : pipelineJob.status === 'completed' ? ' dashboard__pipeline-bar-fill--completed' : ''}`}
+                      style={{
+                        width: pipelineJob.status === 'completed'
+                          ? '100%'
+                          : `${(((pipelineJob.currentStep || 1) - 1) / 3) * 100 + (pipelineJob.status === 'running' ? 100 / 6 : 0)}%`,
+                      }}
+                    />
+                  </div>
+                  {pipelineJob.status === 'failed' && pipelineJob.error && (
+                    <div className="dashboard__pipeline-error">{pipelineJob.error}</div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => runContentAction('pipeline')}
+                  disabled={contentProcessing !== null}
+                  className="dashboard__action dashboard__action--primary"
+                  style={{ width: '100%' }}
+                >
+                  {contentProcessing === 'pipeline' ? 'Запуск...' : '▶ Повний цикл'}
+                </button>
+              )}
               <div className="dashboard__automation-buttons-row">
                 <button
-                  onClick={() => triggerAutomation('scrape')}
-                  disabled={automationAction !== null}
+                  onClick={() => runContentAction('scrape')}
+                  disabled={contentProcessing !== null}
                   className="dashboard__action"
                 >
-                  {automationAction === 'scrape' ? '...' : 'Скрапінг'}
+                  {contentProcessing === 'scrape' ? '...' : 'Скрапінг'}
                 </button>
                 <button
-                  onClick={() => triggerAutomation('generate')}
-                  disabled={automationAction !== null}
+                  onClick={() => runContentAction('import')}
+                  disabled={contentProcessing !== null}
                   className="dashboard__action"
                 >
-                  {automationAction === 'generate' ? '...' : 'Генерація'}
+                  {contentProcessing === 'import' ? '...' : 'Імпорт'}
+                </button>
+                <button
+                  onClick={() => runContentAction('generate')}
+                  disabled={contentProcessing !== null}
+                  className="dashboard__action"
+                >
+                  {contentProcessing === 'generate' ? '...' : 'Генерація'}
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Jobs table */}
-        {automationJobs.length > 0 && (
-          <div className="dashboard__automation-jobs">
-            <h3>Останні запуски</h3>
-            <table className="dashboard__automation-table">
-              <thead>
-                <tr>
-                  <th>Тип</th>
-                  <th>Статус</th>
-                  <th>Початок</th>
-                  <th>Оброблено</th>
-                </tr>
-              </thead>
-              <tbody>
-                {automationJobs.slice(0, 5).map((job) => (
-                  <tr key={job.id}>
-                    <td>{automationJobTypeLabels[job.type]}</td>
-                    <td>
-                      <span className={`dashboard__automation-status dashboard__automation-status--${job.status}`}>
-                        {job.status === 'success' ? '✓ Успішно' : job.status === 'failed' ? '✗ Помилка' : '⏳ В процесі'}
-                      </span>
-                    </td>
-                    <td>{formatDate(job.startedAt)}</td>
-                    <td>{job.itemsProcessed}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Legacy content jobs */}
-        <div className="dashboard__content-jobs">
-          <div className="dashboard__content-jobs-header">
-            <span>Системні завдання</span>
+        {/* Recent content jobs */}
+        <div className="dashboard__automation-jobs">
+          <div className="dashboard__section-header" style={{ marginBottom: '8px' }}>
+            <h3>Останні завдання</h3>
             <button onClick={refreshJobs} className="dashboard__refresh-btn">↻</button>
-          </div>
-          <div className="dashboard__content-actions">
-            {pipelineJob ? (
-              <div className="dashboard__pipeline-progress">
-                <div className="dashboard__pipeline-steps">
-                  {[
-                    { step: 1, label: 'Скрапінг' },
-                    { step: 2, label: 'Імпорт' },
-                    { step: 3, label: 'Генерація' },
-                  ].map(({ step, label }) => {
-                    const current = pipelineJob.currentStep || 1
-                    const isFailed = pipelineJob.status === 'failed' && current === step
-                    const isCompleted = pipelineJob.status === 'completed' || step < current
-                    const isActive = pipelineJob.status === 'running' && step === current
-                    const isPending = step > current && pipelineJob.status !== 'completed'
-                    let className = 'dashboard__pipeline-step'
-                    if (isFailed) className += ' dashboard__pipeline-step--failed'
-                    else if (isCompleted) className += ' dashboard__pipeline-step--completed'
-                    else if (isActive) className += ' dashboard__pipeline-step--active'
-                    else if (isPending) className += ' dashboard__pipeline-step--pending'
-                    return (
-                      <div key={step} className={className}>
-                        <span className="dashboard__pipeline-step-icon">
-                          {isFailed ? '✗' : isCompleted ? '✓' : isActive ? '⏳' : '○'}
-                        </span>
-                        <span className="dashboard__pipeline-step-label">{label}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-                <div className="dashboard__pipeline-bar">
-                  <div
-                    className={`dashboard__pipeline-bar-fill${pipelineJob.status === 'failed' ? ' dashboard__pipeline-bar-fill--failed' : pipelineJob.status === 'completed' ? ' dashboard__pipeline-bar-fill--completed' : ''}`}
-                    style={{
-                      width: pipelineJob.status === 'completed'
-                        ? '100%'
-                        : `${(((pipelineJob.currentStep || 1) - 1) / 3) * 100 + (pipelineJob.status === 'running' ? 100 / 6 : 0)}%`,
-                    }}
-                  />
-                </div>
-                {pipelineJob.status === 'failed' && pipelineJob.error && (
-                  <div className="dashboard__pipeline-error">{pipelineJob.error}</div>
-                )}
-              </div>
-            ) : (
-              <button
-                onClick={() => runContentAction('pipeline')}
-                disabled={contentProcessing !== null}
-                className="dashboard__action dashboard__action--primary"
-                style={{ width: '100%', marginBottom: '8px' }}
-              >
-                ⚡ Повний цикл
-              </button>
-            )}
-            <button
-              onClick={() => runContentAction('scrape')}
-              disabled={contentProcessing !== null}
-              className="dashboard__action"
-            >
-              {contentProcessing === 'scrape' ? 'Скрапінг...' : '1. Зібрати дані'}
-            </button>
-            <button
-              onClick={() => runContentAction('import')}
-              disabled={contentProcessing !== null}
-              className="dashboard__action"
-            >
-              {contentProcessing === 'import' ? 'Імпорт...' : '2. Імпортувати шини'}
-            </button>
-            <button
-              onClick={() => runContentAction('generate')}
-              disabled={contentProcessing !== null}
-              className="dashboard__action dashboard__action--primary"
-            >
-              {contentProcessing === 'generate' ? 'Генерація...' : '3. Згенерувати описи'}
-            </button>
           </div>
           {contentJobs.slice(0, 5).map((job) => (
             <div key={job.id} className={`dashboard__job dashboard__job--${job.status}`}>
@@ -1731,27 +1627,6 @@ export const Dashboard: React.FC<any> = () => {
           border-radius: 8px;
         }
 
-        .dashboard__content-actions {
-          display: flex;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
-          flex-wrap: wrap;
-        }
-
-        .dashboard__content-jobs {
-          border-top: 1px solid var(--theme-elevation-100);
-          padding-top: 1rem;
-        }
-
-        .dashboard__content-jobs-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0.5rem;
-          font-size: 0.875rem;
-          color: var(--theme-elevation-800);
-        }
-
         .dashboard__refresh-btn {
           background: none;
           border: none;
@@ -2431,46 +2306,6 @@ export const Dashboard: React.FC<any> = () => {
           background: var(--theme-elevation-100);
           border-radius: 6px;
           margin-bottom: 1rem;
-        }
-
-        .dashboard__automation-table {
-          width: 100%;
-          font-size: 0.8125rem;
-          border-collapse: collapse;
-        }
-
-        .dashboard__automation-table th {
-          text-align: left;
-          padding: 0.5rem;
-          border-bottom: 1px solid var(--theme-elevation-200);
-          color: var(--theme-elevation-600);
-          font-weight: 500;
-        }
-
-        .dashboard__automation-table td {
-          padding: 0.5rem;
-          border-bottom: 1px solid var(--theme-elevation-100);
-        }
-
-        .dashboard__automation-status {
-          font-size: 0.75rem;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-        }
-
-        .dashboard__automation-status--success {
-          background: rgba(22, 163, 74, 0.1);
-          color: #16a34a;
-        }
-
-        .dashboard__automation-status--failed {
-          background: rgba(220, 38, 38, 0.1);
-          color: #dc2626;
-        }
-
-        .dashboard__automation-status--running {
-          background: rgba(37, 99, 235, 0.1);
-          color: #2563eb;
         }
 
         /* Content Generation styles */
