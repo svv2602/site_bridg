@@ -89,6 +89,7 @@ export default buildConfig({
     },
     components: {
       beforeDashboard: ['/src/components/Dashboard'],
+      beforeNavLinks: ['/src/components/DashboardNavLink#DashboardNavLink'],
     },
     theme: 'dark',
     avatar: 'gravatar',

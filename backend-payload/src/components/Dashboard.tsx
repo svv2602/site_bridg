@@ -184,6 +184,7 @@ export const Dashboard: React.FC<any> = () => {
   const [cronInputs, setCronInputs] = useState<Record<string, string>>({})
   const [cronErrors, setCronErrors] = useState<Record<string, string>>({})
   const [schedulerSaving, setSchedulerSaving] = useState<string | null>(null)
+  const [taskHelpOpen, setTaskHelpOpen] = useState<string | null>(null)
 
   // Content Generation state
   const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
@@ -803,6 +804,10 @@ export const Dashboard: React.FC<any> = () => {
               const taskCronInput = cronInputs[task.taskId] ?? task.cronExpression
               const taskCronError = cronErrors[task.taskId]
               const isSaving = schedulerSaving === task.taskId
+              const taskDescriptions: Record<string, string> = {
+                pipeline: 'Скрапінг даних з ProKoleso, імпорт у базу даних та генерація AI-контенту (описи, SEO, FAQ) для всіх нових шин.',
+                articles: 'Генерація 3 сезонних блог-статей (зимові/літні шини, догляд) з AI-ілюстраціями та публікація в CMS.',
+              }
               return (
                 <div key={task.taskId} className="dashboard__schedule-task-card">
                   <div className="dashboard__scheduler-toggle">
@@ -816,7 +821,15 @@ export const Dashboard: React.FC<any> = () => {
                       <span className="dashboard__toggle-slider" />
                     </label>
                     <span className="dashboard__toggle-label">{task.label}</span>
+                    <button
+                      className={`dashboard__task-help-btn${taskHelpOpen === task.taskId ? ' dashboard__task-help-btn--active' : ''}`}
+                      onClick={() => setTaskHelpOpen(taskHelpOpen === task.taskId ? null : task.taskId)}
+                      title="Довідка"
+                    >?</button>
                   </div>
+                  {taskHelpOpen === task.taskId && (
+                    <div className="dashboard__task-help-text">{taskDescriptions[task.taskId] || task.label}</div>
+                  )}
                   <div className="dashboard__automation-schedule-item">
                     <span className="dashboard__automation-schedule-label">Наступний запуск:</span>
                     <span className="dashboard__automation-schedule-value">
@@ -2479,6 +2492,42 @@ export const Dashboard: React.FC<any> = () => {
 
         .dashboard__schedule-task-card:last-child {
           margin-bottom: 0;
+        }
+
+        .dashboard__task-help-btn {
+          margin-left: auto;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 1px solid var(--theme-elevation-300);
+          background: transparent;
+          color: var(--theme-elevation-500);
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: all 0.15s;
+        }
+
+        .dashboard__task-help-btn:hover,
+        .dashboard__task-help-btn--active {
+          background: var(--theme-elevation-100);
+          color: var(--theme-text);
+          border-color: var(--theme-elevation-400);
+        }
+
+        .dashboard__task-help-text {
+          margin-top: 0.5rem;
+          padding: 0.5rem 0.65rem;
+          font-size: 0.8rem;
+          line-height: 1.4;
+          color: var(--theme-elevation-600);
+          background: var(--theme-elevation-50);
+          border-radius: 4px;
+          border-left: 3px solid var(--theme-elevation-300);
         }
 
         .dashboard__cron-input-row {
