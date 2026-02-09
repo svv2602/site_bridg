@@ -186,6 +186,21 @@ export const Dashboard: React.FC<any> = () => {
   const [schedulerSaving, setSchedulerSaving] = useState<string | null>(null)
   const [taskHelpOpen, setTaskHelpOpen] = useState<string | null>(null)
 
+  // Smart article pipeline state
+  const [contentSources, setContentSources] = useState<Array<{
+    id: string; name: string; sourceType: string; scraper: string; baseUrl: string
+    enabled: boolean; checkIntervalHours: number; lastCheckedAt: string | null; lastFoundNew: number
+  }>>([])
+  const [articleQueue, setArticleQueue] = useState<Array<{
+    id: number; triggerType: string; articleType: string; topic: string
+    priority: number; status: string; createdAt: string; processedAt: string | null; error: string | null
+  }>>([])
+  const [queueStats, setQueueStats] = useState<Record<string, number>>({})
+  const [articleSettings, setArticleSettings] = useState<Record<string, string>>({})
+  const [settingsSaving, setSettingsSaving] = useState(false)
+  const [manualTopic, setManualTopic] = useState('')
+  const [manualType, setManualType] = useState('test-summary')
+
   // Content Generation state
   const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
   const [selectedTyreSlug, setSelectedTyreSlug] = useState<string | null>(null)
@@ -268,6 +283,26 @@ export const Dashboard: React.FC<any> = () => {
           const data = await tyresListRes.json()
           setTyreModels(data.docs || [])
         }
+
+        // Fetch smart article pipeline data
+        const [sourcesRes, queueRes, settingsRes] = await Promise.all([
+          fetch('/api/automation/sources'),
+          fetch('/api/automation/queue?limit=20'),
+          fetch('/api/automation/article-settings'),
+        ])
+        if (sourcesRes.ok) {
+          const data = await sourcesRes.json()
+          setContentSources(data.sources || [])
+        }
+        if (queueRes.ok) {
+          const data = await queueRes.json()
+          setArticleQueue(data.items || [])
+          setQueueStats(data.stats || {})
+        }
+        if (settingsRes.ok) {
+          const data = await settingsRes.json()
+          setArticleSettings(data.settings || {})
+        }
       } catch (error) {
         console.error('Failed to fetch stats:', error)
       } finally {
@@ -301,7 +336,7 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
-  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline' | 'articles') => {
+  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline' | 'articles' | 'smart-pipeline') => {
     setContentProcessing(action)
     try {
       const res = await fetch(`/api/content/${action}`, { method: 'POST' })
@@ -603,6 +638,105 @@ export const Dashboard: React.FC<any> = () => {
     return expr
   }
 
+  // Smart article pipeline functions
+  const refreshSources = async () => {
+    try {
+      const res = await fetch('/api/automation/sources')
+      if (res.ok) {
+        const data = await res.json()
+        setContentSources(data.sources || [])
+      }
+    } catch { /* ignore */ }
+  }
+
+  const toggleSource = async (id: string, enabled: boolean) => {
+    try {
+      await fetch('/api/automation/sources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, enabled }),
+      })
+      refreshSources()
+    } catch { /* ignore */ }
+  }
+
+  const refreshQueue = async () => {
+    try {
+      const res = await fetch('/api/automation/queue?limit=20')
+      if (res.ok) {
+        const data = await res.json()
+        setArticleQueue(data.items || [])
+        setQueueStats(data.stats || {})
+      }
+    } catch { /* ignore */ }
+  }
+
+  const updateQueueItemStatus = async (id: number, status: string) => {
+    try {
+      await fetch('/api/automation/queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'update', id, status }),
+      })
+      refreshQueue()
+    } catch { /* ignore */ }
+  }
+
+  const addManualArticle = async () => {
+    if (!manualTopic.trim()) return
+    try {
+      await fetch('/api/automation/queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'add', topic: manualTopic, articleType: manualType }),
+      })
+      setManualTopic('')
+      refreshQueue()
+    } catch { /* ignore */ }
+  }
+
+  const deleteQueueItem = async (id: number) => {
+    try {
+      await fetch('/api/automation/queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'delete', id }),
+      })
+      refreshQueue()
+    } catch { /* ignore */ }
+  }
+
+  const refreshArticleSettings = async () => {
+    try {
+      const res = await fetch('/api/automation/article-settings')
+      if (res.ok) {
+        const data = await res.json()
+        setArticleSettings(data.settings || {})
+      }
+    } catch { /* ignore */ }
+  }
+
+  const saveArticleSettings = async () => {
+    setSettingsSaving(true)
+    try {
+      await fetch('/api/automation/article-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ settings: articleSettings }),
+      })
+    } catch { /* ignore */ }
+    setSettingsSaving(false)
+  }
+
+  const updateSetting = (key: string, value: string) => {
+    setArticleSettings((prev) => ({ ...prev, [key]: value }))
+  }
+
   // Content Generation functions
   const fetchContentStatus = async (slug: string) => {
     try {
@@ -807,6 +941,7 @@ export const Dashboard: React.FC<any> = () => {
               const taskDescriptions: Record<string, string> = {
                 pipeline: 'Скрапінг даних з ProKoleso, імпорт у базу даних та генерація AI-контенту (описи, SEO, FAQ) для всіх нових шин.',
                 articles: 'Генерація 3 сезонних блог-статей (зимові/літні шини, догляд) з AI-ілюстраціями та публікація в CMS.',
+                'smart-articles': 'Автоматичний пайплайн: сканування джерел тестів (ADAC, Auto Bild) → аналіз нових результатів → планування статей → генерація з перелінковкою на товари → публікація або черга на перевірку.',
               }
               return (
                 <div key={task.taskId} className="dashboard__schedule-task-card">
@@ -951,6 +1086,14 @@ export const Dashboard: React.FC<any> = () => {
                 style={{ width: '100%', marginTop: '4px' }}
               >
                 {contentProcessing === 'articles' ? 'Запуск...' : 'Генерація статей'}
+              </button>
+              <button
+                onClick={() => runContentAction('smart-pipeline')}
+                disabled={contentProcessing !== null}
+                className="dashboard__action dashboard__action--primary"
+                style={{ width: '100%', marginTop: '4px' }}
+              >
+                {contentProcessing === 'smart-pipeline' ? 'Запуск...' : 'Розумна генерація статей'}
               </button>
             </div>
           </div>
@@ -1273,6 +1416,234 @@ export const Dashboard: React.FC<any> = () => {
           >
             {bgProcessing ? 'Обробка...' : 'Видалити фон з усіх фото'}
           </button>
+        </div>
+      </div>
+
+      {/* ===== Smart Article Pipeline ===== */}
+      <div className="dashboard__section">
+        <div className="dashboard__section-header">
+          <h2>Розумна генерація статей</h2>
+        </div>
+
+        <div className="dashboard__smart-articles">
+          {/* Content Sources */}
+          <div className="dashboard__smart-subsection">
+            <div className="dashboard__section-header" style={{ marginBottom: '8px' }}>
+              <h3>Джерела контенту</h3>
+              <button onClick={refreshSources} className="dashboard__refresh-btn">↻</button>
+            </div>
+            <div className="dashboard__sources-table">
+              {contentSources.map((source) => (
+                <div key={source.id} className={`dashboard__source-row ${source.enabled ? '' : 'dashboard__source-row--disabled'}`}>
+                  <div className="dashboard__source-info">
+                    <span className="dashboard__source-name">{source.name}</span>
+                    <span className="dashboard__source-meta">
+                      {source.lastCheckedAt
+                        ? `Перевірено: ${formatDate(source.lastCheckedAt)} | Знайдено: ${source.lastFoundNew}`
+                        : 'Ще не перевірено'}
+                    </span>
+                  </div>
+                  <div className="dashboard__source-actions">
+                    <span className="dashboard__source-interval">Що {source.checkIntervalHours}г</span>
+                    <label className="dashboard__toggle">
+                      <input
+                        type="checkbox"
+                        checked={source.enabled}
+                        onChange={() => toggleSource(source.id, !source.enabled)}
+                      />
+                      <span className="dashboard__toggle-slider" />
+                    </label>
+                  </div>
+                </div>
+              ))}
+              {contentSources.length === 0 && (
+                <div style={{ padding: '1rem', color: 'var(--theme-elevation-500)', fontSize: '0.875rem' }}>
+                  Джерела не налаштовані
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Article Queue */}
+          <div className="dashboard__smart-subsection">
+            <div className="dashboard__section-header" style={{ marginBottom: '8px' }}>
+              <h3>
+                Черга статей
+                {Object.keys(queueStats).length > 0 && (
+                  <span className="dashboard__queue-badges">
+                    {queueStats.pending ? <span className="dashboard__queue-badge dashboard__queue-badge--pending">{queueStats.pending} в черзі</span> : null}
+                    {queueStats.review ? <span className="dashboard__queue-badge dashboard__queue-badge--review">{queueStats.review} на перевірці</span> : null}
+                    {queueStats.published ? <span className="dashboard__queue-badge dashboard__queue-badge--published">{queueStats.published} опубл.</span> : null}
+                  </span>
+                )}
+              </h3>
+              <button onClick={refreshQueue} className="dashboard__refresh-btn">↻</button>
+            </div>
+
+            {/* Add manual article */}
+            <div className="dashboard__queue-add">
+              <input
+                type="text"
+                value={manualTopic}
+                onChange={(e) => setManualTopic(e.target.value)}
+                placeholder="Тема статті..."
+                className="dashboard__queue-input"
+              />
+              <select
+                value={manualType}
+                onChange={(e) => setManualType(e.target.value)}
+                className="dashboard__queue-select"
+              >
+                <option value="test-summary">Підсумок тесту</option>
+                <option value="comparison">Порівняння</option>
+                <option value="seasonal-guide">Сезонний гід</option>
+                <option value="model-review">Огляд моделі</option>
+                <option value="technology">Технологія</option>
+                <option value="tips">Поради</option>
+              </select>
+              <button onClick={addManualArticle} className="dashboard__action" disabled={!manualTopic.trim()}>
+                + Додати
+              </button>
+            </div>
+
+            {/* Queue list */}
+            <div className="dashboard__queue-list">
+              {articleQueue.map((item) => (
+                <div key={item.id} className={`dashboard__queue-item dashboard__queue-item--${item.status}`}>
+                  <div className="dashboard__queue-item-info">
+                    <span className="dashboard__queue-item-topic">{item.topic}</span>
+                    <span className="dashboard__queue-item-meta">
+                      {item.articleType} | {item.triggerType} | {formatDate(item.createdAt)}
+                      {item.error && <span className="dashboard__queue-item-error"> | {item.error}</span>}
+                    </span>
+                  </div>
+                  <div className="dashboard__queue-item-actions">
+                    <span className={`dashboard__queue-status dashboard__queue-status--${item.status}`}>
+                      {item.status === 'pending' ? 'В черзі'
+                        : item.status === 'generating' ? 'Генерація...'
+                        : item.status === 'review' ? 'На перевірці'
+                        : item.status === 'published' ? 'Опубліковано'
+                        : item.status === 'failed' ? 'Помилка'
+                        : item.status === 'rejected' ? 'Відхилено'
+                        : item.status}
+                    </span>
+                    {item.status === 'review' && (
+                      <>
+                        <button
+                          onClick={() => updateQueueItemStatus(item.id, 'published')}
+                          className="dashboard__queue-btn dashboard__queue-btn--approve"
+                          title="Опублікувати"
+                        >✓</button>
+                        <button
+                          onClick={() => updateQueueItemStatus(item.id, 'rejected')}
+                          className="dashboard__queue-btn dashboard__queue-btn--reject"
+                          title="Відхилити"
+                        >✗</button>
+                      </>
+                    )}
+                    {(item.status === 'pending' || item.status === 'failed' || item.status === 'rejected') && (
+                      <button
+                        onClick={() => deleteQueueItem(item.id)}
+                        className="dashboard__queue-btn dashboard__queue-btn--delete"
+                        title="Видалити"
+                      >×</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {articleQueue.length === 0 && (
+                <div style={{ padding: '1rem', color: 'var(--theme-elevation-500)', fontSize: '0.875rem' }}>
+                  Черга порожня. Запустіть &quot;Розумну генерацію&quot; або додайте статтю вручну.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Article Settings */}
+          <div className="dashboard__smart-subsection">
+            <div className="dashboard__section-header" style={{ marginBottom: '8px' }}>
+              <h3>Налаштування генерації</h3>
+              <button onClick={refreshArticleSettings} className="dashboard__refresh-btn">↻</button>
+            </div>
+            <div className="dashboard__settings-grid">
+              <div className="dashboard__setting-row">
+                <label>Макс. статей на тиждень</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={articleSettings.max_articles_per_week || '3'}
+                  onChange={(e) => updateSetting('max_articles_per_week', e.target.value)}
+                  className="dashboard__setting-input dashboard__setting-input--small"
+                />
+              </div>
+              <div className="dashboard__setting-row">
+                <label>Автопублікація</label>
+                <label className="dashboard__toggle">
+                  <input
+                    type="checkbox"
+                    checked={articleSettings.auto_publish === 'true'}
+                    onChange={(e) => updateSetting('auto_publish', e.target.checked ? 'true' : 'false')}
+                  />
+                  <span className="dashboard__toggle-slider" />
+                </label>
+              </div>
+              <div className="dashboard__setting-row">
+                <label>Генерація зображень</label>
+                <label className="dashboard__toggle">
+                  <input
+                    type="checkbox"
+                    checked={articleSettings.image_generation_enabled === 'true'}
+                    onChange={(e) => updateSetting('image_generation_enabled', e.target.checked ? 'true' : 'false')}
+                  />
+                  <span className="dashboard__toggle-slider" />
+                </label>
+              </div>
+              <div className="dashboard__setting-row">
+                <label>Перелінковка з товарами</label>
+                <label className="dashboard__toggle">
+                  <input
+                    type="checkbox"
+                    checked={articleSettings.interlinking_enabled === 'true'}
+                    onChange={(e) => updateSetting('interlinking_enabled', e.target.checked ? 'true' : 'false')}
+                  />
+                  <span className="dashboard__toggle-slider" />
+                </label>
+              </div>
+              <div className="dashboard__setting-row">
+                <label>Сезонне оновлення за (тижнів)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={articleSettings.seasonal_lead_weeks || '6'}
+                  onChange={(e) => updateSetting('seasonal_lead_weeks', e.target.value)}
+                  className="dashboard__setting-input dashboard__setting-input--small"
+                />
+              </div>
+              <div className="dashboard__setting-row">
+                <label>Мін. рейтинг для статті</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  step="0.5"
+                  value={articleSettings.min_rating_to_feature || '2.0'}
+                  onChange={(e) => updateSetting('min_rating_to_feature', e.target.value)}
+                  className="dashboard__setting-input dashboard__setting-input--small"
+                />
+              </div>
+              <div className="dashboard__setting-row dashboard__setting-row--full">
+                <button
+                  onClick={saveArticleSettings}
+                  disabled={settingsSaving}
+                  className="dashboard__action dashboard__action--primary"
+                >
+                  {settingsSaving ? 'Збереження...' : 'Зберегти налаштування'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2829,6 +3200,304 @@ export const Dashboard: React.FC<any> = () => {
 
         .dashboard__content-gen-help li {
           margin-bottom: 0.25rem;
+        }
+
+        /* Smart Article Pipeline */
+        .dashboard__smart-articles {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          padding: 1rem;
+        }
+
+        .dashboard__smart-subsection {
+          background: var(--theme-elevation-50);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 8px;
+          padding: 1rem;
+        }
+
+        /* Sources */
+        .dashboard__sources-table {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .dashboard__source-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 0.75rem;
+          background: var(--theme-elevation-0);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 6px;
+          gap: 1rem;
+        }
+
+        .dashboard__source-row--disabled {
+          opacity: 0.5;
+        }
+
+        .dashboard__source-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+
+        .dashboard__source-name {
+          font-weight: 500;
+          font-size: 0.875rem;
+        }
+
+        .dashboard__source-meta {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-500);
+        }
+
+        .dashboard__source-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        .dashboard__source-interval {
+          font-size: 0.75rem;
+          color: var(--theme-elevation-500);
+          white-space: nowrap;
+        }
+
+        /* Toggle */
+        .dashboard__toggle {
+          position: relative;
+          display: inline-block;
+          width: 36px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+
+        .dashboard__toggle input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .dashboard__toggle-slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: var(--theme-elevation-200);
+          border-radius: 20px;
+          transition: 0.2s;
+        }
+
+        .dashboard__toggle-slider::before {
+          content: '';
+          position: absolute;
+          height: 16px;
+          width: 16px;
+          left: 2px;
+          bottom: 2px;
+          background: white;
+          border-radius: 50%;
+          transition: 0.2s;
+        }
+
+        .dashboard__toggle input:checked + .dashboard__toggle-slider {
+          background: #2563eb;
+        }
+
+        .dashboard__toggle input:checked + .dashboard__toggle-slider::before {
+          transform: translateX(16px);
+        }
+
+        /* Queue */
+        .dashboard__queue-add {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .dashboard__queue-input {
+          flex: 1;
+          padding: 0.375rem 0.5rem;
+          font-size: 0.8125rem;
+          background: var(--theme-elevation-0);
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          color: var(--theme-text);
+        }
+
+        .dashboard__queue-select {
+          padding: 0.375rem 0.5rem;
+          font-size: 0.8125rem;
+          background: var(--theme-elevation-0);
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          color: var(--theme-text);
+        }
+
+        .dashboard__queue-badges {
+          display: inline-flex;
+          gap: 0.5rem;
+          margin-left: 0.75rem;
+          font-weight: 400;
+        }
+
+        .dashboard__queue-badge {
+          font-size: 0.7rem;
+          padding: 1px 6px;
+          border-radius: 10px;
+        }
+
+        .dashboard__queue-badge--pending {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .dashboard__queue-badge--review {
+          background: #dbeafe;
+          color: #1e40af;
+        }
+
+        .dashboard__queue-badge--published {
+          background: #d1fae5;
+          color: #065f46;
+        }
+
+        .dashboard__queue-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.375rem;
+        }
+
+        .dashboard__queue-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 0.75rem;
+          background: var(--theme-elevation-0);
+          border: 1px solid var(--theme-elevation-100);
+          border-radius: 6px;
+          gap: 0.75rem;
+          border-left: 3px solid var(--theme-elevation-200);
+        }
+
+        .dashboard__queue-item--pending { border-left-color: #f59e0b; }
+        .dashboard__queue-item--generating { border-left-color: #3b82f6; }
+        .dashboard__queue-item--review { border-left-color: #8b5cf6; }
+        .dashboard__queue-item--published { border-left-color: #10b981; }
+        .dashboard__queue-item--failed { border-left-color: #ef4444; }
+        .dashboard__queue-item--rejected { border-left-color: #6b7280; }
+
+        .dashboard__queue-item-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+
+        .dashboard__queue-item-topic {
+          font-size: 0.8125rem;
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .dashboard__queue-item-meta {
+          font-size: 0.7rem;
+          color: var(--theme-elevation-500);
+        }
+
+        .dashboard__queue-item-error {
+          color: #ef4444;
+        }
+
+        .dashboard__queue-item-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          flex-shrink: 0;
+        }
+
+        .dashboard__queue-status {
+          font-size: 0.7rem;
+          padding: 1px 6px;
+          border-radius: 10px;
+          white-space: nowrap;
+        }
+
+        .dashboard__queue-status--pending { background: #fef3c7; color: #92400e; }
+        .dashboard__queue-status--generating { background: #dbeafe; color: #1e40af; }
+        .dashboard__queue-status--review { background: #ede9fe; color: #5b21b6; }
+        .dashboard__queue-status--published { background: #d1fae5; color: #065f46; }
+        .dashboard__queue-status--failed { background: #fee2e2; color: #991b1b; }
+        .dashboard__queue-status--rejected { background: #f3f4f6; color: #374151; }
+
+        .dashboard__queue-btn {
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          background: var(--theme-elevation-0);
+          cursor: pointer;
+          font-size: 0.875rem;
+          line-height: 1;
+          color: var(--theme-text);
+        }
+
+        .dashboard__queue-btn--approve { color: #10b981; border-color: #10b981; }
+        .dashboard__queue-btn--approve:hover { background: #d1fae5; }
+        .dashboard__queue-btn--reject { color: #ef4444; border-color: #ef4444; }
+        .dashboard__queue-btn--reject:hover { background: #fee2e2; }
+        .dashboard__queue-btn--delete { color: #6b7280; }
+        .dashboard__queue-btn--delete:hover { background: #f3f4f6; }
+
+        /* Settings */
+        .dashboard__settings-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.75rem;
+        }
+
+        .dashboard__setting-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+        }
+
+        .dashboard__setting-row label:first-child {
+          font-size: 0.8125rem;
+          color: var(--theme-text);
+        }
+
+        .dashboard__setting-row--full {
+          grid-column: 1 / -1;
+          justify-content: flex-end;
+        }
+
+        .dashboard__setting-input {
+          padding: 0.375rem 0.5rem;
+          font-size: 0.8125rem;
+          background: var(--theme-elevation-0);
+          border: 1px solid var(--theme-elevation-200);
+          border-radius: 4px;
+          color: var(--theme-text);
+        }
+
+        .dashboard__setting-input--small {
+          width: 70px;
+          text-align: center;
         }
       `}</style>
     </div>

@@ -1,0 +1,421 @@
+/**
+ * Smart Article Pipeline
+ *
+ * Orchestrator that runs: scan sources → plan articles → generate → publish/review.
+ * Designed to run as a scheduled task or manually from admin dashboard.
+ */
+
+import { chromium } from "playwright";
+import { scrapeADAC } from "./scrapers/adac.js";
+import { scrapeAutoBild } from "./scrapers/autobild.js";
+import { scrapeTyreReviews } from "./scrapers/tyrereviews.js";
+import {
+  getDueSources,
+  updateSource,
+  getPendingQueue,
+  updateQueueItem,
+  getSettingBool,
+  getSettingNumber,
+  type ContentSource,
+  type ArticleQueueItem,
+  type ScraperKey,
+} from "./db/article-queue.js";
+import { planArticles } from "./article-planner.js";
+import { generateArticle, type ArticleInput } from "./processors/content/article-generator.js";
+import { getPayloadClient } from "./publishers/payload-client.js";
+import { getArticlePrompt, type RelatedItem } from "./prompts/index.js";
+import { findTestResultsForTyre, getTestResult } from "./db/test-results.js";
+import type { GeneratedArticle } from "./types/content.js";
+
+interface PipelineResult {
+  phase: string;
+  sourcesScanned: number;
+  newTestResults: number;
+  articlesPlanned: number;
+  articlesGenerated: number;
+  articlesPublished: number;
+  articlesForReview: number;
+  errors: string[];
+}
+
+/**
+ * Run the full smart article pipeline
+ */
+export async function runSmartArticlePipeline(): Promise<PipelineResult> {
+  const result: PipelineResult = {
+    phase: "complete",
+    sourcesScanned: 0,
+    newTestResults: 0,
+    articlesPlanned: 0,
+    articlesGenerated: 0,
+    articlesPublished: 0,
+    articlesForReview: 0,
+    errors: [],
+  };
+
+  try {
+    // Phase 1: Scan sources
+    console.log("\n=== Phase 1: Scanning content sources ===");
+    result.phase = "scanning";
+    const scanResult = await scanSources();
+    result.sourcesScanned = scanResult.scanned;
+    result.newTestResults = scanResult.newResults;
+
+    // Phase 2: Plan articles
+    console.log("\n=== Phase 2: Planning articles ===");
+    result.phase = "planning";
+    const planResult = await planArticles();
+    result.articlesPlanned = planResult.planned;
+
+    // Phase 3: Generate and publish
+    console.log("\n=== Phase 3: Generating articles ===");
+    result.phase = "generating";
+    const genResult = await processQueue();
+    result.articlesGenerated = genResult.generated;
+    result.articlesPublished = genResult.published;
+    result.articlesForReview = genResult.forReview;
+    result.errors.push(...genResult.errors);
+
+    result.phase = "complete";
+    console.log("\n=== Pipeline complete ===");
+    console.log(
+      `Sources: ${result.sourcesScanned}, New tests: ${result.newTestResults}, ` +
+      `Planned: ${result.articlesPlanned}, Generated: ${result.articlesGenerated}, ` +
+      `Published: ${result.articlesPublished}, For review: ${result.articlesForReview}`
+    );
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    result.errors.push(`Pipeline error: ${msg}`);
+    console.error(`[Pipeline] Fatal error:`, error);
+  }
+
+  return result;
+}
+
+// ============ PHASE 1: SCAN SOURCES ============
+
+async function scanSources(): Promise<{ scanned: number; newResults: number }> {
+  const dueSources = getDueSources();
+
+  if (dueSources.length === 0) {
+    console.log("[Scan] No sources due for checking");
+    return { scanned: 0, newResults: 0 };
+  }
+
+  console.log(`[Scan] ${dueSources.length} source(s) due for checking`);
+
+  let totalNew = 0;
+  let browser;
+
+  try {
+    browser = await chromium.launch({ headless: true });
+    const page = await browser.newPage();
+
+    for (const source of dueSources) {
+      try {
+        console.log(`[Scan] Checking ${source.name}...`);
+        const result = await runScraper(page, source);
+
+        updateSource(source.id, {
+          lastCheckedAt: new Date().toISOString(),
+          lastFoundNew: result.newResults,
+        });
+
+        totalNew += result.newResults;
+        console.log(`[Scan] ${source.name}: ${result.newResults} new test results`);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error(`[Scan] Error scanning ${source.name}: ${msg}`);
+
+        // Still update last_checked_at so we don't retry immediately
+        updateSource(source.id, {
+          lastCheckedAt: new Date().toISOString(),
+          lastFoundNew: 0,
+        });
+      }
+    }
+  } finally {
+    if (browser) await browser.close();
+  }
+
+  return { scanned: dueSources.length, newResults: totalNew };
+}
+
+async function runScraper(
+  page: import("playwright").Page,
+  source: ContentSource
+): Promise<{ newResults: number }> {
+  const scraperMap: Record<ScraperKey, (p: import("playwright").Page) => Promise<{ testsNew: number }>> = {
+    adac: scrapeADAC,
+    autobild: scrapeAutoBild,
+    tyrereviews: (p) => scrapeTyreReviews(p),
+  };
+
+  const scraperFn = scraperMap[source.scraper];
+  if (!scraperFn) {
+    throw new Error(`Unknown scraper: ${source.scraper}`);
+  }
+
+  const result = await scraperFn(page);
+  return { newResults: result.testsNew };
+}
+
+// ============ PHASE 3: PROCESS QUEUE ============
+
+async function processQueue(): Promise<{
+  generated: number;
+  published: number;
+  forReview: number;
+  errors: string[];
+}> {
+  const maxPerWeek = getSettingNumber("max_articles_per_week") || 3;
+  const autoPublish = getSettingBool("auto_publish");
+  const interlink = getSettingBool("interlinking_enabled");
+  const errors: string[] = [];
+
+  const pending = getPendingQueue(maxPerWeek);
+
+  if (pending.length === 0) {
+    console.log("[Generate] No pending articles in queue");
+    return { generated: 0, published: 0, forReview: 0, errors };
+  }
+
+  console.log(`[Generate] Processing ${pending.length} article(s) from queue`);
+
+  let generated = 0;
+  let published = 0;
+  let forReview = 0;
+
+  for (const item of pending) {
+    try {
+      // Mark as generating
+      updateQueueItem(item.id, { status: "generating" });
+
+      // Build context for generation
+      const context = await buildGenerationContext(item, interlink);
+
+      // Generate article
+      console.log(`[Generate] Generating: "${item.topic}" (${item.articleType})`);
+      const result = await generateArticle(context.input);
+
+      generated++;
+
+      // Publish or hold for review
+      if (autoPublish) {
+        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds);
+        updateQueueItem(item.id, {
+          status: "published",
+          generatedPayloadId: payloadId,
+          processedAt: new Date().toISOString(),
+        });
+        published++;
+        console.log(`[Generate] Published: "${result.article.title}" (ID: ${payloadId})`);
+      } else {
+        // Save to CMS as draft / hold for review
+        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds);
+        updateQueueItem(item.id, {
+          status: "review",
+          generatedPayloadId: payloadId,
+          processedAt: new Date().toISOString(),
+        });
+        forReview++;
+        console.log(`[Generate] For review: "${result.article.title}" (ID: ${payloadId})`);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      errors.push(`Article #${item.id} "${item.topic}": ${msg}`);
+      updateQueueItem(item.id, {
+        status: "failed",
+        error: msg,
+        processedAt: new Date().toISOString(),
+      });
+      console.error(`[Generate] Failed: "${item.topic}": ${msg}`);
+    }
+  }
+
+  return { generated, published, forReview, errors };
+}
+
+// ============ CONTEXT BUILDING ============
+
+interface GenerationContext {
+  input: ArticleInput;
+  relatedItems: RelatedItem[];
+  relatedTyreIds: string[];
+}
+
+async function buildGenerationContext(
+  item: ArticleQueueItem,
+  interlink: boolean
+): Promise<GenerationContext> {
+  const relatedItems: RelatedItem[] = [];
+  const relatedTyreIds: string[] = [];
+
+  // Build test data if available
+  let testData: ArticleInput["testData"] | undefined;
+  if (item.triggerType === "test-result" && item.triggerData?.testUid) {
+    const test = getTestResult(item.triggerData.testUid as string);
+    if (test) {
+      // Format results as readable string
+      const resultsStr = test.results
+        .slice(0, 10)
+        .map((r) => `${r.position}. ${r.tireName} (${r.rating})`)
+        .join("; ");
+
+      testData = {
+        source: getSourceLabel(test.source),
+        year: test.year,
+        results: resultsStr,
+      };
+    }
+  }
+
+  // Build related items for interlinking
+  if (interlink) {
+    const client = getPayloadClient();
+
+    // Find related tyres in CMS
+    if (item.relatedTyres?.length) {
+      for (const slug of item.relatedTyres) {
+        try {
+          const tyre = await client.findTyreBySlug(slug);
+          if (tyre) {
+            relatedItems.push({
+              slug: tyre.slug,
+              name: tyre.name,
+              type: "tyre",
+            });
+            relatedTyreIds.push(tyre.id);
+          }
+        } catch {
+          // Tyre not in CMS, skip
+        }
+      }
+    }
+
+    // Find related articles for cross-linking
+    try {
+      const articles = await client.getAllArticles(10);
+      for (const article of articles.slice(0, 3)) {
+        relatedItems.push({
+          slug: article.slug,
+          name: article.title,
+          type: "article",
+        });
+      }
+    } catch {
+      // Articles fetch failed, continue without
+    }
+  }
+
+  // Build tireModels list from related tyres or trigger data
+  const tireModels: string[] = [];
+  if (item.triggerData?.ourResults) {
+    const results = item.triggerData.ourResults as Array<{ name: string }>;
+    tireModels.push(...results.map((r) => r.name));
+  }
+
+  // Build keywords based on article type
+  const keywords: string[] = ["Bridgestone", "шини"];
+  if (item.articleType === "test-summary" && item.triggerData?.source) {
+    keywords.push(item.triggerData.source as string, "тест шин");
+  }
+  if (item.articleType === "seasonal-guide") {
+    const season = item.triggerData?.season as string;
+    if (season === "winter") keywords.push("зимові шини", "безпека взимку");
+    if (season === "summer") keywords.push("літні шини", "безпека на дорозі");
+  }
+
+  return {
+    input: {
+      topic: item.topic,
+      type: item.articleType,
+      tireModels: tireModels.length > 0 ? tireModels : undefined,
+      testData,
+      keywords,
+    },
+    relatedItems,
+    relatedTyreIds,
+  };
+}
+
+// ============ PUBLISHING ============
+
+async function publishArticleToCMS(
+  article: GeneratedArticle,
+  relatedTyreIds: string[]
+): Promise<string> {
+  const client = getPayloadClient();
+
+  // Build article data for Payload
+  const articleData = {
+    slug: article.slug,
+    title: article.title,
+    previewText: article.excerpt.slice(0, 300),
+    body: article.content,
+    tags: article.tags.map((tag) => ({ tag })),
+    seoTitle: article.seoTitle?.slice(0, 70),
+    seoDescription: article.seoDescription?.slice(0, 170),
+    readingTimeMinutes: Math.ceil(
+      (article.content?.split(/\s+/).length || 0) / 200
+    ),
+    // relatedTyres populated automatically from CMS IDs
+    ...(relatedTyreIds.length > 0 && { relatedTyres: relatedTyreIds }),
+  };
+
+  const result = await client.publishArticle(articleData);
+  return result.id;
+}
+
+function getSourceLabel(source: string): string {
+  switch (source) {
+    case "adac":
+      return "ADAC";
+    case "autobild":
+      return "Auto Bild";
+    case "tyrereviews":
+      return "TyreReviews";
+    default:
+      return source;
+  }
+}
+
+// ============ CLI ============
+
+async function main() {
+  const args = process.argv.slice(2);
+
+  if (args.includes("--scan-only")) {
+    console.log("Running source scan only...");
+    const result = await scanSources();
+    console.log(`Scanned ${result.scanned} sources, found ${result.newResults} new results`);
+    return;
+  }
+
+  if (args.includes("--plan-only")) {
+    console.log("Running planner only...");
+    const result = await planArticles();
+    console.log(`Planned ${result.planned} articles`);
+    for (const d of result.details) {
+      console.log(`  - [${d.type}] ${d.topic} (${d.reason})`);
+    }
+    return;
+  }
+
+  if (args.includes("--generate-only")) {
+    console.log("Processing queue only (no scan/plan)...");
+    const result = await processQueue();
+    console.log(
+      `Generated: ${result.generated}, Published: ${result.published}, For review: ${result.forReview}`
+    );
+    return;
+  }
+
+  // Full pipeline
+  const result = await runSmartArticlePipeline();
+  console.log("\nPipeline result:", JSON.stringify(result, null, 2));
+}
+
+if (process.argv[1]?.includes("article-pipeline")) {
+  main().catch(console.error);
+}

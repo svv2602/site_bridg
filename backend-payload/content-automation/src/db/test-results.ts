@@ -245,6 +245,42 @@ export function getRecentTestResults(limit = 10): TestResult[] {
 }
 
 /**
+ * Get test results scraped after a given date
+ */
+export function getTestResultsSince(sinceDate: string): TestResult[] {
+  const database = getDatabase();
+
+  const rows = database
+    .prepare(
+      "SELECT * FROM test_results WHERE scraped_at > ? ORDER BY scraped_at DESC"
+    )
+    .all(sinceDate) as Array<Record<string, unknown>>;
+
+  return rows.map((row) => ({
+    testUid: row.test_uid as string,
+    source: row.source as TestResult["source"],
+    testType: row.test_type as TestResult["testType"],
+    year: row.year as number,
+    testedSize: row.tested_size as string,
+    sourceUrl: row.source_url as string,
+    publishedDate: row.published_date as string | undefined,
+    results: JSON.parse(row.results_json as string),
+    scrapedAt: row.scraped_at as string,
+  }));
+}
+
+/**
+ * Get count of test results
+ */
+export function getTestResultsCount(): number {
+  const database = getDatabase();
+  const row = database
+    .prepare("SELECT COUNT(*) as count FROM test_results")
+    .get() as { count: number };
+  return row.count;
+}
+
+/**
  * Close database connection
  */
 export function closeDatabase() {

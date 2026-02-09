@@ -55,6 +55,14 @@ const DEFAULT_TASKS: TaskConfig[] = [
     cronExpression: '0 4 * * 1',
     timezone: 'Europe/Kyiv',
   },
+  {
+    taskId: 'smart-articles',
+    label: 'Розумна генерація статей',
+    command: 'smart-article-pipeline',
+    enabled: false,
+    cronExpression: '0 5 * * 3',
+    timezone: 'Europe/Kyiv',
+  },
 ];
 
 function readAllConfigs(): TaskConfig[] {
@@ -167,6 +175,8 @@ function getTaskCallback(taskId: string): () => Promise<void> {
       return runScheduledPipeline;
     case 'articles':
       return runScheduledArticles;
+    case 'smart-articles':
+      return runScheduledSmartArticles;
     default:
       return async () => {
         console.warn(`[Scheduler] No callback defined for task "${taskId}"`);
@@ -271,6 +281,48 @@ async function runScheduledArticles(): Promise<void> {
     job.output = err.stdout || '';
     updateJob(job);
     console.error(`[Scheduler] Articles failed: ${err.message}`);
+  }
+}
+
+// ---- Smart Articles runner ----
+
+async function runScheduledSmartArticles(): Promise<void> {
+  const automationDir = path.join(process.cwd(), 'content-automation');
+  const command = 'npx tsx src/article-pipeline.ts';
+
+  const jobId = `cron-smart-articles-${Date.now()}`;
+  const job: JobStatus = {
+    id: jobId,
+    status: 'running',
+    startedAt: new Date().toISOString(),
+    command,
+    currentStep: 1,
+    totalSteps: 3,
+    stepLabel: 'Сканування джерел',
+  };
+  saveJob(job);
+
+  console.log(`[Scheduler] Cron triggered smart-articles job ${jobId}`);
+
+  try {
+    const { stdout, stderr } = await execAsync(command, {
+      cwd: automationDir,
+      timeout: 900000, // 15 minutes (scan + plan + generate)
+      env: { ...process.env },
+    });
+    job.status = 'completed';
+    job.completedAt = new Date().toISOString();
+    job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+    updateJob(job);
+    console.log(`[Scheduler] Smart articles completed: ${jobId}`);
+  } catch (error: unknown) {
+    const err = error as { message: string; stdout?: string };
+    job.status = 'failed';
+    job.completedAt = new Date().toISOString();
+    job.error = err.message;
+    job.output = err.stdout || '';
+    updateJob(job);
+    console.error(`[Scheduler] Smart articles failed: ${err.message}`);
   }
 }
 

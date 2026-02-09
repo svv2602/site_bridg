@@ -420,6 +420,64 @@ export const contentArticlesEndpoint: Endpoint = {
 };
 
 /**
+ * POST /api/content/smart-pipeline
+ *
+ * Run the smart article pipeline: scan sources → plan → generate → publish/review
+ */
+export const contentSmartPipelineEndpoint: Endpoint = {
+  path: '/content/smart-pipeline',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+    const command = 'npx tsx src/article-pipeline.ts';
+
+    const jobId = `smart-pipeline-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+      currentStep: 1,
+      totalSteps: 3,
+      stepLabel: 'Сканування джерел',
+    };
+    saveJob(job);
+
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 900000, // 15 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
+        req.payload.logger.info(`Smart pipeline completed: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        updateJob(job);
+        req.payload.logger.error(`Smart pipeline failed: ${error.message}`);
+      });
+
+    return Response.json({
+      message: 'Smart article pipeline started (scan → plan → generate)',
+      jobId,
+      command,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
+  },
+};
+
+/**
  * POST /api/content/publish
  *
  * Publish generated content to Payload CMS

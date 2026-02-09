@@ -33,6 +33,7 @@ import {
   contentPublishEndpoint,
   contentFullPipelineEndpoint,
   contentArticlesEndpoint,
+  contentSmartPipelineEndpoint,
 } from './src/endpoints/contentGeneration';
 import {
   providersSeedEndpoint,
@@ -55,6 +56,12 @@ import {
   automationStatsEndpoint,
   automationStatusEndpoint,
   automationSchedulerEndpoint,
+  automationSourcesEndpoint,
+  automationSourcesUpdateEndpoint,
+  automationQueueEndpoint,
+  automationQueueUpdateEndpoint,
+  automationArticleSettingsEndpoint,
+  automationArticleSettingsUpdateEndpoint,
 } from './src/endpoints/automation';
 import {
   healthEndpoint,
@@ -122,6 +129,7 @@ export default buildConfig({
     contentPublishEndpoint,
     contentFullPipelineEndpoint,
     contentArticlesEndpoint,
+    contentSmartPipelineEndpoint,
     providersSeedEndpoint,
     providersStatusEndpoint,
     providersToggleEndpoint,
@@ -137,6 +145,13 @@ export default buildConfig({
     automationStatsEndpoint,
     automationStatusEndpoint,
     automationSchedulerEndpoint,
+    // Smart article pipeline
+    automationSourcesEndpoint,
+    automationSourcesUpdateEndpoint,
+    automationQueueEndpoint,
+    automationQueueUpdateEndpoint,
+    automationArticleSettingsEndpoint,
+    automationArticleSettingsUpdateEndpoint,
     // Health checks
     healthEndpoint,
     readinessEndpoint,
