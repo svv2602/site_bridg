@@ -365,6 +365,61 @@ export const contentRegenerateEndpoint: Endpoint = {
 };
 
 /**
+ * POST /api/content/articles
+ *
+ * Generate seasonal blog articles with AI
+ */
+export const contentArticlesEndpoint: Endpoint = {
+  path: '/content/articles',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+    const command = 'npx tsx src/generate-articles.ts';
+
+    const jobId = `articles-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+    };
+    saveJob(job);
+
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 600000, // 10 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
+        req.payload.logger.info(`Article generation completed: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        updateJob(job);
+        req.payload.logger.error(`Article generation failed: ${error.message}`);
+      });
+
+    return Response.json({
+      message: 'Article generation started',
+      jobId,
+      command,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
+  },
+};
+
+/**
  * POST /api/content/publish
  *
  * Publish generated content to Payload CMS

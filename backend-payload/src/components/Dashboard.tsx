@@ -91,12 +91,17 @@ interface AutomationStats {
   lastRun: string | null
 }
 
-interface AutomationStatus {
-  status: 'running' | 'idle'
+interface TaskSchedule {
+  taskId: string
+  label: string
   enabled: boolean
   cronExpression: string
   nextRun: string | null
   timezone: string
+}
+
+interface AutomationStatus {
+  tasks: TaskSchedule[]
 }
 
 // Content Generation interfaces
@@ -176,9 +181,9 @@ export const Dashboard: React.FC<any> = () => {
   // Automation Dashboard state
   const [automationStats, setAutomationStats] = useState<AutomationStats | null>(null)
   const [automationStatus, setAutomationStatus] = useState<AutomationStatus | null>(null)
-  const [cronInput, setCronInput] = useState('0 3 * * 0')
-  const [cronError, setCronError] = useState<string | null>(null)
-  const [schedulerSaving, setSchedulerSaving] = useState(false)
+  const [cronInputs, setCronInputs] = useState<Record<string, string>>({})
+  const [cronErrors, setCronErrors] = useState<Record<string, string>>({})
+  const [schedulerSaving, setSchedulerSaving] = useState<string | null>(null)
 
   // Content Generation state
   const [tyreModels, setTyreModels] = useState<TyreModel[]>([])
@@ -247,11 +252,13 @@ export const Dashboard: React.FC<any> = () => {
           setAutomationStats(await automationStatsRes.json())
         }
         if (automationStatusRes.ok) {
-          const statusData = await automationStatusRes.json()
+          const statusData: AutomationStatus = await automationStatusRes.json()
           setAutomationStatus(statusData)
-          if (statusData.cronExpression) {
-            setCronInput(statusData.cronExpression)
+          const inputs: Record<string, string> = {}
+          for (const task of statusData.tasks || []) {
+            inputs[task.taskId] = task.cronExpression
           }
+          setCronInputs(inputs)
         }
 
         // Fetch tyre models for content generation
@@ -293,7 +300,7 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
-  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline') => {
+  const runContentAction = async (action: 'scrape' | 'import' | 'generate' | 'pipeline' | 'articles') => {
     setContentProcessing(action)
     try {
       const res = await fetch(`/api/content/${action}`, { method: 'POST' })
@@ -533,39 +540,45 @@ export const Dashboard: React.FC<any> = () => {
       ])
       if (statsRes.ok) setAutomationStats(await statsRes.json())
       if (statusRes.ok) {
-        const statusData = await statusRes.json()
+        const statusData: AutomationStatus = await statusRes.json()
         setAutomationStatus(statusData)
-        if (statusData.cronExpression) {
-          setCronInput(statusData.cronExpression)
+        const inputs: Record<string, string> = {}
+        for (const task of statusData.tasks || []) {
+          inputs[task.taskId] = task.cronExpression
         }
+        setCronInputs(inputs)
       }
     } catch (error) {
       console.error('Failed to refresh automation:', error)
     }
   }
 
-  const updateScheduler = async (body: { enabled?: boolean; cronExpression?: string }) => {
-    setSchedulerSaving(true)
-    setCronError(null)
+  const updateScheduler = async (taskId: string, body: { enabled?: boolean; cronExpression?: string }) => {
+    setSchedulerSaving(taskId)
+    setCronErrors((prev) => { const next = { ...prev }; delete next[taskId]; return next })
     try {
       const res = await fetch('/api/automation/scheduler', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(body),
+        body: JSON.stringify({ taskId, ...body }),
       })
       if (res.ok) {
-        const data = await res.json()
+        const data: AutomationStatus = await res.json()
         setAutomationStatus(data)
-        if (data.cronExpression) setCronInput(data.cronExpression)
+        const inputs: Record<string, string> = {}
+        for (const task of data.tasks || []) {
+          inputs[task.taskId] = task.cronExpression
+        }
+        setCronInputs(inputs)
       } else {
         const err = await res.json()
-        setCronError(err.error || 'Помилка збереження')
+        setCronErrors((prev) => ({ ...prev, [taskId]: err.error || 'Помилка збереження' }))
       }
     } catch {
-      setCronError('Не вдалось зʼєднатися з сервером')
+      setCronErrors((prev) => ({ ...prev, [taskId]: 'Не вдалось зʼєднатися з сервером' }))
     } finally {
-      setSchedulerSaving(false)
+      setSchedulerSaving(null)
     }
   }
 
@@ -783,54 +796,60 @@ export const Dashboard: React.FC<any> = () => {
         </div>
 
         <div className="dashboard__automation-grid">
-          {/* Schedule info */}
+          {/* Schedule info — per-task cards */}
           <div className="dashboard__automation-schedule">
             <h3>Розклад</h3>
-            <div className="dashboard__scheduler-toggle">
-              <label className="dashboard__toggle">
-                <input
-                  type="checkbox"
-                  checked={automationStatus?.enabled ?? false}
-                  disabled={schedulerSaving}
-                  onChange={(e) => updateScheduler({ enabled: e.target.checked })}
-                />
-                <span className="dashboard__toggle-slider" />
-              </label>
-              <span className="dashboard__toggle-label">
-                {automationStatus?.enabled ? 'Увімкнено' : 'Вимкнено'}
-              </span>
-            </div>
-            <div className="dashboard__automation-schedule-item">
-              <span className="dashboard__automation-schedule-label">Останній запуск:</span>
-              <span className="dashboard__automation-schedule-value">{formatDate(automationStats?.lastRun ?? null)}</span>
-            </div>
-            <div className="dashboard__automation-schedule-item">
-              <span className="dashboard__automation-schedule-label">Наступний запуск:</span>
-              <span className="dashboard__automation-schedule-value">
-                {automationStatus?.enabled ? formatDate(automationStatus?.nextRun ?? null) : '—'}
-              </span>
-            </div>
-            <div className="dashboard__cron-input-row">
-              <input
-                type="text"
-                className={`dashboard__cron-input${cronError ? ' dashboard__cron-input--error' : ''}`}
-                value={cronInput}
-                onChange={(e) => { setCronInput(e.target.value); setCronError(null) }}
-                placeholder="0 3 * * 0"
-                disabled={schedulerSaving}
-              />
-              <button
-                className="dashboard__cron-save"
-                disabled={schedulerSaving || cronInput === (automationStatus?.cronExpression ?? '0 3 * * 0')}
-                onClick={() => updateScheduler({ cronExpression: cronInput })}
-              >
-                {schedulerSaving ? '...' : 'Зберегти'}
-              </button>
-            </div>
-            {cronError && <div className="dashboard__cron-error">{cronError}</div>}
-            <div className="dashboard__automation-schedule-hint">
-              {cronDescription(cronInput)} ({automationStatus?.timezone || 'Europe/Kyiv'})
-            </div>
+            {(automationStatus?.tasks || []).map((task) => {
+              const taskCronInput = cronInputs[task.taskId] ?? task.cronExpression
+              const taskCronError = cronErrors[task.taskId]
+              const isSaving = schedulerSaving === task.taskId
+              return (
+                <div key={task.taskId} className="dashboard__schedule-task-card">
+                  <div className="dashboard__scheduler-toggle">
+                    <label className="dashboard__toggle">
+                      <input
+                        type="checkbox"
+                        checked={task.enabled}
+                        disabled={isSaving}
+                        onChange={(e) => updateScheduler(task.taskId, { enabled: e.target.checked })}
+                      />
+                      <span className="dashboard__toggle-slider" />
+                    </label>
+                    <span className="dashboard__toggle-label">{task.label}</span>
+                  </div>
+                  <div className="dashboard__automation-schedule-item">
+                    <span className="dashboard__automation-schedule-label">Наступний запуск:</span>
+                    <span className="dashboard__automation-schedule-value">
+                      {task.enabled ? formatDate(task.nextRun) : '—'}
+                    </span>
+                  </div>
+                  <div className="dashboard__cron-input-row">
+                    <input
+                      type="text"
+                      className={`dashboard__cron-input${taskCronError ? ' dashboard__cron-input--error' : ''}`}
+                      value={taskCronInput}
+                      onChange={(e) => {
+                        setCronInputs((prev) => ({ ...prev, [task.taskId]: e.target.value }))
+                        setCronErrors((prev) => { const next = { ...prev }; delete next[task.taskId]; return next })
+                      }}
+                      placeholder="0 3 * * 0"
+                      disabled={isSaving}
+                    />
+                    <button
+                      className="dashboard__cron-save"
+                      disabled={isSaving || taskCronInput === task.cronExpression}
+                      onClick={() => updateScheduler(task.taskId, { cronExpression: taskCronInput })}
+                    >
+                      {isSaving ? '...' : 'Зберегти'}
+                    </button>
+                  </div>
+                  {taskCronError && <div className="dashboard__cron-error">{taskCronError}</div>}
+                  <div className="dashboard__automation-schedule-hint">
+                    {cronDescription(taskCronInput)} ({task.timezone})
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
           {/* Actions */}
@@ -912,6 +931,14 @@ export const Dashboard: React.FC<any> = () => {
                   {contentProcessing === 'generate' ? '...' : 'Генерація'}
                 </button>
               </div>
+              <button
+                onClick={() => runContentAction('articles')}
+                disabled={contentProcessing !== null}
+                className="dashboard__action"
+                style={{ width: '100%', marginTop: '4px' }}
+              >
+                {contentProcessing === 'articles' ? 'Запуск...' : 'Генерація статей'}
+              </button>
             </div>
           </div>
         </div>
@@ -2441,6 +2468,17 @@ export const Dashboard: React.FC<any> = () => {
           font-size: 0.85rem;
           font-weight: 500;
           color: var(--theme-text);
+        }
+
+        .dashboard__schedule-task-card {
+          padding: 0.75rem;
+          border: 1px solid var(--theme-elevation-150);
+          border-radius: 6px;
+          margin-bottom: 0.75rem;
+        }
+
+        .dashboard__schedule-task-card:last-child {
+          margin-bottom: 0;
         }
 
         .dashboard__cron-input-row {

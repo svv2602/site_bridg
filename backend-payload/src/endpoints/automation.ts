@@ -111,22 +111,22 @@ export const automationStatsEndpoint: Endpoint = {
 /**
  * GET /api/automation/status
  *
- * Returns scheduler status (next run time, timezone, enabled, cronExpression).
+ * Returns scheduler status as { tasks: TaskSchedule[] }.
  */
 export const automationStatusEndpoint: Endpoint = {
   path: '/automation/status',
   method: 'get',
   handler: async () => {
-    const status = getSchedulerStatus();
-    return Response.json(status);
+    const tasks = getSchedulerStatus();
+    return Response.json({ tasks });
   },
 };
 
 /**
  * POST /api/automation/scheduler
  *
- * Update scheduler config (enable/disable, change cron expression).
- * Body: { enabled?: boolean, cronExpression?: string }
+ * Update scheduler config for a specific task.
+ * Body: { taskId: string, enabled?: boolean, cronExpression?: string }
  */
 export const automationSchedulerEndpoint: Endpoint = {
   path: '/automation/scheduler',
@@ -136,25 +136,29 @@ export const automationSchedulerEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body: { enabled?: boolean; cronExpression?: string };
+    let body: { taskId: string; enabled?: boolean; cronExpression?: string };
     try {
       body = await req.json!();
     } catch {
       return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const { enabled, cronExpression } = body;
+    const { taskId, enabled, cronExpression } = body;
+
+    if (!taskId) {
+      return Response.json({ error: 'taskId is required' }, { status: 400 });
+    }
 
     if (enabled === undefined && cronExpression === undefined) {
       return Response.json({ error: 'Provide at least "enabled" or "cronExpression"' }, { status: 400 });
     }
 
-    const result = setSchedulerConfig({ enabled, cronExpression });
+    const result = setSchedulerConfig({ taskId, enabled, cronExpression });
 
     if (!result.success) {
-      return Response.json({ error: result.error, status: result.status }, { status: 400 });
+      return Response.json({ error: result.error, tasks: result.tasks }, { status: 400 });
     }
 
-    return Response.json(result.status);
+    return Response.json({ tasks: result.tasks });
   },
 };

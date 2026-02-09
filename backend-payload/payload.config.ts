@@ -32,6 +32,7 @@ import {
   contentRegenerateEndpoint,
   contentPublishEndpoint,
   contentFullPipelineEndpoint,
+  contentArticlesEndpoint,
 } from './src/endpoints/contentGeneration';
 import {
   providersSeedEndpoint,
@@ -119,6 +120,7 @@ export default buildConfig({
     contentRegenerateEndpoint,
     contentPublishEndpoint,
     contentFullPipelineEndpoint,
+    contentArticlesEndpoint,
     providersSeedEndpoint,
     providersStatusEndpoint,
     providersToggleEndpoint,
