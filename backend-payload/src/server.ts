@@ -256,37 +256,9 @@ const start = async () => {
     }
   });
 
-  // ===== Custom Automation API Routes =====
-
-  app.get('/api/automation/status', (req: Request, res: Response) => {
-    const now = new Date();
-    const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
-    const nextSunday = new Date(now);
-    nextSunday.setDate(now.getDate() + daysUntilSunday);
-    nextSunday.setHours(3, 0, 0, 0);
-
-    res.json({
-      status: 'running',
-      nextRun: nextSunday.toISOString(),
-      timezone: 'Europe/Kyiv',
-    });
-  });
-
-  app.post('/api/automation/run', (req: Request, res: Response) => {
-    const { type } = req.body;
-    res.json({ success: true, message: `Started ${type || 'full'} automation` });
-  });
-
-  app.get('/api/automation/stats', (req: Request, res: Response) => {
-    res.json({
-      tiresProcessed: 0,
-      articlesCreated: 0,
-      badgesAssigned: 0,
-      totalCost: 0,
-      errorCount: 0,
-      lastRun: null,
-    });
-  });
+  // Note: /api/automation/stats and /api/automation/status are handled by
+  // Payload endpoints registered in payload.config.ts (automationStatsEndpoint,
+  // automationStatusEndpoint).
 
   // Seasonal content API
   app.get('/api/seasonal', (req: Request, res: Response) => {

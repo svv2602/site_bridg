@@ -51,6 +51,10 @@ import {
   reviewStatsEndpoint,
 } from './src/endpoints/reviewGeneration';
 import {
+  automationStatsEndpoint,
+  automationStatusEndpoint,
+} from './src/endpoints/automation';
+import {
   healthEndpoint,
   readinessEndpoint,
   livenessEndpoint,
@@ -124,6 +128,9 @@ export default buildConfig({
     generateReviewsEndpoint,
     generateReviewsStatusEndpoint,
     reviewStatsEndpoint,
+    // Automation metrics
+    automationStatsEndpoint,
+    automationStatusEndpoint,
     // Health checks
     healthEndpoint,
     readinessEndpoint,

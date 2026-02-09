@@ -311,7 +311,7 @@ export function closeMetricsDb() {
   }
 }
 
-// Test
+// Test — only runs when executed directly
 async function main() {
   console.log("Testing Metrics Collector...\n");
 
@@ -345,4 +345,8 @@ async function main() {
   console.log("\n✅ Metrics test complete");
 }
 
-main();
+// Guard: only run test code when executed directly (not on import)
+const isDirectRun = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'));
+if (isDirectRun) {
+  main();
+}

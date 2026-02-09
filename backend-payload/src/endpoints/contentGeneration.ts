@@ -2,26 +2,9 @@ import type { Endpoint } from 'payload';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
+import { saveJob, updateJob, getJob, getRecentJobs, type JobStatus } from './jobStore';
 
 const execAsync = promisify(exec);
-
-// Store for background job status
-interface JobStatus {
-  id: string;
-  status: 'running' | 'completed' | 'failed';
-  startedAt: string;
-  completedAt?: string;
-  output?: string;
-  error?: string;
-  command: string;
-  currentStep?: number;
-  totalSteps?: number;
-  stepLabel?: string;
-}
-
-const jobs: Map<string, JobStatus> = new Map();
 
 /**
  * POST /api/content/generate
@@ -64,7 +47,7 @@ export const contentGenerateEndpoint: Endpoint = {
       startedAt: new Date().toISOString(),
       command,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     // Run in background
     execAsync(command, {
@@ -76,6 +59,7 @@ export const contentGenerateEndpoint: Endpoint = {
         job.status = 'completed';
         job.completedAt = new Date().toISOString();
         job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
         req.payload.logger.info(`Content generation completed: ${jobId}`);
       })
       .catch((error) => {
@@ -83,6 +67,7 @@ export const contentGenerateEndpoint: Endpoint = {
         job.completedAt = new Date().toISOString();
         job.error = error.message;
         job.output = error.stdout || '';
+        updateJob(job);
         req.payload.logger.error(`Content generation failed: ${error.message}`);
       });
 
@@ -105,7 +90,7 @@ export const contentJobStatusEndpoint: Endpoint = {
   method: 'get',
   handler: async (req) => {
     const jobId = req.routeParams?.id as string;
-    const job = jobs.get(jobId);
+    const job = getJob(jobId);
 
     if (!job) {
       return Response.json({ error: 'Job not found' }, { status: 404 });
@@ -141,7 +126,7 @@ export const contentScrapeEndpoint: Endpoint = {
       startedAt: new Date().toISOString(),
       command,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     execAsync(command, {
       cwd: automationDir,
@@ -151,12 +136,14 @@ export const contentScrapeEndpoint: Endpoint = {
         job.status = 'completed';
         job.completedAt = new Date().toISOString();
         job.output = stdout;
+        updateJob(job);
         req.payload.logger.info(`Scraping completed: ${jobId}`);
       })
       .catch((error) => {
         job.status = 'failed';
         job.completedAt = new Date().toISOString();
         job.error = error.message;
+        updateJob(job);
         req.payload.logger.error(`Scraping failed: ${error.message}`);
       });
 
@@ -191,7 +178,7 @@ export const contentImportEndpoint: Endpoint = {
       startedAt: new Date().toISOString(),
       command,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     execAsync(command, {
       cwd: automationDir,
@@ -201,12 +188,14 @@ export const contentImportEndpoint: Endpoint = {
         job.status = 'completed';
         job.completedAt = new Date().toISOString();
         job.output = stdout;
+        updateJob(job);
         req.payload.logger.info(`Import completed: ${jobId}`);
       })
       .catch((error) => {
         job.status = 'failed';
         job.completedAt = new Date().toISOString();
         job.error = error.message;
+        updateJob(job);
         req.payload.logger.error(`Import failed: ${error.message}`);
       });
 
@@ -259,13 +248,14 @@ export const contentFullPipelineEndpoint: Endpoint = {
       totalSteps: 3,
       stepLabel: steps[0].label,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     (async () => {
       let allOutput = '';
       for (const { cmd, label, step } of steps) {
         job.currentStep = step;
         job.stepLabel = label;
+        updateJob(job);
         try {
           const { stdout, stderr } = await execAsync(cmd, {
             cwd: automationDir,
@@ -279,6 +269,7 @@ export const contentFullPipelineEndpoint: Endpoint = {
           job.completedAt = new Date().toISOString();
           job.error = `Крок "${label}" не вдався: ${err.message}`;
           job.output = allOutput + (err.stdout || '');
+          updateJob(job);
           req.payload.logger.error(`Full pipeline failed at step "${label}": ${err.message}`);
           return;
         }
@@ -286,6 +277,7 @@ export const contentFullPipelineEndpoint: Endpoint = {
       job.status = 'completed';
       job.completedAt = new Date().toISOString();
       job.output = allOutput;
+      updateJob(job);
       req.payload.logger.info(`Full pipeline completed: ${jobId}`);
     })();
 
@@ -307,11 +299,7 @@ export const contentJobsListEndpoint: Endpoint = {
   path: '/content/jobs',
   method: 'get',
   handler: async () => {
-    const recentJobs = Array.from(jobs.values())
-      .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
-      .slice(0, 20);
-
-    return Response.json({ jobs: recentJobs });
+    return Response.json({ jobs: getRecentJobs(20) });
   },
 };
 
@@ -345,7 +333,7 @@ export const contentRegenerateEndpoint: Endpoint = {
       startedAt: new Date().toISOString(),
       command,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     execAsync(command, {
       cwd: automationDir,
@@ -356,6 +344,7 @@ export const contentRegenerateEndpoint: Endpoint = {
         job.status = 'completed';
         job.completedAt = new Date().toISOString();
         job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
         req.payload.logger.info(`Content regeneration completed for ${slug}: ${jobId}`);
       })
       .catch((error) => {
@@ -363,6 +352,7 @@ export const contentRegenerateEndpoint: Endpoint = {
         job.completedAt = new Date().toISOString();
         job.error = error.message;
         job.output = error.stdout || '';
+        updateJob(job);
         req.payload.logger.error(`Content regeneration failed for ${slug}: ${error.message}`);
       });
 
@@ -397,7 +387,7 @@ export const contentPublishEndpoint: Endpoint = {
       startedAt: new Date().toISOString(),
       command,
     };
-    jobs.set(jobId, job);
+    saveJob(job);
 
     execAsync(command, {
       cwd: automationDir,
@@ -408,6 +398,7 @@ export const contentPublishEndpoint: Endpoint = {
         job.status = 'completed';
         job.completedAt = new Date().toISOString();
         job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
         req.payload.logger.info(`Content publish completed: ${jobId}`);
       })
       .catch((error) => {
@@ -415,6 +406,7 @@ export const contentPublishEndpoint: Endpoint = {
         job.completedAt = new Date().toISOString();
         job.error = error.message;
         job.output = error.stdout || '';
+        updateJob(job);
         req.payload.logger.error(`Content publish failed: ${error.message}`);
       });
 
