@@ -125,8 +125,11 @@ export const contentScrapeEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const url = new URL(req.url || '', 'http://localhost');
+    const force = url.searchParams.get('force') === 'true';
+
     const automationDir = path.join(process.cwd(), 'content-automation');
-    const command = 'npx tsx src/scrapers/prokoleso.ts';
+    const command = `npx tsx src/scrapers/prokoleso.ts${force ? ' --force' : ''}`;
 
     const jobId = `scrape-${Date.now()}`;
     const job: JobStatus = {

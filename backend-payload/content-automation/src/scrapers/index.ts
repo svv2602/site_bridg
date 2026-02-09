@@ -12,6 +12,8 @@ export {
   scrapeProkoleso,
   scrapeProkolesoBrand,
   saveResults,
+  mergeAndSaveResults,
+  loadExistingData,
   findTireUrlsByBrand,
   type ScrapedTire,
   type ScrapedTireSize,

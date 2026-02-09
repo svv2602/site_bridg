@@ -11,7 +11,7 @@
  */
 
 import { ENV } from "./config/env.js";
-import { scrapeProkoleso, scrapeProkolesoBrand } from "./scrapers/prokoleso.js";
+import { scrapeProkoleso, scrapeProkolesoBrand, mergeAndSaveResults } from "./scrapers/prokoleso.js";
 import { generateTireDescription } from "./processors/content/tire-description.js";
 import { generateTireSEO } from "./processors/content/tire-seo.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
@@ -123,19 +123,27 @@ async function runScrapePipeline(brand?: Brand) {
     if (brand) {
       console.log(`Scraping ${brand} tires...`);
       tires = await scrapeProkolesoBrand(brand);
+      stats.tyresProcessed = tires.length;
+      console.log(`Found ${tires.length} tires`);
+
+      // Save brand-specific data file
+      if (tires.length > 0) {
+        const fs = await import("fs/promises");
+        const dataPath = new URL(`../data/prokoleso-${brand}-tires.json`, import.meta.url);
+        await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
+        console.log(`Saved to ${dataPath}`);
+      }
     } else {
       console.log("Scraping all tires...");
-      tires = await scrapeProkoleso();
-    }
-    stats.tyresProcessed = tires.length;
-    console.log(`Found ${tires.length} tires`);
+      const result = await scrapeProkoleso();
+      tires = result.tires;
+      stats.tyresProcessed = tires.length;
+      console.log(`Found ${tires.length} tires | Skipped ${result.skippedSlugs.size} (already processed)`);
 
-    // Save brand-specific data file
-    if (brand && tires.length > 0) {
-      const fs = await import("fs/promises");
-      const dataPath = new URL(`../data/prokoleso-${brand}-tires.json`, import.meta.url);
-      await fs.writeFile(dataPath, JSON.stringify(tires, null, 2));
-      console.log(`Saved to ${dataPath}`);
+      // Merge and save with flag preservation
+      if (tires.length > 0 || result.skippedSlugs.size > 0) {
+        mergeAndSaveResults(tires, result.skippedSlugs, result.existingData);
+      }
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

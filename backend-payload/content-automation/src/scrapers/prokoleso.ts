@@ -7,7 +7,7 @@
  */
 
 import puppeteer, { type Browser, type Page } from "puppeteer";
-import { writeFileSync } from "fs";
+import { writeFileSync, readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import type { RawTyreContent, Brand } from "../types/content.js";
@@ -503,12 +503,33 @@ async function scrapeProkolesoBrand(brand: Brand): Promise<ScrapedTire[]> {
   }
 }
 
+interface ScrapeOptions {
+  force?: boolean;
+}
+
+interface ScrapeResult {
+  tires: ScrapedTire[];
+  skippedSlugs: Set<string>;
+  existingData: Map<string, ExistingTireRecord>;
+}
+
 /**
  * Main scraper - scrapes model pages for all brands (Bridgestone + Firestone)
+ *
+ * Options:
+ *   force - re-scrape all pages even if already processed (still preserves flags on merge)
  */
-async function scrapeProkoleso(brands?: Brand[]): Promise<ScrapedTire[]> {
+async function scrapeProkoleso(brands?: Brand[], options?: ScrapeOptions): Promise<ScrapeResult> {
+  const force = options?.force ?? false;
   const brandsToScrape = brands || ["bridgestone", "firestone"] as Brand[];
   console.log(`Starting ProKoleso Model Page Scraper for brands: ${brandsToScrape.join(", ")}`);
+  if (force) {
+    console.log(`⚡ Force mode: re-scraping all pages`);
+  }
+
+  // Load existing data for incremental scraping
+  const existingData = loadExistingData();
+  const skippedSlugs = new Set<string>();
 
   let browser: Browser | null = null;
   const allTires: ScrapedTire[] = [];
@@ -540,6 +561,20 @@ async function scrapeProkoleso(brands?: Brand[]): Promise<ScrapedTire[]> {
       console.log("\n[Step 2] Scraping model pages...");
 
       for (const modelUrl of modelUrls) {
+        // Check if this model was already fully processed
+        const sourceSlug = extractSourceSlug(modelUrl);
+        if (!force && sourceSlug) {
+          // Find existing entry by sourceSlug (since we don't have canonicalSlug yet before scraping)
+          const existingEntry = Array.from(existingData.values()).find(
+            (t) => t.sourceSlug === sourceSlug && t.brand === brand,
+          );
+          if (existingEntry && isFullyProcessed(existingEntry)) {
+            console.log(`\n⏭️ Skipped (already processed): ${existingEntry.name}`);
+            skippedSlugs.add(existingEntry.canonicalSlug);
+            continue;
+          }
+        }
+
         console.log(`\nScraping: ${modelUrl}`);
         const tire = await scrapeModelPage(page, modelUrl);
 
@@ -556,10 +591,10 @@ async function scrapeProkoleso(brands?: Brand[]): Promise<ScrapedTire[]> {
     }
 
     console.log(`\n${"=".repeat(50)}`);
-    console.log(`[Done] Scraped ${allTires.length} tire models total`);
+    console.log(`[Done] Scraped ${allTires.length} tire models | Skipped ${skippedSlugs.size} (already processed)`);
     console.log(`${"=".repeat(50)}`);
 
-    return allTires;
+    return { tires: allTires, skippedSlugs, existingData };
   } catch (error) {
     console.error("Scraping error:", error);
     throw error;
@@ -570,11 +605,109 @@ async function scrapeProkoleso(brands?: Brand[]): Promise<ScrapedTire[]> {
   }
 }
 
-// Save results to JSON
+// Processing flags that downstream pipeline adds to scraped records
+interface ProcessingFlags {
+  aiGenerated?: boolean;
+  generatedContent?: unknown;
+  publishedToPayload?: boolean;
+  publishedAt?: string;
+  skippedReason?: string;
+  missingFields?: string[];
+}
+
+type ExistingTireRecord = ScrapedTire & ProcessingFlags;
+
+const DATA_FILE_PATH = join(__dirname, "../../data/prokoleso-tires.json");
+
+/**
+ * Load existing scraped data from JSON file
+ * Returns a Map keyed by canonicalSlug for fast lookup
+ */
+function loadExistingData(): Map<string, ExistingTireRecord> {
+  const map = new Map<string, ExistingTireRecord>();
+
+  if (!existsSync(DATA_FILE_PATH)) {
+    return map;
+  }
+
+  try {
+    const raw = readFileSync(DATA_FILE_PATH, "utf-8");
+    const tires: ExistingTireRecord[] = JSON.parse(raw);
+    for (const tire of tires) {
+      if (tire.canonicalSlug) {
+        map.set(tire.canonicalSlug, tire);
+      }
+    }
+    console.log(`Loaded ${map.size} existing tire records from JSON`);
+  } catch (error) {
+    console.warn(`Warning: Could not load existing data: ${error}`);
+  }
+
+  return map;
+}
+
+/**
+ * Check if a tire has been fully processed (generated + published)
+ */
+function isFullyProcessed(tire: ExistingTireRecord): boolean {
+  return tire.aiGenerated === true && tire.publishedToPayload === true;
+}
+
+// Save results to JSON (legacy, kept for export compatibility)
 function saveResults(tires: ScrapedTire[]): void {
-  const outputPath = join(__dirname, "../../data/prokoleso-tires.json");
-  writeFileSync(outputPath, JSON.stringify(tires, null, 2), "utf-8");
-  console.log(`Results saved to ${outputPath}`);
+  writeFileSync(DATA_FILE_PATH, JSON.stringify(tires, null, 2), "utf-8");
+  console.log(`Results saved to ${DATA_FILE_PATH}`);
+}
+
+/**
+ * Merge newly scraped tires with existing data, preserving processing flags.
+ *
+ * Strategy:
+ * - For re-scraped tires: update scrape fields, preserve processing flags
+ * - For skipped tires (already processed): keep existing record as-is
+ * - For tires in old JSON not found in new scrape: keep them (may reappear later)
+ */
+function mergeAndSaveResults(
+  newlyScraped: ScrapedTire[],
+  skippedSlugs: Set<string>,
+  existingData: Map<string, ExistingTireRecord>,
+): void {
+  const merged = new Map<string, ExistingTireRecord>();
+
+  // 1. Start with all existing records (preserves tires missing from current scrape)
+  for (const [slug, existing] of existingData) {
+    merged.set(slug, existing);
+  }
+
+  // 2. Overlay newly scraped tires — update scrape fields, preserve flags
+  for (const tire of newlyScraped) {
+    const existing = existingData.get(tire.canonicalSlug);
+    if (existing) {
+      // Merge: fresh scrape data + existing processing flags
+      merged.set(tire.canonicalSlug, {
+        ...tire,
+        aiGenerated: existing.aiGenerated,
+        generatedContent: existing.generatedContent,
+        publishedToPayload: existing.publishedToPayload,
+        publishedAt: existing.publishedAt,
+      });
+    } else {
+      // Brand new tire
+      merged.set(tire.canonicalSlug, tire);
+    }
+  }
+
+  // 3. Skipped slugs are already in merged via step 1 (no action needed)
+
+  const result = Array.from(merged.values());
+  writeFileSync(DATA_FILE_PATH, JSON.stringify(result, null, 2), "utf-8");
+
+  const newCount = newlyScraped.filter((t) => !existingData.has(t.canonicalSlug)).length;
+  const updatedCount = newlyScraped.filter((t) => existingData.has(t.canonicalSlug)).length;
+  console.log(
+    `\nMerge results: ${result.length} total | ${newCount} new | ${updatedCount} updated | ${skippedSlugs.size} skipped (already processed)`,
+  );
+  console.log(`Results saved to ${DATA_FILE_PATH}`);
 }
 
 /**
@@ -731,10 +864,11 @@ export async function findFirestoneTireUrls(browser?: Browser): Promise<string[]
 // Main execution
 async function main() {
   try {
-    const tires = await scrapeProkoleso();
+    const force = process.argv.includes("--force");
+    const { tires, skippedSlugs, existingData } = await scrapeProkoleso(undefined, { force });
 
     console.log(`\n${"=".repeat(50)}`);
-    console.log(`SUMMARY: Scraped ${tires.length} tire models`);
+    console.log(`SUMMARY: Scraped ${tires.length} tire models | Skipped ${skippedSlugs.size}`);
     console.log(`${"=".repeat(50)}`);
 
     tires.forEach((tire) => {
@@ -746,8 +880,8 @@ async function main() {
       console.log(`  Description: ${tire.description.substring(0, 100)}...`);
     });
 
-    if (tires.length > 0) {
-      saveResults(tires);
+    if (tires.length > 0 || skippedSlugs.size > 0) {
+      mergeAndSaveResults(tires, skippedSlugs, existingData);
     } else {
       console.log("\nNo tires found. The website structure may have changed.");
     }
@@ -763,4 +897,4 @@ if (isMainModule) {
   main();
 }
 
-export { scrapeProkoleso, scrapeProkolesoBrand, saveResults };
+export { scrapeProkoleso, scrapeProkolesoBrand, saveResults, mergeAndSaveResults, loadExistingData };

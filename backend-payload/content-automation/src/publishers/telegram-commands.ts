@@ -176,13 +176,19 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
 
     try {
       // Import dynamically to avoid circular dependency
-      const { scrapeProkoleso } = await import("../scrapers/prokoleso.js");
-      const tires = await scrapeProkoleso();
+      const { scrapeProkoleso, mergeAndSaveResults } = await import("../scrapers/prokoleso.js");
+      const result = await scrapeProkoleso();
+
+      // Merge and save with flag preservation
+      if (result.tires.length > 0 || result.skippedSlugs.size > 0) {
+        mergeAndSaveResults(result.tires, result.skippedSlugs, result.existingData);
+      }
 
       return `
 *Скрапінг завершено*
 
-Знайдено шин: ${tires.length}
+Знайдено шин: ${result.tires.length}
+Пропущено (вже оброблені): ${result.skippedSlugs.size}
 Джерело: ProKoleso.ua
       `.trim();
     } catch (error) {
