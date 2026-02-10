@@ -1,57 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { ErrorPageContent } from "@/components/ErrorPageContent";
 
-export default function Error({
+export default function RootError({
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log error for debugging
-    console.error('Application error:', error);
-  }, [error]);
-
   return (
-    <div className="bg-background text-foreground min-h-[60vh] flex items-center justify-center">
-      <div className="container mx-auto max-w-lg px-4 text-center">
-        <div className="rounded-2xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 p-10">
-          <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-6" />
-          <h2 className="text-2xl font-bold text-red-800 dark:text-red-200 mb-2">
-            Щось пішло не так
-          </h2>
-          <p className="text-red-600 dark:text-red-300 mb-6">
-            Виникла непередбачена помилка. Спробуйте оновити сторінку або поверніться на головну.
-          </p>
-          {process.env.NODE_ENV === 'development' && error.message && (
-            <p className="text-sm text-red-500 dark:text-red-400 mb-6 font-mono bg-red-100 dark:bg-red-900/30 p-2 rounded break-all">
-              {error.message}
-            </p>
-          )}
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button
-              onClick={reset}
-              variant="danger"
-              size="lg"
-              leftIcon={<RefreshCw className="h-4 w-4" />}
-            >
-              Спробувати знову
-            </Button>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-red-300 dark:border-red-700 px-6 py-3 font-semibold text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            >
-              <Home className="h-4 w-4" />
-              На головну
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ErrorPageContent
+      error={error}
+      reset={reset}
+      backLink={{ href: "/", label: "На головну" }}
+    />
   );
 }

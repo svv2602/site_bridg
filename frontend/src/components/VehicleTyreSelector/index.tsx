@@ -107,30 +107,30 @@ export function VehicleTyreSelector({
       {/* Kit info */}
       {selectedKit && (
         <div
-          className="rounded-xl border border-stone-700 bg-stone-800/50 p-4 animate-fade-in"
+          className="rounded-xl border border-stone-300 bg-stone-100/50 p-4 animate-fade-in dark:border-stone-700 dark:bg-stone-800/50"
         >
-          <h4 className="mb-2 text-sm font-semibold text-stone-50">
+          <h4 className="mb-2 text-sm font-semibold text-stone-900 dark:text-stone-50">
             Параметри кріплення коліс
           </h4>
-          <div className="flex flex-wrap gap-4 text-sm text-stone-400">
+          <div className="flex flex-wrap gap-4 text-sm text-stone-500 dark:text-stone-400">
             {selectedKit.pcd && (
               <span>
-                PCD: <strong className="text-stone-50">{selectedKit.pcd}</strong>
+                PCD: <strong className="text-stone-900 dark:text-stone-50">{selectedKit.pcd}</strong>
               </span>
             )}
             {selectedKit.boltCount && (
               <span>
-                Болтів: <strong className="text-stone-50">{selectedKit.boltCount}</strong>
+                Болтів: <strong className="text-stone-900 dark:text-stone-50">{selectedKit.boltCount}</strong>
               </span>
             )}
             {selectedKit.dia && (
               <span>
-                DIA: <strong className="text-stone-50">{selectedKit.dia}</strong>
+                DIA: <strong className="text-stone-900 dark:text-stone-50">{selectedKit.dia}</strong>
               </span>
             )}
             {selectedKit.boltSize && (
               <span>
-                Болт: <strong className="text-stone-50">{selectedKit.boltSize}</strong>
+                Болт: <strong className="text-stone-900 dark:text-stone-50">{selectedKit.boltSize}</strong>
               </span>
             )}
           </div>
@@ -153,8 +153,8 @@ export function VehicleTyreSelector({
           Підібрати шини Bridgestone
         </button>
 
-        <div className="hidden items-center gap-2 text-sm text-stone-300 sm:flex">
-          <CheckCircle className="h-4 w-4 text-green-400" />
+        <div className="hidden items-center gap-2 text-sm text-stone-500 dark:text-stone-300 sm:flex">
+          <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
           <span>База даних 300,000+ комплектацій</span>
         </div>
       </div>

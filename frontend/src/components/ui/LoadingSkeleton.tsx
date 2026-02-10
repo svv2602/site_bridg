@@ -9,16 +9,16 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
       <div role="status" aria-label="Завантаження" className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="animate-pulse rounded-2xl border border-border bg-card overflow-hidden">
-            <div className="h-48 bg-muted" />
+            <div className="h-48 bg-skeleton" />
             <div className="p-6">
-              <div className="h-3 w-24 rounded bg-muted mb-3" />
-              <div className="h-5 w-3/4 rounded bg-muted mb-2" />
-              <div className="h-4 w-full rounded bg-muted mb-4" />
+              <div className="h-3 w-24 rounded bg-skeleton mb-3" />
+              <div className="h-5 w-3/4 rounded bg-skeleton mb-2" />
+              <div className="h-4 w-full rounded bg-skeleton mb-4" />
               <div className="flex gap-2 mb-4">
-                <div className="h-6 w-16 rounded-full bg-muted" />
-                <div className="h-6 w-20 rounded-full bg-muted" />
+                <div className="h-6 w-16 rounded-full bg-skeleton" />
+                <div className="h-6 w-20 rounded-full bg-skeleton" />
               </div>
-              <div className="h-10 w-full rounded-full bg-muted" />
+              <div className="h-10 w-full rounded-full bg-skeleton" />
             </div>
           </div>
         ))}
@@ -32,10 +32,10 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-4">
             <div className="flex gap-4">
-              <div className="h-12 w-12 rounded-full bg-muted flex-shrink-0" />
+              <div className="h-12 w-12 rounded-full bg-skeleton flex-shrink-0" />
               <div className="flex-1">
-                <div className="h-5 w-1/3 rounded bg-muted mb-2" />
-                <div className="h-4 w-2/3 rounded bg-muted" />
+                <div className="h-5 w-1/3 rounded bg-skeleton mb-2" />
+                <div className="h-4 w-2/3 rounded bg-skeleton" />
               </div>
             </div>
           </div>
@@ -49,29 +49,13 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
     <div role="status" aria-label="Завантаження" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6">
-          <div className="h-48 rounded-xl bg-muted mb-4" />
-          <div className="h-5 w-3/4 rounded bg-muted mb-2" />
-          <div className="h-4 w-1/2 rounded bg-muted mb-4" />
-          <div className="h-4 w-full rounded bg-muted mb-2" />
-          <div className="h-4 w-2/3 rounded bg-muted" />
+          <div className="h-48 rounded-xl bg-skeleton mb-4" />
+          <div className="h-5 w-3/4 rounded bg-skeleton mb-2" />
+          <div className="h-4 w-1/2 rounded bg-skeleton mb-4" />
+          <div className="h-4 w-full rounded bg-skeleton mb-2" />
+          <div className="h-4 w-2/3 rounded bg-skeleton" />
         </div>
       ))}
-    </div>
-  );
-}
-
-export function HeroSkeleton() {
-  return (
-    <div role="status" aria-label="Завантаження" className="animate-pulse">
-      <div className="h-4 w-32 rounded bg-hero-accent mb-4" />
-      <div className="h-10 w-3/4 rounded bg-hero-accent mb-2" />
-      <div className="h-6 w-1/2 rounded bg-hero-accent mb-6" />
-      <div className="h-4 w-full rounded bg-hero-accent mb-2" />
-      <div className="h-4 w-4/5 rounded bg-hero-accent mb-6" />
-      <div className="flex gap-4">
-        <div className="h-12 w-40 rounded-full bg-hero-accent" />
-        <div className="h-12 w-40 rounded-full bg-hero-accent" />
-      </div>
     </div>
   );
 }

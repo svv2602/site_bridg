@@ -42,6 +42,7 @@ export default function TyreSearchPage() {
     selectedBrands,
     toggleBrand,
     handleSizeSearch,
+    handleResetFilters,
     resultsRef,
     urlMake,
     urlModel,
@@ -75,8 +76,7 @@ export default function TyreSearchPage() {
                 </span>
               </h1>
               <p className="hero-text-adaptive max-w-xl text-sm md:text-base">
-                Введіть параметри, а ми підберемо відповідні моделі шин Bridgestone з демонстраційної бази.
-                Інтерфейс оформлений у більш «технічному» стилі на основі референсів Goodyear.
+                Введіть параметри, а ми підберемо відповідні моделі шин Bridgestone з нашого каталогу.
               </p>
             </div>
             <div className="hidden gap-3 rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-100/80 dark:bg-stone-900/60 p-4 text-xs text-stone-600 dark:text-stone-300 shadow-lg md:flex md:flex-col">
@@ -86,9 +86,6 @@ export default function TyreSearchPage() {
               <p>
                 Оберіть пошук за <span className="font-semibold">типорозміром</span> або
                 <span className="font-semibold"> за авто</span>, заповніть поля й запустіть пошук.
-              </p>
-              <p className="text-[11px] text-stone-400 dark:text-stone-500">
-                У продакшн‑версії форми будуть підключені до повного каталогу шин та бази авто.
               </p>
             </div>
           </div>
@@ -154,6 +151,7 @@ export default function TyreSearchPage() {
                     onAspectChange={handleAspectChange}
                     onDiameterChange={handleDiameterChange}
                     onSeasonChange={handleSeasonChange}
+                    onResetFilters={handleResetFilters}
                     widthOptions={widthOptions}
                     aspectOptions={aspectOptions}
                     diameterOptions={diameterOptions}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Car, MapPin, ChevronRight, Truck, ArrowLeft } from "lucide-react";
 import { type TyreModel } from "@/lib/data";
-import { getTyreModels } from "@/lib/api/tyres";
+import { getTyreModels, getTyreModelBySlug } from "@/lib/api/tyres";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { generateProductSchemaWithReviews, generateBreadcrumbSchema, generateFAQSchema, jsonLdScript } from "@/lib/schema";
 import { getReviewsByTyre, getReviewStats } from "@/lib/api/reviews";
@@ -23,10 +23,6 @@ function buildTitle(model: TyreModel): string {
   return `${model.name} — ${seasonLabels[model.season]} Bridgestone`;
 }
 
-// Dynamic rendering - fetch fresh data on each request
-// This ensures we always get data from CMS, not stale build-time data
-export const dynamic = 'force-dynamic';
-
 export async function generateStaticParams() {
   // Return empty array - pages will be generated on-demand
   // This avoids build-time dependency on backend being available
@@ -39,8 +35,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const tyres = await getTyreModels();
-  const model = tyres.find((m) => m.slug === slug);
+  const model = await getTyreModelBySlug(slug);
   if (!model) {
     return {
       title: "Модель шини не знайдена — Bridgestone Україна",
@@ -72,14 +67,16 @@ export default async function TyreModelPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const tyres = await getTyreModels();
-  const model = tyres.find((m) => m.slug === slug);
+  const [model, allTyres] = await Promise.all([
+    getTyreModelBySlug(slug),
+    getTyreModels(),
+  ]);
 
   if (!model) {
     notFound();
   }
 
-  const recommended = tyres.filter(
+  const recommended = allTyres.filter(
     (m) =>
       m.slug !== model.slug &&
       (m.season === model.season ||

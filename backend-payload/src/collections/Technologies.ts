@@ -53,6 +53,15 @@ export const Technologies: CollectionConfig = {
       },
     },
     {
+      // NOTE: Relation direction is one-directional — Tyres reference Technologies
+      // (via the `technologies` field on the Tyres collection), but this `tyres` field
+      // is NOT automatically populated. It must be manually maintained or queried
+      // via a reverse lookup (e.g., fetch tyres where technologies contains this ID).
+      //
+      // The frontend technology detail page already queries tyres by technology slug
+      // using the Tyres API, so this field is mostly informational for the admin UI.
+      // If automatic sync is needed, add an afterChange hook on the Tyres collection
+      // to update this field whenever a tyre's technologies list changes.
       name: 'tyres',
       type: 'relationship',
       relationTo: 'tyres',

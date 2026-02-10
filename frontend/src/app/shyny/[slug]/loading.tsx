@@ -1,6 +1,6 @@
-export default function TyreDetailLoading() {
+export default function Loading() {
   return (
-    <div className="bg-background text-foreground">
+    <div role="status" aria-busy="true" aria-label="Завантаження" className="bg-background text-foreground">
       {/* Hero skeleton */}
       <section className="border-b border-stone-200 dark:border-stone-800 bg-gradient-to-br from-stone-100 via-stone-50 to-white dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -33,28 +33,28 @@ export default function TyreDetailLoading() {
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
               <div className="rounded-2xl border border-border bg-card p-6 animate-pulse">
-                <div className="mb-4 h-6 w-48 rounded bg-muted" />
+                <div className="mb-4 h-6 w-48 rounded bg-skeleton" />
                 <div className="space-y-3">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="h-10 w-full rounded bg-muted" />
+                    <div key={i} className="h-10 w-full rounded bg-skeleton" />
                   ))}
                 </div>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6 animate-pulse">
-                <div className="mb-4 h-6 w-36 rounded bg-muted" />
+                <div className="mb-4 h-6 w-36 rounded bg-skeleton" />
                 <div className="grid gap-4 sm:grid-cols-3">
                   {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-24 rounded-xl bg-muted" />
+                    <div key={i} className="h-24 rounded-xl bg-skeleton" />
                   ))}
                 </div>
               </div>
             </div>
             <aside className="space-y-6">
               <div className="rounded-2xl border border-border bg-card p-6 animate-pulse">
-                <div className="mb-3 h-6 w-40 rounded bg-muted" />
+                <div className="mb-3 h-6 w-40 rounded bg-skeleton" />
                 <div className="space-y-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="h-5 w-full rounded bg-muted" />
+                    <div key={i} className="h-5 w-full rounded bg-skeleton" />
                   ))}
                 </div>
               </div>

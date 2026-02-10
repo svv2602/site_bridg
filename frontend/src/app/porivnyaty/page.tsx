@@ -119,7 +119,7 @@ export default function ComparisonSelectionPage() {
               {comparisonUrl && (
                 <Link
                   href={comparisonUrl}
-                  className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                  className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-text rounded-lg font-medium hover:bg-primary/90 transition-colors"
                 >
                   Порівняти
                   <ArrowRight className="h-4 w-4" />
@@ -230,7 +230,7 @@ export default function ComparisonSelectionPage() {
                   >
                     {/* Selection indicator */}
                     {selected && (
-                      <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
+                      <div className="absolute top-2 right-2 bg-primary text-primary-text rounded-full p-1">
                         <Check className="h-4 w-4" />
                       </div>
                     )}
@@ -241,6 +241,7 @@ export default function ComparisonSelectionPage() {
                         src={tyre.imageUrl || "/placeholder-tyre.png"}
                         alt={tyre.name}
                         fill
+                        sizes="(max-width: 768px) 50vw, 200px"
                         className="object-contain p-2"
                       />
                     </div>

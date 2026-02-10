@@ -19,7 +19,10 @@ export const Reviews: CollectionConfig = {
     description: 'Відгуки користувачів про шини',
   },
   access: {
-    read: () => true, // Public read for frontend
+    read: ({ req }) => {
+      if (req.user) return true;
+      return { isPublished: { equals: true } };
+    },
   },
   fields: [
     // Relationship to Tyre
@@ -130,13 +133,16 @@ export const Reviews: CollectionConfig = {
         },
       ],
     },
-    // Status
+    // Status — defaults to false so new reviews require explicit approval
     {
       name: 'isPublished',
       type: 'checkbox',
-      defaultValue: true,
+      defaultValue: false,
       label: 'Опубліковано',
-      admin: { position: 'sidebar' },
+      admin: {
+        position: 'sidebar',
+        description: 'Нові відгуки потребують ручного затвердження перед публікацією',
+      },
     },
     // AI generated flag
     {

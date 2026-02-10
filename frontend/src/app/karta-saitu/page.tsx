@@ -1,9 +1,16 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { SITE_URL } from "@/lib/constants";
+
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Карта сайту | Bridgestone Україна',
-  description: 'Карта сайту Bridgestone Україна - всі сторінки',
+  title: 'Карта сайту',
+  description: 'Карта сайту Bridgestone Україна. Швидкий доступ до всіх розділів офіційного сайту.',
+  alternates: {
+    canonical: '/karta-saitu',
+  },
 };
 
 const sitemapSections = [
@@ -18,10 +25,12 @@ const sitemapSections = [
   {
     title: 'Каталог шин',
     links: [
+      { href: '/shyny', label: 'Усі шини Bridgestone' },
       { href: '/passenger-tyres', label: 'Шини для легкових авто' },
       { href: '/suv-4x4-tyres', label: 'Шини для SUV та 4x4' },
       { href: '/lcv-tyres', label: 'Комерційні шини' },
       { href: '/tyre-search', label: 'Пошук шин' },
+      { href: '/porivnyaty', label: 'Порівняння шин' },
     ],
   },
   {
@@ -37,6 +46,7 @@ const sitemapSections = [
     links: [
       { href: '/dealers', label: 'Де купити (дилери)' },
       { href: '/blog', label: 'Блог' },
+      { href: '/reviews', label: 'Відгуки покупців' },
       { href: '/technology', label: 'Технології Bridgestone' },
     ],
   },
@@ -51,30 +61,50 @@ const sitemapSections = [
 
 export default function SitemapPage() {
   return (
-    <div className="bg-background py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(generateBreadcrumbSchema([
+          { name: "Головна", url: `${SITE_URL}/` },
+          { name: "Карта сайту", url: `${SITE_URL}/karta-saitu` },
+        ])) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript({
+          "@context": "https://schema.org",
+          "@type": "SiteNavigationElement",
+          name: "Карта сайту Bridgestone Україна",
+          url: `${SITE_URL}/karta-saitu`,
+        }) }}
+      />
+      <div className="bg-background py-12">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
         <h1 className="mb-8 text-3xl font-bold md:text-4xl">Карта сайту</h1>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          {sitemapSections.map((section) => (
-            <div key={section.title}>
-              <h2 className="mb-4 text-lg font-semibold">{section.title}</h2>
-              <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-muted-foreground hover:text-primary hover:underline"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <nav aria-label="Карта сайту">
+          <div className="grid gap-8 md:grid-cols-3">
+            {sitemapSections.map((section) => (
+              <div key={section.title}>
+                <h2 className="mb-4 text-lg font-semibold">{section.title}</h2>
+                <ul className="space-y-1">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="inline-block py-2 text-muted-foreground hover:text-stone-700 hover:underline dark:hover:text-stone-300"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </nav>
       </div>
     </div>
+    </>
   );
 }

@@ -7,28 +7,24 @@ export interface DealerSearchParams {
 }
 
 /**
- * Повертає повний список дилерів з Payload CMS.
+ * Повертає список дилерів з Payload CMS.
  * При помилці повертає порожній масив — компоненти повинні обробити цей стан.
+ * @param limit — максимальна кількість записів (за замовчуванням: всі)
  */
-export async function getDealers(): Promise<Dealer[]> {
-  try {
-    const dealers = await getPayloadDealers();
-    return dealers.map(d => ({
-      id: d.id,
-      name: d.name,
-      type: d.type,
-      city: d.city,
-      address: d.address,
-      latitude: d.latitude,
-      longitude: d.longitude,
-      phone: d.phone,
-      website: d.website,
-      workingHours: d.workingHours,
-    }));
-  } catch (error) {
-    console.error("Помилка завантаження дилерів з CMS:", error);
-    return [];
-  }
+export async function getDealers(limit?: number): Promise<Dealer[]> {
+  const dealers = await getPayloadDealers(limit != null ? { limit } : undefined);
+  return dealers.map(d => ({
+    id: d.id,
+    name: d.name,
+    type: d.type,
+    city: d.city,
+    address: d.address,
+    latitude: d.latitude,
+    longitude: d.longitude,
+    phone: d.phone,
+    website: d.website,
+    workingHours: d.workingHours,
+  }));
 }
 
 /**

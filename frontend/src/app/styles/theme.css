@@ -105,6 +105,8 @@
   --card: #ffffff;
   --card-foreground: var(--stone-900);
   --border: var(--stone-200);
+  --skeleton: var(--stone-200);
+  --destructive: var(--error);
 
   /* Border-radius system */
   --radius: 0.75rem;
@@ -160,7 +162,7 @@
   --secondary: var(--text-primary);
   --accent: var(--silver-muted);
   --muted: var(--text-secondary);
-  --muted-foreground: var(--text-muted);
+  --muted-foreground: #8B8F94; /* Bumped from --text-muted (#6F7378) for WCAG AA 4.5:1 contrast on dark bg */
 
   --card: var(--graphite);
   --card-foreground: var(--text-primary);
@@ -186,6 +188,9 @@
 
   --text-label: var(--text-secondary);
   --text-caption: var(--text-muted);
+
+  --skeleton: var(--graphite);
+  --destructive: var(--error);
 
   --disabled-bg: var(--graphite);
   --disabled-text: var(--text-muted);
@@ -261,6 +266,9 @@
 
   --color-text-label: var(--text-label);
   --color-text-caption: var(--text-caption);
+
+  --color-skeleton: var(--skeleton);
+  --color-destructive: var(--destructive);
 
   --color-disabled-bg: var(--disabled-bg);
   --color-disabled-text: var(--disabled-text);

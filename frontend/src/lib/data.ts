@@ -5,13 +5,13 @@ export type Season = "summer" | "winter" | "allseason";
 
 export type Brand = "bridgestone" | "firestone";
 
-export type VehicleType = "passenger" | "suv" | "lcv";
+export type VehicleType = "passenger" | "suv" | "lcv" | "sport";
 
 export interface TyreSize {
   width: number;
   aspectRatio: number;
   diameter: number;
-  loadIndex?: number;
+  loadIndex?: number | string;
   speedIndex?: string;
 }
 

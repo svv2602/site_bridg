@@ -4,10 +4,16 @@ import { Cpu, Shield, Zap, Droplets, Wind, Gauge, ChevronRight } from "lucide-re
 import { getTechnologies } from "@/lib/api/technologies";
 import { getTyreModels } from "@/lib/api/tyres";
 import { Breadcrumb } from "@/components/ui";
+import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { SITE_URL } from "@/lib/constants";
+import { pluralize } from "@/lib/utils/pluralize";
 
 export const metadata: Metadata = {
   title: "Технології Bridgestone — інновації для безпеки та комфорту",
   description: "Дізнайтеся про технології Bridgestone: Run-Flat, Nano Pro-Tech, зниження шуму та інші інновації для безпеки, комфорту та ефективності.",
+  alternates: {
+    canonical: '/technology',
+  },
   openGraph: {
     title: "Технології Bridgestone — інновації для безпеки та комфорту",
     description: "Дізнайтеся про технології Bridgestone: Run-Flat, Nano Pro-Tech та інші інновації.",
@@ -55,7 +61,8 @@ const benefits = [
 export default async function TechnologyPage() {
   const [technologies, tyreModels] = await Promise.all([
     getTechnologies(),
-    getTyreModels(),
+    // depth=1 is sufficient: we only need technology slugs, not fully expanded relationships
+    getTyreModels({ depth: 1 }),
   ]);
 
   const schemaData = {
@@ -63,6 +70,7 @@ export default async function TechnologyPage() {
     "@type": "ItemList",
     name: "Технології Bridgestone",
     description: "Інноваційні технології шин Bridgestone для безпеки, комфорту та ефективності",
+    inLanguage: "uk",
     numberOfItems: technologies.length,
     itemListElement: technologies.map((tech, index) => ({
       "@type": "ListItem",
@@ -80,10 +88,18 @@ export default async function TechnologyPage() {
   };
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(generateBreadcrumbSchema([
+          { name: "Головна", url: `${SITE_URL}/` },
+          { name: "Технології", url: `${SITE_URL}/technology` },
+        ])) }}
+      />
     <div className="bg-background text-foreground">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(schemaData) }}
       />
       {/* Hero */}
       <section className="hero-adaptive py-8 md:py-12">
@@ -123,12 +139,12 @@ export default async function TechnologyPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
+              <div className="hero-card-adaptive relative h-48 overflow-hidden lg:h-full">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Cpu className="h-40 w-40 text-stone-300 dark:text-white/10" aria-hidden="true" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
-                  <h3 className="text-xl font-semibold text-stone-900 dark:text-white">Технології у дії</h3>
+                  <h2 className="text-xl font-semibold text-stone-900 dark:text-white">Технології у дії</h2>
                   <p className="text-sm text-stone-500 dark:text-stone-400">
                     {technologies.length} унікальних технологій для різних умов експлуатації.
                   </p>
@@ -213,7 +229,7 @@ export default async function TechnologyPage() {
                                 className="rounded-xl border border-border bg-card p-4"
                               >
                                 <div className="mb-2 flex items-center justify-between">
-                                  <h5 className="font-bold">{tyre.name}</h5>
+                                  <h3 className="font-bold">{tyre.name}</h3>
                                   <span className="rounded-full bg-stone-200 px-2 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                                     {tyre.season === "summer"
                                       ? "Літо"
@@ -240,7 +256,7 @@ export default async function TechnologyPage() {
                                 href={`/passenger-tyres?technology=${tech.slug}`}
                                 className="rounded-full border border-primary bg-transparent px-6 py-2 text-primary hover:bg-stone-100 dark:hover:bg-stone-700"
                               >
-                                Показати ще {tyres.length - 3} моделей
+                                Показати ще {pluralize(tyres.length - 3, "модель", "моделі", "моделей")}
                               </Link>
                             </div>
                           )}
@@ -267,8 +283,8 @@ export default async function TechnologyPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
-            <h3 className="mb-4 text-3xl font-bold">Зацікавили технології Bridgestone?</h3>
+          <div className="rounded-3xl bg-graphite p-6 text-white shadow-2xl md:p-10 dark:ring-1 dark:ring-stone-700">
+            <h2 className="mb-4 text-3xl font-bold">Зацікавили технології Bridgestone?</h2>
             <p className="mb-8 text-lg opacity-90">
               Отримайте детальну консультацію від наших експертів щодо технологій,
               які найкраще підходять для вашого авто та стилю водіння.
@@ -291,5 +307,6 @@ export default async function TechnologyPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

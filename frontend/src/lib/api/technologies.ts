@@ -9,7 +9,10 @@ function transformPayloadTechnology(tech: PayloadTechnology): Technology {
     slug: tech.slug,
     name: tech.name,
     description: tech.description || "",
-    tyreSlugs: [], // Will be populated from tyres with this technology
+    // tyreSlugs is always empty here because the Tyres→Technologies relation is
+    // one-directional. The technology detail page fetches related tyres via a
+    // reverse query (tyres where technologies contains this slug) instead.
+    tyreSlugs: [],
   };
 }
 

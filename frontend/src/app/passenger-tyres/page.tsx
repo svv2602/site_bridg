@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { Car, Shield, Zap, Star } from "lucide-react";
-import { getTyreModels } from "@/lib/api/tyres";
+import { getPayloadTyres, transformPayloadTyre } from "@/lib/api/payload";
+import type { TyreModel } from "@/lib/data";
 import { CategoryPage, type CategoryPageConfig } from "@/components/CategoryPage";
 
 export const metadata: Metadata = {
   title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
   description: "Широкий вибір легкових шин Bridgestone для вашого автомобіля. Літні, зимові та всесезонні моделі з гарантією якості для комфортної та безпечної їзди.",
+  alternates: {
+    canonical: '/passenger-tyres',
+  },
   openGraph: {
     title: "Легкові шини Bridgestone | Каталог шин для легкових авто",
     description: "Широкий вибір легкових шин Bridgestone. Літні, зимові та всесезонні моделі.",
@@ -87,10 +91,8 @@ const config: CategoryPageConfig = {
 };
 
 export default async function PassengerTyresPage() {
-  const allTyres = await getTyreModels();
-  const passengerTyres = allTyres.filter((m) =>
-    m.vehicleTypes.includes("passenger"),
-  );
+  const payloadTyres = await getPayloadTyres({ vehicleType: 'passenger' });
+  const passengerTyres = payloadTyres.map(t => transformPayloadTyre(t) as TyreModel);
 
   return <CategoryPage config={config} tyres={passengerTyres} />;
 }

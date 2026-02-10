@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { contactFormSchema, type ContactFormData } from '@/lib/schemas/contact';
+import { createRateLimiter } from '@/lib/rate-limit';
 
-interface ContactFormData {
-  name: string;
-  phone: string;
-  email: string;
-  subject?: string;
-  message: string;
+// Rate limiter: max 5 contact form submissions per 15 minutes per IP
+const contactLimiter = createRateLimiter({ maxRequests: 5, windowMs: 15 * 60 * 1000 });
+
+interface ContactFormPayload extends ContactFormData {
   _loadedAt?: number;
+  _hp_website?: string;
+  consent?: boolean;
 }
 
 /**
@@ -189,30 +191,61 @@ async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
 
 export async function POST(request: NextRequest) {
   try {
-    const data: ContactFormData = await request.json();
-
-    // Validate required fields
-    if (!data.name || !data.phone || !data.email || !data.message) {
+    // Rate limiting: max 5 requests per 15 minutes per IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    if (!contactLimiter.check(ip)) {
       return NextResponse.json(
-        { error: 'Будь ласка, заповніть всі обов\'язкові поля' },
+        { error: 'Забагато запитів. Спробуйте через декілька хвилин.' },
+        { status: 429 }
+      );
+    }
+
+    const rawData: ContactFormPayload = await request.json();
+
+    // Honeypot check: if the hidden field is filled, it's a bot
+    if (rawData._hp_website) {
+      // Silently accept to avoid tipping off the bot
+      console.warn('Bot detection: honeypot field filled', {
+        ip: request.headers.get('x-forwarded-for') || 'unknown',
+      });
+      return NextResponse.json({
+        success: true,
+        message: 'Ваше повідомлення успішно надіслано',
+      });
+    }
+
+    // GDPR consent check
+    if (rawData.consent !== true) {
+      return NextResponse.json(
+        { error: 'Необхідна згода на обробку персональних даних' },
         { status: 400 }
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
+    // Server-side validation with the same Zod schema as client
+    const parseResult = contactFormSchema.safeParse({
+      name: rawData.name,
+      phone: rawData.phone,
+      email: rawData.email,
+      subject: rawData.subject,
+      message: rawData.message,
+    });
+
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0];
       return NextResponse.json(
-        { error: 'Невірний формат електронної пошти' },
+        { error: firstError?.message || 'Невірні дані форми' },
         { status: 400 }
       );
     }
+
+    const data = parseResult.data;
 
     // Bot detection: timestamp-based check
     // If _loadedAt is missing, it's either a bot or an old client — reject gracefully
-    if (data._loadedAt) {
+    if (rawData._loadedAt) {
       const now = Date.now();
-      const elapsed = now - data._loadedAt;
+      const elapsed = now - rawData._loadedAt;
 
       if (elapsed < MIN_SUBMIT_TIME_MS) {
         console.warn('Bot detection: form submitted too quickly', {
@@ -260,8 +293,15 @@ export async function POST(request: NextRequest) {
       emailSent,
     });
 
-    // Return success even if some notifications failed
-    // The main thing is that we received the submission
+    // If database save failed, report error to the user
+    if (!savedToDb) {
+      console.error('Contact form: failed to save to database');
+      return NextResponse.json(
+        { error: 'Не вдалося зберегти повідомлення. Будь ласка, спробуйте пізніше.' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Ваше повідомлення успішно надіслано',

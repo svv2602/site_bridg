@@ -27,12 +27,14 @@ export function ReviewsSectionWithMore({
 
     setIsLoading(true);
     try {
-      const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
       const offset = reviews.length;
       const limit = 6;
 
+      // Use a relative Next.js API route to proxy the request server-side.
+      // This avoids exposing the internal Payload URL to the browser and works
+      // correctly in both development (localhost) and production environments.
       const response = await fetch(
-        `${PAYLOAD_URL}/api/reviews?where[tyre][equals]=${tyreId}&where[isPublished][equals]=true&limit=${limit}&offset=${offset}&depth=1`
+        `/api/reviews/more?tyreId=${tyreId}&limit=${limit}&offset=${offset}`
       );
 
       if (!response.ok) throw new Error('Failed to fetch');

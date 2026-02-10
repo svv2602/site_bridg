@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="bg-background text-foreground">
+    <div role="status" aria-busy="true" aria-label="Завантаження" className="bg-background text-foreground">
       {/* Hero skeleton */}
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -26,14 +26,14 @@ export default function Loading() {
       {/* Benefits skeleton */}
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-10 h-8 w-48 mx-auto animate-pulse rounded bg-muted" />
+          <div className="mb-10 h-8 w-48 mx-auto animate-pulse rounded bg-skeleton" />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6 text-center">
-                <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-muted" />
-                <div className="h-5 w-24 mx-auto rounded bg-muted mb-2" />
-                <div className="h-4 w-full rounded bg-muted mb-1" />
-                <div className="h-4 w-3/4 mx-auto rounded bg-muted" />
+                <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-skeleton" />
+                <div className="h-5 w-24 mx-auto rounded bg-skeleton mb-2" />
+                <div className="h-4 w-full rounded bg-skeleton mb-1" />
+                <div className="h-4 w-3/4 mx-auto rounded bg-skeleton" />
               </div>
             ))}
           </div>
@@ -43,22 +43,22 @@ export default function Loading() {
       {/* Technologies skeleton */}
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-10 h-8 w-64 animate-pulse rounded bg-muted" />
+          <div className="mb-10 h-8 w-64 animate-pulse rounded bg-skeleton" />
           <div className="space-y-8">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-8">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="h-12 w-12 rounded-full bg-muted" />
+                  <div className="h-12 w-12 rounded-full bg-skeleton" />
                   <div>
-                    <div className="h-6 w-40 rounded bg-muted mb-2" />
-                    <div className="h-4 w-32 rounded bg-muted" />
+                    <div className="h-6 w-40 rounded bg-skeleton mb-2" />
+                    <div className="h-4 w-32 rounded bg-skeleton" />
                   </div>
                 </div>
-                <div className="h-4 w-full rounded bg-muted mb-2" />
-                <div className="h-4 w-3/4 rounded bg-muted mb-8" />
+                <div className="h-4 w-full rounded bg-skeleton mb-2" />
+                <div className="h-4 w-3/4 rounded bg-skeleton mb-8" />
                 <div className="flex gap-4">
-                  <div className="h-12 w-48 rounded-full bg-muted" />
-                  <div className="h-12 w-56 rounded-full bg-muted" />
+                  <div className="h-12 w-48 rounded-full bg-skeleton" />
+                  <div className="h-12 w-56 rounded-full bg-skeleton" />
                 </div>
               </div>
             ))}

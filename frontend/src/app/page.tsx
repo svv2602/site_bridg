@@ -2,13 +2,17 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Shield, Zap, Sun, Snowflake, Cloud, ChevronRight, Star, Users, Globe, Phone, Award } from "lucide-react";
+import { ChevronRight, Star, Phone, Award } from "lucide-react";
+import { PHONE_HREF } from "@/lib/constants";
+import { tyreCategories, features } from "./page-data";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
+import { getSeasonalContent } from "@/lib/api/payload";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { VehicleTypeCard, vehicleTypesData } from "@/components/VehicleTypeCard";
 import { AnimatedCard, AnimatedCardX } from "@/components/AnimatedSection";
 import { ReviewsSection } from "@/components/ReviewsSection";
+import { pluralize } from "@/lib/utils/pluralize";
 
 // Lazy load below-the-fold components
 const DealerLocatorCompact = dynamic(
@@ -29,79 +33,9 @@ import { getLatestArticles } from "@/lib/api/articles";
 import { t } from "@/lib/i18n";
 import { seasonLabelsShort, vehicleTypeLabels } from "@/lib/utils/tyres";
 
-const tyreCategories = [
-  {
-    id: "summer",
-    name: "Літні шини",
-    description: "Для теплої пори року, оптимальні для сухого та мокрого асфальту.",
-    icon: Sun,
-    color: "from-emerald-500 to-teal-400",
-    href: "/passenger-tyres/summer",
-  },
-  {
-    id: "winter",
-    name: "Зимові шини",
-    description: "Максимальне зчеплення на снігу та льоду в зимових умовах.",
-    icon: Snowflake,
-    color: "from-blue-500 to-cyan-400",
-    href: "/passenger-tyres/winter",
-  },
-  {
-    id: "allseason",
-    name: "Всесезонні шини",
-    description: "Компромісне рішення для помірного клімату без екстремальних умов.",
-    icon: Cloud,
-    color: "from-orange-500 to-amber-400",
-    href: "/passenger-tyres/all-season",
-  },
-];
-
-const features = [
-  {
-    icon: Shield,
-    title: "Безпека на першому місці",
-    description: "Технології, що забезпечують надійне зчеплення в будь-яких умовах.",
-    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
-  },
-  {
-    icon: Zap,
-    title: "Економія палива",
-    description: "Знижений опір коченню для зменшення витрат на пального.",
-    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
-  },
-  {
-    icon: Users,
-    title: "Експертна підтримка",
-    description: "Консультації від офіційних дилерів та сервісних центрів.",
-    color: { bg: "bg-pink-500/15", text: "text-pink-500" },
-  },
-  {
-    icon: Globe,
-    title: "Глобальна якість",
-    description: "Продукція, що відповідає міжнародним стандартам безпеки.",
-    color: { bg: "bg-teal-500/15", text: "text-teal-500" },
-  },
-];
-
-
 // vehicleLabels consolidated into vehicleTypeLabels from @/lib/utils/tyres
 
 // ---- Suspense skeleton components ----
-
-function CarouselSkeleton() {
-  return (
-    <section className="py-12">
-      <div className="container mx-auto max-w-7xl px-4 md:px-8">
-        <div className="mb-6 h-8 w-48 animate-pulse rounded-lg bg-stone-200 dark:bg-stone-800" />
-        <div className="grid gap-4 md:grid-cols-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-48 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function ArticlesSkeleton() {
   return (
@@ -121,69 +55,51 @@ function ArticlesSkeleton() {
   );
 }
 
-function PopularTyresSkeleton() {
-  return (
-    <div className="space-y-6">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="h-32 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
-      ))}
-    </div>
-  );
-}
-
 // ---- Async data-fetching server components ----
 
-async function PopularCarouselSection() {
-  const allTyres = await getTyreModels();
-  const carouselTyres = allTyres.filter(t => t.isPopular).slice(0, 8);
-  return <ProductCarousel tyres={carouselTyres} title="Популярні моделі" />;
+interface FeaturedTyre {
+  name: string;
+  slug: string;
+  tag: string;
+  description: string;
+  rating: number;
 }
 
-async function FeaturedTyresSection() {
-  const allTyres = await getTyreModels();
-  const featuredTyres = allTyres
-    .filter(t => t.isPopular)
-    .slice(0, 3)
-    .map(t => ({
-      name: `Bridgestone ${t.name}`,
-      slug: t.slug,
-      tag: `${seasonLabelsShort[t.season] || t.season} • ${t.vehicleTypes.map(v => vehicleTypeLabels[v] || v).join(' / ')}`,
-      description: t.shortDescription || '',
-      rating: 4.8,
-    }));
-
+function FeaturedTyresCards({ featuredTyres }: { featuredTyres: FeaturedTyre[] }) {
   return featuredTyres.length > 0 ? (
-    featuredTyres.map((tyre, idx) => (
-      <AnimatedCardX
-        key={tyre.slug}
-        delay={idx * 0.1}
-        direction="right"
-        className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
-      >
-        <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-purple-500/15 flex items-center justify-center">
-          <Star className="h-6 w-6 text-purple-500" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-bold">{tyre.name}</h3>
-          <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link
-              href={`/shyny/${tyre.slug}`}
-              className="rounded-full border border-stone-300 bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-            >
-              Дізнатися більше
-            </Link>
-            <Link
-              href="/dealers"
-              className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
-            >
-              Знайти магазин
-            </Link>
+    <>
+      {featuredTyres.map((tyre, idx) => (
+        <AnimatedCardX
+          key={tyre.slug}
+          delay={idx * 0.1}
+          direction="right"
+          className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
+        >
+          <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-purple-500/15 flex items-center justify-center">
+            <Star className="h-6 w-6 text-purple-500" />
           </div>
-        </div>
-      </AnimatedCardX>
-    ))
+          <div className="flex-1">
+            <h3 className="text-xl font-bold">{tyre.name}</h3>
+            <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href={`/shyny/${tyre.slug}`}
+                className="rounded-full border border-stone-300 bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+              >
+                Дізнатися більше
+              </Link>
+              <Link
+                href="/dealers"
+                className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
+              >
+                Знайти магазин
+              </Link>
+            </div>
+          </div>
+        </AnimatedCardX>
+      ))}
+    </>
   ) : (
     <p className="text-muted-foreground">{t('home.loadingPopularModels')}</p>
   );
@@ -194,7 +110,9 @@ async function ArticlesSection() {
   const articles = latestArticles.map(a => ({
     title: a.title,
     slug: a.slug,
-    readingTime: a.readingTimeMinutes ? `${a.readingTimeMinutes} хвилин читання` : '5 хвилин читання',
+    readingTime: a.readingTimeMinutes
+      ? `${pluralize(a.readingTimeMinutes, 'хвилина', 'хвилини', 'хвилин')} читання`
+      : '5 хвилин читання',
     category: a.tags?.[0] || 'Поради',
   }));
 
@@ -240,18 +158,33 @@ async function DealerLocatorSection() {
 
 // ---- Main page component ----
 
-export default function Home() {
+export default async function Home() {
+  const [seasonalData, allTyres] = await Promise.all([
+    getSeasonalContent(),
+    getTyreModels(),
+  ]);
+
+  const popularTyres = allTyres.filter(t => t.isPopular);
+  const carouselTyres = popularTyres.slice(0, 8);
+  const featuredTyres: FeaturedTyre[] = popularTyres
+    .slice(0, 3)
+    .map(t => ({
+      name: `Bridgestone ${t.name}`,
+      slug: t.slug,
+      tag: `${seasonLabelsShort[t.season] || t.season} • ${t.vehicleTypes.map(v => vehicleTypeLabels[v] || v).join(' / ')}`,
+      description: t.shortDescription || '',
+      rating: 4.8,
+    }));
+
   return (
     <div className="bg-background text-foreground">
-      {/* Hero with Seasonal Content — renders instantly (shell) */}
-      <SeasonalHero>
+      {/* Hero with Seasonal Content — data fetched server-side to avoid CORS */}
+      <SeasonalHero seasonalData={seasonalData}>
         <QuickSearchForm />
       </SeasonalHero>
 
-      {/* Product Carousel — streams */}
-      <Suspense fallback={<CarouselSkeleton />}>
-        <PopularCarouselSection />
-      </Suspense>
+      {/* Product Carousel */}
+      <ProductCarousel tyres={carouselTyres} title="Популярні моделі" />
 
       {/* Features — static content, no data fetch needed */}
       <section className="py-12">
@@ -339,9 +272,7 @@ export default function Home() {
                 {t('home.popularModelsDescription')}
               </p>
               <div className="space-y-6">
-                <Suspense fallback={<PopularTyresSkeleton />}>
-                  <FeaturedTyresSection />
-                </Suspense>
+                <FeaturedTyresCards featuredTyres={featuredTyres} />
               </div>
             </div>
           </div>
@@ -440,7 +371,7 @@ export default function Home() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
+          <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
             <h3 className="mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</h3>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини саме для вас —
@@ -454,7 +385,7 @@ export default function Home() {
                 Допоможіть мені обрати
               </Link>
               <a
-                href="tel:+380800123456"
+                href={PHONE_HREF}
                 className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" />

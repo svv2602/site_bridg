@@ -45,6 +45,7 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
                 onClick={() => toggleItem(index)}
                 className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-stone-100 dark:hover:bg-stone-700"
                 aria-expanded={openIndex === index}
+                aria-controls={`faq-panel-${index}`}
               >
                 <span className="pr-4 font-medium">{faq.question}</span>
                 {openIndex === index ? (
@@ -54,7 +55,7 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
                 )}
               </button>
               {openIndex === index && (
-                <div className="border-t border-border px-6 py-4">
+                <div id={`faq-panel-${index}`} className="border-t border-border px-6 py-4">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {faq.answer}
                   </p>

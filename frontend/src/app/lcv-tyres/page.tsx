@@ -1,7 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Truck, Shield, Zap, ChevronRight, Weight, Gauge } from "lucide-react";
-import { getTyreModels } from "@/lib/api/tyres";
+import { getPayloadTyres, transformPayloadTyre } from "@/lib/api/payload";
+import type { TyreModel } from "@/lib/data";
 import { CategoryPage, type CategoryPageConfig } from "@/components/CategoryPage";
+
+export const metadata: Metadata = {
+  title: "Шини для комерційних авто (LCV)",
+  description: "Шини Bridgestone для легких комерційних авто: фургони, мікроавтобуси, вантажні мінівени. Літні, зимові та всесезонні шини з високою вантажопідйомністю.",
+  alternates: {
+    canonical: '/lcv-tyres',
+  },
+  openGraph: {
+    title: "Шини для комерційних авто (LCV) | Bridgestone Україна",
+    description: "Шини Bridgestone для легких комерційних авто: фургони, мікроавтобуси, вантажні мінівени.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
+};
 
 const config: CategoryPageConfig = {
   slug: "lcv-tyres",
@@ -73,10 +90,8 @@ const config: CategoryPageConfig = {
 };
 
 export default async function LcvTyresPage() {
-  const allTyres = await getTyreModels();
-  const lcvTyres = allTyres.filter((m) =>
-    m.vehicleTypes.includes("lcv"),
-  );
+  const payloadTyres = await getPayloadTyres({ vehicleType: 'van' });
+  const lcvTyres = payloadTyres.map(t => transformPayloadTyre(t) as TyreModel);
 
   // If no LCV tyres available, show empty state instead of template
   if (lcvTyres.length === 0) {

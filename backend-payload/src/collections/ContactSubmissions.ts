@@ -5,7 +5,7 @@
  * Fields: name, phone, email, subject, message, status, adminNotes.
  * Status workflow: new -> in-progress -> resolved.
  *
- * Access: public create + read, auth-required update/delete.
+ * Access: public create, auth-required read/update/delete.
  */
 import type { CollectionConfig } from 'payload';
 
@@ -22,7 +22,7 @@ export const ContactSubmissions: CollectionConfig = {
     description: 'Звернення з форми зворотнього зв\'язку',
   },
   access: {
-    read: () => true,
+    read: ({ req }) => !!req.user,
     create: () => true,
   },
   fields: [
@@ -34,6 +34,13 @@ export const ContactSubmissions: CollectionConfig = {
           label: 'Ім\'я',
           type: 'text',
           required: true,
+          minLength: 2,
+          maxLength: 100,
+          validate: (value: string | null | undefined) => {
+            if (!value || value.trim().length < 2) return 'Ім\'я повинно містити щонайменше 2 символи';
+            if (value.length > 100) return 'Ім\'я не повинно перевищувати 100 символів';
+            return true;
+          },
           admin: { width: '50%' },
         },
         {
@@ -58,6 +65,15 @@ export const ContactSubmissions: CollectionConfig = {
           label: 'Телефон',
           type: 'text',
           required: true,
+          validate: (value: string | null | undefined) => {
+            if (!value) return true; // required check handled separately
+            // Ukrainian phone format: +380XXXXXXXXX or 0XXXXXXXXX or with spaces/dashes
+            const phoneRegex = /^(\+?38)?[\s-]?0[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
+            if (!phoneRegex.test(value.replace(/[() ]/g, ''))) {
+              return 'Невірний формат телефону. Приклад: +380671234567';
+            }
+            return true;
+          },
           admin: { width: '50%' },
         },
         {
@@ -65,6 +81,14 @@ export const ContactSubmissions: CollectionConfig = {
           label: 'Email',
           type: 'email',
           required: true,
+          validate: (value: string | null | undefined) => {
+            if (!value) return true; // required check handled separately
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(value)) {
+              return 'Невірний формат електронної пошти';
+            }
+            return true;
+          },
           admin: { width: '50%' },
         },
       ],
@@ -86,6 +110,13 @@ export const ContactSubmissions: CollectionConfig = {
       label: 'Повідомлення',
       type: 'textarea',
       required: true,
+      minLength: 10,
+      maxLength: 5000,
+      validate: (value: string | null | undefined) => {
+        if (!value || value.trim().length < 10) return 'Повідомлення повинно містити щонайменше 10 символів';
+        if (value.length > 5000) return 'Повідомлення не повинно перевищувати 5000 символів';
+        return true;
+      },
     },
     {
       name: 'adminNotes',

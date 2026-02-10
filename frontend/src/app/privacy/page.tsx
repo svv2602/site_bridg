@@ -1,17 +1,38 @@
 import { Metadata } from 'next';
+import { Breadcrumb } from '@/components/ui';
+import { PHONE_DISPLAY, PHONE_HREF, EMAIL_PRIVACY } from '@/lib/constants';
+
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Політика конфіденційності | Bridgestone Україна',
-  description: 'Політика конфіденційності сайту Bridgestone Україна',
+  title: 'Політика конфіденційності',
+  description: 'Політика конфіденційності та захисту персональних даних офіційного сайту Bridgestone Україна.',
+  alternates: {
+    canonical: '/privacy',
+  },
+  openGraph: {
+    title: "Політика конфіденційності | Bridgestone Україна",
+    description: "Політика конфіденційності та захисту персональних даних офіційного сайту Bridgestone Україна.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 
 export default function PrivacyPage() {
   return (
     <div className="bg-background py-12">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
+        <Breadcrumb
+          className="mb-4"
+          items={[
+            { label: "Головна", href: "/" },
+            { label: "Політика конфіденційності" },
+          ]}
+        />
         <h1 className="mb-8 text-3xl font-bold md:text-4xl">Політика конфіденційності</h1>
 
-        <div className="prose prose-stone dark:prose-invert max-w-none">
+        <article className="prose max-w-none">
           <p className="lead text-lg text-muted-foreground">
             Ця політика конфіденційності описує, як ми збираємо, використовуємо та захищаємо
             вашу персональну інформацію під час використання нашого вебсайту.
@@ -63,15 +84,15 @@ export default function PrivacyPage() {
           <p>
             З питань щодо політики конфіденційності звертайтесь:
             <br />
-            Email: <a href="mailto:privacy@bridgestone.ua">privacy@bridgestone.ua</a>
+            Email: <a href={`mailto:${EMAIL_PRIVACY}`}>{EMAIL_PRIVACY}</a>
             <br />
-            Телефон: 0 800 123 456
+            Телефон: {PHONE_DISPLAY}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">
             Останнє оновлення: січень 2026
           </p>
-        </div>
+        </article>
       </div>
     </div>
   );

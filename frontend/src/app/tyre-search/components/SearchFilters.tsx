@@ -7,6 +7,7 @@ import {
   CheckCircle,
   Search,
   Loader2,
+  X,
 } from "lucide-react";
 import type { SizeOption } from "./useSearchState";
 
@@ -19,6 +20,7 @@ export interface SearchFiltersProps {
   onAspectChange: (value: string) => void;
   onDiameterChange: (value: string) => void;
   onSeasonChange: (value: string) => void;
+  onResetFilters?: () => void;
   widthOptions: SizeOption[];
   aspectOptions: SizeOption[];
   diameterOptions: SizeOption[];
@@ -39,6 +41,7 @@ export function SearchFilters({
   onAspectChange,
   onDiameterChange,
   onSeasonChange,
+  onResetFilters,
   widthOptions,
   aspectOptions,
   diameterOptions,
@@ -49,6 +52,7 @@ export function SearchFilters({
   onSubmit,
   children,
 }: SearchFiltersProps) {
+  const hasActiveFilters = !!(width || aspectRatio || diameter || season);
   return (
     <form
       id="size-search-panel"
@@ -60,7 +64,7 @@ export function SearchFilters({
       <div className="grid gap-4 sm:grid-cols-3">
         {/* Width */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
+          <label htmlFor="filter-width" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
             Ширина {widthOptions.length > 0 && <span className="text-stone-500">({widthOptions.length})</span>}
           </label>
           <div className="relative">
@@ -71,10 +75,12 @@ export function SearchFilters({
               </div>
             ) : (
               <select
+                id="filter-width"
                 className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
                 value={width}
                 onChange={(e) => onWidthChange(e.target.value)}
                 required
+                title="Будь ласка, оберіть ширину шини"
               >
                 <option value="">Оберіть ширину</option>
                 {widthOptions.map((opt) => (
@@ -90,7 +96,7 @@ export function SearchFilters({
 
         {/* Aspect ratio */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
+          <label htmlFor="filter-aspect" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
             Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500">({aspectOptions.length})</span>}
           </label>
           <div className="relative">
@@ -101,11 +107,13 @@ export function SearchFilters({
               </div>
             ) : (
               <select
+                id="filter-aspect"
                 className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
                 value={aspectRatio}
                 onChange={(e) => onAspectChange(e.target.value)}
                 disabled={!width}
                 required
+                title="Будь ласка, оберіть висоту профілю"
               >
                 <option value="">{width ? "Оберіть висоту" : "Спочатку оберіть ширину"}</option>
                 {aspectOptions.map((opt) => (
@@ -121,7 +129,7 @@ export function SearchFilters({
 
         {/* Diameter */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
+          <label htmlFor="filter-diameter" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
             Діаметр {diameterOptions.length > 0 && <span className="text-stone-500">({diameterOptions.length})</span>}
           </label>
           <div className="relative">
@@ -132,11 +140,13 @@ export function SearchFilters({
               </div>
             ) : (
               <select
+                id="filter-diameter"
                 className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
                 value={diameter}
                 onChange={(e) => onDiameterChange(e.target.value)}
                 disabled={!aspectRatio}
                 required
+                title="Будь ласка, оберіть діаметр"
               >
                 <option value="">{aspectRatio ? "Оберіть діаметр" : "Спочатку оберіть висоту"}</option>
                 {diameterOptions.map((opt) => (
@@ -153,12 +163,13 @@ export function SearchFilters({
 
       {/* Season (optional) */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
+        <label htmlFor="filter-season" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
           Сезонність <span className="text-stone-500">(опційно)</span>
         </label>
         <div className="relative">
           <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
           <select
+            id="filter-season"
             className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
             value={season}
             onChange={(e) => onSeasonChange(e.target.value)}
@@ -176,18 +187,30 @@ export function SearchFilters({
         <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
         <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
       </div>
-      <button
-        type="submit"
-        disabled={!width || !aspectRatio || !diameter || searching}
-        className="w-full rounded-full bg-brand py-3 text-base font-semibold text-white shadow-lg hover:bg-brand/90 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {searching ? (
-          <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
-        ) : (
-          <Search className="mr-2 inline h-5 w-5" />
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={!width || !aspectRatio || !diameter || searching}
+          className="flex-1 rounded-full bg-brand py-3 text-base font-semibold text-white shadow-lg hover:bg-brand/90 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {searching ? (
+            <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
+          ) : (
+            <Search className="mr-2 inline h-5 w-5" />
+          )}
+          {searching ? "Шукаємо..." : "Знайти шини"}
+        </button>
+        {hasActiveFilters && onResetFilters && (
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="flex items-center gap-2 rounded-full border border-stone-300 bg-transparent px-5 py-3 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+          >
+            <X className="h-4 w-4" />
+            Скинути фільтри
+          </button>
         )}
-        {searching ? "Шукаємо..." : "Знайти шини"}
-      </button>
+      </div>
 
       {/* Results rendered inside form for proper layout */}
       {children}

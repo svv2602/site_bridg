@@ -37,6 +37,7 @@ export const Dealers: CollectionConfig = {
           name: 'type',
           type: 'select',
           required: true,
+          index: true,
           options: [
             { label: 'Офіційний дилер', value: 'official' },
             { label: 'Партнер', value: 'partner' },
@@ -48,6 +49,7 @@ export const Dealers: CollectionConfig = {
           name: 'city',
           type: 'text',
           required: true,
+          index: true,
           admin: { width: '50%' },
         },
       ],
@@ -63,11 +65,21 @@ export const Dealers: CollectionConfig = {
         {
           name: 'latitude',
           type: 'number',
+          validate: (value: number | null | undefined) => {
+            if (value === null || value === undefined) return true;
+            if (value < -90 || value > 90) return 'Широта повинна бути від -90 до 90';
+            return true;
+          },
           admin: { width: '50%', step: 0.000001 },
         },
         {
           name: 'longitude',
           type: 'number',
+          validate: (value: number | null | undefined) => {
+            if (value === null || value === undefined) return true;
+            if (value < -180 || value > 180) return 'Довгота повинна бути від -180 до 180';
+            return true;
+          },
           admin: { width: '50%', step: 0.000001 },
         },
       ],
@@ -90,6 +102,18 @@ export const Dealers: CollectionConfig = {
     {
       name: 'website',
       type: 'text',
+      validate: (value: string | null | undefined) => {
+        if (!value) return true;
+        try {
+          const url = new URL(value);
+          if (!['http:', 'https:'].includes(url.protocol)) {
+            return 'URL має починатися з http:// або https://';
+          }
+          return true;
+        } catch {
+          return 'Невалідний URL';
+        }
+      },
     },
     {
       name: 'workingHours',
@@ -109,6 +133,16 @@ export const Dealers: CollectionConfig = {
         { label: 'Зберігання шин', value: 'storage' },
         { label: 'Ремонт шин', value: 'repair' },
       ],
+    },
+    {
+      name: 'isActive',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Активний',
+      admin: {
+        position: 'sidebar',
+        description: 'Вимкніть для м\'якого деактивування дилера без видалення',
+      },
     },
   ],
 };

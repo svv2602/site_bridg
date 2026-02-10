@@ -1,11 +1,23 @@
 import { NextResponse } from 'next/server';
 import { searchVehicleTyres } from '@/lib/api/vehicles';
+import { createRateLimiter } from '@/lib/rate-limit';
+
+// Rate limiter: max 30 requests per minute per IP
+const vehicleSearchLimiter = createRateLimiter({ maxRequests: 30, windowMs: 60 * 1000 });
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Кешувати 1 годину
 
 export async function GET(request: Request) {
   try {
+    // Rate limiting: max 30 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    if (!vehicleSearchLimiter.check(ip)) {
+      return NextResponse.json(
+        { data: null, error: 'Забагато запитів. Спробуйте через хвилину.' },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const kitId = searchParams.get('kitId');
     const season = searchParams.get('season') || undefined;

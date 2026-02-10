@@ -1,33 +1,58 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Clock, Search, X } from "lucide-react";
+import { BookOpen, Calendar, Clock, Search, X } from "lucide-react";
 import { getArticlesPaginated, getArticleTags } from "@/lib/api/articles";
 import { Breadcrumb, Pagination } from "@/components/ui";
-
-export const metadata: Metadata = {
-  title: "Блог про шини та автомобілі",
-  description: "Блог Bridgestone Україна: поради з вибору шин, огляди новинок, сезонні рекомендації, безпека на дорозі та експертні статті про автомобільні шини.",
-  alternates: {
-    canonical: '/blog',
-  },
-  openGraph: {
-    title: "Блог про шини та автомобілі | Bridgestone Україна",
-    description: "Поради з вибору шин, огляди новинок, сезонні рекомендації та експертні статті про автомобільні шини від Bridgestone.",
-    type: "website",
-    locale: "uk_UA",
-    siteName: "Bridgestone Україна",
-  },
-};
+import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { SITE_URL } from "@/lib/constants";
+import { pluralize } from "@/lib/utils/pluralize";
 
 interface BlogPageProps {
   searchParams: Promise<{ tag?: string; search?: string; page?: string }>;
 }
 
+/** Safely parse page number, fallback to 1 for NaN/negative/zero values */
+function parsePage(raw: string | undefined): number {
+  return Math.max(1, parseInt(raw || '1', 10) || 1);
+}
+
+/** Sanitize search/tag strings: trim and limit length */
+function sanitizeParam(value: string | undefined, maxLength = 200): string | undefined {
+  if (!value) return undefined;
+  return value.trim().slice(0, maxLength) || undefined;
+}
+
+export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const activeTag = sanitizeParam(params.tag);
+  const searchQuery = sanitizeParam(params.search);
+  const currentPage = parsePage(params.page);
+
+  let title = "Блог про шини та автомобілі";
+  if (activeTag) title = `#${activeTag} — Блог Bridgestone`;
+  if (searchQuery) title = `Пошук: "${searchQuery}" — Блог Bridgestone`;
+  if (currentPage > 1) title = `${title} — Сторінка ${currentPage}`;
+
+  return {
+    title,
+    description: "Блог Bridgestone Україна: поради з вибору шин, огляди новинок, сезонні рекомендації та експертні статті.",
+    alternates: { canonical: '/blog' },
+    openGraph: {
+      title: `${title} | Bridgestone Україна`,
+      description: "Поради з вибору шин, огляди новинок та експертні статті від Bridgestone.",
+      type: "website",
+      locale: "uk_UA",
+      siteName: "Bridgestone Україна",
+    },
+  };
+}
+
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const params = await searchParams;
-  const activeTag = params.tag;
-  const searchQuery = params.search;
-  const currentPage = params.page ? parseInt(params.page, 10) : 1;
+  const activeTag = sanitizeParam(params.tag);
+  const searchQuery = sanitizeParam(params.search);
+  const currentPage = parsePage(params.page);
 
   const [paginatedResult, allTags] = await Promise.all([
     getArticlesPaginated({ tag: activeTag, search: searchQuery, page: currentPage }),
@@ -37,8 +62,27 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { articles, totalDocs, totalPages } = paginatedResult;
 
   return (
-    <div className="bg-background text-foreground">
-      {/* Hero */}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(generateBreadcrumbSchema([
+          { name: "Головна", url: `${SITE_URL}/` },
+          { name: "Блог", url: `${SITE_URL}/blog` },
+        ])) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Блог Bridgestone Україна",
+          description: "Поради з вибору шин, огляди новинок та експертні статті.",
+          url: `${SITE_URL}/blog`,
+          inLanguage: "uk",
+        }) }}
+      />
+      <div className="bg-background text-foreground">
+        {/* Hero */}
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl text-left">
@@ -67,14 +111,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <section className="border-b border-border bg-card py-6">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           {/* Search */}
-          <form action="/blog" method="GET" className="mb-6">
+          <form action="/blog" method="GET" role="search" className="mb-6">
             <div className="relative max-w-md">
+              <label htmlFor="blog-search" className="sr-only">Пошук статей</label>
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
+                id="blog-search"
                 name="search"
                 defaultValue={searchQuery}
                 placeholder="Пошук статей..."
+                maxLength={200}
                 className="w-full rounded-full border border-border bg-background py-2.5 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
               {activeTag && <input type="hidden" name="tag" value={activeTag} />}
@@ -87,7 +134,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               <span className="text-sm text-muted-foreground">Фільтри:</span>
               {searchQuery && (
                 <Link
-                  href={activeTag ? `/blog?tag=${activeTag}` : "/blog"}
+                  href={activeTag ? `/blog?tag=${encodeURIComponent(activeTag)}` : "/blog"}
                   className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text hover:bg-primary-hover"
                 >
                   Пошук: &quot;{searchQuery}&quot;
@@ -96,7 +143,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               )}
               {activeTag && (
                 <Link
-                  href={searchQuery ? `/blog?search=${searchQuery}` : "/blog"}
+                  href={searchQuery ? `/blog?search=${encodeURIComponent(searchQuery)}` : "/blog"}
                   className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text hover:bg-primary-hover"
                 >
                   #{activeTag}
@@ -116,7 +163,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           {allTags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               <Link
-                href={searchQuery ? `/blog?search=${searchQuery}` : "/blog"}
+                href={searchQuery ? `/blog?search=${encodeURIComponent(searchQuery)}` : "/blog"}
                 className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                   !activeTag
                     ? "bg-primary text-primary-text"
@@ -128,7 +175,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {allTags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/blog?tag=${encodeURIComponent(tag)}${searchQuery ? `&search=${searchQuery}` : ""}`}
+                  href={`/blog?tag=${encodeURIComponent(tag)}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`}
                   className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                     activeTag === tag
                       ? "bg-primary text-primary-text"
@@ -146,12 +193,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {/* Articles Grid */}
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-2xl font-bold">
               {activeTag ? `Статті з тегом #${activeTag}` : searchQuery ? `Результати пошуку` : "Усі статті"}
             </h2>
             <span className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground">
-              {totalDocs} {totalDocs === 1 ? "стаття" : totalDocs < 5 ? "статті" : "статей"}
+              {pluralize(totalDocs, "стаття", "статті", "статей")}
             </span>
           </div>
 
@@ -182,17 +229,47 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
                   >
                     <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <BookOpen className="h-16 w-16 text-primary/40" />
-                      </div>
+                      {(article.featuredImage || article.imageUrl) ? (
+                        <Image
+                          src={article.featuredImage || article.imageUrl!}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <BookOpen className="h-16 w-16 text-primary/40" aria-hidden="true" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-1 flex-col p-6">
-                      <div className="mb-3 flex items-center gap-2 text-xs text-muted">
-                        <Clock className="h-3 w-3" />
-                        <span>{article.readingTimeMinutes} хвилин читання</span>
+                      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-600 dark:text-stone-400">
+                        {article.publishedAt && (
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="h-3 w-3" aria-hidden="true" />
+                            <time dateTime={article.publishedAt}>
+                              {new Date(article.publishedAt).toLocaleDateString("uk-UA", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                            </time>
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="h-3 w-3" aria-hidden="true" />
+                          <span>
+                            {article.readingTimeMinutes
+                              ? `${pluralize(article.readingTimeMinutes, "хвилина", "хвилини", "хвилин")} читання`
+                              : "5 хвилин читання"}
+                          </span>
+                        </span>
                       </div>
                       <h3 className="mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                        {article.title}
+                        <Link href={`/blog/${article.slug}`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded">
+                          {article.title}
+                        </Link>
                       </h3>
                       {article.subtitle && (
                         <p className="mb-4 text-sm text-muted-foreground">{article.subtitle}</p>
@@ -205,7 +282,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           <Link
                             key={tag}
                             href={`/blog?tag=${encodeURIComponent(tag)}`}
-                            className="rounded-full bg-stone-200 px-3 py-1 text-xs font-medium text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+                            className="rounded-full bg-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                           >
                             #{tag}
                           </Link>
@@ -213,6 +290,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       </div>
                       <Link
                         href={`/blog/${article.slug}`}
+                        tabIndex={-1}
+                        aria-hidden="true"
                         className="group/btn mt-auto inline-flex items-center justify-center rounded-full border border-primary bg-transparent px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
                       >
                         Читати статтю
@@ -238,7 +317,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібну інформацію?</h3>
             <p className="mb-8 text-lg opacity-90">
               Задайте питання нашим експертам або знайдіть найближчого дилера.
@@ -261,5 +340,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
       </section>
     </div>
+    </>
   );
 }

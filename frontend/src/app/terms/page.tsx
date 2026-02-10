@@ -1,17 +1,38 @@
 import { Metadata } from 'next';
+import { Breadcrumb } from '@/components/ui';
+import { PHONE_DISPLAY, EMAIL_INFO } from '@/lib/constants';
+
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Умови використання | Bridgestone Україна',
-  description: 'Умови використання сайту Bridgestone Україна',
+  title: 'Умови використання',
+  description: 'Умови використання офіційного сайту Bridgestone Україна. Правила користування сервісами та інформацією на сайті.',
+  alternates: {
+    canonical: '/terms',
+  },
+  openGraph: {
+    title: "Умови використання | Bridgestone Україна",
+    description: "Умови використання офіційного сайту Bridgestone Україна. Правила користування сервісами та інформацією на сайті.",
+    type: "website",
+    locale: "uk_UA",
+    siteName: "Bridgestone Україна",
+  },
 };
 
 export default function TermsPage() {
   return (
     <div className="bg-background py-12">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
+        <Breadcrumb
+          className="mb-4"
+          items={[
+            { label: "Головна", href: "/" },
+            { label: "Умови використання" },
+          ]}
+        />
         <h1 className="mb-8 text-3xl font-bold md:text-4xl">Умови використання</h1>
 
-        <div className="prose prose-stone dark:prose-invert max-w-none">
+        <article className="prose max-w-none">
           <p className="lead text-lg text-muted-foreground">
             Використовуючи цей вебсайт, ви погоджуєтесь з наступними умовами. Будь ласка,
             уважно прочитайте їх перед використанням сайту.
@@ -59,15 +80,15 @@ export default function TermsPage() {
           <p>
             З питань щодо умов використання звертайтесь:
             <br />
-            Email: <a href="mailto:info@bridgestone.ua">info@bridgestone.ua</a>
+            Email: <a href={`mailto:${EMAIL_INFO}`}>{EMAIL_INFO}</a>
             <br />
-            Телефон: 0 800 123 456
+            Телефон: {PHONE_DISPLAY}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">
             Останнє оновлення: січень 2026
           </p>
-        </div>
+        </article>
       </div>
     </div>
   );

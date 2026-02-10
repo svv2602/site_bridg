@@ -4,10 +4,11 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Check, Minus, ExternalLink } from "lucide-react";
 import type { TyreModel, Season } from "@/lib/data";
-import { getTyreModels } from "@/lib/api/tyres";
+import { getTyreModels, getTyreModelBySlug } from "@/lib/api/tyres";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
 import { seasonLabelsShort, brandLabels, vehicleTypeLabelsLong } from "@/lib/utils/tyres";
+import { pluralize } from "@/lib/utils/pluralize";
 import { SITE_URL } from "@/lib/constants";
 
 // Comparison attributes
@@ -49,7 +50,7 @@ function getAttributeValue(tyre: TyreModel, key: string): string {
       return tyre.technologies?.join(", ") || "—";
     case "sizes":
       return tyre.sizes?.length
-        ? `${tyre.sizes.length} розмір${tyre.sizes.length > 4 ? "ів" : tyre.sizes.length > 1 ? "и" : ""}`
+        ? pluralize(tyre.sizes.length, "розмір", "розміри", "розмірів")
         : "—";
     default:
       return "—";
@@ -134,10 +135,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const tyreSlugs = parseComparisonSlug(slug);
-  const tyres = await getTyreModels();
-  const compareTyres = tyreSlugs
-    .map((s) => tyres.find((t) => t.slug === s))
-    .filter(Boolean) as TyreModel[];
+  const compareTyres = (await Promise.all(
+    tyreSlugs.map((s) => getTyreModelBySlug(s))
+  )).filter(Boolean) as TyreModel[];
 
   if (compareTyres.length < 2) {
     return {
@@ -146,24 +146,31 @@ export async function generateMetadata({
   }
 
   const names = compareTyres.map((t) => t.name).join(" vs ");
+  const description = `Детальне порівняння ${names}. EU-маркування, технології, характеристики. Який варіант обрати для вашого автомобіля?`;
 
   return {
     title: `${names} — Порівняння шин Bridgestone`,
-    description: `Детальне порівняння ${names}. EU-маркування, технології, характеристики. Який варіант обрати для вашого автомобіля?`,
+    description,
+    alternates: {
+      canonical: `/porivnyaty/${slug}`,
+    },
+    openGraph: {
+      title: `${names} — Порівняння шин Bridgestone | Bridgestone Україна`,
+      description,
+      type: "website",
+      locale: "uk_UA",
+      siteName: "Bridgestone Україна",
+    },
   };
 }
 
 function generateComparisonSchema(tyres: TyreModel[]): object {
   return {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: `Порівняння: ${tyres.map((t) => t.name).join(" vs ")}`,
+    "@type": "WebPage",
+    name: `Порівняння: ${tyres.map((t) => t.name).join(" vs ")}`,
     description: `Детальне порівняння шин Bridgestone: ${tyres.map((t) => t.name).join(", ")}`,
-    datePublished: new Date().toISOString(),
-    author: {
-      "@type": "Organization",
-      name: "Bridgestone Україна",
-    },
+    inLanguage: "uk",
     about: tyres.map((tyre) => ({
       "@type": "Product",
       name: `Bridgestone ${tyre.name}`,
@@ -183,10 +190,9 @@ export default async function ComparisonPage({
 }) {
   const { slug } = await params;
   const tyreSlugs = parseComparisonSlug(slug);
-  const tyres = await getTyreModels();
-  const compareTyres = tyreSlugs
-    .map((s) => tyres.find((t) => t.slug === s))
-    .filter(Boolean) as TyreModel[];
+  const compareTyres = (await Promise.all(
+    tyreSlugs.map((s) => getTyreModelBySlug(s))
+  )).filter(Boolean) as TyreModel[];
 
   if (compareTyres.length < 2) {
     notFound();
@@ -252,6 +258,7 @@ export default async function ComparisonPage({
                       src={tyre.imageUrl || "/placeholder-tyre.png"}
                       alt={tyre.name}
                       fill
+                      sizes="(max-width: 768px) 50vw, 300px"
                       className="object-contain p-4"
                     />
                   </div>
@@ -373,7 +380,7 @@ export default async function ComparisonPage({
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/dealers"
-                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-text rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 Знайти дилера
               </Link>

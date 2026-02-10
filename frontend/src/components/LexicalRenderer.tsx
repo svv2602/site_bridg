@@ -8,6 +8,7 @@
 
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import DOMPurify from "isomorphic-dompurify";
 
@@ -46,13 +47,26 @@ interface LexicalParagraphNode {
   children: LexicalNode[];
 }
 
+interface LexicalImageNode {
+  type: "image" | "upload";
+  src?: string;
+  url?: string;
+  value?: { url?: string; alt?: string; width?: number; height?: number };
+  altText?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+}
+
 type LexicalNode =
   | LexicalTextNode
   | LexicalLinkNode
   | LexicalListItemNode
   | LexicalListNode
   | LexicalHeadingNode
-  | LexicalParagraphNode;
+  | LexicalParagraphNode
+  | LexicalImageNode;
 
 interface LexicalRoot {
   root: {
@@ -117,14 +131,14 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
               href={child.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary underline hover:no-underline"
+              className="text-stone-600 underline hover:text-stone-900 hover:no-underline dark:text-stone-300 dark:hover:text-stone-100"
             >
               {renderChildren(child.children, key)}
             </a>
           );
         }
         return (
-          <Link key={key} href={child.url} className="text-primary underline hover:no-underline">
+          <Link key={key} href={child.url} className="text-stone-600 underline hover:text-stone-900 hover:no-underline dark:text-stone-300 dark:hover:text-stone-100">
             {renderChildren(child.children, key)}
           </Link>
         );
@@ -154,11 +168,11 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
 
       case "list":
         const ListTag = child.listType === "number" ? "ol" : "ul";
-        const listClass = child.listType === "number" ? "list-decimal" : "list-disc";
+        const listClass = child.listType === "number" ? "!list-decimal" : "!list-disc";
         return (
-          <ListTag key={key} className={`${listClass} pl-6 mb-4 space-y-1`}>
+          <ListTag key={key} className={`${listClass} !pl-6 mb-4 space-y-1`}>
             {child.children.map((item, i) => (
-              <li key={`${key}-li-${i}`}>
+              <li key={`${key}-li-${i}`} className="!p-0 before:!content-none">
                 {renderChildren(item.children, `${key}-li-${i}`)}
               </li>
             ))}
@@ -167,6 +181,36 @@ function renderChildren(children: LexicalNode[], keyPrefix: string): React.React
 
       case "listitem":
         return <li key={key}>{renderChildren(child.children, key)}</li>;
+
+      case "image":
+      case "upload": {
+        // Support both Lexical image nodes and Payload upload nodes
+        const imgSrc = child.src || child.url || child.value?.url;
+        const imgAlt = child.altText || child.alt || child.value?.alt || "";
+        const imgWidth = child.width || child.value?.width || 800;
+        const imgHeight = child.height || child.value?.height || 450;
+        const imgCaption = child.caption;
+
+        if (!imgSrc) return null;
+
+        return (
+          <figure key={key} className="my-6">
+            <Image
+              src={imgSrc}
+              alt={imgAlt}
+              width={imgWidth}
+              height={imgHeight}
+              className="rounded-xl"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
+            />
+            {imgCaption && (
+              <figcaption className="mt-2 text-center text-sm text-muted-foreground">
+                {imgCaption}
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
 
       default:
         return null;
@@ -181,7 +225,7 @@ function getProseClasses(
   variant: ProseVariant,
   options: { leadParagraph?: boolean }
 ): string {
-  const baseClasses = "prose prose-stone dark:prose-invert max-w-none";
+  const baseClasses = "prose max-w-none";
 
   // Variant-specific defaults
   const variantDefaults: Record<ProseVariant, { leadParagraph: boolean }> = {
@@ -222,13 +266,19 @@ export function LexicalRenderer({
   if (typeof content === "string") {
     const sanitizedContent = DOMPurify.sanitize(content, {
       ADD_TAGS: ["iframe"], // Allow iframes for embedded content
-      ADD_ATTR: ["target", "rel", "allowfullscreen", "frameborder"], // Allow common attrs
+      ADD_ATTR: ["target", "rel", "allowfullscreen", "frameborder", "loading", "decoding", "fetchpriority", "sizes"], // Allow common + image optimization attrs
       ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
     });
+
+    // Add lazy loading and decoding attributes to img tags in HTML content
+    const optimizedContent = sanitizedContent.replace(
+      /<img\b(?![^>]*\bloading=)/gi,
+      '<img loading="lazy" decoding="async"'
+    );
     return (
       <div
         className={`${proseClasses} ${className}`}
-        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+        dangerouslySetInnerHTML={{ __html: optimizedContent }}
       />
     );
   }

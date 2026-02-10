@@ -33,31 +33,22 @@ export interface CarSearchParams {
 /**
  * Повертає всі моделі шин з Payload CMS.
  * При помилці повертає порожній масив — компоненти повинні обробити цей стан.
+ * @param options.depth — глибина розкриття зв'язків (за замовчуванням: 2)
  */
-export async function getTyreModels(): Promise<TyreModel[]> {
-  try {
-    const tyres = await getPayloadTyres();
-    return tyres.map(tyre => transformPayloadTyre(tyre) as TyreModel);
-  } catch (error) {
-    console.error("Помилка завантаження шин з CMS:", error);
-    return [];
-  }
+export async function getTyreModels(options?: { depth?: number }): Promise<TyreModel[]> {
+  const tyres = await getPayloadTyres(options?.depth != null ? { depth: options.depth } : undefined);
+  return tyres.map(tyre => transformPayloadTyre(tyre) as TyreModel);
 }
 
 /**
  * Повертає одну модель шини за slug або null, якщо не знайдена.
  */
 export async function getTyreModelBySlug(slug: string): Promise<TyreModel | null> {
-  try {
-    const tyre = await getPayloadTyreBySlug(slug);
-    if (tyre) {
-      return transformPayloadTyre(tyre) as TyreModel;
-    }
-    return null;
-  } catch (error) {
-    console.error("Помилка завантаження шини з CMS:", error);
-    return null;
+  const tyre = await getPayloadTyreBySlug(slug);
+  if (tyre) {
+    return transformPayloadTyre(tyre) as TyreModel;
   }
+  return null;
 }
 
 /**
@@ -65,19 +56,17 @@ export async function getTyreModelBySlug(slug: string): Promise<TyreModel | null
  */
 export async function searchTyresBySize(params: SizeSearchParams): Promise<TyreModel[]> {
   const { width, aspectRatio, diameter, season } = params;
-  const all = await getTyreModels();
+  const raw = await getPayloadTyres(season ? { season } : undefined);
+  const all = raw.map(tyre => transformPayloadTyre(tyre) as TyreModel);
 
-  return all.filter((model) => {
-    if (season && model.season !== season) {
-      return false;
-    }
-    return model.sizes.some(
+  return all.filter((model) =>
+    model.sizes.some(
       (s) =>
         s.width === width &&
         s.aspectRatio === aspectRatio &&
         s.diameter === diameter,
-    );
-  });
+    ),
+  );
 }
 
 /**

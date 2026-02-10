@@ -55,9 +55,11 @@ export function EuLabelBadge({
   if (type === "noise" && typeof value === "number") {
     return (
       <span
+        role="img"
+        aria-label={`${typeLabels[type]}: ${value} дБ`}
         className={`inline-flex items-center rounded-lg bg-stone-100 font-medium text-stone-700 dark:bg-stone-800 dark:text-stone-300 ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
       >
-        {typeIcons[type]}
+        <span aria-hidden="true">{typeIcons[type]}</span>
         {showLabel && <span className="uppercase opacity-70">{typeLabels[type]}</span>}
         <span className="font-semibold">{value} дБ</span>
       </span>
@@ -70,9 +72,11 @@ export function EuLabelBadge({
 
   return (
     <span
+      role="img"
+      aria-label={`${typeLabels[type]}: ${grade}`}
       className={`inline-flex items-center rounded-lg font-medium ${colorClass} ${sizeStyles[size]} ${iconSizes[size]} ${className}`}
     >
-      {typeIcons[type]}
+      <span aria-hidden="true">{typeIcons[type]}</span>
       {showLabel && <span className="uppercase opacity-80">{typeLabels[type]}</span>}
       <span className="font-bold">{grade}</span>
     </span>

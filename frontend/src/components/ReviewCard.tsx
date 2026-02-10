@@ -27,10 +27,11 @@ interface ReviewCardProps {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5" role="img" aria-label={`Рейтинг: ${rating} з 5`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
+          aria-hidden="true"
           className={`h-4 w-4 ${
             star <= rating
               ? 'fill-amber-400 text-amber-400'

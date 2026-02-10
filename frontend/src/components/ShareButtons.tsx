@@ -7,6 +7,8 @@ interface ShareButtonsProps {
   title: string;
   url: string;
   className?: string;
+  /** Use "hero-dark" when placed on an always-dark hero section */
+  variant?: "default" | "hero-dark";
 }
 
 const TelegramIcon = ({ className }: { className?: string }) => (
@@ -21,10 +23,11 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) {
+export function ShareButtons({ title, url, className = "", variant = "default" }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
+  const isHeroDark = variant === "hero-dark";
 
   const handleNativeShare = async () => {
     if (navigator.share) {
@@ -75,12 +78,16 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <span className="text-xs text-muted-foreground mr-1">Поділитися:</span>
+      <span className={`text-xs mr-1 ${isHeroDark ? "text-stone-400" : "text-muted-foreground"}`}>Поділитися:</span>
 
       {/* Native share button for mobile */}
       <button
         onClick={handleNativeShare}
-        className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary lg:hidden"
+        className={`rounded-full p-2 transition-colors lg:hidden ${
+          isHeroDark
+            ? "text-stone-400 hover:bg-stone-700 hover:text-white"
+            : "text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary"
+        }`}
         aria-label="Поділитися статтею"
         type="button"
       >
@@ -95,7 +102,11 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 ${link.color}`}
+            className={`rounded-full p-2 transition-colors ${
+              isHeroDark
+                ? `text-stone-400 hover:bg-stone-700 ${link.color}`
+                : `text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-700 ${link.color}`
+            }`}
             aria-label={`Поділитися в ${link.name}`}
           >
             <link.icon className="h-4 w-4" />
@@ -105,7 +116,11 @@ export function ShareButtons({ title, url, className = "" }: ShareButtonsProps) 
         {/* Copy link button */}
         <button
           onClick={handleCopyLink}
-          className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary"
+          className={`rounded-full p-2 transition-colors ${
+            isHeroDark
+              ? "text-stone-400 hover:bg-stone-700 hover:text-white"
+              : "text-muted-foreground hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-primary"
+          }`}
           aria-label={copied ? "Посилання скопійовано" : "Копіювати посилання"}
           type="button"
         >

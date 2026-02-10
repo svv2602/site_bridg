@@ -1,6 +1,6 @@
 /**
  * Payload CMS API Client
- * Replaces Strapi API for fetching data
+ * Fetches data from the Payload CMS backend (REST API).
  */
 
 // Internal API URL for server-side requests (container-to-container in Docker)
@@ -192,6 +192,7 @@ export async function getPayloadTyres(params?: {
   vehicleType?: string;
   limit?: number;
   page?: number;
+  depth?: number;
 }): Promise<PayloadTyre[]> {
   const searchParams = new URLSearchParams();
 
@@ -205,15 +206,17 @@ export async function getPayloadTyres(params?: {
     searchParams.set('where[vehicleTypes][contains]', params.vehicleType);
   }
 
-  // Set limit (default 100 to get all tyres)
-  searchParams.set('limit', String(params?.limit ?? 100));
+  // Set limit — use 500 to ensure all tyres are fetched in a single request.
+  // Payload CMS defaults to 10; our catalogue is expected to stay under 500 models.
+  // If the catalogue grows beyond 500, implement automatic pagination here.
+  searchParams.set('limit', String(params?.limit ?? 500));
 
   if (params?.page) {
     searchParams.set('page', String(params.page));
   }
 
-  // Populate relationships
-  searchParams.set('depth', '2');
+  // Populate relationships (default depth=2, allow override for lighter queries)
+  searchParams.set('depth', String(params?.depth ?? 2));
 
   const query = searchParams.toString();
   const data = await fetchPayload<PayloadTyre>(`tyres${query ? `?${query}` : ''}`);
@@ -388,11 +391,19 @@ export async function getPayloadArticlesPaginated(params?: {
 }
 
 // Get all unique tags from articles
+// Optimized: fetch only tags field with depth=0 and high limit to minimize data transfer
 export async function getPayloadArticleTags(): Promise<string[]> {
-  const articles = await getPayloadArticles();
-  const tagsSet = new Set<string>();
+  const searchParams = new URLSearchParams();
+  searchParams.set('limit', '500');
+  searchParams.set('depth', '0');
+  // Only select the tags field to minimize response payload
+  searchParams.set('select[tags]', 'true');
 
-  articles.forEach(article => {
+  const query = searchParams.toString();
+  const data = await fetchPayload<Pick<PayloadArticle, 'tags'>>(`articles?${query}`);
+
+  const tagsSet = new Set<string>();
+  data.docs.forEach(article => {
     article.tags?.forEach(t => tagsSet.add(t.tag));
   });
 
@@ -529,7 +540,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     name: tyre.name,
     brand: tyre.brand || 'bridgestone', // Default to bridgestone for existing data
     season: tyre.season,
-    vehicleTypes: tyre.vehicleTypes,
+    vehicleTypes: tyre.vehicleTypes?.map(v => v === 'van' ? 'lcv' : v),
     isNew: tyre.isNew,
     isPopular: tyre.isPopular,
     shortDescription: tyre.shortDescription || '',
@@ -553,6 +564,10 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
 
 // Transform Payload data to match existing frontend Article type
 export function transformPayloadArticle(article: PayloadArticle) {
+  const imageUrl = article.image && typeof article.image === 'object' && article.image.url
+    ? (article.image.url.startsWith('http') ? article.image.url : `${PAYLOAD_URL}${article.image.url}`)
+    : undefined;
+
   return {
     slug: article.slug,
     title: article.title,
@@ -562,5 +577,7 @@ export function transformPayloadArticle(article: PayloadArticle) {
     readingTimeMinutes: article.readingTimeMinutes || 5,
     publishedAt: article.createdAt, // Use createdAt as publishedAt
     tags: article.tags?.map(t => t.tag) || [],
+    featuredImage: imageUrl,
+    imageUrl,
   };
 }

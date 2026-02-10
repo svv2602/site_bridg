@@ -26,6 +26,20 @@ interface KitOption {
   name: string;
 }
 
+const API_TIMEOUT_MS = 10_000; // 10 seconds
+
+/** Fetch with an AbortController timeout. Throws on timeout or network error. */
+async function fetchWithTimeout(url: string, timeoutMs = API_TIMEOUT_MS): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return res;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export function QuickSearchForm() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<SearchTab>('size');
@@ -68,11 +82,15 @@ export function QuickSearchForm() {
   useEffect(() => {
     async function fetchWidths() {
       try {
-        const res = await fetch('/api/tyres/sizes?type=width');
+        const res = await fetchWithTimeout('/api/tyres/sizes?type=width');
         const data = await res.json();
         setWidths(data.data || []);
       } catch (error) {
-        console.error('Error fetching widths:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні ширин');
+        } else {
+          console.error('Error fetching widths:', error);
+        }
       } finally {
         setLoadingWidths(false);
       }
@@ -91,11 +109,15 @@ export function QuickSearchForm() {
     async function fetchHeights() {
       setLoadingHeights(true);
       try {
-        const res = await fetch(`/api/tyres/sizes?type=height&width=${width}`);
+        const res = await fetchWithTimeout(`/api/tyres/sizes?type=height&width=${width}`);
         const data = await res.json();
         setHeights(data.data || []);
       } catch (error) {
-        console.error('Error fetching heights:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні профілів');
+        } else {
+          console.error('Error fetching heights:', error);
+        }
       } finally {
         setLoadingHeights(false);
       }
@@ -114,11 +136,15 @@ export function QuickSearchForm() {
     async function fetchDiameters() {
       setLoadingDiameters(true);
       try {
-        const res = await fetch(`/api/tyres/sizes?type=diameter&width=${width}&height=${aspectRatio}`);
+        const res = await fetchWithTimeout(`/api/tyres/sizes?type=diameter&width=${width}&height=${aspectRatio}`);
         const data = await res.json();
         setDiameters(data.data || []);
       } catch (error) {
-        console.error('Error fetching diameters:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні діаметрів');
+        } else {
+          console.error('Error fetching diameters:', error);
+        }
       } finally {
         setLoadingDiameters(false);
       }
@@ -130,11 +156,15 @@ export function QuickSearchForm() {
   useEffect(() => {
     async function fetchBrands() {
       try {
-        const res = await fetch('/api/vehicles/brands');
+        const res = await fetchWithTimeout('/api/vehicles/brands');
         const data = await res.json();
         setBrands(data.data || []);
       } catch (error) {
-        console.error('Error fetching brands:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні марок');
+        } else {
+          console.error('Error fetching brands:', error);
+        }
       } finally {
         setLoadingBrands(false);
       }
@@ -155,11 +185,15 @@ export function QuickSearchForm() {
     async function fetchModels() {
       setLoadingModels(true);
       try {
-        const res = await fetch(`/api/vehicles/models?brandId=${brandId}`);
+        const res = await fetchWithTimeout(`/api/vehicles/models?brandId=${brandId}`);
         const data = await res.json();
         setModels(data.data || []);
       } catch (error) {
-        console.error('Error fetching models:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні моделей');
+        } else {
+          console.error('Error fetching models:', error);
+        }
       } finally {
         setLoadingModels(false);
       }
@@ -178,11 +212,15 @@ export function QuickSearchForm() {
     async function fetchYears() {
       setLoadingYears(true);
       try {
-        const res = await fetch(`/api/vehicles/years?modelId=${modelId}`);
+        const res = await fetchWithTimeout(`/api/vehicles/years?modelId=${modelId}`);
         const data = await res.json();
         setYears(data.data || []);
       } catch (error) {
-        console.error('Error fetching years:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні років');
+        } else {
+          console.error('Error fetching years:', error);
+        }
       } finally {
         setLoadingYears(false);
       }
@@ -201,11 +239,15 @@ export function QuickSearchForm() {
     async function fetchKits() {
       setLoadingKits(true);
       try {
-        const res = await fetch(`/api/vehicles/kits?modelId=${modelId}&year=${year}`);
+        const res = await fetchWithTimeout(`/api/vehicles/kits?modelId=${modelId}&year=${year}`);
         const data = await res.json();
         setKits(data.data || []);
       } catch (error) {
-        console.error('Error fetching kits:', error);
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.error('Час очікування вичерпано при завантаженні комплектацій');
+        } else {
+          console.error('Error fetching kits:', error);
+        }
       } finally {
         setLoadingKits(false);
       }
@@ -216,17 +258,13 @@ export function QuickSearchForm() {
   const handleSizeSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
-    // Зберігаємо параметри в sessionStorage замість URL
-    const searchData = {
-      mode: 'size' as const,
-      width,
-      aspectRatio,
-      diameter,
-      season,
-      timestamp: Date.now(),
-    };
-    sessionStorage.setItem('tyreSearchParams', JSON.stringify(searchData));
-    router.push('/tyre-search');
+    const params = new URLSearchParams();
+    params.set('mode', 'size');
+    if (width) params.set('width', width);
+    if (aspectRatio) params.set('profile', aspectRatio);
+    if (diameter) params.set('diameter', diameter);
+    if (season) params.set('season', season);
+    router.push(`/tyre-search?${params.toString()}`);
   };
 
   const handleCarSearch = (e: React.FormEvent) => {
@@ -235,18 +273,14 @@ export function QuickSearchForm() {
     const selectedBrand = brands.find(b => b.id === parseInt(brandId));
     const selectedModel = models.find(m => m.id === parseInt(modelId));
     const selectedKit = kits.find(k => k.id === parseInt(kitId));
-    // Зберігаємо параметри в sessionStorage замість URL
-    const searchData = {
-      mode: 'car',
-      make: selectedBrand?.name || '',
-      model: selectedModel?.name || '',
-      year,
-      kit: selectedKit?.name || '',
-      season: carSeason,
-      timestamp: Date.now(),
-    };
-    sessionStorage.setItem('tyreSearchParams', JSON.stringify(searchData));
-    router.push('/tyre-search');
+    const params = new URLSearchParams();
+    params.set('mode', 'car');
+    if (selectedBrand?.name) params.set('make', selectedBrand.name);
+    if (selectedModel?.name) params.set('model', selectedModel.name);
+    if (year) params.set('year', year);
+    if (selectedKit?.name) params.set('kit', selectedKit.name);
+    if (carSeason) params.set('season', carSeason);
+    router.push(`/tyre-search?${params.toString()}`);
   };
 
   const handleTabKeyDown = (e: React.KeyboardEvent) => {
@@ -418,14 +452,14 @@ export function QuickSearchForm() {
                 <option value="">Не важливо</option>
                 <option value="summer">Літні</option>
                 <option value="winter">Зимові</option>
-                <option value="all-season">Всесезонні</option>
+                <option value="allseason">Всесезонні</option>
               </select>
               <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
             </div>
           </div>
           <button
             type="submit"
-            disabled={isSearching}
+            disabled={isSearching || !width || !aspectRatio || !diameter}
             className={buttonClass}
           >
             {isSearching ? (
@@ -570,14 +604,14 @@ export function QuickSearchForm() {
                 <option value="">Не важливо</option>
                 <option value="summer">Літня</option>
                 <option value="winter">Зимова</option>
-                <option value="all-season">Всесезонна</option>
+                <option value="allseason">Всесезонна</option>
               </select>
               <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
             </div>
           </div>
           <button
             type="submit"
-            disabled={isSearching}
+            disabled={isSearching || !kitId}
             className={buttonClass}
           >
             {isSearching ? (

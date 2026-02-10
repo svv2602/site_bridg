@@ -9,6 +9,7 @@ import { MainHeader } from "@/components/MainHeader";
 import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
 import { Analytics } from "@/components/Analytics";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL_WHITE, PHONE_SCHEMA, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,10 +23,8 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.ua';
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Bridgestone Україна — офіційний сайт шин",
     template: "%s | Bridgestone Україна",
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "uk_UA",
     siteName: "Bridgestone Україна",
-    url: siteUrl,
+    url: SITE_URL,
     images: [
       {
         url: '/og-image.jpg',
@@ -80,39 +79,39 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Bridgestone Україна",
+  name: SITE_NAME,
   alternateName: "Bridgestone Ukraine",
-  url: "https://bridgestone.ua",
-  logo: "https://bridgestone.ua/bridgestone-logo-white.svg",
-  description: "Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.",
+  url: SITE_URL,
+  logo: `${SITE_URL}${LOGO_URL_WHITE}`,
+  description: SITE_DESCRIPTION,
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+380-800-123-456",
+    telephone: PHONE_SCHEMA,
     contactType: "customer service",
     availableLanguage: "Ukrainian",
     areaServed: "UA",
   },
   sameAs: [
-    "https://www.bridgestone.com",
-    "https://www.facebook.com/BridgestoneUkraine",
+    SOCIAL_LINKS.website,
+    SOCIAL_LINKS.facebook,
   ],
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Bridgestone Україна",
-  url: "https://bridgestone.ua",
+  name: SITE_NAME,
+  url: SITE_URL,
   description: "Офіційний сайт шин Bridgestone в Україні",
   publisher: {
     "@type": "Organization",
-    name: "Bridgestone Україна",
+    name: SITE_NAME,
   },
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: "https://bridgestone.ua/tyre-search?q={search_term_string}",
+      urlTemplate: `${SITE_URL}/tyre-search?q={search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },
@@ -148,13 +147,13 @@ export default function RootLayout({
           <div className="border-b border-border bg-card text-xs">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 md:px-8">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
+                <Link href="/dealers" className="flex items-center gap-1.5 hover:text-primary transition-colors">
                   <MapPin className="h-3 w-3" />
                   <span>Знайти дилера поруч</span>
-                </div>
+                </Link>
                 <div className="hidden items-center gap-1.5 sm:flex text-muted">
                   <Phone className="h-3 w-3" />
-                  <span>Гаряча лінія: 0 800 123 456</span>
+                  <span>Гаряча лінія: {PHONE_DISPLAY}</span>
                 </div>
               </div>
               <ThemeToggle />

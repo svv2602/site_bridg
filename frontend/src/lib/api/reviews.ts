@@ -35,40 +35,66 @@ interface ReviewDoc {
 }
 
 /**
- * Shuffle array using Fisher-Yates algorithm
+ * Shuffle array using a seed-based pseudo-random algorithm for cache efficiency.
+ * The seed rotates every hour so cached pages show the same order within the
+ * revalidation window, but the selection still feels fresh to returning visitors.
  */
-function shuffleArray<T>(array: T[]): T[] {
+function seededShuffle<T>(array: T[]): T[] {
   const shuffled = [...array];
+  // Seed based on the current hour — changes every hour, matching the revalidate window
+  let seed = Math.floor(Date.now() / (3600 * 1000));
+  function nextRandom() {
+    seed = (seed * 16807 + 0) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(nextRandom() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
 }
 
 /**
- * Get reviews with optional filtering
+ * Get reviews with optional filtering.
+ * Uses server-side where queries for season/vehicleType via Payload's
+ * relationship field filtering (tyre.season, tyre.vehicleTypes).
  */
 export async function getReviews(options: GetReviewsOptions = {}): Promise<Review[]> {
   const { tyreId, season, vehicleType, limit = 3, random = true } = options;
 
   try {
-    // Build query
-    const whereConditions: string[] = ['where[isPublished][equals]=true'];
+    // Build query params
+    const searchParams = new URLSearchParams();
+    searchParams.set('where[isPublished][equals]', 'true');
 
     if (tyreId) {
-      whereConditions.push(`where[tyre][equals]=${tyreId}`);
+      searchParams.set('where[tyre][equals]', String(tyreId));
     }
 
-    // For season/vehicleType filtering, we need to filter by tyre properties
-    // We'll fetch more and filter client-side since Payload doesn't support deep filtering well
-    const fetchLimit = season || vehicleType ? 100 : (random ? 50 : limit);
+    // Server-side filtering via Payload relationship queries
+    if (season) {
+      searchParams.set('where[tyre.season][equals]', season);
+    }
+    if (vehicleType) {
+      searchParams.set('where[tyre.vehicleTypes][contains]', vehicleType);
+    }
 
-    const queryString = whereConditions.join('&');
-    const url = `${PAYLOAD_API_URL}/api/reviews?${queryString}&limit=${fetchLimit}&depth=1`;
+    // When randomly sampling, fetch a larger pool; otherwise, fetch exact limit
+    // If server-side relationship filtering is not supported by the Payload config,
+    // we fall back to client-side filtering below
+    const fetchLimit = random ? Math.max(limit * 5, 50) : limit;
+    searchParams.set('limit', String(fetchLimit));
+    searchParams.set('depth', '1');
+
+    if (!random) {
+      // Stable sort: highest rating first, then newest
+      searchParams.set('sort', '-rating,-createdAt');
+    }
+
+    const url = `${PAYLOAD_API_URL}/api/reviews?${searchParams.toString()}`;
 
     const response = await fetch(url, {
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      next: { revalidate: 3600 }, // Cache for 1 hour — aligned with seed-based shuffle rotation
     });
 
     if (!response.ok) {
@@ -79,19 +105,18 @@ export async function getReviews(options: GetReviewsOptions = {}): Promise<Revie
     const data = await response.json();
     let reviews: ReviewDoc[] = data.docs || [];
 
-    // Filter by season if specified
+    // Fallback client-side filtering in case server-side relationship queries
+    // are not fully supported (safe to keep — no-ops when already filtered)
     if (season) {
       reviews = reviews.filter((r) => r.tyre?.season === season);
     }
-
-    // Filter by vehicle type if specified
     if (vehicleType) {
       reviews = reviews.filter((r) => r.tyre?.vehicleTypes?.includes(vehicleType));
     }
 
     // Shuffle for random selection, or sort by rating/date for stable SEO output
     if (random) {
-      reviews = shuffleArray(reviews);
+      reviews = seededShuffle(reviews);
     } else {
       // Stable sort: highest rating first, then newest first
       reviews = reviews.sort((a, b) => {
@@ -176,10 +201,10 @@ export async function getReviewStats(tyreId: number): Promise<{
   averageRating: number;
 }> {
   try {
-    const url = `${PAYLOAD_API_URL}/api/reviews?where[tyre][equals]=${tyreId}&where[isPublished][equals]=true&limit=100`;
+    const url = `${PAYLOAD_API_URL}/api/reviews?where[tyre][equals]=${tyreId}&where[isPublished][equals]=true&limit=500`;
 
     const response = await fetch(url, {
-      next: { revalidate: 60 },
+      next: { revalidate: 3600 }, // Cache for 1 hour — aligned with reviews list revalidation
     });
 
     if (!response.ok) {
@@ -188,8 +213,9 @@ export async function getReviewStats(tyreId: number): Promise<{
 
     const data = await response.json();
     const reviews: ReviewDoc[] = data.docs || [];
+    const totalCount = data.totalDocs ?? reviews.length;
 
-    if (reviews.length === 0) {
+    if (totalCount === 0) {
       return { totalCount: 0, averageRating: 0 };
     }
 
@@ -197,7 +223,7 @@ export async function getReviewStats(tyreId: number): Promise<{
     const averageRating = Math.round((sum / reviews.length) * 10) / 10;
 
     return {
-      totalCount: reviews.length,
+      totalCount,
       averageRating,
     };
   } catch (error) {

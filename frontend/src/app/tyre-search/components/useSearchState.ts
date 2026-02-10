@@ -11,7 +11,7 @@ export interface SizeOption {
   count: number;
 }
 
-// Type for sessionStorage data
+// Legacy sessionStorage type kept for backward compatibility migration
 interface StoredSearchParams {
   mode: 'size' | 'car';
   width?: string;
@@ -63,6 +63,7 @@ export interface UseSearchStateReturn {
   // Search actions
   performSearch: () => Promise<void>;
   handleSizeSearch: (e: React.FormEvent) => void;
+  handleResetFilters: () => void;
 
   // Results ref for scroll
   resultsRef: React.RefObject<HTMLDivElement | null>;
@@ -336,6 +337,16 @@ export function useSearchState(): UseSearchStateReturn {
     performSearch();
   }
 
+  function handleResetFilters() {
+    setWidth("");
+    setAspectRatio("");
+    setDiameter("");
+    setSeason("");
+    setResults([]);
+    setHasSearched(false);
+    updateUrlParams({ mode: 'size' });
+  }
+
   return {
     mode,
     handleModeChange,
@@ -363,6 +374,7 @@ export function useSearchState(): UseSearchStateReturn {
     toggleBrand,
     performSearch,
     handleSizeSearch,
+    handleResetFilters,
     resultsRef,
     urlMake,
     urlModel,

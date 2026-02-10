@@ -23,11 +23,6 @@ export function generateProductSchema(tyre: TyreModel, baseUrl: string = "https:
     },
     category: `${seasonLabels[tyre.season]} > Шини`,
     url: `${baseUrl}/shyny/${tyre.slug}`,
-    offers: {
-      "@type": "AggregateOffer",
-      availability: "https://schema.org/InStock",
-      priceCurrency: "UAH",
-    },
     ...(tyre.euLabel && {
       additionalProperty: [
         tyre.euLabel.wetGrip && {
@@ -82,13 +77,17 @@ export function generateLocalBusinessSchema(dealer: Dealer, baseUrl: string = "h
 
 // Article schema for blog posts
 export function generateArticleSchema(article: Article, baseUrl: string = "https://bridgestone.ua") {
+  const imageUrl = article.featuredImage || article.imageUrl;
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.previewText,
     url: `${baseUrl}/blog/${article.slug}`,
+    inLanguage: "uk",
     ...(article.publishedAt && { datePublished: article.publishedAt }),
+    ...(article.updatedAt ? { dateModified: article.updatedAt } : article.publishedAt ? { dateModified: article.publishedAt } : {}),
+    ...(imageUrl && { image: imageUrl.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}` }),
     author: {
       "@type": "Organization",
       name: "Bridgestone Ukraine",
@@ -229,11 +228,6 @@ export function generateProductSchemaWithReviews(
     ...(tyre.imageUrl && {
       image: tyre.imageUrl.startsWith("http") ? tyre.imageUrl : `${baseUrl}${tyre.imageUrl}`,
     }),
-    offers: {
-      "@type": "AggregateOffer",
-      availability: "https://schema.org/InStock",
-      priceCurrency: "UAH",
-    },
     ...(aggregateRating && { aggregateRating }),
     ...(reviews.length > 0 && {
       review: reviews.slice(0, 5).map((r) => generateReviewSchema(r, baseUrl)),
@@ -263,5 +257,5 @@ export function generateProductSchemaWithReviews(
 // Helper to render JSON-LD script tag content
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function jsonLdScript(schema: any): string {
-  return JSON.stringify(schema);
+  return JSON.stringify(schema).replace(/<\/script/gi, '<\\/script');
 }

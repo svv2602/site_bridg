@@ -8,13 +8,17 @@ interface BreadcrumbItem {
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
   className?: string;
+  /** Use "hero-dark" when Breadcrumb is placed on an always-dark hero section */
+  variant?: "default" | "hero-dark";
 }
 
-export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
+export function Breadcrumb({ items, className = "", variant = "default" }: BreadcrumbProps) {
+  const isHeroDark = variant === "hero-dark";
+
   return (
     <nav
       aria-label="Breadcrumb"
-      className={`text-xs text-muted-foreground ${className}`}
+      className={`text-xs ${isHeroDark ? "text-stone-400" : "text-muted-foreground"} ${className}`}
     >
       <ol className="flex flex-wrap items-center gap-1">
         {items.map((item, index) => {
@@ -25,13 +29,13 @@ export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="hover:text-foreground transition-colors"
+                  className={`transition-colors ${isHeroDark ? "hover:text-white" : "hover:text-foreground"}`}
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
-                  className={isLast ? "font-medium text-foreground" : ""}
+                  className={isLast ? `font-medium ${isHeroDark ? "text-stone-200" : "text-foreground"}` : ""}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {item.label}

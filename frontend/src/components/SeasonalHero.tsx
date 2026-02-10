@@ -18,10 +18,11 @@ const heroImages: Record<string, string> = {
 interface SeasonalData {
   heroTitle: string;
   heroSubtitle: string;
-  featuredSeason: 'summer' | 'winter' | null;
+  featuredSeason: 'summer' | 'winter' | 'allseason' | null;
   gradient: string;
   ctaText: string;
   ctaLink: string;
+  promoText?: string;
 }
 
 const defaultData: SeasonalData = {
@@ -35,14 +36,21 @@ const defaultData: SeasonalData = {
 
 interface SeasonalHeroProps {
   children?: React.ReactNode; // For the Quick Search form
+  seasonalData?: SeasonalData; // Pre-fetched from server component to avoid CORS issues
 }
 
-export function SeasonalHero({ children }: SeasonalHeroProps) {
-  const [seasonalData, setSeasonalData] = useState<SeasonalData>(defaultData);
-  const [isLoading, setIsLoading] = useState(true);
+export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHeroProps) {
+  const [seasonalData, setSeasonalData] = useState<SeasonalData>(serverData || defaultData);
+  const [isLoading, setIsLoading] = useState(!serverData);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // If data was provided via props (server-side fetch), skip client-side fetch
+    if (serverData) {
+      requestAnimationFrame(() => setIsVisible(true));
+      return;
+    }
+
     async function fetchSeasonalData() {
       try {
         const data = await getSeasonalContent();
@@ -57,12 +65,12 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
     fetchSeasonalData();
     // Trigger animation after mount
     requestAnimationFrame(() => setIsVisible(true));
-  }, []);
+  }, [serverData]);
 
   const SeasonIcon = seasonalData.featuredSeason === 'winter' ? Snowflake : Sun;
 
   return (
-    <section className="hero-adaptive relative py-8 md:py-12 overflow-hidden">
+    <section className="hero-adaptive relative min-h-[480px] py-8 md:min-h-[520px] md:py-12 overflow-hidden">
       <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
           <div
@@ -91,17 +99,13 @@ export function SeasonalHero({ children }: SeasonalHeroProps) {
             {/* Dynamic Title */}
             <h1 className="hero-title-adaptive text-3xl md:text-4xl lg:text-[2.9rem]">
               {isLoading ? (
-                <span className="animate-pulse bg-stone-300 dark:bg-white/20 rounded inline-block">
-                  Технічний контроль на кожному кілометрі
-                </span>
+                <span className="animate-pulse rounded bg-stone-300 dark:bg-white/20 inline-block h-[2.25rem] w-[80%] md:h-[2.5rem]" aria-hidden="true" />
               ) : (
                 seasonalData.heroTitle
               )}
               <span className="hero-subtitle-adaptive mt-1 block text-base md:text-lg">
                 {isLoading ? (
-                  <span className="animate-pulse">
-                    літні, зимові та всесезонні шини під ваш стиль водіння
-                  </span>
+                  <span className="animate-pulse rounded bg-stone-200 dark:bg-white/10 inline-block h-[1.25rem] w-[60%] md:h-[1.5rem]" aria-hidden="true" />
                 ) : (
                   seasonalData.heroSubtitle
                 )}

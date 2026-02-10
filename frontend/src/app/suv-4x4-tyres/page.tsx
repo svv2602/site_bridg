@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { Car, Shield, Zap, Mountain } from "lucide-react";
-import { getTyreModels } from "@/lib/api/tyres";
+import { getPayloadTyres, transformPayloadTyre } from "@/lib/api/payload";
+import type { TyreModel } from "@/lib/data";
 import { CategoryPage, type CategoryPageConfig } from "@/components/CategoryPage";
 
 export const metadata: Metadata = {
   title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
   description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення на будь-якому покритті. Літні, зимові та всесезонні моделі.",
+  alternates: {
+    canonical: '/suv-4x4-tyres',
+  },
   openGraph: {
     title: "Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків",
     description: "Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення.",
@@ -85,10 +89,8 @@ const config: CategoryPageConfig = {
 };
 
 export default async function SuvTyresPage() {
-  const allTyres = await getTyreModels();
-  const suvTyres = allTyres.filter((m) =>
-    m.vehicleTypes.includes("suv"),
-  );
+  const payloadTyres = await getPayloadTyres({ vehicleType: 'suv' });
+  const suvTyres = payloadTyres.map(t => transformPayloadTyre(t) as TyreModel);
 
   return <CategoryPage config={config} tyres={suvTyres} />;
 }

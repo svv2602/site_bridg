@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { TyreCard } from './TyreCard';
@@ -117,13 +118,13 @@ export function ProductCarousel({ tyres, title = 'Популярні модел�
 
         {/* View all link */}
         <div className="mt-8 text-center">
-          <a
+          <Link
             href="/passenger-tyres"
             className="inline-flex items-center gap-2 rounded-full border border-primary bg-transparent px-6 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-text"
           >
             Переглянути всі шини
             <ChevronRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

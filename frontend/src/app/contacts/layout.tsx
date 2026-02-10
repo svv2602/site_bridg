@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PHONE_SCHEMA, SITE_URL, LOGO_URL_WHITE, ADDRESS_CITY } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Контакти | Bridgestone Україна",
@@ -23,18 +24,18 @@ const contactPageSchema = {
   mainEntity: {
     "@type": "Organization",
     name: "Bridgestone Україна",
-    url: "https://bridgestone.ua",
-    logo: "https://bridgestone.ua/bridgestone-logo-white.svg",
+    url: SITE_URL,
+    logo: `${SITE_URL}${LOGO_URL_WHITE}`,
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+380-800-123-456",
+      telephone: PHONE_SCHEMA,
       contactType: "customer service",
       availableLanguage: "Ukrainian",
       areaServed: "UA",
     },
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Київ",
+      addressLocality: ADDRESS_CITY,
       addressCountry: "UA",
     },
   },

@@ -52,11 +52,11 @@ const defaultCenter = {
   lng: 31.1656,
 };
 
-// Marker colors by dealer type
+// Marker colors by dealer type (stone palette + brand red)
 const markerColors: Record<DealerType, string> = {
-  official: "#dc2626", // red-600 - primary
-  partner: "#2563eb", // blue-600
-  service: "#16a34a", // green-600
+  official: "#dc2626", // red-600 - brand primary
+  partner: "#292524", // stone-800 - dark stone
+  service: "#78716c", // stone-500 - medium stone
 };
 
 // Custom marker icon SVG (as data URL)
@@ -71,22 +71,32 @@ function getMarkerIcon(type: DealerType) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+/**
+ * InfoWindow content for Google Maps.
+ *
+ * Google Maps InfoWindow renders inside a Google-controlled container with a
+ * forced white background. Tailwind dark: variants do NOT apply here because
+ * the content is injected into a separate DOM context. We use inline styles
+ * to guarantee readability regardless of the site's color scheme.
+ */
 function DealerInfoContent({ dealer }: { dealer: Dealer }) {
   const googleMapsUrl = dealer.latitude && dealer.longitude
     ? `https://www.google.com/maps/dir/?api=1&destination=${dealer.latitude},${dealer.longitude}`
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dealer.address + ", " + dealer.city)}`;
 
+  // Match DealerList badge colors: red=official, orange=partner, green=service
+  const badgeStyle =
+    dealer.type === "official"
+      ? { backgroundColor: "#fee2e2", color: "#b91c1c" }
+      : dealer.type === "partner"
+        ? { backgroundColor: "#ffedd5", color: "#c2410c" }
+        : { backgroundColor: "#dcfce7", color: "#15803d" };
+
   return (
-    <div className="max-w-xs p-1">
-      <div className="mb-2">
+    <div style={{ maxWidth: 280, padding: 4, color: "#1c1917" }}>
+      <div style={{ marginBottom: 8 }}>
         <span
-          className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-            dealer.type === "official"
-              ? "bg-red-100 text-red-700"
-              : dealer.type === "partner"
-                ? "bg-blue-100 text-blue-700"
-                : "bg-green-100 text-green-700"
-          }`}
+          style={{ ...badgeStyle, display: "inline-block", borderRadius: 9999, padding: "2px 8px", fontSize: 12, fontWeight: 600 }}
         >
           {dealer.type === "official"
             ? "Офіційний дилер"
@@ -95,8 +105,8 @@ function DealerInfoContent({ dealer }: { dealer: Dealer }) {
               : "Сервісний центр"}
         </span>
       </div>
-      <h3 className="font-bold text-stone-900">{dealer.name}</h3>
-      <div className="mt-2 space-y-1 text-sm text-stone-600">
+      <h3 style={{ fontWeight: 700, color: "#1c1917", margin: 0 }}>{dealer.name}</h3>
+      <div style={{ marginTop: 8, fontSize: 14, color: "#57534e" }} className="space-y-1">
         <div className="flex items-center gap-1">
           <MapPin className="h-3 w-3" />
           <span>{dealer.city}, {dealer.address}</span>
@@ -104,7 +114,7 @@ function DealerInfoContent({ dealer }: { dealer: Dealer }) {
         {dealer.phone && (
           <div className="flex items-center gap-1">
             <Phone className="h-3 w-3" />
-            <a href={`tel:${dealer.phone}`} className="hover:text-red-600">
+            <a href={`tel:${dealer.phone}`} style={{ color: "#57534e", textDecoration: "none" }}>
               {dealer.phone}
             </a>
           </div>
@@ -120,7 +130,7 @@ function DealerInfoContent({ dealer }: { dealer: Dealer }) {
         href={googleMapsUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-3 inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+        style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 9999, backgroundColor: "#dc2626", padding: "6px 12px", fontSize: 12, fontWeight: 600, color: "#ffffff", textDecoration: "none" }}
       >
         <Navigation className="h-3 w-3" />
         Маршрут
@@ -137,6 +147,12 @@ export function DealersMap({
 }: DealersMapProps) {
   const [infoWindowDealer, setInfoWindowDealer] = useState<Dealer | null>(null);
 
+  // SECURITY: This is a public API key (NEXT_PUBLIC_*) which is expected for the
+  // Google Maps JavaScript API — it is embedded in client-side bundles. However,
+  // it MUST be restricted in the Google Cloud Console:
+  //   1. Application restrictions → HTTP referrers: bridgestone.ua/*, localhost:3010/*
+  //   2. API restrictions → Maps JavaScript API only
+  // Without these restrictions, the key could be abused for unauthorized usage.
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded, loadError } = useJsApiLoader({

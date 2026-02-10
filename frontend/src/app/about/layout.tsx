@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "uk_UA",
     siteName: "Bridgestone Україна",
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Про Bridgestone — офіційний представник в Україні',
+      },
+    ],
   },
 };
 

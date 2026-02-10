@@ -24,13 +24,8 @@ export async function getArticles(params?: {
   tag?: string;
   search?: string;
 }): Promise<Article[]> {
-  try {
-    const articles = await getPayloadArticles(params);
-    return articles.map(article => transformPayloadArticle(article) as Article);
-  } catch (error) {
-    console.error("Помилка завантаження статей з CMS:", error);
-    return [];
-  }
+  const articles = await getPayloadArticles(params);
+  return articles.map(article => transformPayloadArticle(article) as Article);
 }
 
 /**
@@ -45,33 +40,21 @@ export async function getArticlesPaginated(params?: {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 9;
 
-  try {
-    const result = await getPayloadArticlesPaginated({
-      tag: params?.tag,
-      search: params?.search,
-      page,
-      limit,
-    });
+  const result = await getPayloadArticlesPaginated({
+    tag: params?.tag,
+    search: params?.search,
+    page,
+    limit,
+  });
 
-    return {
-      articles: result.articles.map(article => transformPayloadArticle(article) as Article),
-      totalDocs: result.totalDocs,
-      totalPages: result.totalPages,
-      page: result.page,
-      hasNextPage: result.hasNextPage,
-      hasPrevPage: result.hasPrevPage,
-    };
-  } catch (error) {
-    console.error("Помилка завантаження статей з CMS:", error);
-    return {
-      articles: [],
-      totalDocs: 0,
-      totalPages: 0,
-      page,
-      hasNextPage: false,
-      hasPrevPage: false,
-    };
-  }
+  return {
+    articles: result.articles.map(article => transformPayloadArticle(article) as Article),
+    totalDocs: result.totalDocs,
+    totalPages: result.totalPages,
+    page: result.page,
+    hasNextPage: result.hasNextPage,
+    hasPrevPage: result.hasPrevPage,
+  };
 }
 
 /**
@@ -104,20 +87,15 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 
 /**
  * Повертає список останніх статей,
- * відсортованих за датою публікації (якщо є) або в порядку масиву.
+ * відсортованих за датою публікації (від найновішої).
+ * Використовує серверну пагінацію та сортування для мінімізації трафіку.
  */
 export async function getLatestArticles(limit?: number): Promise<Article[]> {
-  const all = await getArticles();
-
-  const sorted = [...all].sort((a, b) => {
-    const da = a.publishedAt ? Date.parse(a.publishedAt) : 0;
-    const db = b.publishedAt ? Date.parse(b.publishedAt) : 0;
-    return db - da;
+  // Use server-side sort + limit via paginated endpoint to avoid fetching all articles
+  const result = await getPayloadArticlesPaginated({
+    limit: typeof limit === "number" ? limit : 9,
+    page: 1,
   });
 
-  if (typeof limit === "number") {
-    return sorted.slice(0, limit);
-  }
-
-  return sorted;
+  return result.articles.map(article => transformPayloadArticle(article) as Article);
 }

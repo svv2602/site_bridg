@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/postgres';
+import { createRateLimiter } from '@/lib/rate-limit';
+
+// Rate limiter: max 30 requests per minute per IP
+const sizesLimiter = createRateLimiter({ maxRequests: 30, windowMs: 60 * 1000 });
 
 interface UniqueSize {
   width: number;
@@ -16,12 +20,56 @@ interface UniqueSize {
  *   - width: filter by width (for height/diameter)
  *   - height: filter by height (for diameter)
  */
+/** Parse a numeric query param, returning null if missing or NaN */
+function parseIntParam(value: string | null): number | null {
+  if (value === null) return null;
+  const num = parseInt(value, 10);
+  return Number.isNaN(num) ? null : num;
+}
+
+const VALID_TYPES = new Set(['width', 'height', 'diameter', 'all']);
+
 export async function GET(request: Request) {
   try {
+    // Rate limiting: max 30 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    if (!sizesLimiter.check(ip)) {
+      return NextResponse.json(
+        { error: 'Забагато запитів. Спробуйте через хвилину.' },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'all';
-    const width = searchParams.get('width');
-    const height = searchParams.get('height');
+    const widthRaw = searchParams.get('width');
+    const heightRaw = searchParams.get('height');
+
+    // Validate type parameter
+    if (!VALID_TYPES.has(type)) {
+      return NextResponse.json(
+        { error: 'Невірний параметр type. Допустимі значення: width, height, diameter, all' },
+        { status: 400 }
+      );
+    }
+
+    // Parse and validate numeric params
+    const width = parseIntParam(widthRaw);
+    const height = parseIntParam(heightRaw);
+
+    if (widthRaw !== null && width === null) {
+      return NextResponse.json(
+        { error: 'Параметр width повинен бути числом' },
+        { status: 400 }
+      );
+    }
+
+    if (heightRaw !== null && height === null) {
+      return NextResponse.json(
+        { error: 'Параметр height повинен бути числом' },
+        { status: 400 }
+      );
+    }
 
     if (type === 'width') {
       // Унікальні ширини
@@ -47,9 +95,9 @@ export async function GET(request: Request) {
       `;
       const params: number[] = [];
 
-      if (width) {
+      if (width !== null) {
         sql += ` AND width = $1`;
-        params.push(parseInt(width));
+        params.push(width);
       }
 
       sql += ` GROUP BY height ORDER BY height`;
@@ -71,13 +119,13 @@ export async function GET(request: Request) {
       const params: number[] = [];
       let paramIdx = 1;
 
-      if (width) {
+      if (width !== null) {
         sql += ` AND width = $${paramIdx++}`;
-        params.push(parseInt(width));
+        params.push(width);
       }
-      if (height) {
+      if (height !== null) {
         sql += ` AND height = $${paramIdx++}`;
-        params.push(parseInt(height));
+        params.push(height);
       }
 
       sql += ` GROUP BY diameter ORDER BY diameter`;

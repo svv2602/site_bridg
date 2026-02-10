@@ -92,7 +92,7 @@ export const SearchResults = forwardRef<HTMLDivElement, SearchResultsProps>(
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 pt-2 sm:grid-cols-2">
             {filteredResults.map((model) => (
               <TyreCard key={model.slug} tyre={model} variant="compact" />
             ))}

@@ -1,42 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { Globe, Award, Shield, Users, Target, Zap, Phone } from "lucide-react";
+import { Globe, Target, Phone } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
-
-const stats = [
-  { label: "Країн присутності", value: "150+", icon: Globe, color: { bg: "bg-teal-500/15", text: "text-teal-500" } },
-  { label: "Років на ринку", value: "90+", icon: Award, color: { bg: "bg-yellow-500/15", text: "text-yellow-500" } },
-  { label: "Дослідницьких центрів", value: "12", icon: Zap, color: { bg: "bg-amber-500/15", text: "text-amber-500" } },
-  { label: "Сертифікатів якості", value: "ISO 9001", icon: Shield, color: { bg: "bg-emerald-500/15", text: "text-emerald-500" } },
-];
-
-const values = [
-  {
-    icon: Shield,
-    title: "Безпека",
-    description: "Пріоритет номер один у кожній шині Bridgestone.",
-    color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
-  },
-  {
-    icon: Target,
-    title: "Точність",
-    description: "Інженерна точність та контроль якості на всіх етапах.",
-    color: { bg: "bg-orange-500/15", text: "text-orange-500" },
-  },
-  {
-    icon: Users,
-    title: "Клієнтоорієнтованість",
-    description: "Розуміння потреб водіїв та пропозиція оптимальних рішень.",
-    color: { bg: "bg-pink-500/15", text: "text-pink-500" },
-  },
-  {
-    icon: Globe,
-    title: "Екологічність",
-    description: "Інновації для зменшення впливу на довкілля.",
-    color: { bg: "bg-teal-500/15", text: "text-teal-500" },
-  },
-];
+import { PHONE_HREF } from "@/lib/constants";
+import { stats, values, timelineEvents } from "./data";
 
 export default function AboutPage() {
   return (
@@ -88,9 +54,6 @@ export default function AboutPage() {
             {stats.map((stat, idx) => (
               <div
                 key={stat.label}
-                
-                
-                
                 className="group rounded-2xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg"
               >
                 <div className={`mb-4 inline-flex rounded-full ${stat.color.bg} p-3`}>
@@ -142,7 +105,7 @@ export default function AboutPage() {
                 </div>
               </div>
             </div>
-            <div >
+            <div>
               <h2 className="mb-6 text-3xl font-bold">Наші цінності</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {values.map((value) => (
@@ -178,25 +141,19 @@ export default function AboutPage() {
               {/* Timeline line: left on mobile, center on desktop */}
               <div className="absolute left-5 top-0 h-full w-0.5 bg-brand/30 lg:left-1/2 lg:-translate-x-1/2" />
               <div className="relative grid gap-8">
-                {[
-                  { year: "1931", event: "Заснування компанії в місті Куробе, Японія." },
-                  { year: "1960", event: "Початок міжнародної експансії та відкриття перших заводів за межами Японії." },
-                  { year: "1988", event: "Придбання Firestone та зміцнення позицій на американському ринку." },
-                  { year: "2000‑ні", event: "Активний розвиток екологічних технологій та запуск лінійки «енергоефективних» шин." },
-                  { year: "Сьогодні", event: "Bridgestone — глобальний лідер з представництвом у понад 150 країнах, включаючи Україну." },
-                ].map((item, idx) => (
+                {timelineEvents.map((item, idx) => (
                   <div
                     key={item.year}
-                    className={`flex items-start lg:items-center ${idx % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"}`}
+                    className={`relative flex items-start lg:items-center ${idx % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"}`}
                   >
                     {/* Desktop: empty spacer for alternating layout */}
-                    <div className="hidden lg:block lg:w-1/2" />
-                    {/* Year badge: pill shape that adapts to content */}
-                    <div className="relative z-10 flex-shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-lg lg:mx-4">
+                    <div className="hidden lg:block lg:w-[calc(50%-2rem)]" />
+                    {/* Year badge: absolutely centered on timeline line for desktop */}
+                    <div className="relative z-10 flex-shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-lg lg:absolute lg:left-1/2 lg:-translate-x-1/2">
                       {item.year}
                     </div>
                     {/* Event card: with left margin on mobile */}
-                    <div className="ml-4 flex-1 lg:ml-0 lg:w-1/2">
+                    <div className="ml-4 flex-1 lg:ml-0 lg:w-[calc(50%-2rem)]">
                       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                         <p className="font-medium">{item.event}</p>
                       </div>
@@ -213,10 +170,7 @@ export default function AboutPage() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div
-            
-            
-            
-            className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
+            className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700"
           >
             <h3 className="mb-4 text-3xl font-bold">Готові дізнатися більше?</h3>
             <p className="mb-8 text-lg opacity-90">
@@ -231,7 +185,7 @@ export default function AboutPage() {
                 Знайти дилера
               </Link>
               <a
-                href="tel:+380800123456"
+                href={PHONE_HREF}
                 className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" aria-hidden="true" />

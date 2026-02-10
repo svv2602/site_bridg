@@ -17,10 +17,7 @@ const dealerTypes = [
   { key: "service", label: "Сервісний центр" },
 ];
 
-interface UserPosition {
-  lat: number;
-  lng: number;
-}
+import { type UserPosition } from "../types";
 
 export interface DealerFiltersProps {
   cityQuery: string;
@@ -64,7 +61,7 @@ export function DealerFilters({
       {/* Search form */}
       <div className="p-6">
         <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row">
+        <div role="search" className="mb-6 flex flex-col gap-4 sm:flex-row">
           <div className="flex-1">
             <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">
               Місто або адреса
@@ -75,9 +72,11 @@ export function DealerFilters({
                 type="text"
                 id="city-search"
                 placeholder="Наприклад, Київ, Львів..."
+                aria-label="Пошук дилерів"
                 value={cityQuery}
                 onChange={(e) => onCityQueryChange(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary"
+                maxLength={100}
+                className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               />
             </div>
           </div>
@@ -89,7 +88,7 @@ export function DealerFilters({
                 id="dealer-type"
                 value={selectedType}
                 onChange={(e) => onSelectedTypeChange(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary"
+                className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {dealerTypes.map((type) => (
                   <option key={type.key} value={type.key}>
@@ -114,6 +113,7 @@ export function DealerFilters({
             <button
               onClick={onRequestGeolocation}
               disabled={geoLoading}
+              title="Визначити ваше місцезнаходження для сортування дилерів за відстанню"
               className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                 userPosition
                   ? "border-green-500 bg-green-50 text-green-700 dark:border-green-600 dark:bg-green-900/30 dark:text-green-300"

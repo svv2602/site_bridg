@@ -151,7 +151,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
                   alt={config.heroImageAlt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -227,7 +227,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
             <h3 className="mb-4 text-3xl font-bold">{config.ctaTitle}</h3>
             <p className="mb-8 text-lg opacity-90">
               {config.ctaDescription}

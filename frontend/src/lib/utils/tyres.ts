@@ -112,7 +112,7 @@ export const vehicleTypeLabelsLong: Record<string, string> = {
  * Format tyre size as string (e.g., "205/55 R16" or "205/55 R16 91H" with full=true)
  */
 export function formatSize(
-  size: { width: number; aspectRatio: number; diameter: number; loadIndex?: number; speedIndex?: string } | null | undefined,
+  size: { width: number; aspectRatio: number; diameter: number; loadIndex?: number | string; speedIndex?: string } | null | undefined,
   full?: boolean
 ): string {
   if (!size) return "—";
@@ -160,6 +160,9 @@ export function formatVehicleTypes(model: TyreModel): string {
   }
   if (model.vehicleTypes.includes("lcv")) {
     labels.push("Легкі вантажні");
+  }
+  if (model.vehicleTypes.includes("sport")) {
+    labels.push("Спортивні");
   }
   return labels.join(", ") || "Універсальні";
 }

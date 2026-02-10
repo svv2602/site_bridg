@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Search,
   MapPin,
@@ -8,14 +9,10 @@ import {
   Clock,
   Loader2,
   Navigation,
+  ChevronDown,
 } from "lucide-react";
-import { type Dealer } from "@/lib/data";
 import { ErrorState } from "@/components/ui";
-
-type FilteredDealer = Dealer & {
-  displayAddress: string;
-  distance?: number;
-};
+import { type FilteredDealer, buildRouteUrl } from "../types";
 
 export interface DealerListProps {
   dealers: FilteredDealer[];
@@ -26,13 +23,7 @@ export interface DealerListProps {
   onRetry: () => void;
 }
 
-function buildRouteUrl(dealer: Dealer): string {
-  if (dealer.latitude && dealer.longitude) {
-    return `https://www.google.com/maps/dir/?api=1&destination=${dealer.latitude},${dealer.longitude}`;
-  }
-  const address = encodeURIComponent(`${dealer.address}, ${dealer.city}, Україна`);
-  return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
-}
+const DEALERS_PER_PAGE = 20;
 
 export function DealerList({
   dealers,
@@ -42,6 +33,16 @@ export function DealerList({
   onExpandDealer,
   onRetry,
 }: DealerListProps) {
+  const [visibleCount, setVisibleCount] = useState(DEALERS_PER_PAGE);
+
+  // Reset visible count when dealer list changes (e.g. filter/search)
+  useEffect(() => {
+    setVisibleCount(DEALERS_PER_PAGE);
+  }, [dealers]);
+
+  const visibleDealers = dealers.slice(0, visibleCount);
+  const hasMore = visibleCount < dealers.length;
+
   if (error) {
     return (
       <ErrorState
@@ -64,7 +65,7 @@ export function DealerList({
   if (dealers.length === 0) {
     return (
       <div className="rounded-2xl border border-border bg-card p-12 text-center">
-        <Search className="mx-auto h-12 w-12 text-muted" />
+        <Search className="mx-auto h-12 w-12 text-stone-500 dark:text-stone-400" />
         <h3 className="mt-4 text-xl font-semibold">Дилерів не знайдено</h3>
         <p className="mt-2 text-muted-foreground">
           Спробуйте змінити параметри пошуку або обрати інше місто.
@@ -74,10 +75,12 @@ export function DealerList({
   }
 
   return (
+    <div>
     <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
-      {dealers.map((dealer) => (
+      {visibleDealers.map((dealer) => (
         <article
           key={dealer.id}
+          id={`dealer-${dealer.id}`}
           className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
         >
           <div className="p-6">
@@ -119,7 +122,7 @@ export function DealerList({
                 <div className="flex items-center gap-3">
                   <Phone className="h-4 w-4 text-primary" />
                   <div>
-                    <p className="text-xs text-muted">Телефон</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Телефон</p>
                     <a
                       href={`tel:${dealer.phone}`}
                       className="font-medium hover:text-primary hover:underline"
@@ -129,11 +132,11 @@ export function DealerList({
                   </div>
                 </div>
               )}
-              {dealer.website && (
+              {dealer.website && /^https?:\/\//i.test(dealer.website) && (
                 <div className="flex items-center gap-3">
                   <Globe className="h-4 w-4 text-primary" />
                   <div>
-                    <p className="text-xs text-muted">Вебсайт</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Вебсайт</p>
                     <a
                       href={dealer.website}
                       target="_blank"
@@ -149,7 +152,7 @@ export function DealerList({
                 <div className="flex items-center gap-3">
                   <Clock className="h-4 w-4 text-primary" />
                   <div>
-                    <p className="text-xs text-muted">Години роботи</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Години роботи</p>
                     <p className="font-medium">{dealer.workingHours}</p>
                   </div>
                 </div>
@@ -197,6 +200,19 @@ export function DealerList({
           </div>
         </article>
       ))}
+    </div>
+
+    {hasMore && (
+      <div className="mt-8 flex justify-center">
+        <button
+          onClick={() => setVisibleCount((prev) => prev + DEALERS_PER_PAGE)}
+          className="flex items-center gap-2 rounded-full border border-stone-300 bg-transparent px-6 py-3 text-sm font-medium transition-colors hover:bg-stone-100 dark:border-stone-600 dark:hover:bg-stone-700"
+        >
+          <ChevronDown className="h-4 w-4" />
+          Показати ще ({dealers.length - visibleCount} залишилось)
+        </button>
+      </div>
+    )}
     </div>
   );
 }

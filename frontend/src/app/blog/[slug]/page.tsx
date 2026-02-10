@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Tag } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
 import { getArticleBySlug, getArticles } from "@/lib/api/articles";
 import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
@@ -9,6 +10,7 @@ import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { ShareButtons } from "@/components/ShareButtons";
 import { TableOfContents } from "@/components/TableOfContents";
 import { SITE_URL } from "@/lib/constants";
+import { pluralize } from "@/lib/utils/pluralize";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -54,6 +56,8 @@ export async function generateMetadata(
       locale: 'uk_UA',
       siteName: 'Bridgestone Україна',
       publishedTime: article.publishedAt,
+      ...(article.updatedAt && { modifiedTime: article.updatedAt }),
+      ...(article.tags?.[0] && { section: article.tags[0] }),
       images: article.featuredImage ? [{ url: article.featuredImage, alt: article.title }] : undefined,
     },
   };
@@ -88,9 +92,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }}
       />
       <section className="border-b border-border bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 py-8 md:py-12">
-        <div className="container mx-auto max-w-4xl px-4 md:px-8">
+        <div className="container mx-auto max-w-6xl px-4 md:px-8">
           <Breadcrumb
             className="mb-4"
+            variant="hero-dark"
             items={[
               { label: "Головна", href: "/" },
               { label: "Блог", href: "/blog" },
@@ -114,10 +119,22 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-stone-400">
             <div className="flex flex-wrap items-center gap-3">
+              {article.publishedAt && (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  <time dateTime={article.publishedAt}>
+                    {new Date(article.publishedAt).toLocaleDateString("uk-UA", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </span>
+              )}
               {article.readingTimeMinutes && (
                 <span className="inline-flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {article.readingTimeMinutes} хвилин читання
+                  {pluralize(article.readingTimeMinutes, "хвилина", "хвилини", "хвилин")} читання
                 </span>
               )}
               {article.tags && article.tags.length > 0 && (
@@ -127,9 +144,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <Link
                       key={tag}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="hover:text-stone-200"
+                      className="rounded-full px-2 py-1 hover:bg-white/10 hover:text-stone-200"
                     >
-                      #{tag}{i < article.tags!.length - 1 ? ", " : ""}
+                      #{tag}{i < article.tags!.length - 1 ? "," : ""}
                     </Link>
                   ))}
                 </span>
@@ -138,11 +155,28 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <ShareButtons
               title={article.title}
               url={articleUrl}
+              variant="hero-dark"
               className="text-stone-400"
             />
           </div>
         </div>
       </section>
+
+      {/* Featured image */}
+      {(article.featuredImage || article.imageUrl) && (
+        <div className="container mx-auto max-w-6xl px-4 pt-8 md:px-8">
+          <div className="relative aspect-[2/1] max-h-[480px] overflow-hidden rounded-2xl">
+            <Image
+              src={article.featuredImage || article.imageUrl!}
+              alt={article.title}
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
+            />
+          </div>
+        </div>
+      )}
 
       <section className="py-10">
         <div className="container mx-auto max-w-6xl px-4 md:px-8">
@@ -154,7 +188,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   variant="article"
                 />
               ) : (
-                <div className="prose prose-stone dark:prose-invert max-w-none">
+                <div className="prose max-w-none">
                   <p className="text-sm text-muted-foreground">
                     {article.previewText}
                   </p>
@@ -176,7 +210,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {/* Related tags */}
       {article.tags && article.tags.length > 0 && (
         <section className="border-t border-border py-8">
-          <div className="container mx-auto max-w-4xl px-4 md:px-8">
+          <div className="container mx-auto max-w-6xl px-4 md:px-8">
             <h3 className="mb-4 text-lg font-semibold">Схожі теми</h3>
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (

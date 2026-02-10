@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
 import { MessageSquare, Star, Filter } from "lucide-react";
-import { ReviewCard } from "@/components/ReviewCard";
 import { getReviews } from "@/lib/api/reviews";
+import { ReviewsList } from "./ReviewsList";
 import { Breadcrumb } from "@/components/ui";
 import { seasonLabelsShort, vehicleTypeLabels } from "@/lib/utils/tyres";
 import Link from "next/link";
+import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { SITE_URL } from "@/lib/constants";
+import { pluralize } from "@/lib/utils/pluralize";
 
 export const metadata: Metadata = {
   title: "Відгуки про шини Bridgestone — Bridgestone Україна",
   description:
     "Реальні відгуки покупців про шини Bridgestone та Firestone. Дізнайтесь думку водіїв про якість, комфорт та безпеку шин.",
+  alternates: {
+    canonical: '/reviews',
+  },
 };
 
 interface ReviewsPageProps {
@@ -57,9 +63,38 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
   if (vehicleType) activeFilters.push(vehicleTypeLabels[vehicleType]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <section className="border-b border-stone-200 bg-gradient-to-br from-amber-50 via-white to-stone-50 py-12 dark:border-stone-800 dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 md:py-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(generateBreadcrumbSchema([
+          { name: "Головна", url: `${SITE_URL}/` },
+          { name: "Відгуки", url: `${SITE_URL}/reviews` },
+        ])) }}
+      />
+      {totalCount > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: "Шини Bridgestone",
+            brand: {
+              "@type": "Brand",
+              name: "Bridgestone",
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: averageRating,
+              reviewCount: totalCount,
+              bestRating: 5,
+              worstRating: 1,
+            },
+          }) }}
+        />
+      )}
+      <div className="min-h-screen bg-background">
+        {/* Hero */}
+      <section className="border-b border-stone-200 bg-gradient-to-br from-stone-100 via-stone-50 to-stone-50 py-12 dark:border-stone-800 dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 md:py-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <Breadcrumb
             className="mb-4"
@@ -70,8 +105,8 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
           />
 
           <div className="flex items-start gap-4">
-            <div className="rounded-2xl bg-amber-100 p-4 dark:bg-amber-900/30">
-              <MessageSquare className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+            <div className="rounded-2xl bg-stone-200 p-4 dark:bg-stone-700">
+              <MessageSquare className="h-8 w-8 text-stone-600 dark:text-stone-300" />
             </div>
             <div>
               <h1 className="text-3xl font-bold md:text-4xl">
@@ -87,7 +122,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
           {/* Stats */}
           {totalCount > 0 && (
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-800/50">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-700 dark:bg-stone-800/50">
                 <div className="text-sm text-muted-foreground">
                   Загальна оцінка
                 </div>
@@ -96,13 +131,13 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                   <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
                 </div>
               </div>
-              <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-800/50">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-700 dark:bg-stone-800/50">
                 <div className="text-sm text-muted-foreground">
                   Кількість відгуків
                 </div>
                 <div className="mt-1 text-3xl font-bold">{totalCount}</div>
               </div>
-              <div className="col-span-2 rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-700 dark:bg-stone-800/50">
+              <div className="sm:col-span-2 rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-700 dark:bg-stone-800/50">
                 <div className="mb-2 text-sm text-muted-foreground">
                   Розподіл оцінок
                 </div>
@@ -111,7 +146,14 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                     <div key={rating} className="flex items-center gap-2 text-sm">
                       <span className="w-4">{rating}</span>
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
+                      <div
+                        role="progressbar"
+                        aria-valuenow={percent}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`${pluralize(rating, "зірка", "зірки", "зірок")}: ${pluralize(count, "відгук", "відгуки", "відгуків")}`}
+                        className="h-2 flex-1 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700"
+                      >
                         <div
                           className="h-full rounded-full bg-amber-400"
                           style={{ width: `${percent}%` }}
@@ -145,9 +187,11 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                     ...(vehicleType && { vehicleType }),
                     ...(season !== s && { season: s }),
                   }).toString()}`}
-                  className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                  role="button"
+                  aria-pressed={season === s}
+                  className={`rounded-full px-4 py-2 text-sm transition-colors ${
                     season === s
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-text"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
                   }`}
                 >
@@ -167,9 +211,11 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                     ...(season && { season }),
                     ...(vehicleType !== v && { vehicleType: v }),
                   }).toString()}`}
-                  className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                  role="button"
+                  aria-pressed={vehicleType === v}
+                  className={`rounded-full px-4 py-2 text-sm transition-colors ${
                     vehicleType === v
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-primary-text"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
                   }`}
                 >
@@ -184,7 +230,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                 <span className="text-stone-300 dark:text-stone-600">|</span>
                 <Link
                   href="/reviews"
-                  className="rounded-full px-3 py-1 text-sm text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
+                  className="rounded-full px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
                 >
                   Скинути
                 </Link>
@@ -204,11 +250,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           {reviews.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {reviews.map((review) => (
-                <ReviewCard key={review.id} review={review} showTyreName />
-              ))}
-            </div>
+            <ReviewsList reviews={reviews} showTyreName />
           ) : (
             <div className="py-16 text-center">
               <MessageSquare className="mx-auto h-16 w-16 text-muted-foreground/30" />
@@ -221,7 +263,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
               {activeFilters.length > 0 && (
                 <Link
                   href="/reviews"
-                  className="mt-4 inline-flex rounded-full bg-primary px-6 py-2 font-semibold text-primary-foreground"
+                  className="mt-4 inline-flex rounded-full bg-primary px-6 py-2 font-semibold text-primary-text"
                 >
                   Показати всі відгуки
                 </Link>
@@ -231,5 +273,6 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
         </div>
       </section>
     </div>
+    </>
   );
 }

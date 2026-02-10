@@ -2,13 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { type Season } from "@/lib/data";
-import { getTyreModels } from "@/lib/api/tyres";
+import { type Season, type TyreModel } from "@/lib/data";
+import { getPayloadTyres, transformPayloadTyre } from "@/lib/api/payload";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-react";
 import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
 import { ReviewsSection } from "@/components/ReviewsSection";
+import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
+import { SITE_URL } from "@/lib/constants";
+import { pluralize } from "@/lib/utils/pluralize";
 
 // Hero images for each season (optimized WebP format)
 const seasonHeroImages: Record<Season, string> = {
@@ -173,6 +176,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: meta.title,
     description: meta.description,
+    alternates: {
+      canonical: `/passenger-tyres/${slug}`,
+    },
     openGraph: {
       title: meta.title,
       description: meta.description,
@@ -194,30 +200,50 @@ export default async function SeasonTyresPage({ params }: PageProps) {
   const meta = seasonMeta[season];
   const Icon = SeasonIcons[season];
 
-  // Get tyres filtered by season and vehicle type
-  const allTyres = await getTyreModels();
-  const seasonTyres = allTyres.filter(
-    (m) => m.season === season && m.vehicleTypes.includes("passenger")
-  );
+  // Get tyres filtered by season and vehicle type (server-side filtering)
+  const payloadTyres = await getPayloadTyres({ season, vehicleType: 'passenger' });
+  const seasonTyres = payloadTyres.map(t => transformPayloadTyre(t) as TyreModel);
 
   // Separate popular and regular tyres
   const popularTyres = seasonTyres.filter((m) => m.isPopular);
   const otherTyres = seasonTyres.filter((m) => !m.isPopular);
 
+  const seasonTitle = seasonLabels[season];
+
   return (
-    <div className="bg-background text-foreground">
-      {/* Hero */}
-      <section className="hero-adaptive py-8 md:py-12">
-        <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="grid gap-10 lg:grid-cols-2">
-            <div>
-              <Breadcrumb
-                className="hero-breadcrumb-adaptive mb-2"
-                items={[
-                  { label: "Головна", href: "/" },
-                  { label: "Легкові шини", href: "/passenger-tyres" },
-                  { label: seasonLabels[season] },
-                ]}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(generateBreadcrumbSchema([
+          { name: "Головна", url: `${SITE_URL}/` },
+          { name: "Легкові шини", url: `${SITE_URL}/passenger-tyres` },
+          { name: seasonTitle, url: `${SITE_URL}/passenger-tyres/${slug}` },
+        ])) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: `${seasonTitle} Bridgestone`,
+          description: meta.description,
+          url: `${SITE_URL}/passenger-tyres/${slug}`,
+          inLanguage: "uk",
+        }) }}
+      />
+      <div className="bg-background text-foreground">
+        {/* Hero */}
+        <section className="hero-adaptive py-8 md:py-12">
+          <div className="container mx-auto max-w-7xl px-4 md:px-8">
+            <div className="grid gap-10 lg:grid-cols-2">
+              <div>
+                <Breadcrumb
+                  className="hero-breadcrumb-adaptive mb-2"
+                  items={[
+                    { label: "Головна", href: "/" },
+                    { label: "Легкові шини", href: "/passenger-tyres" },
+                    { label: seasonLabels[season] },
+                  ]}
               />
               <h1 className="hero-title-adaptive mb-4 text-3xl font-semibold tracking-tight md:text-4xl lg:text-[2.9rem]">
                 {meta.h1}
@@ -264,10 +290,10 @@ export default async function SeasonTyresPage({ params }: PageProps) {
                     <div className={`rounded-full ${seasonBgLight[season]} p-2`}>
                       <Icon className={`h-5 w-5 ${seasonTextColors[season]}`} />
                     </div>
-                    <h3 className="text-xl font-semibold text-white">{meta.h1}</h3>
+                    <h2 className="text-xl font-semibold text-white">{meta.h1}</h2>
                   </div>
                   <p className="text-sm text-white/80">
-                    {seasonTyres.length} моделей у каталозі
+                    {pluralize(seasonTyres.length, "модель", "моделі", "моделей")} у каталозі
                   </p>
                 </div>
               </div>
@@ -277,7 +303,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       </section>
 
       {/* Catalog */}
-      <section id="catalog" className="py-12">
+      <section id="catalog" aria-label="Каталог шин" className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           {popularTyres.length > 0 && (
             <>
@@ -335,10 +361,10 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       </div>
 
       {/* Related Seasons */}
-      <section className="border-t border-border bg-card py-12">
+      <section aria-label="Інші сезони" className="border-t border-border bg-card py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <h2 className="mb-8 text-center text-2xl font-bold">Інші сезони</h2>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {(["summer", "winter", "allseason"] as Season[])
               .filter((s) => s !== season)
               .map((s) => {
@@ -364,10 +390,10 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="py-16">
+      <section aria-label="Допомога у виборі" className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
-          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl">
-            <h3 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h3>
+          <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
+            <h2 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h2>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні {seasonLabels[season].toLowerCase()} для
               вашого автомобіля з урахуванням стилю водіння та умов експлуатації.
@@ -390,5 +416,6 @@ export default async function SeasonTyresPage({ params }: PageProps) {
         </div>
       </section>
     </div>
+    </>
   );
 }

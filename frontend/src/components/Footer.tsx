@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin, ChevronRight } from 'lucide-react';
+import { PHONE_HREF, PHONE_DISPLAY, EMAIL_SUPPORT } from '@/lib/constants';
 
 const productLinks = [
   { href: '/passenger-tyres', label: 'Легкові шини' },
@@ -149,10 +150,10 @@ export function Footer() {
                 <div>
                   <p className="text-xs text-muted-foreground">Гаряча лінія:</p>
                   <a
-                    href="tel:+380800123456"
+                    href={PHONE_HREF}
                     className="text-lg font-bold text-foreground hover:text-primary"
                   >
-                    0 800 123 456
+                    {PHONE_DISPLAY}
                   </a>
                 </div>
               </div>
@@ -162,10 +163,10 @@ export function Footer() {
                 <div>
                   <p className="text-xs text-muted-foreground">Email:</p>
                   <a
-                    href="mailto:support@bridgestone.ua"
+                    href={`mailto:${EMAIL_SUPPORT}`}
                     className="text-foreground hover:text-primary"
                   >
-                    support@bridgestone.ua
+                    {EMAIL_SUPPORT}
                   </a>
                 </div>
               </div>
