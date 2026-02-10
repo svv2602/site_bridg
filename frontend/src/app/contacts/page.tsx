@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, AlertCircle } from "lucide-react";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, Button } from "@/components/ui";
+import { contactFormSchema, type ContactFormData } from "@/lib/schemas/contact";
 
 const contactMethods = [
   {
@@ -66,16 +67,8 @@ const faqs = [
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
-interface FormData {
-  name: string;
-  phone: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
 export default function ContactsPage() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     phone: '',
     email: '',
@@ -84,22 +77,47 @@ export default function ContactsPage() {
   });
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear field error on change
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
+    setFieldErrors({});
     setErrorMessage('');
+
+    // Client-side Zod validation
+    const result = contactFormSchema.safeParse(formData);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0];
+        if (typeof field === 'string' && !errors[field]) {
+          errors[field] = issue.message;
+        }
+      }
+      setFieldErrors(errors);
+      return;
+    }
+
+    setStatus('loading');
 
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(result.data),
       });
 
       if (!response.ok) {
@@ -245,13 +263,17 @@ export default function ContactsPage() {
                         name="name"
                         required
                         aria-required="true"
-                        aria-describedby={status === 'error' ? 'form-error' : undefined}
+                        aria-invalid={!!fieldErrors.name}
+                        aria-describedby={fieldErrors.name ? 'name-error' : status === 'error' ? 'form-error' : undefined}
                         value={formData.name}
                         onChange={handleChange}
                         disabled={status === 'loading'}
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                        className={`w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50 ${fieldErrors.name ? 'border-red-500' : 'border-border'}`}
                         placeholder="Ваше ім'я"
                       />
+                      {fieldErrors.name && (
+                        <p id="name-error" className="mt-1 text-xs text-red-500">{fieldErrors.name}</p>
+                      )}
                     </div>
                     <div>
                       <label htmlFor="phone" className="mb-2 block text-sm font-medium">Телефон *</label>
@@ -261,12 +283,17 @@ export default function ContactsPage() {
                         name="phone"
                         required
                         aria-required="true"
+                        aria-invalid={!!fieldErrors.phone}
+                        aria-describedby={fieldErrors.phone ? 'phone-error' : undefined}
                         value={formData.phone}
                         onChange={handleChange}
                         disabled={status === 'loading'}
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                        className={`w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50 ${fieldErrors.phone ? 'border-red-500' : 'border-border'}`}
                         placeholder="+380 (__) ___ __ __"
                       />
+                      {fieldErrors.phone && (
+                        <p id="phone-error" className="mt-1 text-xs text-red-500">{fieldErrors.phone}</p>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -277,12 +304,17 @@ export default function ContactsPage() {
                       name="email"
                       required
                       aria-required="true"
+                      aria-invalid={!!fieldErrors.email}
+                      aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                       value={formData.email}
                       onChange={handleChange}
                       disabled={status === 'loading'}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                      className={`w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50 ${fieldErrors.email ? 'border-red-500' : 'border-border'}`}
                       placeholder="you@example.com"
                     />
+                    {fieldErrors.email && (
+                      <p id="email-error" className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="subject" className="mb-2 block text-sm font-medium">Тема звернення</label>
@@ -309,31 +341,31 @@ export default function ContactsPage() {
                       rows={4}
                       required
                       aria-required="true"
+                      aria-invalid={!!fieldErrors.message}
+                      aria-describedby={fieldErrors.message ? 'message-error' : undefined}
                       value={formData.message}
                       onChange={handleChange}
                       disabled={status === 'loading'}
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50"
+                      className={`w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary disabled:opacity-50 ${fieldErrors.message ? 'border-red-500' : 'border-border'}`}
                       placeholder="Опишіть ваше запитання або ситуацію..."
                     />
+                    {fieldErrors.message && (
+                      <p id="message-error" className="mt-1 text-xs text-red-500">{fieldErrors.message}</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <span>Ми гарантуємо конфіденційність ваших даних</span>
                   </div>
-                  <button
+                  <Button
                     type="submit"
-                    disabled={status === 'loading'}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-lg font-semibold text-primary-text shadow-lg hover:bg-primary-hover disabled:opacity-50"
+                    variant="primary"
+                    size="lg"
+                    loading={status === 'loading'}
+                    className="w-full py-3.5 text-lg shadow-lg"
                   >
-                    {status === 'loading' ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Надсилаємо...
-                      </>
-                    ) : (
-                      'Надіслати запит'
-                    )}
-                  </button>
+                    {status === 'loading' ? 'Надсилаємо...' : 'Надіслати запит'}
+                  </Button>
                 </form>
               )}
             </div>

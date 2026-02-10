@@ -1,0 +1,285 @@
+/* ============================================
+   Theme Variables: Bridgestone Design System
+   Stone palette, silver accents, brand tokens
+   ============================================ */
+
+:root {
+  color-scheme: light;
+
+  /* ============================================
+     MINI DESIGN SYSTEM 2026: Premium Dark Theme
+     Silver accents, minimal red (brand only)
+     ============================================ */
+
+  /* Brand tokens Bridgestone - ONLY for logo, alerts, badges */
+  --bridgestone-red: #e30613;
+  --bridgestone-red-dark: #b8050f;
+  --bridgestone-red-light: #ff3344;
+  --bridgestone-black: #1c1917;
+
+  /* NEW: Core Dark Palette */
+  --black-base: #0E0E0E;
+  --wet-asphalt: #1C1F22;
+  --graphite: #24282C;
+  --graphite-hover: #2A2F34;
+
+  /* NEW: Silver Accent System (primary CTA color) */
+  --silver-accent: #D7D9DC;
+  --silver-hover: #FFFFFF;
+  --silver-muted: #BFC3C7;
+  --border-dark: #2F3438;
+
+  /* NEW: Text Colors for Dark Theme */
+  --text-primary: #E0E0E0;
+  --text-secondary: #8B8F94;
+  --text-muted: #6F7378;
+
+  /* Header tokens - always dark regardless of theme */
+  --header-bg: var(--stone-950);
+  --header-text: #ffffff;
+  --header-border: rgba(255, 255, 255, 0.1);
+
+  /* Text hierarchy tokens */
+  --text-label: var(--stone-700);
+  --text-caption: var(--stone-500);
+
+  /* Disabled state tokens */
+  --disabled-bg: var(--stone-200);
+  --disabled-text: var(--stone-400);
+
+  /* Stone palette (warm neutrals) - kept for light mode */
+  --stone-50: #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-300: #d6d3d1;
+  --stone-400: #a8a29e;
+  --stone-500: #78716c;
+  --stone-600: #57534e;
+  --stone-700: #44403c;
+  --stone-800: #292524;
+  --stone-900: #1c1917;
+  --stone-950: #0c0a09;
+
+  /* Accent colors (secondary) */
+  --amber-warm: #f59e0b;
+  --emerald-tech: #10b981;
+  --sky-trust: #0ea5e9;
+
+  /* Semantic status colors */
+  --error: #dc2626;
+  --error-foreground: #fef2f2;
+  --success: #16a34a;
+  --success-foreground: #f0fdf4;
+  --warning: #d97706;
+  --warning-foreground: #fffbeb;
+  --info: #2563eb;
+  --info-foreground: #eff6ff;
+
+  /* Hero section tokens (always dark background) */
+  --hero-background: var(--stone-950);
+  --hero-foreground: #ffffff;
+  --hero-muted: rgba(255, 255, 255, 0.7);
+  --hero-border: rgba(255, 255, 255, 0.1);
+  --hero-accent: rgba(255, 255, 255, 0.1);
+
+  /* Light theme (default) - Premium silver accents */
+  --background: var(--stone-50);
+  --foreground: var(--stone-900);
+
+  /* NEW: Primary = Silver (for CTAs), Brand = Red (for logo/alerts) */
+  --primary: var(--silver-accent);
+  --primary-hover: var(--silver-hover);
+  --primary-text: var(--black-base);
+  --brand: var(--bridgestone-red);
+  --brand-dark: var(--bridgestone-red-dark);
+
+  /* Link/text accent colors */
+  --link-color: var(--stone-600);
+  --link-color-hover: var(--stone-900);
+  --accent-text: var(--stone-700);
+
+  --secondary: var(--bridgestone-black);
+  --accent: var(--stone-600);
+  --muted: var(--stone-500);
+  --muted-foreground: var(--stone-700);
+  --card: #ffffff;
+  --card-foreground: var(--stone-900);
+  --border: var(--stone-200);
+
+  /* Border-radius system */
+  --radius: 0.75rem;
+  --radius-sm: 6px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+
+  /* Warm shadows with stone tint */
+  --shadow-color: 28, 25, 23;
+  --shadow-sm: 0 1px 2px rgba(var(--shadow-color), 0.05);
+  --shadow: 0 2px 8px rgba(var(--shadow-color), 0.08);
+  --shadow-md: 0 4px 16px rgba(var(--shadow-color), 0.1);
+  --shadow-lg: 0 8px 32px rgba(var(--shadow-color), 0.12);
+  --shadow-xl: 0 16px 48px rgba(var(--shadow-color), 0.15);
+  --shadow-2xl: 0 24px 64px rgba(var(--shadow-color), 0.18);
+  --shadow-glow: 0 0 40px rgba(215, 217, 220, 0.25);
+  --shadow-glow-lg: 0 0 60px rgba(215, 217, 220, 0.35);
+  --shadow-glow-brand: 0 0 40px rgba(227, 6, 19, 0.3);
+
+  /* Typography scale */
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+}
+
+/* Dark Theme */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: var(--black-base);
+  --foreground: var(--text-primary);
+
+  --primary: var(--silver-accent);
+  --primary-hover: var(--silver-hover);
+  --primary-text: var(--black-base);
+  --brand: var(--bridgestone-red);
+  --brand-dark: var(--bridgestone-red-dark);
+
+  --secondary: var(--text-primary);
+  --accent: var(--silver-muted);
+  --muted: var(--text-secondary);
+  --muted-foreground: var(--text-muted);
+
+  --card: var(--graphite);
+  --card-foreground: var(--text-primary);
+  --card-hover: var(--graphite-hover);
+  --border: var(--border-dark);
+
+  --error: #f87171;
+  --error-foreground: #450a0a;
+  --success: #4ade80;
+  --success-foreground: #052e16;
+  --warning: #fbbf24;
+  --warning-foreground: #451a03;
+  --info: #60a5fa;
+  --info-foreground: #1e3a5f;
+
+  --header-bg: var(--black-base);
+  --header-text: var(--text-primary);
+  --header-border: var(--border-dark);
+
+  --link-color: var(--text-primary);
+  --link-color-hover: #ffffff;
+  --accent-text: var(--silver-accent);
+
+  --text-label: var(--text-secondary);
+  --text-caption: var(--text-muted);
+
+  --disabled-bg: var(--graphite);
+  --disabled-text: var(--text-muted);
+}
+
+/* Tailwind v4 theme configuration */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-text: var(--primary-text);
+
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+
+  --color-link: var(--link-color);
+  --color-link-hover: var(--link-color-hover);
+  --color-accent-text: var(--accent-text);
+
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-hover: var(--graphite-hover);
+  --color-border: var(--border);
+
+  --color-black-base: var(--black-base);
+  --color-wet-asphalt: var(--wet-asphalt);
+  --color-graphite: var(--graphite);
+  --color-graphite-hover: var(--graphite-hover);
+  --color-silver: var(--silver-accent);
+  --color-silver-hover: var(--silver-hover);
+  --color-border-dark: var(--border-dark);
+
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-hero-background: #0c0a09;
+  --color-hero-foreground: #ffffff;
+  --color-hero-muted: rgba(255, 255, 255, 0.7);
+  --color-hero-border: rgba(255, 255, 255, 0.1);
+  --color-hero-accent: rgba(255, 255, 255, 0.1);
+
+  --color-stone-50: var(--stone-50);
+  --color-stone-100: var(--stone-100);
+  --color-stone-200: var(--stone-200);
+  --color-stone-300: var(--stone-300);
+  --color-stone-400: var(--stone-400);
+  --color-stone-500: var(--stone-500);
+  --color-stone-600: var(--stone-600);
+  --color-stone-700: var(--stone-700);
+  --color-stone-800: var(--stone-800);
+  --color-stone-900: var(--stone-900);
+  --color-stone-950: var(--stone-950);
+
+  --color-amber-warm: var(--amber-warm);
+  --color-emerald-tech: var(--emerald-tech);
+  --color-sky-trust: var(--sky-trust);
+
+  --color-header-bg: var(--header-bg);
+  --color-header-text: var(--header-text);
+  --color-header-border: var(--header-border);
+
+  --color-text-label: var(--text-label);
+  --color-text-caption: var(--text-caption);
+
+  --color-disabled-bg: var(--disabled-bg);
+  --color-disabled-text: var(--disabled-text);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-default: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-glow: var(--shadow-glow);
+  --shadow-glow-lg: var(--shadow-glow-lg);
+}

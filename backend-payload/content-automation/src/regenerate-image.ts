@@ -19,81 +19,13 @@
 import { image } from "./providers/index.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { createLogger } from "./utils/logger.js";
+import {
+  NEGATIVE_PROMPT,
+  generatePromptByType,
+  type ImageType,
+} from "./config/image-prompts.js";
 
 const logger = createLogger("RegenerateImage");
-
-// Negative prompt for quality
-const NEGATIVE_PROMPT = `blurry, low quality, distorted, deformed, disfigured, bad anatomy,
-watermark, text, logo, signature, cropped, out of frame, worst quality, low resolution,
-jpeg artifacts, pixelated, noise, grain, overexposed, underexposed, oversaturated,
-cartoon, anime, illustration, 3d render, cgi, artificial looking, plastic looking`;
-
-// Default prompts by type
-const DEFAULT_PROMPTS = {
-  hero: (topic: string, season?: string) => {
-    const seasonContext: Record<string, string> = {
-      summer: `golden hour sunlight, warm summer day, dry clean asphalt highway,
-clear blue sky with soft clouds, vibrant green landscape in background`,
-      winter: `fresh snow on road, winter morning atmosphere, cold blue and white tones,
-frost on trees, overcast sky with soft diffused light, tire tracks in snow`,
-      allseason: `dramatic weather transition, partly cloudy sky with sun breaking through,
-wet road reflecting light, dynamic atmospheric lighting`,
-    };
-    const weather = season ? seasonContext[season] : "professional studio lighting";
-
-    return `Award-winning automotive photography, ultra high resolution 8K, ${topic}.
-
-Scene: ${weather}. Modern premium SUV or luxury sedan photographed at dynamic 3/4 front angle.
-Vehicle positioned on scenic road with emphasis on wheel and tire visibility.
-
-Technical: Shot with Sony A7R V, 85mm f/1.4 lens, shallow depth of field.
-Professional color grading, high dynamic range. Cinematic widescreen composition.
-
-Style: Editorial automotive magazine quality, photorealistic, hyperdetailed.
-Requirements: Photorealistic only, no CGI, no text, no logos, no watermarks.`;
-  },
-
-  content: (topic: string) => `Professional editorial photography for automotive blog about ${topic}.
-
-Scene: Clean, well-organized frame with clear focal point.
-Environmental context showing real-world automotive situations.
-
-Technical: High resolution, 24-70mm lens, balanced exposure, sharp details.
-Style: Modern editorial magazine aesthetic, authentic documentary feel.
-Requirements: Photorealistic, no text overlays, no watermarks, publication-ready.`,
-
-  product: (topic: string) => `Ultra high-resolution product photography of ${topic} automotive tire.
-
-Setup: Professional studio, infinity curve backdrop in gradient dark gray to black.
-Single tire at slight angle to showcase tread pattern and sidewall.
-
-Lighting: Three-point setup - key light softbox, fill reflector, rim light for edge definition.
-Focus: Razor-sharp detail on tread grooves, sipes, shoulder blocks.
-
-Technical: Medium format camera, 100mm macro, f/8-f/11, focus stacking.
-Requirements: Hyperrealistic, studio quality, no text, no watermarks.`,
-
-  lifestyle: (topic: string, season?: string) => {
-    const seasonContext: Record<string, string> = {
-      summer: `family summer road trip, scenic highway, bright sunny day, vacation mood`,
-      winter: `cozy winter journey, snow-covered landscape, safe confident driving`,
-      allseason: `versatile everyday driving, suburban neighborhood, practical daily life`,
-    };
-    const scene = season ? seasonContext[season] : "everyday driving moments";
-
-    return `Authentic lifestyle automotive photography capturing ${scene}.
-
-Story: Real moments of people enjoying safe, confident driving.
-Subjects: Diverse, relatable people in natural poses.
-Vehicle: Modern family SUV, clean but realistic everyday condition.
-
-Technical: Editorial style, 35-50mm lens, natural depth of field.
-Lighting: Natural light, golden hour preferred, soft flattering illumination.
-Requirements: Photorealistic, authentic feel, no text, no watermarks.`;
-  },
-};
-
-type ImageType = keyof typeof DEFAULT_PROMPTS;
 
 interface RegenerateOptions {
   mediaId: number;
@@ -133,10 +65,7 @@ async function regenerateImage(options: RegenerateOptions) {
   // Build prompt
   let prompt = options.prompt;
   if (!prompt) {
-    const promptFn = DEFAULT_PROMPTS[type];
-    prompt = type === "hero" || type === "lifestyle"
-      ? (promptFn as (t: string, s?: string) => string)(topic, season)
-      : (promptFn as (t: string) => string)(topic);
+    prompt = generatePromptByType(type, topic, { season });
   }
 
   // Determine size: use explicit size, or default based on type

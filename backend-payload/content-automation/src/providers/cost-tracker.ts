@@ -30,6 +30,9 @@ class CostTrackerImpl {
   private limits: CostLimits;
   private entries: CostEntry[] = [];
   private loaded = false;
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private savePending = false;
+  private static readonly SAVE_DEBOUNCE_MS = 300;
 
   constructor(limits?: CostLimits) {
     this.limits = limits || COST_LIMITS;
@@ -70,9 +73,27 @@ class CostTrackerImpl {
   }
 
   /**
-   * Save costs to file
+   * Schedule a debounced save to prevent race conditions with concurrent writes.
+   * Batches multiple record() calls within SAVE_DEBOUNCE_MS into a single write.
    */
   private save(): void {
+    this.savePending = true;
+
+    if (this.saveTimer) {
+      return; // Already scheduled
+    }
+
+    this.saveTimer = setTimeout(() => {
+      this.saveTimer = null;
+      this.savePending = false;
+      this.flushToDisk();
+    }, CostTrackerImpl.SAVE_DEBOUNCE_MS);
+  }
+
+  /**
+   * Immediately write costs to disk
+   */
+  private flushToDisk(): void {
     try {
       const data: CostsData = {
         entries: this.entries,
@@ -83,6 +104,20 @@ class CostTrackerImpl {
       logger.error("Failed to save costs data", {
         error: error instanceof Error ? error.message : String(error),
       });
+    }
+  }
+
+  /**
+   * Flush pending changes to disk immediately (call before process exit)
+   */
+  flush(): void {
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer);
+      this.saveTimer = null;
+    }
+    if (this.savePending) {
+      this.flushToDisk();
+      this.savePending = false;
     }
   }
 
@@ -285,7 +320,7 @@ class CostTrackerImpl {
     this.entries = this.entries.filter((e) => new Date(e.timestamp) >= cutoff);
 
     if (this.entries.length < originalCount) {
-      this.save();
+      this.flushToDisk(); // Immediate save for cleanup operations
       const removed = originalCount - this.entries.length;
       logger.info(`Cleaned up ${removed} old cost entries`);
       return removed;
@@ -299,7 +334,7 @@ class CostTrackerImpl {
    */
   reset(): void {
     this.entries = [];
-    this.save();
+    this.flushToDisk(); // Immediate save for reset
     logger.info("Cost tracker reset");
   }
 }

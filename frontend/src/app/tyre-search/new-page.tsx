@@ -10,7 +10,7 @@ import {
   type TyreModel,
   type TyreSize,
 } from "@/lib/data";
-import { brandLabels, brandColors } from "@/lib/utils/tyres";
+import { brandLabels, brandColors, seasonLabels, formatSize } from "@/lib/utils/tyres";
 import {
   Search,
   Car,
@@ -27,19 +27,6 @@ import { TyreCard } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
 
 type SearchMode = "size" | "car";
-
-const seasonLabels: Record<Season, string> = {
-  summer: "Літні шини",
-  winter: "Зимові шини",
-  allseason: "Всесезонні шини",
-};
-
-function formatSize(size: TyreSize) {
-  const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
-  const li = size.loadIndex ? ` ${size.loadIndex}` : "";
-  const si = size.speedIndex ?? "";
-  return `${base}${li}${si}`;
-}
 
 interface SizeOption {
   value: number;
@@ -116,7 +103,7 @@ export default function TyreSearchPage() {
         const params: StoredSearchParams = JSON.parse(stored);
         // Перевіряємо що дані свіжі (не старші 5 хвилин)
         if (params.timestamp && Date.now() - params.timestamp < 5 * 60 * 1000) {
-          console.log('[TyreSearchPage] Loaded params from sessionStorage:', params);
+          // Debug log removed
           setStoredParams(params);
           setMode(params.mode || 'size');
           if (params.mode === 'size') {
@@ -571,7 +558,6 @@ export default function TyreSearchPage() {
                         initialKit: storedParams?.mode === 'car' ? storedParams.kit : undefined,
                         initialSeason: storedParams?.mode === 'car' ? storedParams.season : undefined,
                       };
-                      console.log('[TyreSearchPage] VehicleTyreSelector props:', props);
                       return <VehicleTyreSelector {...props} />;
                     })()}
                   </div>

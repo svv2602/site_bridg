@@ -7,7 +7,8 @@ import { generateArticleSchema, generateBreadcrumbSchema, jsonLdScript } from "@
 import { Breadcrumb } from "@/components/ui";
 import { LexicalRenderer } from "@/components/LexicalRenderer";
 import { ShareButtons } from "@/components/ShareButtons";
-import { getSiteUrl } from "@/lib/utils/tyres";
+import { TableOfContents } from "@/components/TableOfContents";
+import { SITE_URL } from "@/lib/constants";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -33,11 +34,9 @@ export async function generateMetadata(
   }
 
   const title =
-    // @ts-expect-error: seoTitle/seoDescription закладені в CMS‑моделі, але відсутні в мок‑даних
     article.seoTitle ?? `${article.title} — Блог Bridgestone Україна`;
 
   const description =
-    // @ts-expect-error: seoDescription закладене в CMS‑моделі, але відсутнє в мок‑даних
     article.seoDescription ??
     article.previewText ??
     "Корисні статті про шини Bridgestone в Україні.";
@@ -55,7 +54,6 @@ export async function generateMetadata(
       locale: 'uk_UA',
       siteName: 'Bridgestone Україна',
       publishedTime: article.publishedAt,
-      // @ts-expect-error: featuredImage може бути в CMS-моделі
       images: article.featuredImage ? [{ url: article.featuredImage, alt: article.title }] : undefined,
     },
   };
@@ -69,7 +67,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 
-  const siteUrl = getSiteUrl();
+  const siteUrl = SITE_URL;
   const articleUrl = `${siteUrl}/blog/${article.slug}`;
 
   const articleSchema = generateArticleSchema(article);
@@ -147,24 +145,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       </section>
 
       <section className="py-10">
-        <div className="container mx-auto max-w-4xl px-4 md:px-8">
-          <article>
-            {article.content ? (
-              <LexicalRenderer
-                content={article.content as Parameters<typeof LexicalRenderer>[0]['content']}
-                variant="article"
-              />
-            ) : (
-              <div className="prose prose-stone dark:prose-invert max-w-none">
-                <p className="text-sm text-muted-foreground">
-                  {article.previewText}
-                </p>
-                <p className="mt-6 text-[13px] text-muted-foreground">
-                  Повний текст статті буде підтягуватися з CMS.
-                </p>
+        <div className="container mx-auto max-w-6xl px-4 md:px-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_240px]">
+            <article className="min-w-0 max-w-4xl">
+              {article.content ? (
+                <LexicalRenderer
+                  content={article.content as Parameters<typeof LexicalRenderer>[0]['content']}
+                  variant="article"
+                />
+              ) : (
+                <div className="prose prose-stone dark:prose-invert max-w-none">
+                  <p className="text-sm text-muted-foreground">
+                    {article.previewText}
+                  </p>
+                  <p className="mt-6 text-[13px] text-muted-foreground">
+                    Повний текст статті буде підтягуватися з CMS.
+                  </p>
+                </div>
+              )}
+            </article>
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <TableOfContents containerSelector="article" />
               </div>
-            )}
-          </article>
+            </aside>
+          </div>
         </div>
       </section>
 

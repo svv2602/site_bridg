@@ -3,6 +3,7 @@ import path from 'path';
 
 export interface JobStatus {
   id: string;
+  type?: 'content' | 'review' | 'image';
   status: 'running' | 'completed' | 'failed';
   startedAt: string;
   completedAt?: string;
@@ -12,9 +13,15 @@ export interface JobStatus {
   currentStep?: number;
   totalSteps?: number;
   stepLabel?: string;
+  // Extended fields for unified job tracking
+  targetId?: number;
+  targetName?: string;
+  count?: number;
+  resultIds?: number[];
+  newMediaId?: number;
 }
 
-// In-memory cache for active (running) jobs — fast reads during polling
+// In-memory cache for active (running) jobs -- fast reads during polling
 const activeJobs: Map<string, JobStatus> = new Map();
 
 let db: Database.Database | null = null;
@@ -25,10 +32,12 @@ function getDb(): Database.Database {
   const dbPath = process.env.SQLITE_PATH
     || path.join(process.cwd(), 'content-automation', 'data', 'content-automation.db');
   db = new Database(dbPath);
+  db.pragma('journal_mode = WAL');
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS content_jobs (
       id TEXT PRIMARY KEY,
+      type TEXT,
       status TEXT NOT NULL DEFAULT 'running',
       started_at TEXT NOT NULL,
       completed_at TEXT,
@@ -37,9 +46,31 @@ function getDb(): Database.Database {
       command TEXT NOT NULL,
       current_step INTEGER,
       total_steps INTEGER,
-      step_label TEXT
+      step_label TEXT,
+      target_id INTEGER,
+      target_name TEXT,
+      count INTEGER,
+      result_ids TEXT,
+      new_media_id INTEGER
     )
   `);
+
+  // Add columns if missing (safe migration for existing DBs)
+  const cols = db.pragma('table_info(content_jobs)') as Array<{ name: string }>;
+  const colNames = new Set(cols.map((c) => c.name));
+  const migrations: Array<[string, string]> = [
+    ['type', 'TEXT'],
+    ['target_id', 'INTEGER'],
+    ['target_name', 'TEXT'],
+    ['count', 'INTEGER'],
+    ['result_ids', 'TEXT'],
+    ['new_media_id', 'INTEGER'],
+  ];
+  for (const [col, colType] of migrations) {
+    if (!colNames.has(col)) {
+      db.exec(`ALTER TABLE content_jobs ADD COLUMN ${col} ${colType}`);
+    }
+  }
 
   return db;
 }
@@ -47,6 +78,7 @@ function getDb(): Database.Database {
 function jobToRow(job: JobStatus) {
   return {
     id: job.id,
+    type: job.type ?? null,
     status: job.status,
     started_at: job.startedAt,
     completed_at: job.completedAt ?? null,
@@ -56,6 +88,11 @@ function jobToRow(job: JobStatus) {
     current_step: job.currentStep ?? null,
     total_steps: job.totalSteps ?? null,
     step_label: job.stepLabel ?? null,
+    target_id: job.targetId ?? null,
+    target_name: job.targetName ?? null,
+    count: job.count ?? null,
+    result_ids: job.resultIds ? JSON.stringify(job.resultIds) : null,
+    new_media_id: job.newMediaId ?? null,
   };
 }
 
@@ -66,12 +103,20 @@ function rowToJob(row: Record<string, unknown>): JobStatus {
     startedAt: row.started_at as string,
     command: row.command as string,
   };
+  if (row.type) job.type = row.type as JobStatus['type'];
   if (row.completed_at) job.completedAt = row.completed_at as string;
   if (row.output) job.output = row.output as string;
   if (row.error) job.error = row.error as string;
   if (row.current_step != null) job.currentStep = row.current_step as number;
   if (row.total_steps != null) job.totalSteps = row.total_steps as number;
   if (row.step_label) job.stepLabel = row.step_label as string;
+  if (row.target_id != null) job.targetId = row.target_id as number;
+  if (row.target_name) job.targetName = row.target_name as string;
+  if (row.count != null) job.count = row.count as number;
+  if (row.result_ids) {
+    try { job.resultIds = JSON.parse(row.result_ids as string); } catch { /* ignore */ }
+  }
+  if (row.new_media_id != null) job.newMediaId = row.new_media_id as number;
   return job;
 }
 
@@ -81,8 +126,8 @@ export function saveJob(job: JobStatus): void {
   const r = jobToRow(job);
   database
     .prepare(
-      `INSERT INTO content_jobs (id, status, started_at, completed_at, output, error, command, current_step, total_steps, step_label)
-       VALUES (@id, @status, @started_at, @completed_at, @output, @error, @command, @current_step, @total_steps, @step_label)
+      `INSERT INTO content_jobs (id, type, status, started_at, completed_at, output, error, command, current_step, total_steps, step_label, target_id, target_name, count, result_ids, new_media_id)
+       VALUES (@id, @type, @status, @started_at, @completed_at, @output, @error, @command, @current_step, @total_steps, @step_label, @target_id, @target_name, @count, @result_ids, @new_media_id)
        ON CONFLICT(id) DO UPDATE SET
          status = @status,
          completed_at = @completed_at,
@@ -90,7 +135,12 @@ export function saveJob(job: JobStatus): void {
          error = @error,
          current_step = @current_step,
          total_steps = @total_steps,
-         step_label = @step_label`
+         step_label = @step_label,
+         target_id = @target_id,
+         target_name = @target_name,
+         count = @count,
+         result_ids = @result_ids,
+         new_media_id = @new_media_id`
     )
     .run(r);
 }
@@ -114,7 +164,12 @@ export function updateJob(job: JobStatus): void {
          error = @error,
          current_step = @current_step,
          total_steps = @total_steps,
-         step_label = @step_label
+         step_label = @step_label,
+         target_id = @target_id,
+         target_name = @target_name,
+         count = @count,
+         result_ids = @result_ids,
+         new_media_id = @new_media_id
        WHERE id = @id`
     )
     .run(r);
@@ -143,4 +198,43 @@ export function getRecentJobs(limit: number = 20): JobStatus[] {
 
   // Merge with active in-memory jobs (they may have newer step info)
   return persisted.map((job) => activeJobs.get(job.id) ?? job);
+}
+
+/**
+ * Find an active (running) job for a specific target.
+ * Used for concurrency control -- prevent duplicate jobs for the same tyre/media/slug.
+ */
+export function findActiveByTarget(type: string, targetId?: number, targetName?: string): JobStatus | undefined {
+  for (const job of activeJobs.values()) {
+    if (job.status !== 'running') continue;
+    if (job.type !== type) continue;
+    if (targetId && job.targetId === targetId) return job;
+    if (targetName && job.command?.includes(targetName)) return job;
+  }
+  return undefined;
+}
+
+/**
+ * Count all currently active (running) jobs.
+ * Used for global rate limiting.
+ */
+export function countActiveJobs(): number {
+  return activeJobs.size;
+}
+
+/**
+ * Remove old completed/failed jobs from the database.
+ * Called on scheduler init to prevent unbounded growth.
+ */
+export function cleanupOldJobs(olderThanDays: number = 30): number {
+  const database = getDb();
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - olderThanDays);
+  const cutoffIso = cutoff.toISOString();
+
+  const result = database
+    .prepare('DELETE FROM content_jobs WHERE status != ? AND started_at < ?')
+    .run('running', cutoffIso);
+
+  return result.changes;
 }

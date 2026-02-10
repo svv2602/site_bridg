@@ -92,14 +92,32 @@ async function resizeImage(options: ResizeOptions) {
   const newMeta = await sharp(inputPath).metadata();
   console.log(`   New size: ${newMeta.width}x${newMeta.height}`);
 
-  // Update media record in Payload
+  // Update media record dimensions in Payload via REST API
   console.log(`\n🔄 Updating media record...`);
 
-  // Need to re-upload to update dimensions in DB
-  // For now just inform user
-  console.log(`   ⚠️  File updated on disk. Dimensions in database may need manual update.`);
-  console.log(`   To restore: mv "${backupPath}" "${inputPath}"`);
+  try {
+    const updateResponse = await fetch(`${PAYLOAD_URL}/api/media/${mediaId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        width: newMeta.width,
+        height: newMeta.height,
+      }),
+    });
 
+    if (updateResponse.ok) {
+      console.log(`   Dimensions updated in database: ${newMeta.width}x${newMeta.height}`);
+    } else {
+      const errText = await updateResponse.text();
+      console.log(`   ⚠️  Failed to update DB (status ${updateResponse.status}): ${errText}`);
+      console.log(`   You may need to manually update dimensions in the admin panel.`);
+    }
+  } catch (updateErr) {
+    console.log(`   ⚠️  Could not reach Payload API to update dimensions: ${updateErr}`);
+    console.log(`   Ensure the Payload server is running at ${PAYLOAD_URL}`);
+  }
+
+  console.log(`   To restore: mv "${backupPath}" "${inputPath}"`);
   console.log(`\n✅ Done!`);
 }
 

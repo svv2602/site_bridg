@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDocumentInfo } from '@payloadcms/ui';
+import './admin-components.css';
 
 const RegenerateContentButton: React.FC = () => {
   const { id, collectionSlug } = useDocumentInfo();
@@ -83,35 +84,16 @@ const RegenerateContentButton: React.FC = () => {
   }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
+    <div className="admin-mb-1">
       <button
         type="button"
         onClick={handleRegenerate}
         disabled={isLoading}
-        style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: isLoading ? '#666' : '#0066cc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: isLoading ? 'not-allowed' : 'pointer',
-          fontSize: '0.875rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}
+        className="admin-btn admin-btn--primary"
       >
         {isLoading ? (
           <>
-            <span style={{
-              display: 'inline-block',
-              width: '14px',
-              height: '14px',
-              border: '2px solid #fff',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }} />
+            <span className="admin-spinner admin-spinner--white" />
             Генерація...
           </>
         ) : (
@@ -125,22 +107,16 @@ const RegenerateContentButton: React.FC = () => {
       </button>
 
       {status === 'success' && (
-        <p style={{ color: '#22c55e', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+        <p className="admin-status-msg admin-status-msg--success">
           {message}
         </p>
       )}
 
       {status === 'error' && (
-        <p style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+        <p className="admin-status-msg admin-status-msg--error">
           {message}
         </p>
       )}
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

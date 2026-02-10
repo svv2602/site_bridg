@@ -15,7 +15,7 @@
  */
 
 export { uk, t, getSection } from "./uk";
-export type { Translations, TranslationKey } from "./uk";
+export type { Translations, TranslationKey, TranslationPath } from "./uk";
 
 // Future: Add more languages here
 // export { en } from "./en";

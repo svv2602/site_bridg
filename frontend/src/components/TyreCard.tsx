@@ -5,7 +5,8 @@ import { Car, Truck, Sun, Snowflake, Cloud, ChevronRight } from "lucide-react";
 import { EuLabelGroup } from "@/components/ui/EuLabelBadge";
 import { TechnologyGroup } from "@/components/ui/TechnologyIcon";
 import { Badge } from "@/components/ui/Badge";
-import { brandLabels, brandColors } from "@/lib/utils/tyres";
+import { brandLabels, brandColors, seasonLabelsShort, formatSize } from "@/lib/utils/tyres";
+import { pluralize } from "@/lib/utils/pluralize";
 
 interface TyreCardProps {
   tyre: TyreModel;
@@ -13,12 +14,6 @@ interface TyreCardProps {
   /** For vehicle search: show matching sizes instead of all sizes */
   matchingSizes?: string[];
 }
-
-const seasonLabels: Record<Season, string> = {
-  summer: "Літня",
-  winter: "Зимова",
-  allseason: "Всесезонна",
-};
 
 const seasonIcons: Record<Season, React.ReactNode> = {
   summer: <Sun className="h-4 w-4" aria-hidden="true" />,
@@ -100,7 +95,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
         {/* Season Badge */}
         <div className={`absolute top-4 left-4 flex items-center gap-1.5 rounded-lg ${seasonColors[tyre.season]} px-3 py-1.5 text-sm font-semibold text-white shadow-lg`}>
           {seasonIcons[tyre.season]}
-          <span>{seasonLabels[tyre.season]}</span>
+          <span>{seasonLabelsShort[tyre.season]}</span>
         </div>
 
         {/* Test Badge or New Badge */}
@@ -180,7 +175,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
         {variant !== "compact" && tyre.sizes.length > 0 && (
           <div className="mt-auto pt-2">
             <p className="mb-2 text-xs font-medium text-muted-foreground">
-              {tyre.sizes.length} розмірів доступно
+              {pluralize(tyre.sizes.length, 'розмір доступний', 'розміри доступні', 'розмірів доступно')}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {tyre.sizes.slice(0, 3).map((size, i) => (
@@ -188,7 +183,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
                   key={i}
                   className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
                 >
-                  {size.width}/{size.aspectRatio}R{size.diameter}
+                  {formatSize(size)}
                 </span>
               ))}
               {tyre.sizes.length > 3 && (
@@ -221,7 +216,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
               </div>
             ) : tyre.sizes.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                {tyre.sizes.length} розмірів
+                {pluralize(tyre.sizes.length, 'розмір', 'розміри', 'розмірів')}
               </p>
             )}
           </div>

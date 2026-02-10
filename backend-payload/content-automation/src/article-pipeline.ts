@@ -24,8 +24,9 @@ import { planArticles } from "./article-planner.js";
 import { generateArticle, type ArticleInput } from "./processors/content/article-generator.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { getArticlePrompt, type RelatedItem } from "./prompts/index.js";
-import { findTestResultsForTyre, getTestResult } from "./db/test-results.js";
+import { getTestResult } from "./db/test-results.js";
 import type { GeneratedArticle } from "./types/content.js";
+import { notify } from "./publishers/telegram-bot.js";
 
 interface PipelineResult {
   phase: string;
@@ -88,6 +89,24 @@ export async function runSmartArticlePipeline(): Promise<PipelineResult> {
     result.errors.push(`Pipeline error: ${msg}`);
     console.error(`[Pipeline] Fatal error:`, error);
   }
+
+  // Send Telegram summary notification
+  const hasErrors = result.errors.length > 0;
+  let notifyBody = `📰 Джерел переглянуто: ${result.sourcesScanned}\n`;
+  notifyBody += `🆕 Нових тестів: ${result.newTestResults}\n`;
+  notifyBody += `📝 Статей заплановано: ${result.articlesPlanned}\n`;
+  notifyBody += `✅ Згенеровано: ${result.articlesGenerated}\n`;
+  notifyBody += `📤 Опубліковано: ${result.articlesPublished}\n`;
+  notifyBody += `👀 На перевірку: ${result.articlesForReview}\n`;
+  if (hasErrors) {
+    notifyBody += `\n⚠️ Помилок: ${result.errors.length}`;
+  }
+
+  await notify({
+    type: hasErrors ? "error" : "info",
+    title: "Smart Article Pipeline",
+    body: notifyBody,
+  });
 
   return result;
 }

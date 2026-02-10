@@ -3,19 +3,9 @@ import path from 'path';
 import fs from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { getRembgPath } from '../utils/rembg';
 
 const execAsync = promisify(exec);
-
-// Support multiple rembg locations: env var, venv, or system-wide
-function getRembgPath(): string {
-  if (process.env.REMBG_PATH) {
-    return process.env.REMBG_PATH;
-  }
-  // Try venv first (local development)
-  const venvPath = path.resolve(process.cwd(), '.venv/bin/rembg');
-  // Fallback to system-wide (Docker/server)
-  return venvPath;
-}
 
 const REMBG_CLI = getRembgPath();
 
@@ -174,8 +164,8 @@ export const removeBackgroundsEndpoint: Endpoint = {
           if (filename !== newFilename) {
             try {
               await fs.unlink(filePath);
-            } catch {
-              // Ignore deletion errors
+            } catch (unlinkError) {
+              payload.logger.warn(`Failed to delete original file ${filePath}: ${String(unlinkError)}`);
             }
           }
 

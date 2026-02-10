@@ -288,7 +288,7 @@ export function formatSummaryForTelegram(summary: MetricsSummary): string {
   };
 
   return `
-📊 *${periodLabel}*
+📊 <b>${periodLabel}</b>
 📅 ${summary.startDate} — ${summary.endDate}
 
 📦 Шин оброблено: ${summary.totals.tiresScraped}

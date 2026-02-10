@@ -204,12 +204,8 @@ export class DeepSeekProvider extends BaseLLMProvider {
 
     try {
       const client = this.getClient();
-      // Quick availability check
-      await client.chat.completions.create({
-        model: "deepseek-chat",
-        messages: [{ role: "user", content: "Hi" }],
-        max_tokens: 5,
-      });
+      // Use models.list() -- free endpoint, no token consumption
+      await client.models.list();
       return true;
     } catch (error) {
       logger.warn("DeepSeek availability check failed", {

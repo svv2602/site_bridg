@@ -1,3 +1,12 @@
+/**
+ * ContactSubmissions Collection
+ *
+ * Customer contact form submissions. Created publicly (no auth required).
+ * Fields: name, phone, email, subject, message, status, adminNotes.
+ * Status workflow: new -> in-progress -> resolved.
+ *
+ * Access: public create + read, auth-required update/delete.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const ContactSubmissions: CollectionConfig = {

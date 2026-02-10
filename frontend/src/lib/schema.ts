@@ -1,19 +1,14 @@
 // Schema.org structured data generators for SEO
 
-import type { TyreModel, Dealer, Article, Season, FAQ } from "./data";
+import type { TyreModel, Dealer, Article, FAQ } from "./data";
 import type { Review } from "@/components/ReviewCard";
+import { seasonLabels } from "@/lib/utils/tyres";
 
 // Review stats interface
 export interface ReviewStats {
   totalCount: number;
   averageRating: number;
 }
-
-const seasonLabels: Record<Season, string> = {
-  summer: "Літні шини",
-  winter: "Зимові шини",
-  allseason: "Всесезонні шини",
-};
 
 // Product schema for tyre models
 export function generateProductSchema(tyre: TyreModel, baseUrl: string = "https://bridgestone.ua") {

@@ -1,3 +1,12 @@
+/**
+ * Reviews Collection
+ *
+ * User reviews for tyre models. AI-generated or user-submitted.
+ * Fields: title, body, rating (1-5), authorName, tyre (relationship),
+ * isPublished, isAiGenerated flags.
+ *
+ * Access: public read (published only), auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const Reviews: CollectionConfig = {

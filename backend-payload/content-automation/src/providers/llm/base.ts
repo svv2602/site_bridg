@@ -19,6 +19,49 @@ import { createLogger } from "../../utils/logger.js";
 
 const logger = createLogger("LLMProvider");
 
+/**
+ * Extract a balanced JSON substring from text using bracket counting.
+ * Handles nested objects/arrays correctly, unlike non-greedy regex.
+ */
+function extractBalancedJSON(text: string, openChar: string, closeChar: string): string | null {
+  const startIdx = text.indexOf(openChar);
+  if (startIdx === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+
+  for (let i = startIdx; i < text.length; i++) {
+    const ch = text[i];
+
+    if (escape) {
+      escape = false;
+      continue;
+    }
+
+    if (ch === '\\' && inString) {
+      escape = true;
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (inString) continue;
+
+    if (ch === openChar) depth++;
+    else if (ch === closeChar) depth--;
+
+    if (depth === 0) {
+      return text.slice(startIdx, i + 1);
+    }
+  }
+
+  return null; // Unbalanced brackets
+}
+
 export interface BaseLLMConfig extends ProviderConfig {
   /** Retry configuration */
   maxRetries?: number;
@@ -103,14 +146,14 @@ Respond with valid JSON only. No explanations or markdown.`;
         }
       }
 
-      // Try to find a single JSON object
-      const objectMatch = content.match(/\{[\s\S]*?\}/);
-      if (objectMatch) {
+      // Try to find a single JSON object using balanced bracket matching
+      const extractedObject = extractBalancedJSON(content, '{', '}');
+      if (extractedObject) {
         try {
-          const data = JSON.parse(objectMatch[0]) as T;
+          const data = JSON.parse(extractedObject) as T;
           return { data, response };
         } catch {
-          // Single object match wasn't valid JSON
+          // Extracted object wasn't valid JSON
         }
       }
 

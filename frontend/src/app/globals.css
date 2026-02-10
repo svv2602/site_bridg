@@ -4,315 +4,18 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ============================================
-   REDESIGN 2026: Warm Stone Palette
-   Замінено холодні zinc кольори на теплі stone
+   Split CSS Architecture:
+   - theme.css: Design tokens, colors, typography
+   - hero.css: Hero section styles (dark + adaptive)
+   - prose.css: Rich text content styling
    ============================================ */
+@import "./styles/theme.css";
+@import "./styles/hero.css";
+@import "./styles/prose.css";
 
-:root {
-  color-scheme: light;
-
-  /* ============================================
-     MINI DESIGN SYSTEM 2026: Premium Dark Theme
-     Silver accents, minimal red (brand only)
-     ============================================ */
-
-  /* Brand tokens Bridgestone - ONLY for logo, alerts, badges */
-  --bridgestone-red: #e30613;
-  --bridgestone-red-dark: #b8050f;
-  --bridgestone-red-light: #ff3344;
-  --bridgestone-black: #1c1917;
-
-  /* NEW: Core Dark Palette */
-  --black-base: #0E0E0E;
-  --wet-asphalt: #1C1F22;
-  --graphite: #24282C;
-  --graphite-hover: #2A2F34;
-
-  /* NEW: Silver Accent System (primary CTA color) */
-  --silver-accent: #D7D9DC;
-  --silver-hover: #FFFFFF;
-  --silver-muted: #BFC3C7;
-  --border-dark: #2F3438;
-
-  /* NEW: Text Colors for Dark Theme */
-  --text-primary: #E0E0E0;
-  --text-secondary: #8B8F94;
-  --text-muted: #6F7378;
-
-  /* Header tokens - always dark regardless of theme */
-  --header-bg: var(--stone-950);
-  --header-text: #ffffff;
-  --header-border: rgba(255, 255, 255, 0.1);
-
-  /* Text hierarchy tokens */
-  --text-label: var(--stone-700);
-  --text-caption: var(--stone-500);
-
-  /* Disabled state tokens */
-  --disabled-bg: var(--stone-200);
-  --disabled-text: var(--stone-400);
-
-  /* Stone palette (warm neutrals) - kept for light mode */
-  --stone-50: #fafaf9;
-  --stone-100: #f5f5f4;
-  --stone-200: #e7e5e4;
-  --stone-300: #d6d3d1;
-  --stone-400: #a8a29e;
-  --stone-500: #78716c;
-  --stone-600: #57534e;
-  --stone-700: #44403c;
-  --stone-800: #292524;
-  --stone-900: #1c1917;
-  --stone-950: #0c0a09;
-
-  /* Accent colors (secondary) */
-  --amber-warm: #f59e0b;
-  --emerald-tech: #10b981;
-  --sky-trust: #0ea5e9;
-
-  /* Semantic status colors */
-  --error: #dc2626;
-  --error-foreground: #fef2f2;
-  --success: #16a34a;
-  --success-foreground: #f0fdf4;
-  --warning: #d97706;
-  --warning-foreground: #fffbeb;
-  --info: #2563eb;
-  --info-foreground: #eff6ff;
-
-  /* Hero section tokens (always dark background) */
-  --hero-background: var(--stone-950);
-  --hero-foreground: #ffffff;
-  --hero-muted: rgba(255, 255, 255, 0.7);
-  --hero-border: rgba(255, 255, 255, 0.1);
-  --hero-accent: rgba(255, 255, 255, 0.1);
-
-  /* Light theme (default) - Premium silver accents */
-  --background: var(--stone-50);
-  --foreground: var(--stone-900);
-
-  /* NEW: Primary = Silver (for CTAs), Brand = Red (for logo/alerts) */
-  --primary: var(--silver-accent);
-  --primary-hover: var(--silver-hover);
-  --primary-text: var(--black-base);
-  --brand: var(--bridgestone-red);
-  --brand-dark: var(--bridgestone-red-dark);
-
-  /* Link/text accent colors - контрастні для читабельності */
-  --link-color: var(--stone-600);
-  --link-color-hover: var(--stone-900);
-  --accent-text: var(--stone-700);
-
-  --secondary: var(--bridgestone-black);
-  --accent: var(--stone-600);
-  --muted: var(--stone-500);
-  --muted-foreground: var(--stone-700);
-  --card: #ffffff;
-  --card-foreground: var(--stone-900);
-  --border: var(--stone-200);
-
-  /* REDESIGN: Updated border-radius system */
-  --radius: 0.75rem;
-  --radius-sm: 6px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-
-  /* REDESIGN: Warm shadows with stone tint */
-  --shadow-color: 28, 25, 23;
-  --shadow-sm: 0 1px 2px rgba(var(--shadow-color), 0.05);
-  --shadow: 0 2px 8px rgba(var(--shadow-color), 0.08);
-  --shadow-md: 0 4px 16px rgba(var(--shadow-color), 0.1);
-  --shadow-lg: 0 8px 32px rgba(var(--shadow-color), 0.12);
-  --shadow-xl: 0 16px 48px rgba(var(--shadow-color), 0.15);
-  --shadow-2xl: 0 24px 64px rgba(var(--shadow-color), 0.18);
-  /* Glow effects - silver instead of red */
-  --shadow-glow: 0 0 40px rgba(215, 217, 220, 0.25);
-  --shadow-glow-lg: 0 0 60px rgba(215, 217, 220, 0.35);
-  /* Brand glow - only for special brand elements */
-  --shadow-glow-brand: 0 0 40px rgba(227, 6, 19, 0.3);
-
-  /* REDESIGN: Typography scale */
-  --text-xs: 0.875rem;    /* 14px - minimum readable */
-  --text-sm: 1rem;        /* 16px */
-  --text-base: 1.125rem;  /* 18px */
-  --text-lg: 1.25rem;     /* 20px */
-  --text-xl: 1.5rem;      /* 24px */
-  --text-2xl: 1.875rem;   /* 30px */
-  --text-3xl: 2.25rem;    /* 36px */
-  --text-4xl: 3rem;       /* 48px */
-  --text-5xl: 3.75rem;    /* 60px */
-
-  /* REDESIGN: Line heights */
-  --leading-tight: 1.2;
-  --leading-snug: 1.35;
-  --leading-normal: 1.6;
-  --leading-relaxed: 1.75;
-}
-
-/* MINI DESIGN SYSTEM: Premium Dark Theme */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  /* Core backgrounds from Mini Design System */
-  --background: var(--black-base);
-  --foreground: var(--text-primary);
-
-  /* Silver accent system */
-  --primary: var(--silver-accent);
-  --primary-hover: var(--silver-hover);
-  --primary-text: var(--black-base);
-  --brand: var(--bridgestone-red);
-  --brand-dark: var(--bridgestone-red-dark);
-
-  --secondary: var(--text-primary);
-  --accent: var(--silver-muted);
-  --muted: var(--text-secondary);
-  --muted-foreground: var(--text-muted);
-
-  /* Card styling from Mini Design System */
-  --card: var(--graphite);
-  --card-foreground: var(--text-primary);
-  --card-hover: var(--graphite-hover);
-  --border: var(--border-dark);
-
-  /* Status colors in dark mode - red only for errors */
-  --error: #f87171;
-  --error-foreground: #450a0a;
-  --success: #4ade80;
-  --success-foreground: #052e16;
-  --warning: #fbbf24;
-  --warning-foreground: #451a03;
-  --info: #60a5fa;
-  --info-foreground: #1e3a5f;
-
-  /* Header tokens - same in dark (always dark header) */
-  --header-bg: var(--black-base);
-  --header-text: var(--text-primary);
-  --header-border: var(--border-dark);
-
-  /* Link/text accent colors for dark theme */
-  --link-color: var(--text-primary);
-  --link-color-hover: #ffffff;
-  --accent-text: var(--silver-accent);
-
-  /* Text hierarchy tokens for dark */
-  --text-label: var(--text-secondary);
-  --text-caption: var(--text-muted);
-
-  /* Disabled state tokens for dark */
-  --disabled-bg: var(--graphite);
-  --disabled-text: var(--text-muted);
-}
-
-/* MINI DESIGN SYSTEM: Extended theme configuration for Tailwind v4 */
-@theme inline {
-  /* Core Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  /* Primary = Silver (CTAs, interactive elements) */
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-text: var(--primary-text);
-
-  /* Brand = Red (logo, alerts, badges only) */
-  --color-brand: var(--brand);
-  --color-brand-dark: var(--brand-dark);
-
-  /* Link colors - контрастні для читабельності */
-  --color-link: var(--link-color);
-  --color-link-hover: var(--link-color-hover);
-  --color-accent-text: var(--accent-text);
-
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-card-hover: var(--graphite-hover);
-  --color-border: var(--border);
-
-  /* NEW: Dark Palette for direct use */
-  --color-black-base: var(--black-base);
-  --color-wet-asphalt: var(--wet-asphalt);
-  --color-graphite: var(--graphite);
-  --color-graphite-hover: var(--graphite-hover);
-  --color-silver: var(--silver-accent);
-  --color-silver-hover: var(--silver-hover);
-  --color-border-dark: var(--border-dark);
-
-  /* Status colors */
-  --color-error: var(--error);
-  --color-error-foreground: var(--error-foreground);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
-
-  /* Hero section colors - direct values for guaranteed contrast */
-  --color-hero-background: #0c0a09;
-  --color-hero-foreground: #ffffff;
-  --color-hero-muted: rgba(255, 255, 255, 0.7);
-  --color-hero-border: rgba(255, 255, 255, 0.1);
-  --color-hero-accent: rgba(255, 255, 255, 0.1);
-
-  /* Stone palette for direct use */
-  --color-stone-50: var(--stone-50);
-  --color-stone-100: var(--stone-100);
-  --color-stone-200: var(--stone-200);
-  --color-stone-300: var(--stone-300);
-  --color-stone-400: var(--stone-400);
-  --color-stone-500: var(--stone-500);
-  --color-stone-600: var(--stone-600);
-  --color-stone-700: var(--stone-700);
-  --color-stone-800: var(--stone-800);
-  --color-stone-900: var(--stone-900);
-  --color-stone-950: var(--stone-950);
-
-  /* Accent colors */
-  --color-amber-warm: var(--amber-warm);
-  --color-emerald-tech: var(--emerald-tech);
-  --color-sky-trust: var(--sky-trust);
-
-  /* Header tokens */
-  --color-header-bg: var(--header-bg);
-  --color-header-text: var(--header-text);
-  --color-header-border: var(--header-border);
-
-  /* Text hierarchy tokens */
-  --color-text-label: var(--text-label);
-  --color-text-caption: var(--text-caption);
-
-  /* Disabled state tokens */
-  --color-disabled-bg: var(--disabled-bg);
-  --color-disabled-text: var(--disabled-text);
-
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* REDESIGN: Border radius system */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
-
-  /* REDESIGN: Shadow system with warm tint */
-  --shadow-sm: var(--shadow-sm);
-  --shadow-default: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
-  --shadow-glow: var(--shadow-glow);
-  --shadow-glow-lg: var(--shadow-glow-lg);
-}
+/* ======================================
+   Base Styles
+   ====================================== */
 
 body {
   background: var(--background);
@@ -322,7 +25,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
@@ -345,85 +47,51 @@ html {
   background: var(--silver-accent);
 }
 
-/* Selection - silver instead of red */
+/* Selection */
 ::selection {
   background-color: var(--silver-accent);
   color: var(--black-base);
 }
 
-/* Animations */
+/* ======================================
+   Animations
+   ====================================== */
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
+.animate-fade-in { animation: fadeIn 0.6s ease-out; }
+.animate-slide-left { animation: slideInLeft 0.5s ease-out; }
+.animate-slide-right { animation: slideInRight 0.5s ease-out; }
+.animate-pulse-slow { animation: pulse 2s infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
 
-.animate-slide-left {
-  animation: slideInLeft 0.5s ease-out;
-}
+/* ======================================
+   Hover & Interaction Effects
+   ====================================== */
 
-.animate-slide-right {
-  animation: slideInRight 0.5s ease-out;
-}
-
-.animate-pulse-slow {
-  animation: pulse 2s infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* REDESIGN: Hover effects with warm shadows */
 .hover-lift {
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
 }
@@ -433,7 +101,6 @@ html {
   box-shadow: var(--shadow-lg);
 }
 
-/* REDESIGN: Glow hover effect */
 .hover-glow {
   transition: box-shadow 0.3s ease-out;
 }
@@ -442,391 +109,14 @@ html {
   box-shadow: var(--shadow-glow);
 }
 
-/* REDESIGN: Modern border-radius (larger, softer) */
-.rounded-2xl {
-  border-radius: var(--radius-lg); /* 20px */
-}
-
-.rounded-3xl {
-  border-radius: var(--radius-xl); /* 24px */
-}
+/* Border-radius overrides */
+.rounded-2xl { border-radius: var(--radius-lg); }
+.rounded-3xl { border-radius: var(--radius-xl); }
 
 /* ======================================
-   UNIFIED DESIGN SYSTEM: Hero Sections
-   Always dark background, white text
+   Layout Utilities
    ====================================== */
 
-.hero-dark {
-  /* Direct hex values guarantee dark background in ALL themes */
-  background: linear-gradient(to bottom right, #0c0a09, #1c1917, #292524) !important;
-  color: #ffffff !important;
-}
-
-.hero-dark * {
-  /* Ensure all text in hero is light colored */
-  --tw-text-opacity: 1;
-}
-
-/* Hero section element styles - using direct colors for guaranteed contrast */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.hero-title {
-  color: #ffffff !important;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.hero-subtitle {
-  color: rgba(255, 255, 255, 0.7) !important;
-  font-weight: 400;
-}
-
-.hero-text {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.hero-card {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 1.5rem;
-}
-
-.hero-input {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-}
-
-.hero-input::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-.hero-input:focus {
-  border-color: var(--silver-accent);
-  outline: none;
-}
-
-/* Hero buttons - guaranteed colors */
-.hero-btn-primary {
-  background: #ffffff !important;
-  color: #1c1917 !important;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
-  font-weight: 600;
-  transition: all 0.2s ease-out;
-}
-
-.hero-btn-primary:hover {
-  background: #f5f5f4 !important;
-  transform: scale(1.02);
-}
-
-.hero-btn-secondary {
-  background: transparent !important;
-  color: #ffffff !important;
-  padding: 0.75rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 9999px;
-  font-weight: 600;
-  transition: all 0.2s ease-out;
-}
-
-.hero-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* ======================================
-   ADAPTIVE HERO: Silver (light) / Dark (dark)
-   ====================================== */
-
-.hero-adaptive {
-  /* Light theme: silver gradient */
-  background: linear-gradient(to bottom right, #f5f5f4, #fafaf9, #ffffff);
-  border-bottom: 1px solid #e7e5e4;
-}
-
-[data-theme="dark"] .hero-adaptive {
-  /* Dark theme: dark gradient */
-  background: linear-gradient(to bottom right, #0c0a09, #1c1917, #292524);
-  border-bottom-color: #292524;
-}
-
-/* Adaptive hero text */
-.hero-adaptive .hero-title-adaptive {
-  color: #1c1917;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-title-adaptive {
-  color: #ffffff;
-}
-
-.hero-adaptive .hero-subtitle-adaptive {
-  color: #78716c;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-subtitle-adaptive {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.hero-adaptive .hero-text-adaptive {
-  color: #57534e;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-text-adaptive {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* Adaptive hero badge */
-.hero-adaptive .hero-badge-adaptive {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: #ffffff;
-  color: #57534e;
-  border: 1px solid #e7e5e4;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-badge-adaptive {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-}
-
-/* Adaptive hero tag/pill */
-.hero-adaptive .hero-tag-adaptive {
-  display: inline-flex;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  background: #ffffff;
-  color: #44403c;
-  border: 1px solid #e7e5e4;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-tag-adaptive {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-}
-
-/* Adaptive hero buttons */
-.hero-adaptive .hero-btn-primary-adaptive {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #1c1917;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
-  font-weight: 600;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease-out;
-}
-
-.hero-adaptive .hero-btn-primary-adaptive:hover {
-  background: #292524;
-  transform: scale(1.02);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-btn-primary-adaptive {
-  background: #ffffff;
-  color: #1c1917;
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-btn-primary-adaptive:hover {
-  background: #f5f5f4;
-}
-
-.hero-adaptive .hero-btn-secondary-adaptive {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #ffffff;
-  color: #1c1917;
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #d6d3d1;
-  border-radius: 9999px;
-  font-weight: 600;
-  transition: all 0.2s ease-out;
-}
-
-.hero-adaptive .hero-btn-secondary-adaptive:hover {
-  background: #fafaf9;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-btn-secondary-adaptive {
-  background: transparent;
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-btn-secondary-adaptive:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Adaptive hero card (for images, etc.) */
-.hero-adaptive .hero-card-adaptive {
-  background: linear-gradient(to bottom right, #ffffff, #f5f5f4);
-  border: 1px solid #e7e5e4;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-card-adaptive {
-  background: linear-gradient(to bottom right, #292524, #1c1917);
-  border-color: #44403c;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Adaptive hero form card (search form) */
-.hero-adaptive .hero-form-card-adaptive {
-  background: #ffffff;
-  border: 1px solid #e7e5e4;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-form-card-adaptive {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Adaptive hero form title */
-.hero-adaptive .hero-form-title-adaptive {
-  color: #1c1917;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-form-title-adaptive {
-  color: #ffffff;
-}
-
-/* Adaptive hero form text/labels */
-.hero-adaptive .hero-form-text-adaptive {
-  color: #57534e;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-form-text-adaptive {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* Adaptive hero tabs container */
-.hero-adaptive .hero-tabs-adaptive {
-  background: #f5f5f4;
-  border-radius: 9999px;
-  padding: 0.25rem;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-tabs-adaptive {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Adaptive hero tab button (inactive) */
-.hero-adaptive .hero-tab-adaptive {
-  color: #78716c;
-  transition: color 0.2s;
-}
-
-.hero-adaptive .hero-tab-adaptive:hover {
-  color: #1c1917;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-tab-adaptive {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-tab-adaptive:hover {
-  color: #ffffff;
-}
-
-/* Adaptive hero tab button (active) */
-.hero-adaptive .hero-tab-active-adaptive {
-  background: #ffffff;
-  color: #1c1917;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-tab-active-adaptive {
-  background: #ffffff;
-  color: #1c1917;
-}
-
-/* Adaptive hero input */
-.hero-adaptive .hero-input-adaptive {
-  background: #f5f5f4;
-  border: 1px solid #e7e5e4;
-  color: #1c1917;
-  border-radius: 0.75rem;
-}
-
-.hero-adaptive .hero-input-adaptive:focus {
-  border-color: #a8a29e;
-  outline: none;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-input-adaptive {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-input-adaptive:focus {
-  border-color: var(--silver-accent);
-}
-
-/* Adaptive breadcrumb colors */
-.hero-adaptive .hero-breadcrumb-adaptive {
-  color: #78716c;
-}
-
-.hero-adaptive .hero-breadcrumb-adaptive a:hover {
-  color: #1c1917;
-}
-
-.hero-adaptive .hero-breadcrumb-adaptive span {
-  color: #44403c;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive a:hover {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive span {
-  color: #ffffff;
-}
-
-/* ======================================
-   REDESIGN 2026: Design System Utilities
-   ====================================== */
-
-/* Container with larger max-width */
 .container-redesign {
   width: 100%;
   max-width: 1440px;
@@ -837,57 +127,39 @@ html {
 }
 
 @media (min-width: 768px) {
-  .container-redesign {
-    padding-left: 3rem;
-    padding-right: 3rem;
-  }
+  .container-redesign { padding-left: 3rem; padding-right: 3rem; }
 }
 
 @media (min-width: 1024px) {
-  .container-redesign {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
+  .container-redesign { padding-left: 4rem; padding-right: 4rem; }
 }
 
-/* Section spacing with responsive rhythm */
 .section-spacing {
   padding-top: 3rem;
   padding-bottom: 3rem;
 }
 
 @media (min-width: 768px) {
-  .section-spacing {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-  }
+  .section-spacing { padding-top: 4rem; padding-bottom: 4rem; }
 }
 
 @media (min-width: 1024px) {
-  .section-spacing {
-    padding-top: 5rem;
-    padding-bottom: 5rem;
-  }
+  .section-spacing { padding-top: 5rem; padding-bottom: 5rem; }
 }
 
-/* Transition utilities */
-.transition-fast {
-  transition: all 0.15s ease-out;
-}
+/* ======================================
+   Transition Utilities
+   ====================================== */
 
-.transition-normal {
-  transition: all 0.3s ease-out;
-}
+.transition-fast { transition: all 0.15s ease-out; }
+.transition-normal { transition: all 0.3s ease-out; }
+.transition-slow { transition: all 0.5s ease-out; }
+.transition-spring { transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
 
-.transition-slow {
-  transition: all 0.5s ease-out;
-}
+/* ======================================
+   Glass Effects
+   ====================================== */
 
-.transition-spring {
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-/* Glass morphism effects */
 .glass {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
@@ -902,7 +174,7 @@ html {
   border: 1px solid rgba(250, 250, 249, 0.08);
 }
 
-/* Hero glow effect - subtle silver/white glow */
+/* Hero glow effect */
 .hero-glow::before {
   content: '';
   position: absolute;
@@ -917,7 +189,7 @@ html {
   z-index: 0;
 }
 
-/* Grid pattern overlay for hero */
+/* Grid pattern overlay */
 .hero-grid-pattern {
   background-image:
     linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
@@ -925,7 +197,7 @@ html {
   background-size: 50px 50px;
 }
 
-/* Gradient text - silver gradient for premium look */
+/* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, var(--silver-accent), var(--silver-hover));
   -webkit-background-clip: text;
@@ -933,7 +205,6 @@ html {
   background-clip: text;
 }
 
-/* Brand gradient text - use only for brand elements */
 .gradient-text-brand {
   color: var(--bridgestone-red);
 }
@@ -966,22 +237,18 @@ html {
 }
 
 /* ======================================
-   MINI DESIGN SYSTEM: Focus-visible styles
-   Silver focus rings instead of red
+   Focus & Accessibility
    ====================================== */
 
-/* Global focus-visible для всіх інтерактивних елементів */
 :focus-visible {
   outline: 1px solid var(--silver-accent);
   outline-offset: 2px;
 }
 
-/* Видалення default outline при mouse focus */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Спеціальні стилі для кнопок та посилань */
 a:focus-visible,
 button:focus-visible {
   outline: 1px solid var(--silver-accent);
@@ -989,7 +256,6 @@ button:focus-visible {
   border-radius: 4px;
 }
 
-/* Стилі для inputs/selects/textareas */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
@@ -998,7 +264,6 @@ textarea:focus-visible {
   border-color: var(--silver-accent);
 }
 
-/* Стилі для карток (clickable) */
 [role="button"]:focus-visible,
 .card:focus-visible {
   outline: 1px solid var(--silver-accent);
@@ -1006,7 +271,6 @@ textarea:focus-visible {
   box-shadow: 0 0 0 4px rgba(215, 217, 220, 0.2);
 }
 
-/* Skip link для keyboard navigation */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -1024,11 +288,7 @@ textarea:focus-visible {
   top: 0;
 }
 
-/* ======================================
-   Accessibility: Reduced Motion
-   ====================================== */
-
-/* Вимкнення анімацій для користувачів, які надають перевагу зменшенню руху */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1039,27 +299,23 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 
-  /* Framer Motion animations */
   [data-framer-portal] *,
   [class*="motion"] * {
     animation: none !important;
     transition: none !important;
   }
 
-  /* Disable scroll effects */
   html {
     scroll-behavior: auto;
   }
 
-  /* Disable hover transforms */
   .hover-lift:hover {
     transform: none;
   }
 }
 
 /* ======================================
-   MINI DESIGN SYSTEM: Button Styles
-   Primary = Silver, Brand = Red (special cases)
+   Button CSS Classes (legacy, prefer Button.tsx component)
    ====================================== */
 
 .btn-primary {
@@ -1076,7 +332,6 @@ textarea:focus-visible {
   transition: all 0.2s ease-out;
   cursor: pointer;
   border: none;
-  /* Mini Design System: height 44-48px */
   min-height: 44px;
 }
 
@@ -1090,7 +345,6 @@ textarea:focus-visible {
   transform: scale(0.98);
 }
 
-/* NEW: Brand button - use only for special cases (alerts, promos) */
 .btn-brand {
   display: inline-flex;
   align-items: center;
@@ -1156,7 +410,7 @@ textarea:focus-visible {
 }
 
 /* ======================================
-   REDESIGN 2026: Input & Select Styles
+   Form CSS Classes (legacy, prefer Input/Select.tsx)
    ====================================== */
 
 .input {
@@ -1180,7 +434,6 @@ textarea:focus-visible {
   color: var(--muted);
 }
 
-/* Dark mode input */
 [data-theme="dark"] .input {
   background: var(--card);
   border-color: var(--border);
@@ -1211,10 +464,9 @@ textarea:focus-visible {
 }
 
 /* ======================================
-   REDESIGN 2026: Season Badge Styles
+   Season Badges (CSS classes)
    ====================================== */
 
-/* Літо = зелений (emerald) */
 .badge-summer {
   background: linear-gradient(135deg, #34d399, #059669);
   color: white;
@@ -1224,7 +476,6 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
-/* Зима = синій (sky/blue) */
 .badge-winter {
   background: linear-gradient(135deg, #38bdf8, #0284c7);
   color: white;
@@ -1234,7 +485,6 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
-/* Всесезон = оранжевий (amber/orange) */
 .badge-allseason {
   background: linear-gradient(135deg, #fb923c, #ea580c);
   color: white;
@@ -1245,399 +495,9 @@ textarea:focus-visible {
 }
 
 /* ======================================
-   PROSE STYLING: Rich Text Content
-   For articles, tyre descriptions, etc.
+   Text-primary Override: Readable colors
    ====================================== */
 
-/* Заголовки з покращеною типографікою */
-.prose h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-
-.prose h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-}
-
-.prose h3 {
-  font-size: 1.375rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.prose h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-}
-
-.prose h5,
-.prose h6 {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-/* Перший заголовок без верхнього відступу */
-.prose > h1:first-child,
-.prose > h2:first-child,
-.prose > h3:first-child {
-  margin-top: 0;
-}
-
-/* Стилізовані цитати */
-.prose blockquote {
-  position: relative;
-  border-left: 4px solid var(--silver-accent);
-  background: var(--stone-100);
-  padding: 1.25rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: 0 12px 12px 0;
-  font-style: italic;
-  color: var(--stone-700);
-}
-
-[data-theme="dark"] .prose blockquote {
-  background: var(--graphite);
-  border-left-color: var(--silver-accent);
-  color: var(--text-secondary);
-}
-
-.prose blockquote::before {
-  content: '"';
-  position: absolute;
-  top: -10px;
-  left: 16px;
-  font-size: 4rem;
-  font-family: Georgia, serif;
-  color: var(--silver-accent);
-  opacity: 0.3;
-  line-height: 1;
-}
-
-.prose blockquote p {
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-
-/* Інформаційні блоки */
-.prose .note,
-.prose .info-block {
-  background: rgba(37, 99, 235, 0.08);
-  border-left: 4px solid var(--info);
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
-  border-radius: 0 12px 12px 0;
-}
-
-.prose .tip,
-.prose .success-block {
-  background: rgba(22, 163, 74, 0.08);
-  border-left: 4px solid var(--success);
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
-  border-radius: 0 12px 12px 0;
-}
-
-.prose .warning,
-.prose .warning-block {
-  background: rgba(217, 119, 6, 0.08);
-  border-left: 4px solid var(--warning);
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
-  border-radius: 0 12px 12px 0;
-}
-
-.prose .danger,
-.prose .error-block {
-  background: rgba(220, 38, 38, 0.08);
-  border-left: 4px solid var(--error);
-  padding: 1rem 1.25rem;
-  margin: 1.5rem 0;
-  border-radius: 0 12px 12px 0;
-}
-
-/* Dark mode for info blocks */
-[data-theme="dark"] .prose .note,
-[data-theme="dark"] .prose .info-block {
-  background: rgba(96, 165, 250, 0.1);
-}
-
-[data-theme="dark"] .prose .tip,
-[data-theme="dark"] .prose .success-block {
-  background: rgba(74, 222, 128, 0.1);
-}
-
-[data-theme="dark"] .prose .warning,
-[data-theme="dark"] .prose .warning-block {
-  background: rgba(251, 191, 36, 0.1);
-}
-
-[data-theme="dark"] .prose .danger,
-[data-theme="dark"] .prose .error-block {
-  background: rgba(248, 113, 113, 0.1);
-}
-
-/* Ненумеровані списки з галочками */
-.prose ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.prose ul > li {
-  position: relative;
-  padding-left: 1.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.prose ul > li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--success);
-  font-weight: 700;
-}
-
-/* Нумеровані списки з акцентом */
-.prose ol {
-  counter-reset: list-counter;
-  list-style: none;
-  padding-left: 0;
-}
-
-.prose ol > li {
-  position: relative;
-  padding-left: 2.5rem;
-  margin-bottom: 0.75rem;
-  counter-increment: list-counter;
-}
-
-.prose ol > li::before {
-  content: counter(list-counter);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1.75rem;
-  height: 1.75rem;
-  background: var(--stone-800);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .prose ol > li::before {
-  background: var(--silver-accent);
-  color: var(--black-base);
-}
-
-/* Декоративний розділювач */
-.prose hr {
-  border: none;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--border), transparent);
-  margin: 2.5rem 0;
-}
-
-.prose hr.decorative {
-  height: auto;
-  background: none;
-  text-align: center;
-  overflow: visible;
-}
-
-.prose hr.decorative::before {
-  content: '• • •';
-  display: inline-block;
-  color: var(--silver-accent);
-  font-size: 1.25rem;
-  letter-spacing: 0.5rem;
-}
-
-/* Маркер-підсвітка */
-.prose mark {
-  background: linear-gradient(120deg, var(--silver-accent) 0%, var(--silver-accent) 100%);
-  background-repeat: no-repeat;
-  background-size: 100% 40%;
-  background-position: 0 90%;
-  padding: 0 0.2em;
-  color: inherit;
-}
-
-[data-theme="dark"] .prose mark {
-  background: linear-gradient(120deg, rgba(215, 217, 220, 0.3) 0%, rgba(215, 217, 220, 0.3) 100%);
-  background-repeat: no-repeat;
-  background-size: 100% 40%;
-  background-position: 0 90%;
-}
-
-/* Inline код */
-.prose code:not(pre code) {
-  background: var(--stone-200);
-  padding: 0.2em 0.4em;
-  border-radius: 6px;
-  font-size: 0.9em;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  color: var(--stone-700);
-}
-
-[data-theme="dark"] .prose code:not(pre code) {
-  background: var(--graphite);
-  color: var(--silver-accent);
-}
-
-/* Блок коду */
-.prose pre {
-  background: var(--stone-900);
-  color: var(--stone-100);
-  padding: 1.25rem;
-  border-radius: 12px;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-}
-
-.prose pre code {
-  background: none;
-  padding: 0;
-  color: inherit;
-  font-size: 0.875rem;
-}
-
-/* Посилання */
-.prose a {
-  color: var(--stone-600);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: all 0.2s ease;
-}
-
-.prose a:hover {
-  text-decoration-thickness: 2px;
-  color: var(--stone-950);
-}
-
-[data-theme="dark"] .prose a {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .prose a:hover {
-  color: #ffffff;
-}
-
-/* Таблиці */
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  font-size: 0.95rem;
-}
-
-.prose thead {
-  background: var(--stone-100);
-  border-bottom: 2px solid var(--border);
-}
-
-[data-theme="dark"] .prose thead {
-  background: var(--graphite);
-}
-
-.prose th {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-.prose td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.prose tbody tr:hover {
-  background: var(--stone-50);
-}
-
-[data-theme="dark"] .prose tbody tr:hover {
-  background: var(--graphite-hover);
-}
-
-/* Зображення в контенті */
-.prose img {
-  border-radius: 12px;
-  margin: 1.5rem 0;
-  box-shadow: var(--shadow-md);
-}
-
-.prose figure {
-  margin: 2rem 0;
-}
-
-.prose figcaption {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.875rem;
-  margin-top: 0.75rem;
-  font-style: italic;
-}
-
-/* Абзаци - кращий інтерліньяж */
-.prose p {
-  line-height: 1.75;
-  margin-bottom: 1.25rem;
-}
-
-.prose p:last-child {
-  margin-bottom: 0;
-}
-
-/* Lead paragraph - перший абзац з більшим розміром */
-.prose-lead > p:first-of-type {
-  font-size: 1.125rem;
-  color: var(--foreground);
-  line-height: 1.8;
-}
-
-[data-theme="dark"] .prose-lead > p:first-of-type {
-  color: var(--text-primary);
-}
-
-/* Utility: комбінований клас для статей */
-.prose-article {
-  /* Об'єднує всі покращення для статей */
-}
-
-/* Utility: комбінований клас для описів шин */
-.prose-product {
-  /* Об'єднує покращення для карток товарів */
-}
-
-/* ======================================
-   TEXT-PRIMARY OVERRIDE: Readable colors
-   Переопределяем text-primary для текстовых
-   элементов (не кнопок) в светлой теме
-   ====================================== */
-
-/* Ссылки и текст с text-primary - делаем читаемыми */
 a.text-primary,
 span.text-primary,
 p.text-primary,
@@ -1650,20 +510,17 @@ span.text-primary:hover {
   color: var(--link-color-hover) !important;
 }
 
-/* Иконки с text-primary */
 svg.text-primary,
 .text-primary > svg,
 [class*="text-primary"] svg {
   color: var(--accent-text) !important;
 }
 
-/* Badges с text-primary на светлом фоне */
 .bg-primary\/10.text-primary,
 [class*="bg-primary/10"].text-primary {
   color: var(--accent-text) !important;
 }
 
-/* Темная тема - возвращаем серебряный */
 [data-theme="dark"] a.text-primary,
 [data-theme="dark"] span.text-primary,
 [data-theme="dark"] p.text-primary {

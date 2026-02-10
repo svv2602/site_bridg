@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDocumentInfo, useField } from '@payloadcms/ui';
+import './admin-components.css';
 
 type ImageType = 'hero' | 'content' | 'product' | 'lifestyle';
 type Season = 'summer' | 'winter' | 'allseason';
@@ -160,32 +161,11 @@ const RegenerateImageSection: React.FC = () => {
   const showSeasonSelect = ['hero', 'lifestyle'].includes(type);
 
   return (
-    <div style={{
-      marginBottom: '1.5rem',
-      backgroundColor: 'var(--theme-elevation-50)',
-      borderRadius: '8px',
-      border: '1px solid var(--theme-elevation-100)',
-      overflow: 'hidden',
-    }}>
+    <div className="admin-section">
       <button
         type="button"
         onClick={() => setIsCollapsed(!isCollapsed)}
-        style={{
-          width: '100%',
-          padding: '0.75rem 1rem',
-          margin: 0,
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.5rem',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--theme-text)',
-          textAlign: 'left',
-        }}
+        className="admin-section__header"
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -212,33 +192,20 @@ const RegenerateImageSection: React.FC = () => {
       </button>
 
       {!isCollapsed && (
-        <div style={{ padding: '0 1rem 1rem 1rem' }}>
+        <div className="admin-section__body">
 
       {/* Settings row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: showSeasonSelect ? '1fr 1fr 1fr' : '1fr 1fr',
-        gap: '0.75rem',
-        marginBottom: '1rem',
-      }}>
+      <div className={`admin-settings-grid ${showSeasonSelect ? 'admin-settings-grid--3col' : 'admin-settings-grid--2col'}`}>
         {/* Type select */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.75rem', marginBottom: '0.25rem', color: 'var(--theme-elevation-800)' }}>
+          <label className="admin-label">
             Тип зображення
           </label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value as ImageType)}
             disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              borderRadius: '4px',
-              border: '1px solid var(--theme-elevation-150)',
-              backgroundColor: 'var(--theme-input-bg)',
-              color: 'var(--theme-text)',
-              fontSize: '0.875rem',
-            }}
+            className="admin-select"
           >
             <option value="hero">Hero (широкий)</option>
             <option value="content">Content (квадрат)</option>
@@ -250,22 +217,14 @@ const RegenerateImageSection: React.FC = () => {
         {/* Season select (conditional) */}
         {showSeasonSelect && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', marginBottom: '0.25rem', color: 'var(--theme-elevation-800)' }}>
+            <label className="admin-label">
               Сезон
             </label>
             <select
               value={season}
               onChange={(e) => setSeason(e.target.value as Season)}
               disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid var(--theme-elevation-150)',
-                backgroundColor: 'var(--theme-input-bg)',
-                color: 'var(--theme-text)',
-                fontSize: '0.875rem',
-              }}
+              className="admin-select"
             >
               <option value="winter">Зима</option>
               <option value="summer">Літо</option>
@@ -276,22 +235,14 @@ const RegenerateImageSection: React.FC = () => {
 
         {/* Size select */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.75rem', marginBottom: '0.25rem', color: 'var(--theme-elevation-800)' }}>
+          <label className="admin-label">
             Розмір
           </label>
           <select
             value={size}
             onChange={(e) => setSize(e.target.value as ImageSize)}
             disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              borderRadius: '4px',
-              border: '1px solid var(--theme-elevation-150)',
-              backgroundColor: 'var(--theme-input-bg)',
-              color: 'var(--theme-text)',
-              fontSize: '0.875rem',
-            }}
+            className="admin-select"
           >
             <option value="1024x1024">1024x1024 (квадрат)</option>
             <option value="1792x1024">1792x1024 (широкий)</option>
@@ -301,8 +252,8 @@ const RegenerateImageSection: React.FC = () => {
       </div>
 
       {/* Topic input */}
-      <div style={{ marginBottom: '0.75rem' }}>
-        <label style={{ display: 'block', fontSize: '0.75rem', marginBottom: '0.25rem', color: 'var(--theme-elevation-800)' }}>
+      <div className="admin-field-group">
+        <label className="admin-label">
           Тема (для генерації промпта)
         </label>
         <input
@@ -311,42 +262,25 @@ const RegenerateImageSection: React.FC = () => {
           onChange={(e) => setTopic(e.target.value)}
           disabled={isLoading}
           placeholder="наприклад: зимові шини Bridgestone Blizzak"
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid var(--theme-elevation-150)',
-            backgroundColor: 'var(--theme-input-bg)',
-            color: 'var(--theme-text)',
-            fontSize: '0.875rem',
-          }}
+          className="admin-input"
         />
       </div>
 
       {/* Generate prompt button */}
-      <div style={{ marginBottom: '0.75rem' }}>
+      <div className="admin-field-group">
         <button
           type="button"
           onClick={handleGeneratePrompt}
           disabled={isLoading || isGeneratingPrompt}
-          style={{
-            padding: '0.375rem 0.75rem',
-            backgroundColor: 'transparent',
-            color: 'var(--theme-text)',
-            border: '1px solid var(--theme-elevation-150)',
-            borderRadius: '4px',
-            cursor: isLoading || isGeneratingPrompt ? 'not-allowed' : 'pointer',
-            fontSize: '0.75rem',
-            opacity: isLoading || isGeneratingPrompt ? 0.5 : 1,
-          }}
+          className="admin-btn--outline"
         >
           {isGeneratingPrompt ? 'Генерація...' : 'Згенерувати стандартний промпт'}
         </button>
       </div>
 
       {/* Prompt textarea */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', fontSize: '0.75rem', marginBottom: '0.25rem', color: 'var(--theme-elevation-800)' }}>
+      <div className="admin-mb-1">
+        <label className="admin-label">
           Промпт для генерації
         </label>
         <textarea
@@ -358,18 +292,7 @@ const RegenerateImageSection: React.FC = () => {
           disabled={isLoading}
           placeholder="Введіть промпт для генерації зображення або натисніть кнопку вище"
           rows={8}
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid var(--theme-elevation-150)',
-            backgroundColor: 'var(--theme-input-bg)',
-            color: 'var(--theme-text)',
-            fontSize: '0.875rem',
-            fontFamily: 'monospace',
-            resize: 'vertical',
-            lineHeight: 1.4,
-          }}
+          className="admin-textarea"
         />
       </div>
 
@@ -378,31 +301,11 @@ const RegenerateImageSection: React.FC = () => {
         type="button"
         onClick={handleRegenerate}
         disabled={isLoading || !prompt.trim()}
-        style={{
-          padding: '0.625rem 1.25rem',
-          backgroundColor: isLoading ? 'var(--theme-elevation-200)' : '#0066cc',
-          color: isLoading ? 'var(--theme-elevation-600)' : 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: isLoading || !prompt.trim() ? 'not-allowed' : 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: 500,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}
+        className={`admin-btn admin-btn--regen ${!isLoading ? 'admin-btn--primary' : ''}`}
       >
         {isLoading ? (
           <>
-            <span style={{
-              display: 'inline-block',
-              width: '14px',
-              height: '14px',
-              border: '2px solid currentColor',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }} />
+            <span className="admin-spinner" />
             Генерація...
           </>
         ) : (
@@ -417,28 +320,23 @@ const RegenerateImageSection: React.FC = () => {
 
       {/* Status messages */}
       {status === 'success' && (
-        <p style={{ color: '#22c55e', marginTop: '0.75rem', fontSize: '0.875rem' }}>
+        <p className="admin-status-msg admin-status-msg--success">
           {message}
         </p>
       )}
 
       {status === 'error' && (
-        <p style={{ color: '#ef4444', marginTop: '0.75rem', fontSize: '0.875rem' }}>
+        <p className="admin-status-msg admin-status-msg--error">
           {message}
         </p>
       )}
 
       {isLoading && message && status === 'idle' && (
-        <p style={{ color: 'var(--theme-elevation-600)', marginTop: '0.75rem', fontSize: '0.875rem' }}>
+        <p className="admin-status-msg admin-status-msg--info">
           {message}
         </p>
       )}
 
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
         </div>
       )}
     </div>

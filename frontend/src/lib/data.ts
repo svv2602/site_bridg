@@ -108,7 +108,12 @@ export interface Article {
   content?: unknown; // Lexical rich text content from CMS
   readingTimeMinutes?: number;
   publishedAt?: string; // ISO date
+  updatedAt?: string; // ISO date
   tags?: string[];
+  featuredImage?: string; // URL to featured image
+  seoTitle?: string;
+  seoDescription?: string;
+  imageUrl?: string; // URL to article image
 }
 
 export interface Technology {

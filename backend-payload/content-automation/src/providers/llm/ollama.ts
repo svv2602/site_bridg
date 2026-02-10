@@ -55,10 +55,11 @@ export class OllamaProvider extends BaseLLMProvider {
   readonly models = OLLAMA_MODELS;
   readonly defaultModel: OllamaModel = "llama3.2";
 
-  private baseUrl: string;
+  // Uses protected baseUrl from BaseLLMProvider (no shadowing)
 
   constructor(config: BaseLLMConfig) {
     super(config);
+    // Override baseUrl from parent with Ollama default if not provided
     this.baseUrl = config.baseUrl || DEFAULT_OLLAMA_URL;
     if (config.defaultModel) {
       this.defaultModel = config.defaultModel;

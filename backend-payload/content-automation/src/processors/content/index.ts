@@ -49,6 +49,7 @@ import { generateTireSEO } from "./tire-seo.js";
 import { generateTireFAQ, generateFAQSchema, type TireFAQInput, type FAQ } from "./tire-faq.js";
 import { markdownToLexical } from "../../utils/markdown-to-lexical.js";
 import { loadFromStorage, saveToStorage } from "../../utils/storage.js";
+import { sanitizeHtml } from "../../utils/sanitize.js";
 import type { RawTyreContent, GeneratedTyreContent } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -182,15 +183,19 @@ export async function generateFullTyreContent(
     });
     costs.faq = faqResult.metadata.cost;
 
-    // 4. Convert to Lexical
-    const fullDescriptionLexical = markdownToLexical(descResult.content.fullDescription);
+    // 4. Sanitize generated HTML to prevent XSS
+    const sanitizedFullDescription = sanitizeHtml(descResult.content.fullDescription);
+    const sanitizedShortDescription = sanitizeHtml(descResult.content.shortDescription);
 
-    // 5. Build final content
+    // 5. Convert to Lexical
+    const fullDescriptionLexical = markdownToLexical(sanitizedFullDescription);
+
+    // 6. Build final content
     const content: GeneratedTyreContent = {
       modelSlug,
       brand: firstSource.brand || "bridgestone",
-      shortDescription: descResult.content.shortDescription,
-      fullDescription: descResult.content.fullDescription,
+      shortDescription: sanitizedShortDescription,
+      fullDescription: sanitizedFullDescription,
       fullDescriptionLexical,
       seoTitle: seoResult.seo.seoTitle,
       seoDescription: seoResult.seo.seoDescription,

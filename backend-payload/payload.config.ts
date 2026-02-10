@@ -19,6 +19,7 @@ import {
   TaskRouting,
   Reviews,
 } from './src/collections';
+import AuditLog from './src/collections/AuditLog';
 import {
   removeBackgroundsEndpoint,
   removeBackgroundsStatusEndpoint,
@@ -67,7 +68,8 @@ import {
   readinessEndpoint,
   livenessEndpoint,
 } from './src/endpoints/health';
-import { initScheduler } from './src/automation/jobs/scheduler';
+import { initScheduler } from './src/scheduler';
+import { initSentry } from './src/lib/sentry';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -115,6 +117,7 @@ export default buildConfig({
     ProviderSettings,
     TaskRouting,
     Reviews,
+    AuditLog,
   ],
   endpoints: [
     removeBackgroundsEndpoint,
@@ -199,6 +202,7 @@ export default buildConfig({
   csrf: [], // Empty array enables CSRF protection for all origins
   sharp,
   onInit: async () => {
+    initSentry();
     initScheduler();
   },
 });

@@ -1,0 +1,360 @@
+/* ======================================
+   Hero Sections: Always-dark and Adaptive
+   ====================================== */
+
+/* Always dark hero */
+.hero-dark {
+  background: linear-gradient(to bottom right, #0c0a09, #1c1917, #292524) !important;
+  color: #ffffff !important;
+}
+
+.hero-dark * {
+  --tw-text-opacity: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.hero-title {
+  color: #ffffff !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 400;
+}
+
+.hero-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1.5rem;
+}
+
+.hero-input {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.hero-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.hero-input:focus {
+  border-color: var(--silver-accent);
+  outline: none;
+}
+
+/* Hero buttons */
+.hero-btn-primary {
+  background: #ffffff !important;
+  color: #1c1917 !important;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.2s ease-out;
+}
+
+.hero-btn-primary:hover {
+  background: #f5f5f4 !important;
+  transform: scale(1.02);
+}
+
+.hero-btn-secondary {
+  background: transparent !important;
+  color: #ffffff !important;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.2s ease-out;
+}
+
+.hero-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ======================================
+   Adaptive Hero: Light/Dark theme aware
+   ====================================== */
+
+.hero-adaptive {
+  background: linear-gradient(to bottom right, #f5f5f4, #fafaf9, #ffffff);
+  border-bottom: 1px solid #e7e5e4;
+}
+
+[data-theme="dark"] .hero-adaptive {
+  background: linear-gradient(to bottom right, #0c0a09, #1c1917, #292524);
+  border-bottom-color: #292524;
+}
+
+.hero-adaptive .hero-title-adaptive {
+  color: #1c1917;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-title-adaptive {
+  color: #ffffff;
+}
+
+.hero-adaptive .hero-subtitle-adaptive {
+  color: #78716c;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-subtitle-adaptive {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-adaptive .hero-text-adaptive {
+  color: #57534e;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-text-adaptive {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Adaptive hero badge */
+.hero-adaptive .hero-badge-adaptive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #ffffff;
+  color: #57534e;
+  border: 1px solid #e7e5e4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-badge-adaptive {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+/* Adaptive hero tag/pill */
+.hero-adaptive .hero-tag-adaptive {
+  display: inline-flex;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: #ffffff;
+  color: #44403c;
+  border: 1px solid #e7e5e4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tag-adaptive {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+/* Adaptive hero buttons */
+.hero-adaptive .hero-btn-primary-adaptive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1c1917;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-out;
+}
+
+.hero-adaptive .hero-btn-primary-adaptive:hover {
+  background: #292524;
+  transform: scale(1.02);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-btn-primary-adaptive {
+  background: #ffffff;
+  color: #1c1917;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-btn-primary-adaptive:hover {
+  background: #f5f5f4;
+}
+
+.hero-adaptive .hero-btn-secondary-adaptive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #1c1917;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.2s ease-out;
+}
+
+.hero-adaptive .hero-btn-secondary-adaptive:hover {
+  background: #fafaf9;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-btn-secondary-adaptive {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-btn-secondary-adaptive:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Adaptive hero card */
+.hero-adaptive .hero-card-adaptive {
+  background: linear-gradient(to bottom right, #ffffff, #f5f5f4);
+  border: 1px solid #e7e5e4;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-card-adaptive {
+  background: linear-gradient(to bottom right, #292524, #1c1917);
+  border-color: #44403c;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Adaptive hero form card */
+.hero-adaptive .hero-form-card-adaptive {
+  background: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-card-adaptive {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-adaptive .hero-form-title-adaptive {
+  color: #1c1917;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-title-adaptive {
+  color: #ffffff;
+}
+
+.hero-adaptive .hero-form-text-adaptive {
+  color: #57534e;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-form-text-adaptive {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Adaptive hero tabs */
+.hero-adaptive .hero-tabs-adaptive {
+  background: #f5f5f4;
+  border-radius: 9999px;
+  padding: 0.25rem;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tabs-adaptive {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hero-adaptive .hero-tab-adaptive {
+  color: #78716c;
+  transition: color 0.2s;
+}
+
+.hero-adaptive .hero-tab-adaptive:hover {
+  color: #1c1917;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-adaptive {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-adaptive:hover {
+  color: #ffffff;
+}
+
+.hero-adaptive .hero-tab-active-adaptive {
+  background: #ffffff;
+  color: #1c1917;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-tab-active-adaptive {
+  background: #ffffff;
+  color: #1c1917;
+}
+
+/* Adaptive hero input */
+.hero-adaptive .hero-input-adaptive {
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  color: #1c1917;
+  border-radius: 0.75rem;
+}
+
+.hero-adaptive .hero-input-adaptive:focus {
+  border-color: #a8a29e;
+  outline: none;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-input-adaptive {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-input-adaptive:focus {
+  border-color: var(--silver-accent);
+}
+
+/* Adaptive breadcrumb */
+.hero-adaptive .hero-breadcrumb-adaptive {
+  color: #78716c;
+}
+
+.hero-adaptive .hero-breadcrumb-adaptive a:hover {
+  color: #1c1917;
+}
+
+.hero-adaptive .hero-breadcrumb-adaptive span {
+  color: #44403c;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive a:hover {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .hero-adaptive .hero-breadcrumb-adaptive span {
+  color: #ffffff;
+}

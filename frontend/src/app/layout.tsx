@@ -34,6 +34,13 @@ export const metadata: Metadata = {
     "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні. Пошук шин за розміром, за авто, карта дилерів, поради та технології.",
   alternates: {
     canonical: '/',
+    languages: {
+      'uk': '/',
+      'x-default': '/',
+    },
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
   },
   openGraph: {
     title: "Bridgestone Україна — офіційний сайт шин",

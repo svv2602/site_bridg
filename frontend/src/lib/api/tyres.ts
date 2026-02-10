@@ -131,12 +131,3 @@ export async function searchTyresByCar(params: CarSearchParams): Promise<TyreMod
   );
 }
 
-/**
- * Допоміжна утиліта: форматує типорозмір у рядок, щоб UI міг використовувати єдиний формат.
- */
-export function formatTyreSize(size: TyreSize): string {
-  const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
-  const li = size.loadIndex ? ` ${size.loadIndex}` : "";
-  const si = size.speedIndex ?? "";
-  return `${base}${li}${si}`;
-}

@@ -1,3 +1,13 @@
+/**
+ * VehicleFitments Collection
+ *
+ * Maps car make/model/year combinations to recommended tyre sizes.
+ * Powers the "Search by car" feature on the frontend.
+ * Fields: make, model, yearFrom/yearTo, recommendedSizes (array),
+ * and optional recommendedTyres relationship.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const VehicleFitments: CollectionConfig = {

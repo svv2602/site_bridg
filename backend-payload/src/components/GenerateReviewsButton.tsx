@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDocumentInfo } from '@payloadcms/ui';
+import './admin-components.css';
 
 const GenerateReviewsButton: React.FC = () => {
   const { id } = useDocumentInfo();
@@ -98,24 +99,17 @@ const GenerateReviewsButton: React.FC = () => {
   }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-      <div style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: '#888' }}>
+    <div className="admin-mb-1">
+      <div className="admin-review-count">
         Відгуки: {reviewCount !== null ? reviewCount : '...'} шт.
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="admin-controls-row">
         <select
           value={count}
           onChange={(e) => setCount(parseInt(e.target.value, 10))}
           disabled={isLoading}
-          style={{
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: '1px solid #444',
-            backgroundColor: '#2a2a2a',
-            color: 'white',
-            fontSize: '0.875rem',
-          }}
+          className="admin-select--dark"
         >
           {[1, 2, 3, 5, 10].map((n) => (
             <option key={n} value={n}>
@@ -128,32 +122,11 @@ const GenerateReviewsButton: React.FC = () => {
           type="button"
           onClick={handleGenerate}
           disabled={isLoading}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: isLoading ? '#666' : '#22c55e',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            fontSize: '0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-          }}
+          className="admin-btn admin-btn--success"
         >
           {isLoading ? (
             <>
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: '14px',
-                  height: '14px',
-                  border: '2px solid #fff',
-                  borderTopColor: 'transparent',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              />
+              <span className="admin-spinner admin-spinner--white" />
               Генерація...
             </>
           ) : (
@@ -168,18 +141,12 @@ const GenerateReviewsButton: React.FC = () => {
       </div>
 
       {status === 'success' && (
-        <p style={{ color: '#22c55e', marginTop: '0.5rem', fontSize: '0.875rem' }}>{message}</p>
+        <p className="admin-status-msg admin-status-msg--success">{message}</p>
       )}
 
       {status === 'error' && (
-        <p style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.875rem' }}>{message}</p>
+        <p className="admin-status-msg admin-status-msg--error">{message}</p>
       )}
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

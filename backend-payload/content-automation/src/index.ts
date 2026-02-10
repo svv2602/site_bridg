@@ -1,6 +1,13 @@
 /**
  * Content Automation System - Daemon Entry Point
  *
+ * @deprecated This standalone daemon is superseded by the Payload-integrated scheduler
+ * at `backend-payload/src/scheduler/index.ts`. The Payload onInit hook calls
+ * initScheduler(), which manages cron jobs within the main Payload process.
+ *
+ * This file is retained for backward compatibility during the transition period.
+ * Use `npm run dev` (Payload) instead of running this daemon directly.
+ *
  * Starts:
  * - Cron scheduler for weekly automation
  * - Telegram bot for interactive commands
@@ -8,7 +15,7 @@
 
 import { logger } from "./utils/logger.js";
 import { startCronJobs, getNextRunTime } from "./cron.js";
-import { startPolling } from "./publishers/telegram-commands.js";
+import { startPolling, stopPolling } from "./publishers/telegram-commands.js";
 import { ENV } from "./config/env.js";
 
 async function main(): Promise<void> {
@@ -47,14 +54,16 @@ async function main(): Promise<void> {
   logger.info("System ready. Press Ctrl+C to stop.");
   logger.info("=".repeat(50));
 
-  // Keep process running
+  // Keep process running with graceful shutdown
   process.on("SIGINT", () => {
     logger.info("\nShutting down...");
+    stopPolling();
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
     logger.info("\nShutting down...");
+    stopPolling();
     process.exit(0);
   });
 }

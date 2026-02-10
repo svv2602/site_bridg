@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { Trophy, CheckCircle, Medal, Sun, Snowflake, Cloud, Leaf, Gauge } from "lucide-react";
+import { seasonLabelsShort } from "@/lib/utils/tyres";
 
 type BadgeVariant =
   | "winner"
@@ -120,12 +121,6 @@ interface SeasonBadgeProps {
   showLabel?: boolean;
 }
 
-const seasonLabels: Record<SeasonBadgeProps["season"], string> = {
-  summer: "Літня",
-  winter: "Зимова",
-  allseason: "Всесезонна",
-};
-
 export function SeasonBadge({
   season,
   size = "md",
@@ -133,7 +128,7 @@ export function SeasonBadge({
 }: SeasonBadgeProps) {
   return (
     <Badge variant={season} size={size}>
-      {showLabel && seasonLabels[season]}
+      {showLabel && seasonLabelsShort[season]}
     </Badge>
   );
 }

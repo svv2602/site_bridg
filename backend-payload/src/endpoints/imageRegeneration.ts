@@ -2,22 +2,40 @@ import type { Endpoint } from 'payload';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
-import fs from 'fs/promises';
+import { saveJob, updateJob, getJob, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
+import { generatePromptByType, type ImageType } from '../../content-automation/src/config/image-prompts';
 
 const execAsync = promisify(exec);
 
-// Store for background job status
-interface JobStatus {
-  id: string;
-  status: 'running' | 'completed' | 'failed';
-  startedAt: string;
-  completedAt?: string;
-  mediaId?: number;
-  newMediaId?: number;
-  error?: string;
-}
+/**
+ * Per-user rate limiting for image regeneration.
+ * Tracks timestamps of regeneration requests per user.
+ * Max 10 regenerations per hour per user to prevent API key abuse.
+ */
+const IMAGE_REGEN_RATE_LIMIT = 10;
+const IMAGE_REGEN_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const userRegenTimestamps: Map<string, number[]> = new Map();
 
-const imageJobs: Map<string, JobStatus> = new Map();
+function checkUserRateLimit(userId: string): { allowed: boolean; retryAfterSeconds?: number } {
+  const now = Date.now();
+  const cutoff = now - IMAGE_REGEN_WINDOW_MS;
+
+  // Get and clean old timestamps
+  let timestamps = userRegenTimestamps.get(userId) || [];
+  timestamps = timestamps.filter((ts) => ts > cutoff);
+  userRegenTimestamps.set(userId, timestamps);
+
+  if (timestamps.length >= IMAGE_REGEN_RATE_LIMIT) {
+    // Calculate when the oldest timestamp will expire
+    const oldestInWindow = timestamps[0];
+    const retryAfterSeconds = Math.ceil((oldestInWindow + IMAGE_REGEN_WINDOW_MS - now) / 1000);
+    return { allowed: false, retryAfterSeconds };
+  }
+
+  // Record this request
+  timestamps.push(now);
+  return { allowed: true };
+}
 
 /**
  * POST /api/media/regenerate/:id
@@ -36,6 +54,19 @@ export const regenerateImageEndpoint: Endpoint = {
   handler: async (req) => {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Per-user rate limiting: max 10 regenerations per hour
+    const userId = String(req.user.id || 'unknown');
+    const rateCheck = checkUserRateLimit(userId);
+    if (!rateCheck.allowed) {
+      return Response.json(
+        { error: `Rate limit exceeded. Maximum ${IMAGE_REGEN_RATE_LIMIT} regenerations per hour.` },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateCheck.retryAfterSeconds || 60) },
+        }
+      );
     }
 
     const mediaId = parseInt((req.routeParams?.id as string) || '0', 10);
@@ -80,15 +111,35 @@ export const regenerateImageEndpoint: Endpoint = {
       }, { status: 400 });
     }
 
-    // Create job
+    // Concurrency check: prevent duplicate jobs for the same media
+    const existingJob = findActiveByTarget('image', mediaId);
+    if (existingJob) {
+      return Response.json({
+        message: 'Image regeneration already running for this media',
+        jobId: existingJob.id,
+        checkStatus: `/api/media/regenerate-status/${existingJob.id}`,
+      });
+    }
+
+    // Rate limit: max 5 concurrent AI jobs
+    if (countActiveJobs() >= 5) {
+      return Response.json(
+        { error: 'Too many concurrent jobs. Please wait and try again.' },
+        { status: 429 }
+      );
+    }
+
+    // Create job in unified store
     const jobId = `img-${Date.now()}`;
     const job: JobStatus = {
       id: jobId,
+      type: 'image',
       status: 'running',
       startedAt: new Date().toISOString(),
-      mediaId,
+      command: `regenerate-image --id=${mediaId}`,
+      targetId: mediaId,
     };
-    imageJobs.set(jobId, job);
+    saveJob(job);
 
     req.payload.logger.info(`Starting image regeneration: ${jobId} for media ${mediaId}`);
 
@@ -120,6 +171,9 @@ export const regenerateImageEndpoint: Endpoint = {
           job.newMediaId = parseInt(newIdMatch[1], 10);
         }
 
+        job.output = stdout.slice(0, 2000);
+        updateJob(job);
+
         // Update media with generation metadata
         try {
           const updateId = job.newMediaId || mediaId;
@@ -143,6 +197,7 @@ export const regenerateImageEndpoint: Endpoint = {
         job.status = 'failed';
         job.completedAt = new Date().toISOString();
         job.error = error.message || String(error);
+        updateJob(job);
         req.payload.logger.error(`Image regeneration failed: ${jobId} - ${job.error}`);
       });
 
@@ -168,7 +223,7 @@ export const regenerateImageStatusEndpoint: Endpoint = {
       return Response.json({ error: 'Job ID is required' }, { status: 400 });
     }
 
-    const job = imageJobs.get(jobId);
+    const job = getJob(jobId);
     if (!job) {
       return Response.json({ error: 'Job not found' }, { status: 404 });
     }
@@ -202,138 +257,9 @@ export const generatePromptEndpoint: Endpoint = {
 };
 
 /**
- * Generate default prompt based on type and season
+ * Generate default prompt based on type and season.
+ * Delegates to shared image-prompts module.
  */
 function generateDefaultPrompt(type: string, topic: string, season?: string): string {
-  const seasonContexts: Record<string, Record<string, string>> = {
-    hero: {
-      summer: `golden hour sunlight, warm summer day, dry clean asphalt highway,
-clear blue sky with soft clouds, vibrant green landscape in background,
-warm orange and gold color grading, lens flare effects`,
-      winter: `fresh snow on road, winter morning atmosphere, cold blue and white tones,
-frost on trees, overcast sky with soft diffused light,
-breath-visible cold air, tire tracks in snow showing grip`,
-      allseason: `dramatic weather transition, partly cloudy sky with sun breaking through,
-wet road reflecting light, versatile conditions,
-dynamic atmospheric lighting, moody cinematic feel`,
-    },
-    lifestyle: {
-      summer: `family summer road trip adventure, scenic coastal or mountain highway,
-bright sunny day, happy relaxed atmosphere, adventure and freedom feeling,
-warm golden tones, vacation mood, luggage on roof rack`,
-      winter: `cozy winter family journey, snow-covered landscape,
-safe confident driving in winter conditions, warm interior glow from vehicle,
-holiday travel feeling, ski equipment visible, breath in cold air`,
-      allseason: `versatile everyday driving, suburban family neighborhood,
-mix of weather conditions showing adaptability, practical daily life,
-school run, grocery shopping, weekend activities`,
-    },
-  };
-
-  const prompts: Record<string, (t: string, s?: string) => string> = {
-    hero: (t, s) => {
-      const weather = s && seasonContexts.hero[s]
-        ? seasonContexts.hero[s]
-        : 'professional studio lighting, neutral backdrop';
-
-      return `Award-winning automotive photography, ultra high resolution 8K, ${t}.
-
-Scene: ${weather}. Modern premium SUV or luxury sedan (Mercedes, BMW, Audi style)
-photographed at dynamic 3/4 front angle. Vehicle positioned on scenic road with
-emphasis on wheel and tire visibility.
-
-Technical details: Shot with Sony A7R V, 85mm f/1.4 lens, shallow depth of field
-with sharp focus on vehicle and tires. Professional color grading, high dynamic range.
-Cinematic widescreen composition following rule of thirds.
-
-Style: Editorial automotive magazine quality, photorealistic, hyperdetailed.
-Lighting: Natural environmental lighting with professional fill, rim lighting on vehicle.
-Colors: Rich, vibrant but natural color palette, professional post-processing.
-
-Requirements: Photorealistic only, no CGI, no text, no logos, no watermarks,
-clean uncluttered composition, premium luxury feel.`;
-    },
-
-    content: (t) => `Professional editorial photography for automotive blog article about ${t}.
-
-Context: tire and automotive safety theme.
-
-Scene composition: Clean, well-organized frame with clear focal point.
-Environmental context showing real-world automotive situations.
-People interacting naturally with vehicles when appropriate.
-
-Technical specs: High resolution photograph, 24-70mm lens perspective,
-balanced exposure, professional white balance, sharp details throughout.
-
-Style: Modern editorial magazine aesthetic, authentic documentary feel,
-relatable to everyday drivers, warm and approachable mood.
-
-Lighting: Natural daylight or professional studio setup, soft shadows,
-even illumination, no harsh contrasts.
-
-Requirements: Photorealistic, no text overlays, no watermarks,
-publication-ready quality, clean background, professional composition.`,
-
-    product: (t) => `Ultra high-resolution product photography of ${t} automotive tire.
-
-Setup: Professional product photography studio, infinity curve backdrop in
-gradient dark gray to black. Single tire displayed at slight angle (15-20 degrees)
-to showcase both tread pattern and sidewall branding.
-
-Lighting: Three-point professional lighting setup:
-- Key light: Large softbox 45 degrees from front
-- Fill light: Reflector panel opposite key light
-- Rim/accent light: Strip softbox behind for edge definition
-
-Focus: Razor-sharp detail on tread pattern grooves, sipes, and shoulder blocks.
-Visible sidewall markings and size specifications in crisp detail.
-
-Technical: Shot with medium format camera, 100mm macro lens, f/8-f/11 for
-maximum depth of field, focus stacking for complete sharpness.
-
-Style: Clean commercial product photography, premium brand aesthetic,
-suitable for e-commerce and marketing materials.
-
-Post-processing: Professional retouching, enhanced contrast on rubber texture,
-clean background, color-accurate representation of black rubber.
-
-Requirements: Hyperrealistic, no text additions, no watermarks,
-studio quality, emphasize quality and engineering precision.`,
-
-    lifestyle: (t, s) => {
-      const scene = s && seasonContexts.lifestyle[s]
-        ? seasonContexts.lifestyle[s]
-        : 'everyday driving moments, relatable situations';
-
-      return `Authentic lifestyle automotive photography capturing ${scene}.
-
-Story: Real moments of people enjoying safe, confident driving.
-Families, couples, or individuals in genuine automotive situations.
-Subtle emphasis on tire/vehicle reliability without being promotional.
-
-Subjects: Diverse, relatable people (age 30-50) in natural poses,
-authentic expressions of comfort and confidence while driving.
-
-Vehicle: Modern family SUV or crossover, clean but not showroom-perfect,
-realistic everyday use condition.
-
-Environment: ${scene}. Authentic locations, real backgrounds,
-environmental context that tells a story.
-
-Technical: Editorial style photography, 35-50mm lens,
-natural depth of field, candid documentary approach.
-
-Lighting: Natural available light, golden hour preferred,
-soft flattering illumination on subjects, environmental fill.
-
-Mood: Warm, positive, aspirational but achievable, family-oriented,
-safety and reliability themes subtly conveyed.
-
-Requirements: Photorealistic, authentic feel, no staged look,
-no text, no watermarks, magazine editorial quality.`;
-    },
-  };
-
-  const promptFn = prompts[type] || prompts.content;
-  return promptFn(topic, season);
+  return generatePromptByType(type as ImageType, topic, { season });
 }

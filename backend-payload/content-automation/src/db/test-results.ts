@@ -176,16 +176,17 @@ export function getTestResultsByYear(year: number): TestResult[] {
 }
 
 /**
- * Find test results containing a specific tyre
+ * Find test results containing a specific tyre.
+ * Uses SQL LIKE to pre-filter rows before in-memory matching.
  */
 export function findTestResultsForTyre(tireName: string): TestResult[] {
   const database = getDatabase();
-
-  const rows = database
-    .prepare("SELECT * FROM test_results ORDER BY year DESC")
-    .all() as Array<Record<string, unknown>>;
-
   const normalizedSearch = tireName.toLowerCase();
+
+  // Pre-filter at SQL level using LIKE on JSON column (case-insensitive via LOWER)
+  const rows = database
+    .prepare("SELECT * FROM test_results WHERE LOWER(results_json) LIKE ? ORDER BY year DESC")
+    .all(`%${normalizedSearch}%`) as Array<Record<string, unknown>>;
 
   return rows
     .map((row) => ({

@@ -2,17 +2,11 @@
 
 import { useState, useMemo } from "react";
 import { type TyreSize } from "@/lib/data";
+import { formatSize } from "@/lib/utils/tyres";
 
 interface SizesByDiameterProps {
   sizes: TyreSize[];
   modelSlug: string;
-}
-
-function formatSize(size: TyreSize) {
-  const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
-  const li = size.loadIndex ? ` ${size.loadIndex}` : "";
-  const si = size.speedIndex ?? "";
-  return `${base}${li}${si}`;
 }
 
 export function SizesByDiameter({ sizes, modelSlug }: SizesByDiameterProps) {
@@ -127,7 +121,7 @@ function SizesTable({
               className="border-b border-border/60 last:border-0"
             >
               <td className="py-2 pr-4 font-medium text-foreground">
-                {formatSize(size)}
+                {formatSize(size, true)}
               </td>
               <td className="py-2 pr-4 text-muted-foreground">
                 {size.loadIndex ?? "—"}

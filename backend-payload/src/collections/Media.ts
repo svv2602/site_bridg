@@ -1,3 +1,13 @@
+/**
+ * Media Collection
+ *
+ * Uploaded images with auto-generated sizes (thumbnail, mobile, card, tablet, hero).
+ * Supports AI image generation fields (prompt, type, season, size) and
+ * background removal via rembg. Empty enum fields sanitized before save
+ * (PostgreSQL does not accept empty strings for enum columns).
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload';
 import { removeBackgroundHook } from '../hooks/removeBackground';
 
@@ -39,9 +49,21 @@ export const Media: CollectionConfig = {
         position: 'centre',
       },
       {
+        name: 'mobile',
+        width: 480,
+        height: 360,
+        position: 'centre',
+      },
+      {
         name: 'card',
         width: 768,
         height: 576,
+        position: 'centre',
+      },
+      {
+        name: 'tablet',
+        width: 1024,
+        height: 768,
         position: 'centre',
       },
       {

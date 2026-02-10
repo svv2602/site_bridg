@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Button } from './Button';
 
 interface ErrorStateProps {
   title?: string;
@@ -14,18 +15,20 @@ export function ErrorState({
   onRetry
 }: ErrorStateProps) {
   return (
-    <div className="rounded-2xl border border-error/30 bg-error/10 p-12 text-center">
+    <div role="alert" className="rounded-2xl border border-error/30 bg-error/10 p-12 text-center">
       <AlertTriangle className="mx-auto h-12 w-12 text-error mb-4" />
       <h3 className="text-xl font-semibold text-foreground">{title}</h3>
       <p className="mt-2 text-muted-foreground">{message}</p>
       {onRetry && (
-        <button
+        <Button
+          variant="danger"
+          size="lg"
           onClick={onRetry}
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-error px-6 py-2.5 text-sm font-semibold text-error-foreground hover:bg-error/90 transition-colors"
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+          className="mt-6"
         >
-          <RefreshCw className="h-4 w-4" />
           Спробувати знову
-        </button>
+        </Button>
       )}
     </div>
   );

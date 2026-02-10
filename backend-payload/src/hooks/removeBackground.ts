@@ -3,18 +3,9 @@ import path from 'path';
 import fs from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { getRembgPath } from '../utils/rembg';
 
 const execAsync = promisify(exec);
-
-// Support multiple rembg locations: env var, venv, or system-wide
-function getRembgPath(): string {
-  if (process.env.REMBG_PATH) {
-    return process.env.REMBG_PATH;
-  }
-  // Try venv first (local development)
-  const venvPath = path.resolve(process.cwd(), '.venv/bin/rembg');
-  return venvPath;
-}
 
 const REMBG_CLI = getRembgPath();
 
@@ -25,6 +16,7 @@ const REMBG_CLI = getRembgPath();
 async function processBackgroundRemoval(
   docId: number | string,
   filename: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: any
 ): Promise<void> {
   const mediaDir = path.resolve(process.cwd(), 'media');

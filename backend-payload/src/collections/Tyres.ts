@@ -1,3 +1,12 @@
+/**
+ * Tyres Collection
+ *
+ * Core product catalog — tyre models with sizes, season, EU label data,
+ * technologies, test badges, FAQs, and AI-generated descriptions.
+ * Auto-generates slug from name via beforeChange hook.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 import { euLabelField } from '../fields/euLabel';
 import { tyreSizeFields } from '../fields/tyreSize';

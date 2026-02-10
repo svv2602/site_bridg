@@ -1,5 +1,9 @@
 /**
- * Cron Scheduler
+ * Cron Scheduler (legacy daemon mode)
+ *
+ * @deprecated This standalone cron scheduler is superseded by the Payload-integrated
+ * scheduler at `backend-payload/src/scheduler/index.ts`. That scheduler runs within
+ * the main Payload process and persists task configs in SQLite.
  *
  * Schedules automated content generation tasks:
  * - Weekly full automation on Sunday 03:00 Kyiv time

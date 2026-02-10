@@ -45,8 +45,17 @@ const FALLBACK_ERROR_TYPES = [
   "504",
 ];
 
-// Provider instance cache
-const providerCache = new Map<string, LLMProvider>();
+// Provider instance cache with TTL
+const PROVIDER_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const providerCache = new Map<string, { provider: LLMProvider; createdAt: number }>();
+
+/**
+ * Clear provider cache (e.g., when CMS config changes)
+ */
+export function clearProviderCache(): void {
+  providerCache.clear();
+  logger.info("Provider cache cleared");
+}
 
 /**
  * Check if error should trigger fallback
@@ -63,24 +72,35 @@ function shouldFallback(error: Error | unknown): boolean {
 }
 
 /**
- * Get or create LLM provider instance
+ * Get or create LLM provider instance (with TTL-based cache invalidation)
  */
 function getProvider(name: string): LLMProvider | null {
-  if (!providerCache.has(name)) {
-    try {
-      // Check if API key exists
-      if (!hasApiKey(name)) {
-        logger.debug(`Provider ${name} skipped - no API key`);
-        return null;
-      }
-      const provider = createLLMProvider(name);
-      providerCache.set(name, provider);
-    } catch (error) {
-      logger.warn(`Failed to create provider ${name}`, { error });
+  const cached = providerCache.get(name);
+  const now = Date.now();
+
+  // Return cached if within TTL
+  if (cached && (now - cached.createdAt) < PROVIDER_CACHE_TTL_MS) {
+    return cached.provider;
+  }
+
+  // Remove expired entry
+  if (cached) {
+    providerCache.delete(name);
+  }
+
+  try {
+    // Check if API key exists
+    if (!hasApiKey(name)) {
+      logger.debug(`Provider ${name} skipped - no API key`);
       return null;
     }
+    const provider = createLLMProvider(name);
+    providerCache.set(name, { provider, createdAt: now });
+    return provider;
+  } catch (error) {
+    logger.warn(`Failed to create provider ${name}`, { error });
+    return null;
   }
-  return providerCache.get(name) || null;
 }
 
 /**
@@ -141,42 +161,76 @@ export async function generateWithFallback(
         continue;
       }
 
-      // Create timeout promise
+      // Create timeout with proper cleanup to avoid timer leaks
       const timeoutMs = routing.timeoutMs || 60000;
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), timeoutMs)
-      );
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("timeout")), timeoutMs);
+      });
 
       // Generate with timeout
-      const response = await Promise.race([
-        provider.generateText(prompt, {
-          ...options,
-          model: options?.model || routing.preferredModel,
-        }),
-        timeoutPromise,
-      ]);
+      let response: LLMResponse;
+      try {
+        // Try fallback models within the same provider first
+        const modelsToTry = [
+          options?.model || routing.preferredModel,
+          ...(routing.fallbackModels || []),
+        ];
+
+        let lastModelError: Error | undefined;
+        let succeeded = false;
+
+        for (const model of modelsToTry) {
+          try {
+            response = await Promise.race([
+              provider.generateText(prompt, {
+                ...options,
+                model,
+              }),
+              timeoutPromise,
+            ]);
+            succeeded = true;
+            break;
+          } catch (modelError) {
+            lastModelError = modelError instanceof Error ? modelError : new Error(String(modelError));
+            if (modelsToTry.indexOf(model) < modelsToTry.length - 1) {
+              logger.warn(`Model ${model} failed on ${providerName}, trying next model`, {
+                error: lastModelError.message,
+              });
+            }
+          }
+        }
+
+        if (!succeeded) {
+          throw lastModelError || new Error("All models failed");
+        }
+      } finally {
+        // Always clear the timeout to prevent timer leaks
+        if (timeoutId) clearTimeout(timeoutId);
+      }
 
       // Record cost
       costTracker.record({
-        provider: response.provider,
-        model: response.model,
+        provider: response!.provider,
+        model: response!.model,
         taskType,
-        inputTokens: response.usage.promptTokens,
-        outputTokens: response.usage.completionTokens,
-        cost: response.cost,
-        latencyMs: response.latencyMs,
+        inputTokens: response!.usage.promptTokens,
+        outputTokens: response!.usage.completionTokens,
+        cost: response!.cost,
+        latencyMs: response!.latencyMs,
         success: true,
       });
 
       logger.info(`Generation successful with ${providerName}`, {
         taskType,
-        latencyMs: response.latencyMs,
-        cost: response.cost,
+        model: response!.model,
+        latencyMs: response!.latencyMs,
+        cost: response!.cost,
         fallbackUsed: providersAttempted.length > 1,
       });
 
       return {
-        result: response,
+        result: response!,
         providersAttempted,
         fallbackUsed: providersAttempted.length > 1,
         errors,
@@ -250,39 +304,73 @@ export async function generateJSONWithFallback<T = unknown>(
     try {
       logger.info(`Attempting JSON generation with ${providerName}`, { taskType });
 
+      // Create timeout with proper cleanup to avoid timer leaks
       const timeoutMs = routing.timeoutMs || 60000;
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), timeoutMs)
-      );
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("timeout")), timeoutMs);
+      });
 
-      const result = await Promise.race([
-        provider.generateJSON<T>(prompt, {
-          ...options,
-          model: options?.model || routing.preferredModel,
-        }),
-        timeoutPromise,
-      ]);
+      let result: { data: T; response: LLMResponse };
+      try {
+        // Try fallback models within the same provider
+        const modelsToTry = [
+          options?.model || routing.preferredModel,
+          ...(routing.fallbackModels || []),
+        ];
+
+        let lastModelError: Error | undefined;
+        let succeeded = false;
+
+        for (const model of modelsToTry) {
+          try {
+            result = await Promise.race([
+              provider.generateJSON<T>(prompt, {
+                ...options,
+                model,
+              }),
+              timeoutPromise,
+            ]);
+            succeeded = true;
+            break;
+          } catch (modelError) {
+            lastModelError = modelError instanceof Error ? modelError : new Error(String(modelError));
+            if (modelsToTry.indexOf(model) < modelsToTry.length - 1) {
+              logger.warn(`Model ${model} failed on ${providerName} for JSON, trying next model`, {
+                error: lastModelError.message,
+              });
+            }
+          }
+        }
+
+        if (!succeeded) {
+          throw lastModelError || new Error("All models failed");
+        }
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+      }
 
       // Record cost
       costTracker.record({
-        provider: result.response.provider,
-        model: result.response.model,
+        provider: result!.response.provider,
+        model: result!.response.model,
         taskType,
-        inputTokens: result.response.usage.promptTokens,
-        outputTokens: result.response.usage.completionTokens,
-        cost: result.response.cost,
-        latencyMs: result.response.latencyMs,
+        inputTokens: result!.response.usage.promptTokens,
+        outputTokens: result!.response.usage.completionTokens,
+        cost: result!.response.cost,
+        latencyMs: result!.response.latencyMs,
         success: true,
       });
 
       logger.info(`JSON generation successful with ${providerName}`, {
         taskType,
-        latencyMs: result.response.latencyMs,
+        model: result!.response.model,
+        latencyMs: result!.response.latencyMs,
         fallbackUsed: providersAttempted.length > 1,
       });
 
       return {
-        result,
+        result: result!,
         providersAttempted,
         fallbackUsed: providersAttempted.length > 1,
         errors,

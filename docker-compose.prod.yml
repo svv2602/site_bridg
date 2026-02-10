@@ -1,0 +1,39 @@
+# Production overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  postgres:
+    # No external port mapping in production
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+
+  backend:
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend-payload/media:/app/media
+      - ./backend-payload/logs:/app/logs
+      - ./backend-payload/data:/app/data
+      - ./backend-payload/content-automation/data:/app/content-automation/data
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+
+  frontend:
+    restart: unless-stopped
+    ports:
+      - "3010:3010"
+    environment:
+      # Enable image optimization in production (requires proper NEXT_PUBLIC_PAYLOAD_URL)
+      SKIP_IMAGE_OPTIMIZATION: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G

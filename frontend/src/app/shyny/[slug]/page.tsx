@@ -16,7 +16,8 @@ import { KeyBenefits } from "@/components/KeyBenefits";
 import { Breadcrumb } from "@/components/ui";
 import { SizesByDiameter } from "@/components/SizesByDiameter";
 import { ReviewsSectionWithMore } from "@/components/ReviewsSectionWithMore";
-import { seasonLabels, SeasonIcons, formatVehicleTypes, getSiteUrl } from "@/lib/utils/tyres";
+import { seasonLabels, SeasonIcons, formatVehicleTypes } from "@/lib/utils/tyres";
+import { SITE_URL } from "@/lib/constants";
 
 function buildTitle(model: TyreModel): string {
   return `${model.name} — ${seasonLabels[model.season]} Bridgestone`;
@@ -91,7 +92,7 @@ export default async function TyreModelPage({
     model.id ? getReviewStats(model.id) : Promise.resolve({ totalCount: 0, averageRating: 0 }),
   ]);
 
-  const siteUrl = getSiteUrl();
+  const siteUrl = SITE_URL;
   const productSchema = generateProductSchemaWithReviews(model, reviews, reviewStats, siteUrl);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: `${siteUrl}/` },

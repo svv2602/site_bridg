@@ -38,10 +38,6 @@ export const ENV = {
   // === Payload CMS ===
   PAYLOAD_URL: process.env.PAYLOAD_URL || "http://localhost:3001",
 
-  // === Legacy Strapi (deprecated) ===
-  STRAPI_URL: process.env.STRAPI_URL || "http://localhost:1337",
-  STRAPI_API_TOKEN: process.env.STRAPI_API_TOKEN || "",
-
   // === Telegram notifications ===
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
   TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID || "",

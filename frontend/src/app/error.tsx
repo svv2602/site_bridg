@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 export default function Error({
   error,
@@ -33,13 +34,14 @@ export default function Error({
             </p>
           )}
           <div className="flex flex-wrap justify-center gap-4">
-            <button
+            <Button
               onClick={reset}
-              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700 transition-colors"
+              variant="danger"
+              size="lg"
+              leftIcon={<RefreshCw className="h-4 w-4" />}
             >
-              <RefreshCw className="h-4 w-4" />
               Спробувати знову
-            </button>
+            </Button>
             <Link
               href="/"
               className="inline-flex items-center gap-2 rounded-full border border-red-300 dark:border-red-700 px-6 py-3 font-semibold text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"

@@ -15,7 +15,7 @@ import { scrapeProkoleso, scrapeProkolesoBrand, mergeAndSaveResults } from "./sc
 import { generateTireDescription } from "./processors/content/tire-description.js";
 import { generateTireSEO } from "./processors/content/tire-seo.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
-import { notifyWeeklySummary, notifyError } from "./publishers/telegram-bot.js";
+import { notifyWeeklySummary, notifyError, notifyNewContent } from "./publishers/telegram-bot.js";
 import { markdownToHtml } from "./utils/markdown-to-html.js";
 import type { Brand } from "./types/content.js";
 
@@ -76,7 +76,7 @@ export async function runWeeklyAutomation(): Promise<AutomationResult> {
     console.log("\n[4/6] Generating articles...");
     console.log("(Article generation triggered by new tests)");
 
-    // Step 5: Publish to Strapi
+    // Step 5: Publish to Payload CMS
     console.log("\n[5/6] Publishing to Payload...");
     await runPublishPipeline();
 
@@ -441,6 +441,14 @@ async function runPublishPipeline(brand?: Brand) {
         tire.publishedAt = new Date().toISOString();
         published++;
         stats.tyresProcessed++;
+
+        // Send Telegram notification about new content
+        await notifyNewContent({
+          tireName: tire.name,
+          descriptionLength: content.shortDescription?.split(/\s+/).length || 0,
+          badges: [],
+          payloadUrl: `${ENV.PAYLOAD_URL}/admin/collections/tyres/${slug}`,
+        });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         console.log(`  ✗ Failed: ${errorMessage}`);

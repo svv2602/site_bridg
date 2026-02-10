@@ -7,39 +7,44 @@ import type { TyreModel, Season } from "@/lib/data";
 import { getTyreModels } from "@/lib/api/tyres";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
-import { seasonLabelsShort, getSiteUrl } from "@/lib/utils/tyres";
-
-// Vehicle type labels (extended with sport)
-const vehicleLabels: Record<string, string> = {
-  passenger: "Легкові",
-  suv: "SUV/Кросовери",
-  lcv: "Легкі вантажівки",
-  sport: "Спортивні",
-};
+import { seasonLabelsShort, brandLabels, vehicleTypeLabelsLong } from "@/lib/utils/tyres";
+import { SITE_URL } from "@/lib/constants";
 
 // Comparison attributes
 const comparisonAttributes = [
+  { key: "brand", label: "Бренд" },
   { key: "season", label: "Сезон" },
   { key: "vehicleTypes", label: "Тип авто" },
-  { key: "fuelEfficiency", label: "Паливна ефективність" },
-  { key: "wetGrip", label: "Зчеплення на мокрій дорозі" },
-  { key: "noiseDb", label: "Рівень шуму" },
+  { key: "fuelEfficiency", label: "Паливна ефективність (EU)" },
+  { key: "wetGrip", label: "Зчеплення на мокрій дорозі (EU)" },
+  { key: "noiseDb", label: "Рівень шуму (EU)" },
+  { key: "usage", label: "Призначення" },
   { key: "technologies", label: "Технології" },
   { key: "sizes", label: "Доступні розміри" },
 ];
 
 function getAttributeValue(tyre: TyreModel, key: string): string {
   switch (key) {
+    case "brand":
+      return brandLabels[tyre.brand] || tyre.brand;
     case "season":
       return seasonLabelsShort[tyre.season] || tyre.season;
     case "vehicleTypes":
-      return tyre.vehicleTypes.map((v) => vehicleLabels[v] || v).join(", ");
+      return tyre.vehicleTypes.map((v) => vehicleTypeLabelsLong[v] || v).join(", ");
     case "fuelEfficiency":
       return tyre.euLabel?.fuelEfficiency || "—";
     case "wetGrip":
       return tyre.euLabel?.wetGrip || "—";
     case "noiseDb":
       return tyre.euLabel?.noiseDb ? `${tyre.euLabel.noiseDb} дБ` : "—";
+    case "usage": {
+      const usageLabels: string[] = [];
+      if (tyre.usage?.city) usageLabels.push("Місто");
+      if (tyre.usage?.highway) usageLabels.push("Траса");
+      if (tyre.usage?.offroad) usageLabels.push("Бездоріжжя");
+      if (tyre.usage?.winter) usageLabels.push("Зима");
+      return usageLabels.length > 0 ? usageLabels.join(", ") : "—";
+    }
     case "technologies":
       return tyre.technologies?.join(", ") || "—";
     case "sizes":
@@ -187,7 +192,7 @@ export default async function ComparisonPage({
     notFound();
   }
 
-  const siteUrl = getSiteUrl();
+  const siteUrl = SITE_URL;
   const comparisonSchema = generateComparisonSchema(compareTyres);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: `${siteUrl}/` },
@@ -307,7 +312,7 @@ export default async function ComparisonPage({
                     return (
                       <tr
                         key={attr.key}
-                        className="border-b border-border hover:bg-muted/50 transition-colors"
+                        className="border-b border-border hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                       >
                         <th scope="row" className="py-4 px-4 font-medium text-left">
                           {attr.label}

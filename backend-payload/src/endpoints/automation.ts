@@ -1,21 +1,23 @@
 import type { Endpoint } from 'payload';
 import Database from 'better-sqlite3';
 import path from 'path';
-import { getSchedulerStatus, setSchedulerConfig } from '../automation/jobs/scheduler';
+import { getSchedulerStatus, setSchedulerConfig } from '../scheduler';
 
-// Dynamic imports for article-queue module (lives in content-automation)
-function getArticleQueueModule() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const dbPath = path.join(process.cwd(), 'content-automation', 'src', 'db', 'article-queue.ts');
-  // We use the compiled version at runtime — the DB module accesses SQLite directly
-  // Since content-automation uses .js imports, we access SQLite via the same DB path
+// Singleton SQLite connection for article queue / metrics / settings
+// DDL runs only once on first access; connection is never closed (lives for process lifetime).
+let articleQueueDb: Database.Database | null = null;
+
+function getArticleQueueDb(): Database.Database {
+  if (articleQueueDb) return articleQueueDb;
+
   const dbFilePath = process.env.SQLITE_PATH
     || path.join(process.cwd(), 'content-automation', 'data', 'content-automation.db');
 
-  const db = new Database(dbFilePath);
+  articleQueueDb = new Database(dbFilePath);
+  articleQueueDb.pragma('journal_mode = WAL');
 
-  // Ensure tables exist
-  db.exec(`
+  // Ensure all tables exist (runs once)
+  articleQueueDb.exec(`
     CREATE TABLE IF NOT EXISTS content_sources (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -45,19 +47,22 @@ function getArticleQueueModule() {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      tires_scraped INTEGER DEFAULT 0,
+      tires_generated INTEGER DEFAULT 0,
+      articles_generated INTEGER DEFAULT 0,
+      tokens_used INTEGER DEFAULT 0,
+      cost_usd REAL DEFAULT 0,
+      errors_count INTEGER DEFAULT 0,
+      execution_time_ms INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(date)
+    );
   `);
 
-  return db;
-}
-
-/**
- * Resolve the path to the content-automation SQLite database.
- * When Payload runs from backend-payload/, the DB is at
- * content-automation/data/content-automation.db.
- */
-function getMetricsDbPath(): string {
-  return process.env.SQLITE_PATH
-    || path.join(process.cwd(), 'content-automation', 'data', 'content-automation.db');
+  return articleQueueDb;
 }
 
 /**
@@ -88,26 +93,8 @@ export const automationStatsEndpoint: Endpoint = {
   path: '/automation/stats',
   method: 'get',
   handler: async () => {
-    let db: Database.Database | null = null;
     try {
-      db = new Database(getMetricsDbPath());
-
-      // Ensure table exists (DB may be empty/new)
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS metrics (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          date TEXT NOT NULL,
-          tires_scraped INTEGER DEFAULT 0,
-          tires_generated INTEGER DEFAULT 0,
-          articles_generated INTEGER DEFAULT 0,
-          tokens_used INTEGER DEFAULT 0,
-          cost_usd REAL DEFAULT 0,
-          errors_count INTEGER DEFAULT 0,
-          execution_time_ms INTEGER DEFAULT 0,
-          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE(date)
-        )
-      `);
+      const db = getArticleQueueDb();
 
       // Weekly totals
       const today = new Date();
@@ -133,14 +120,15 @@ export const automationStatsEndpoint: Endpoint = {
 
       return Response.json({
         tiresProcessed: row.tires_scraped,
-        articlesCreated: row.tires_generated,
-        badgesAssigned: row.articles_generated,
+        articlesCreated: row.articles_generated,
+        badgesAssigned: row.tires_generated,
         totalCost: Math.round(row.cost_usd * 100) / 100,
         errorCount: row.errors_count,
         lastRun,
       });
     } catch (error) {
       // If DB doesn't exist yet, return zeros gracefully
+      console.error('[automation/stats] Failed to load stats:', error);
       return Response.json({
         tiresProcessed: 0,
         articlesCreated: 0,
@@ -149,8 +137,6 @@ export const automationStatsEndpoint: Endpoint = {
         errorCount: 0,
         lastRun: null,
       });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -221,9 +207,8 @@ export const automationSourcesEndpoint: Endpoint = {
   path: '/automation/sources',
   method: 'get',
   handler: async () => {
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
 
       // Seed defaults if empty
       const defaultSources = [
@@ -256,10 +241,9 @@ export const automationSourcesEndpoint: Endpoint = {
       }));
 
       return Response.json({ sources });
-    } catch {
+    } catch (error) {
+      console.error('[automation/sources] Failed to load sources:', error);
       return Response.json({ sources: [] });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -289,9 +273,8 @@ export const automationSourcesUpdateEndpoint: Endpoint = {
       return Response.json({ error: 'id is required' }, { status: 400 });
     }
 
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
 
       const fields: string[] = [];
       const values: unknown[] = [];
@@ -316,8 +299,6 @@ export const automationSourcesUpdateEndpoint: Endpoint = {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       return Response.json({ error: msg }, { status: 500 });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -334,9 +315,8 @@ export const automationQueueEndpoint: Endpoint = {
   path: '/automation/queue',
   method: 'get',
   handler: async (req) => {
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
 
       const url = new URL(req.url || '', 'http://localhost');
       const status = url.searchParams.get('status');
@@ -380,10 +360,9 @@ export const automationQueueEndpoint: Endpoint = {
       }
 
       return Response.json({ items, stats });
-    } catch {
+    } catch (error) {
+      console.error('[automation/queue] Failed to load queue:', error);
       return Response.json({ items: [], stats: {} });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -411,9 +390,8 @@ export const automationQueueUpdateEndpoint: Endpoint = {
       return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
       const action = body.action as string;
 
       if (action === 'add') {
@@ -456,8 +434,6 @@ export const automationQueueUpdateEndpoint: Endpoint = {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       return Response.json({ error: msg }, { status: 500 });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -473,9 +449,8 @@ export const automationArticleSettingsEndpoint: Endpoint = {
   path: '/automation/article-settings',
   method: 'get',
   handler: async () => {
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
 
       // Seed defaults
       const defaults: Record<string, string> = {
@@ -504,10 +479,9 @@ export const automationArticleSettingsEndpoint: Endpoint = {
       }
 
       return Response.json({ settings });
-    } catch {
+    } catch (error) {
+      console.error('[automation/article-settings] Failed to load settings:', error);
       return Response.json({ settings: {} });
-    } finally {
-      db?.close();
     }
   },
 };
@@ -537,9 +511,8 @@ export const automationArticleSettingsUpdateEndpoint: Endpoint = {
       return Response.json({ error: 'settings object is required' }, { status: 400 });
     }
 
-    let db: Database.Database | null = null;
     try {
-      db = getArticleQueueModule();
+      const db = getArticleQueueDb();
 
       const stmt = db.prepare(
         `INSERT INTO article_settings (key, value) VALUES (?, ?)
@@ -557,8 +530,6 @@ export const automationArticleSettingsUpdateEndpoint: Endpoint = {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       return Response.json({ error: msg }, { status: 500 });
-    } finally {
-      db?.close();
     }
   },
 };

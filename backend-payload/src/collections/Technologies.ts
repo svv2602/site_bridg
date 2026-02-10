@@ -1,3 +1,12 @@
+/**
+ * Technologies Collection
+ *
+ * Bridgestone proprietary tyre technologies (e.g., ENLITEN, NanoPro-Tech).
+ * Referenced by Tyres collection via many-to-many relationship.
+ * Fields: name, slug, description, icon.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const Technologies: CollectionConfig = {

@@ -212,11 +212,34 @@ export type Translations = typeof uk;
 export type TranslationKey = keyof typeof uk;
 
 /**
- * Helper function to get translation by dot-notation key
+ * Recursive type that generates all valid dot-notation paths for the translation object.
+ * Enables compile-time checking of translation keys.
+ *
+ * @example
+ * type Paths = TranslationPath;
+ * // "common.home" | "common.search" | "seasons.summer" | ...
+ */
+type NestedKeyOf<T, Prefix extends string = ""> = T extends string
+  ? Prefix
+  : T extends Record<string, unknown>
+    ? {
+        [K in keyof T & string]: NestedKeyOf<
+          T[K],
+          Prefix extends "" ? K : `${Prefix}.${K}`
+        >;
+      }[keyof T & string]
+    : never;
+
+export type TranslationPath = NestedKeyOf<typeof uk>;
+
+/**
+ * Helper function to get translation by dot-notation key.
+ * Type-safe: a typo like t('home.whyBridgestoone') causes a compile-time error.
+ *
  * @example t('common.home') // "Головна"
  * @example t('seasons.summer') // "Літні шини"
  */
-export function t(key: string): string {
+export function t(key: TranslationPath): string {
   const keys = key.split(".");
   let value: unknown = uk;
 
@@ -232,6 +255,7 @@ export function t(key: string): string {
 }
 
 /**
+ * @deprecated Use direct access to uk.section instead. Will be removed in future versions.
  * Get all translations for a section
  * @example getSection('seasons') // { summer: "...", winter: "...", ... }
  */

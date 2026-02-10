@@ -2,14 +2,18 @@
  * Telegram Bot Commands Handler
  *
  * Implements bot commands: /start, /help, /run, /scrape, /status, /stats
- * Uses long-polling to receive updates.
+ * Uses long-polling to receive updates with graceful shutdown support.
  */
 
 import { ENV } from "../config/env.js";
-import { notify } from "./telegram-bot.js";
+import { notify, escapeHtml } from "./telegram-bot.js";
 import { runWeeklyAutomation } from "../scheduler.js";
 import { getMetricsSummary, formatSummaryForTelegram } from "../utils/metrics.js";
 import { logger } from "../utils/logger.js";
+import { withRetry } from "../utils/retry.js";
+
+// Constants
+const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
 
 // Types
 interface TelegramUpdate {
@@ -45,6 +49,9 @@ let runStatus: RunStatus = {
   lastRunError: null,
 };
 
+// Polling control
+let shouldStop = false;
+
 // Constants
 const TELEGRAM_API = `https://api.telegram.org/bot${ENV.TELEGRAM_BOT_TOKEN}`;
 const AUTHORIZED_CHAT_ID = ENV.TELEGRAM_CHAT_ID;
@@ -69,24 +76,49 @@ function formatDuration(ms: number): string {
 }
 
 /**
- * Send a message to the chat
+ * Truncate message to fit Telegram API limit (4096 chars)
+ */
+function truncateMessage(text: string): string {
+  if (text.length <= TELEGRAM_MAX_MESSAGE_LENGTH) return text;
+
+  const truncationSuffix = "\n\n...[truncated]";
+  return text.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - truncationSuffix.length) + truncationSuffix;
+}
+
+/**
+ * Send a message to the chat with retry logic and HTML parse_mode
  */
 async function sendMessage(chatId: number, text: string): Promise<boolean> {
-  try {
-    const response = await fetch(`${TELEGRAM_API}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        parse_mode: "Markdown",
-      }),
+  const truncated = truncateMessage(text);
+
+  const result = await withRetry(
+    async () => {
+      const response = await fetch(`${TELEGRAM_API}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: truncated,
+          parse_mode: "HTML",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Telegram API error: ${response.status}`);
+      }
+      return true;
+    },
+    { maxRetries: 2, initialDelayMs: 1000, maxDelayMs: 5000 }
+  );
+
+  if (!result.success) {
+    logger.error("Failed to send Telegram message", {
+      error: result.error?.message || "Unknown error",
+      stack: result.error?.stack,
     });
-    return response.ok;
-  } catch (error) {
-    logger.error("Failed to send Telegram message:", error);
     return false;
   }
+
+  return true;
 }
 
 /**
@@ -96,11 +128,11 @@ function isAuthorized(chatId: number): boolean {
   return String(chatId) === AUTHORIZED_CHAT_ID;
 }
 
-// Command handlers
+// Command handlers (using HTML formatting)
 const commands: Record<string, (chatId: number) => Promise<string>> = {
   "/start": async () => {
     return `
-*Bridgestone Content Automation Bot*
+<b>Bridgestone Content Automation Bot</b>
 
 Доступні команди:
 /run - Запустити повний цикл автоматизації
@@ -109,20 +141,20 @@ const commands: Record<string, (chatId: number) => Promise<string>> = {
 /stats - Статистика за тиждень
 /help - Показати цю довідку
 
-_Бот працює тільки з авторизованого чату._
+<i>Бот працює тільки з авторизованого чату.</i>
     `.trim();
   },
 
   "/help": async () => {
     return `
-*Довідка*
+<b>Довідка</b>
 
 /run - Запускає повний цикл: скрапінг → генерація контенту → публікація
 /scrape - Тільки збір даних з ProKoleso та тестових ресурсів
 /status - Показує статус та результат останнього запуску
 /stats - Статистика обробки за останній тиждень
 
-_Автоматичний запуск: щонеділі о 03:00 за київським часом_
+<i>Автоматичний запуск: щонеділі о 03:00 за київським часом</i>
     `.trim();
   },
 
@@ -146,9 +178,9 @@ _Автоматичний запуск: щонеділі о 03:00 за київ�
       runStatus.lastRunStatus = result.errors.length === 0 ? "success" : "error";
       runStatus.lastRunError = result.errors.length > 0 ? result.errors.join("; ") : null;
 
-      const statusEmoji = result.errors.length === 0 ? "" : "";
+      const statusEmoji = result.errors.length === 0 ? "✅" : "⚠️";
       return `
-${statusEmoji} *Автоматизація завершена*
+${statusEmoji} <b>Автоматизація завершена</b>
 
 Час виконання: ${formatDuration(runStatus.lastRunDuration)}
 Шин оброблено: ${result.tyresProcessed}
@@ -163,7 +195,7 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
       runStatus.lastRunStatus = "error";
       runStatus.lastRunError = error instanceof Error ? error.message : String(error);
 
-      return `Помилка автоматизації: ${runStatus.lastRunError}`;
+      return `❌ Помилка автоматизації: ${escapeHtml(runStatus.lastRunError)}`;
     }
   },
 
@@ -185,7 +217,7 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
       }
 
       return `
-*Скрапінг завершено*
+<b>Скрапінг завершено</b>
 
 Знайдено шин: ${result.tires.length}
 Пропущено (вже оброблені): ${result.skippedSlugs.size}
@@ -193,31 +225,31 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
       `.trim();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      return `Помилка скрапінгу: ${errorMessage}`;
+      return `❌ Помилка скрапінгу: ${escapeHtml(errorMessage)}`;
     }
   },
 
   "/status": async () => {
     if (runStatus.isRunning) {
-      return "Автоматизація зараз виконується...";
+      return "⏳ Автоматизація зараз виконується...";
     }
 
     if (!runStatus.lastRunAt) {
       return "Ще не було жодного запуску.";
     }
 
-    const statusEmoji = runStatus.lastRunStatus === "success" ? "" : "";
+    const statusEmoji = runStatus.lastRunStatus === "success" ? "✅" : "⚠️";
     const lastRunDate = new Date(runStatus.lastRunAt).toLocaleString("uk-UA", {
       timeZone: "Europe/Kyiv",
     });
 
     return `
-${statusEmoji} *Статус останнього запуску*
+${statusEmoji} <b>Статус останнього запуску</b>
 
 Час: ${lastRunDate}
 Тривалість: ${runStatus.lastRunDuration ? formatDuration(runStatus.lastRunDuration) : "N/A"}
 Результат: ${runStatus.lastRunStatus === "success" ? "Успішно" : "З помилками"}
-${runStatus.lastRunError ? `Помилка: ${runStatus.lastRunError}` : ""}
+${runStatus.lastRunError ? `Помилка: ${escapeHtml(runStatus.lastRunError)}` : ""}
     `.trim();
   },
 
@@ -225,7 +257,7 @@ ${runStatus.lastRunError ? `Помилка: ${runStatus.lastRunError}` : ""}
     try {
       const summary = getMetricsSummary("week");
       return formatSummaryForTelegram(summary);
-    } catch (error) {
+    } catch {
       return "Не вдалось отримати статистику. Можливо, база даних не ініціалізована.";
     }
   },
@@ -262,7 +294,15 @@ async function processUpdate(update: TelegramUpdate): Promise<void> {
 }
 
 /**
- * Start long-polling for updates
+ * Stop the polling loop gracefully
+ */
+export function stopPolling(): void {
+  shouldStop = true;
+  logger.info("Telegram bot polling stop requested");
+}
+
+/**
+ * Start long-polling for updates with graceful shutdown support
  */
 export async function startPolling(): Promise<void> {
   if (!ENV.TELEGRAM_BOT_TOKEN || !ENV.TELEGRAM_CHAT_ID) {
@@ -271,16 +311,19 @@ export async function startPolling(): Promise<void> {
   }
 
   logger.info("Starting Telegram bot polling...");
+  shouldStop = false;
 
   let offset = 0;
   let retryDelay = 1000;
 
-  while (true) {
+  while (!shouldStop) {
     try {
       const response = await fetch(
         `${TELEGRAM_API}/getUpdates?offset=${offset}&timeout=30&allowed_updates=["message"]`,
         { signal: AbortSignal.timeout(35000) }
       );
+
+      if (shouldStop) break;
 
       if (!response.ok) {
         throw new Error(`Telegram API error: ${response.status}`);
@@ -289,6 +332,7 @@ export async function startPolling(): Promise<void> {
       const data: TelegramResponse = await response.json();
 
       for (const update of data.result) {
+        if (shouldStop) break;
         await processUpdate(update);
         offset = update.update_id + 1;
       }
@@ -296,13 +340,18 @@ export async function startPolling(): Promise<void> {
       // Reset retry delay on success
       retryDelay = 1000;
     } catch (error) {
-      logger.error("Polling error:", error);
+      if (shouldStop) break;
+
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      logger.error("Polling error", { error: errorMsg, stack: error instanceof Error ? error.stack : undefined });
 
       // Exponential backoff with max 60 seconds
       await sleep(retryDelay);
       retryDelay = Math.min(retryDelay * 2, 60000);
     }
   }
+
+  logger.info("Telegram bot polling stopped");
 }
 
 /**

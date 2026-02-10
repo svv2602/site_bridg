@@ -2,7 +2,9 @@ import type { Endpoint } from 'payload';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
-import { saveJob, updateJob, getJob, getRecentJobs, type JobStatus } from './jobStore';
+import { saveJob, updateJob, getJob, getRecentJobs, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
+import { tryAcquireLock, releaseLock, LOCK_IDS } from '../lib/distributed-lock';
+import { auditLog } from '../lib/audit-log';
 
 const execAsync = promisify(exec);
 
@@ -222,6 +224,15 @@ export const contentFullPipelineEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Distributed lock: prevent concurrent pipeline runs
+    const lock = await tryAcquireLock(req.payload, LOCK_IDS.PIPELINE);
+    if (!lock.acquired) {
+      return Response.json(
+        { error: 'Pipeline is already running. Please wait for it to complete.' },
+        { status: 409 },
+      );
+    }
+
     const url = new URL(req.url || '', 'http://localhost');
     const force = url.searchParams.get('force') === 'true';
 
@@ -250,35 +261,49 @@ export const contentFullPipelineEndpoint: Endpoint = {
     };
     saveJob(job);
 
+    // Audit log
+    const userEmail = (req.user as { email?: string }).email;
+    auditLog(req.payload, {
+      action: 'automation_run',
+      actor: userEmail,
+      target: 'pipeline',
+      details: { jobId, force },
+    }).catch(() => {});
+
     (async () => {
-      let allOutput = '';
-      for (const { cmd, label, step } of steps) {
-        job.currentStep = step;
-        job.stepLabel = label;
-        updateJob(job);
-        try {
-          const { stdout, stderr } = await execAsync(cmd, {
-            cwd: automationDir,
-            timeout: 600000, // 10 minutes per step
-            env: { ...process.env },
-          });
-          allOutput += stdout + (stderr ? `\nSTDERR:\n${stderr}` : '') + '\n';
-        } catch (error: unknown) {
-          const err = error as { message: string; stdout?: string };
-          job.status = 'failed';
-          job.completedAt = new Date().toISOString();
-          job.error = `Крок "${label}" не вдався: ${err.message}`;
-          job.output = allOutput + (err.stdout || '');
+      try {
+        let allOutput = '';
+        for (const { cmd, label, step } of steps) {
+          job.currentStep = step;
+          job.stepLabel = label;
           updateJob(job);
-          req.payload.logger.error(`Full pipeline failed at step "${label}": ${err.message}`);
-          return;
+          try {
+            const { stdout, stderr } = await execAsync(cmd, {
+              cwd: automationDir,
+              timeout: 600000, // 10 minutes per step
+              env: { ...process.env },
+            });
+            allOutput += stdout + (stderr ? `\nSTDERR:\n${stderr}` : '') + '\n';
+          } catch (error: unknown) {
+            const err = error as { message: string; stdout?: string };
+            job.status = 'failed';
+            job.completedAt = new Date().toISOString();
+            job.error = `Крок "${label}" не вдався: ${err.message}`;
+            job.output = allOutput + (err.stdout || '');
+            updateJob(job);
+            req.payload.logger.error(`Full pipeline failed at step "${label}": ${err.message}`);
+            return;
+          }
         }
+        job.status = 'completed';
+        job.completedAt = new Date().toISOString();
+        job.output = allOutput;
+        updateJob(job);
+        req.payload.logger.info(`Full pipeline completed: ${jobId}`);
+      } finally {
+        // Always release the lock when pipeline finishes
+        await releaseLock(req.payload, LOCK_IDS.PIPELINE);
       }
-      job.status = 'completed';
-      job.completedAt = new Date().toISOString();
-      job.output = allOutput;
-      updateJob(job);
-      req.payload.logger.info(`Full pipeline completed: ${jobId}`);
     })();
 
     return Response.json({
@@ -321,6 +346,24 @@ export const contentRegenerateEndpoint: Endpoint = {
       return Response.json({ error: 'Slug is required' }, { status: 400 });
     }
 
+    // Concurrency check: prevent duplicate jobs for the same slug
+    const existing = findActiveByTarget('content', undefined, slug);
+    if (existing) {
+      return Response.json({
+        message: 'Content regeneration already running for this slug',
+        jobId: existing.id,
+        checkStatus: `/api/content/status/${existing.id}`,
+      });
+    }
+
+    // Rate limit: max 5 concurrent AI jobs
+    if (countActiveJobs() >= 5) {
+      return Response.json(
+        { error: 'Too many concurrent jobs. Please wait and try again.' },
+        { status: 429 }
+      );
+    }
+
     const automationDir = path.join(process.cwd(), 'content-automation');
 
     // Command to regenerate specific tyre
@@ -329,9 +372,11 @@ export const contentRegenerateEndpoint: Endpoint = {
     const jobId = `regen-${slug}-${Date.now()}`;
     const job: JobStatus = {
       id: jobId,
+      type: 'content',
       status: 'running',
       startedAt: new Date().toISOString(),
       command,
+      targetName: slug,
     };
     saveJob(job);
 
@@ -377,6 +422,15 @@ export const contentSmartPipelineEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Distributed lock: prevent concurrent smart pipeline runs
+    const lock = await tryAcquireLock(req.payload, LOCK_IDS.SMART_ARTICLES);
+    if (!lock.acquired) {
+      return Response.json(
+        { error: 'Smart article pipeline is already running. Please wait for it to complete.' },
+        { status: 409 },
+      );
+    }
+
     const automationDir = path.join(process.cwd(), 'content-automation');
     const command = 'npx tsx src/article-pipeline.ts';
 
@@ -391,6 +445,15 @@ export const contentSmartPipelineEndpoint: Endpoint = {
       stepLabel: 'Сканування джерел',
     };
     saveJob(job);
+
+    // Audit log
+    const userEmail = (req.user as { email?: string }).email;
+    auditLog(req.payload, {
+      action: 'automation_run',
+      actor: userEmail,
+      target: 'smart-pipeline',
+      details: { jobId },
+    }).catch(() => {});
 
     execAsync(command, {
       cwd: automationDir,
@@ -411,6 +474,10 @@ export const contentSmartPipelineEndpoint: Endpoint = {
         job.output = error.stdout || '';
         updateJob(job);
         req.payload.logger.error(`Smart pipeline failed: ${error.message}`);
+      })
+      .finally(() => {
+        // Release distributed lock when done
+        releaseLock(req.payload, LOCK_IDS.SMART_ARTICLES).catch(() => {});
       });
 
     return Response.json({

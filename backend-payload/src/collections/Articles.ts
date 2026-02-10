@@ -1,3 +1,12 @@
+/**
+ * Articles Collection
+ *
+ * Blog/advice articles with rich text body (CKEditor), tags, hero image,
+ * related tyres, and SEO fields. Supports drafts/versions.
+ * Auto-generates slug from title via beforeChange hook.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const Articles: CollectionConfig = {

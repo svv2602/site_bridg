@@ -1,0 +1,220 @@
+/* Shared styles for Payload CMS admin components */
+
+/* Spinner animation - used by RegenerateContentButton, GenerateReviewsButton, RegenerateImageSection */
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Spinner element */
+.admin-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: admin-spin 1s linear infinite;
+}
+
+.admin-spinner--white {
+  border-color: #fff;
+  border-top-color: transparent;
+}
+
+/* Action buttons */
+.admin-btn {
+  padding: 0.5rem 1rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.admin-btn:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.admin-btn--primary {
+  background-color: #0066cc;
+}
+
+.admin-btn--primary:disabled {
+  background-color: #666;
+}
+
+.admin-btn--success {
+  background-color: #22c55e;
+}
+
+.admin-btn--success:disabled {
+  background-color: #666;
+}
+
+.admin-btn--regen {
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+}
+
+.admin-btn--regen:disabled {
+  background-color: var(--theme-elevation-200);
+  color: var(--theme-elevation-600);
+}
+
+.admin-btn--outline {
+  padding: 0.375rem 0.75rem;
+  background-color: transparent;
+  color: var(--theme-text);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.admin-btn--outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status messages */
+.admin-status-msg {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.admin-status-msg--success {
+  color: #22c55e;
+}
+
+.admin-status-msg--error {
+  color: #ef4444;
+}
+
+.admin-status-msg--info {
+  color: var(--theme-elevation-600);
+  margin-top: 0.75rem;
+}
+
+/* Form controls */
+.admin-select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-150);
+  background-color: var(--theme-input-bg);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+}
+
+.admin-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-150);
+  background-color: var(--theme-input-bg);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+}
+
+.admin-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-150);
+  background-color: var(--theme-input-bg);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+  font-family: monospace;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.admin-label {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  color: var(--theme-elevation-800);
+}
+
+/* Section container (collapsible) */
+.admin-section {
+  margin-bottom: 1.5rem;
+  background-color: var(--theme-elevation-50);
+  border-radius: 8px;
+  border: 1px solid var(--theme-elevation-100);
+  overflow: hidden;
+}
+
+.admin-section__header {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--theme-text);
+  text-align: left;
+}
+
+.admin-section__body {
+  padding: 0 1rem 1rem 1rem;
+}
+
+/* Reviews count */
+.admin-review-count {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+/* Dark-themed select (for review count selector) */
+.admin-select--dark {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: white;
+  font-size: 0.875rem;
+}
+
+/* Grid layout for settings */
+.admin-settings-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-settings-grid--2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.admin-settings-grid--3col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Wrapper for button + controls row */
+.admin-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Field group spacing */
+.admin-field-group {
+  margin-bottom: 0.75rem;
+}
+
+/* Margin wrapper */
+.admin-mb-1 {
+  margin-bottom: 1rem;
+}

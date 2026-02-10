@@ -6,7 +6,7 @@ interface LoadingSkeletonProps {
 export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeletonProps) {
   if (variant === 'article') {
     return (
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div role="status" aria-label="Завантаження" className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="animate-pulse rounded-2xl border border-border bg-card overflow-hidden">
             <div className="h-48 bg-muted" />
@@ -28,7 +28,7 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
 
   if (variant === 'list') {
     return (
-      <div className="space-y-4">
+      <div role="status" aria-label="Завантаження" className="space-y-4">
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-4">
             <div className="flex gap-4">
@@ -46,7 +46,7 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
 
   // Default card variant
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div role="status" aria-label="Завантаження" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6">
           <div className="h-48 rounded-xl bg-muted mb-4" />
@@ -62,7 +62,7 @@ export function LoadingSkeleton({ count = 3, variant = 'card' }: LoadingSkeleton
 
 export function HeroSkeleton() {
   return (
-    <div className="animate-pulse">
+    <div role="status" aria-label="Завантаження" className="animate-pulse">
       <div className="h-4 w-32 rounded bg-hero-accent mb-4" />
       <div className="h-10 w-3/4 rounded bg-hero-accent mb-2" />
       <div className="h-6 w-1/2 rounded bg-hero-accent mb-6" />

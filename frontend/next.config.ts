@@ -33,8 +33,25 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(self)',
           },
-          // HSTS - УВІМКНУТИ ТІЛЬКИ НА PRODUCTION З HTTPS
-          // Розкоментувати на production після налаштування SSL:
+          // Content Security Policy
+          // Allows: self, Google Maps, Google Analytics, Meta Pixel, Sentry, inline styles (Next.js)
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: blob: http://localhost:3001 https://*.googleapis.com https://*.gstatic.com https://s7d1.scene7.com https://prokoleso.ua https://images.simpletire.com https://www.facebook.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "connect-src 'self' http://localhost:3001 https://maps.googleapis.com https://www.google-analytics.com https://www.facebook.com https://*.sentry.io",
+              "frame-src 'self' https://www.google.com https://www.facebook.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
+          // HSTS -- activate only on production with HTTPS configured
+          // Uncomment on production after SSL setup:
           // {
           //   key: 'Strict-Transport-Security',
           //   value: 'max-age=31536000; includeSubDomains; preload',

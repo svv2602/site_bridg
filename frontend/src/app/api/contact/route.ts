@@ -61,15 +61,15 @@ async function sendTelegramNotification(data: ContactFormData): Promise<boolean>
 
   try {
     const subjectLabel = SUBJECT_LABELS[data.subject || 'other'] || data.subject || 'Інше';
-    const message = `🔔 *Нове звернення з сайту*
+    const message = `🔔 <b>Нове звернення з сайту</b>
 
-👤 *Ім'я:* ${escapeMarkdown(data.name)}
-📞 *Телефон:* ${escapeMarkdown(data.phone)}
-📧 *Email:* ${escapeMarkdown(data.email)}
-📋 *Тема:* ${escapeMarkdown(subjectLabel)}
+👤 <b>Ім'я:</b> ${escapeHtml(data.name)}
+📞 <b>Телефон:</b> ${escapeHtml(data.phone)}
+📧 <b>Email:</b> ${escapeHtml(data.email)}
+📋 <b>Тема:</b> ${escapeHtml(subjectLabel)}
 
-💬 *Повідомлення:*
-${escapeMarkdown(data.message)}`;
+💬 <b>Повідомлення:</b>
+${escapeHtml(data.message)}`;
 
     const response = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
@@ -81,7 +81,7 @@ ${escapeMarkdown(data.message)}`;
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text: message,
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
         }),
       }
     );
@@ -98,8 +98,16 @@ ${escapeMarkdown(data.message)}`;
   }
 }
 
-function escapeMarkdown(text: string): string {
-  return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
+/**
+ * Escape HTML special characters to prevent XSS in email templates and Telegram messages.
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
@@ -138,24 +146,24 @@ async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
         <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;"><strong>Ім'я:</strong></td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${data.name}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(data.name)}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;"><strong>Телефон:</strong></td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><a href="tel:${data.phone}">${data.phone}</a></td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><a href="tel:${escapeHtml(data.phone)}">${escapeHtml(data.phone)}</a></td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;"><strong>Email:</strong></td>
-            <td style="padding: 10px; border: 1px solid #ddd;"><a href="mailto:${data.email}">${data.email}</a></td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5;"><strong>Тема:</strong></td>
-            <td style="padding: 10px; border: 1px solid #ddd;">${subjectLabel}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(subjectLabel)}</td>
           </tr>
         </table>
         <h3>Повідомлення:</h3>
         <div style="padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
-          ${data.message.replace(/\n/g, '<br>')}
+          ${escapeHtml(data.message).replace(/\n/g, '<br>')}
         </div>
         <p style="color: #666; font-size: 12px; margin-top: 20px;">
           Відправлено з сайту bridgestone.ua

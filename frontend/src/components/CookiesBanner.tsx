@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Cookie, X } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 type ConsentStatus = "accepted" | "rejected" | null;
 
@@ -127,18 +128,22 @@ export function CookiesBanner() {
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button
+          <Button
             onClick={handleAccept}
-            className="flex-1 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-text hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-silver focus:ring-offset-2"
+            variant="primary"
+            size="lg"
+            className="flex-1"
           >
             Прийняти всі
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleReject}
-            className="flex-1 rounded-full border border-stone-300 bg-transparent px-6 py-2.5 text-sm font-semibold hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-stone-600 dark:hover:bg-stone-700"
+            variant="secondary"
+            size="lg"
+            className="flex-1"
           >
             Тільки необхідні
-          </button>
+          </Button>
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">

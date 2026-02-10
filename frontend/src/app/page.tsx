@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -26,6 +27,7 @@ import { getTyreModels } from "@/lib/api/tyres";
 import { getDealers } from "@/lib/api/dealers";
 import { getLatestArticles } from "@/lib/api/articles";
 import { t } from "@/lib/i18n";
+import { seasonLabelsShort, vehicleTypeLabels } from "@/lib/utils/tyres";
 
 const tyreCategories = [
   {
@@ -81,41 +83,113 @@ const features = [
   },
 ];
 
-const seasonLabels: Record<string, string> = {
-  summer: "Літня",
-  winter: "Зимова",
-  allseason: "Всесезонна",
-};
 
-const vehicleLabels: Record<string, string> = {
-  passenger: "Легковий авто",
-  suv: "SUV/Кросовер",
-  lcv: "Комерційний",
-};
+// vehicleLabels consolidated into vehicleTypeLabels from @/lib/utils/tyres
 
-export default async function Home() {
-  // Fetch popular tyres from API
+// ---- Suspense skeleton components ----
+
+function CarouselSkeleton() {
+  return (
+    <section className="py-12">
+      <div className="container mx-auto max-w-7xl px-4 md:px-8">
+        <div className="mb-6 h-8 w-48 animate-pulse rounded-lg bg-stone-200 dark:bg-stone-800" />
+        <div className="grid gap-4 md:grid-cols-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-48 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ArticlesSkeleton() {
+  return (
+    <section className="py-12">
+      <div className="container mx-auto max-w-7xl px-4 md:px-8">
+        <div className="mb-10 text-center">
+          <div className="mx-auto mb-4 h-8 w-64 animate-pulse rounded-lg bg-stone-200 dark:bg-stone-800" />
+          <div className="mx-auto h-6 w-96 animate-pulse rounded-lg bg-stone-200 dark:bg-stone-800" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-48 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PopularTyresSkeleton() {
+  return (
+    <div className="space-y-6">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-32 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+      ))}
+    </div>
+  );
+}
+
+// ---- Async data-fetching server components ----
+
+async function PopularCarouselSection() {
   const allTyres = await getTyreModels();
-
-  // Tyres for carousel (full model objects)
   const carouselTyres = allTyres.filter(t => t.isPopular).slice(0, 8);
+  return <ProductCarousel tyres={carouselTyres} title="Популярні моделі" />;
+}
 
-  // Featured tyres for sidebar list (formatted)
+async function FeaturedTyresSection() {
+  const allTyres = await getTyreModels();
   const featuredTyres = allTyres
     .filter(t => t.isPopular)
     .slice(0, 3)
     .map(t => ({
       name: `Bridgestone ${t.name}`,
       slug: t.slug,
-      tag: `${seasonLabels[t.season] || t.season} • ${t.vehicleTypes.map(v => vehicleLabels[v] || v).join(' / ')}`,
+      tag: `${seasonLabelsShort[t.season] || t.season} • ${t.vehicleTypes.map(v => vehicleTypeLabels[v] || v).join(' / ')}`,
       description: t.shortDescription || '',
       rating: 4.8,
     }));
 
-  // Fetch dealers for locator
-  const allDealers = await getDealers();
+  return featuredTyres.length > 0 ? (
+    featuredTyres.map((tyre, idx) => (
+      <AnimatedCardX
+        key={tyre.slug}
+        delay={idx * 0.1}
+        direction="right"
+        className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
+      >
+        <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-purple-500/15 flex items-center justify-center">
+          <Star className="h-6 w-6 text-purple-500" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold">{tyre.name}</h3>
+          <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href={`/shyny/${tyre.slug}`}
+              className="rounded-full border border-stone-300 bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+            >
+              Дізнатися більше
+            </Link>
+            <Link
+              href="/dealers"
+              className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
+            >
+              Знайти магазин
+            </Link>
+          </div>
+        </div>
+      </AnimatedCardX>
+    ))
+  ) : (
+    <p className="text-muted-foreground">{t('home.loadingPopularModels')}</p>
+  );
+}
 
-  // Fetch latest articles from API
+async function ArticlesSection() {
   const latestArticles = await getLatestArticles(3);
   const articles = latestArticles.map(a => ({
     title: a.title,
@@ -125,16 +199,61 @@ export default async function Home() {
   }));
 
   return (
+    <section className="py-12">
+      <div className="container mx-auto max-w-7xl px-4 md:px-8">
+        <div className="mb-10 text-center">
+          <h2 className="mb-4 text-3xl font-bold">{t('home.adviceTitle')}</h2>
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            {t('home.adviceDescription')}
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {articles.map((article, idx) => (
+            <AnimatedCard
+              key={article.slug}
+              delay={idx * 0.1}
+              className="rounded-2xl border border-border bg-card p-6 shadow-lg"
+            >
+              <div className="mb-4 inline-flex rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
+                {article.category}
+              </div>
+              <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
+              <p className="mb-4 text-sm text-muted-foreground">{article.readingTime}</p>
+              <Link
+                href={`/blog/${article.slug}`}
+                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+              >
+                Читати <ChevronRight className="h-4 w-4" />
+              </Link>
+            </AnimatedCard>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function DealerLocatorSection() {
+  const allDealers = await getDealers();
+  return <DealerLocatorCompact initialDealers={allDealers} />;
+}
+
+// ---- Main page component ----
+
+export default function Home() {
+  return (
     <div className="bg-background text-foreground">
-      {/* Hero with Seasonal Content */}
+      {/* Hero with Seasonal Content — renders instantly (shell) */}
       <SeasonalHero>
         <QuickSearchForm />
       </SeasonalHero>
 
-      {/* Product Carousel */}
-      <ProductCarousel tyres={carouselTyres} title="Популярні моделі" />
+      {/* Product Carousel — streams */}
+      <Suspense fallback={<CarouselSkeleton />}>
+        <PopularCarouselSection />
+      </Suspense>
 
-      {/* Features */}
+      {/* Features — static content, no data fetch needed */}
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
@@ -161,7 +280,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Vehicle Types */}
+      {/* Vehicle Types — static content */}
       <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8 text-center">
@@ -180,7 +299,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Categories & Popular */}
+      {/* Categories & Popular — Categories are static, Popular fetches data */}
       <section className="py-12 bg-background">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
@@ -220,81 +339,21 @@ export default async function Home() {
                 {t('home.popularModelsDescription')}
               </p>
               <div className="space-y-6">
-                {featuredTyres.length > 0 ? (
-                  featuredTyres.map((tyre, idx) => (
-                    <AnimatedCardX
-                      key={tyre.slug}
-                      delay={idx * 0.1}
-                      direction="right"
-                      className="flex gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
-                    >
-                      <div className="mt-1 h-12 w-12 flex-shrink-0 rounded-full bg-purple-500/15 flex items-center justify-center">
-                        <Star className="h-6 w-6 text-purple-500" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold">{tyre.name}</h3>
-                        <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
-                        <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <Link
-                            href={`/shyny/${tyre.slug}`}
-                            className="rounded-full border border-stone-300 bg-transparent px-3 py-1.5 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-                          >
-                            Дізнатися більше
-                          </Link>
-                          <Link
-                            href="/dealers"
-                            className="rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-semibold text-primary-text hover:bg-primary-hover"
-                          >
-                            Знайти магазин
-                          </Link>
-                        </div>
-                      </div>
-                    </AnimatedCardX>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground">{t('home.loadingPopularModels')}</p>
-                )}
+                <Suspense fallback={<PopularTyresSkeleton />}>
+                  <FeaturedTyresSection />
+                </Suspense>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Articles */}
-      <section className="py-12">
-        <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">{t('home.adviceTitle')}</h2>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              {t('home.adviceDescription')}
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {articles.map((article, idx) => (
-              <AnimatedCard
-                key={article.slug}
-                delay={idx * 0.1}
-                className="rounded-2xl border border-border bg-card p-6 shadow-lg"
-              >
-                <div className="mb-4 inline-flex rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
-                  {article.category}
-                </div>
-                <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
-                <p className="mb-4 text-sm text-muted-foreground">{article.readingTime}</p>
-                <Link
-                  href={`/blog/${article.slug}`}
-                  className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
-                >
-                  Читати <ChevronRight className="h-4 w-4" />
-                </Link>
-              </AnimatedCard>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Articles — streams */}
+      <Suspense fallback={<ArticlesSkeleton />}>
+        <ArticlesSection />
+      </Suspense>
 
-      {/* Trust Indicators */}
+      {/* Trust Indicators — static content */}
       <section className="border-y border-border bg-stone-50 py-12 dark:bg-stone-900/50">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8 text-center">
@@ -367,8 +426,16 @@ export default async function Home() {
         showTyreName
       />
 
-      {/* Dealer Locator */}
-      <DealerLocatorCompact initialDealers={allDealers} />
+      {/* Dealer Locator — streams */}
+      <Suspense fallback={
+        <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
+          <div className="container mx-auto max-w-7xl px-4 md:px-8">
+            <div className="h-64 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+          </div>
+        </section>
+      }>
+        <DealerLocatorSection />
+      </Suspense>
 
       {/* CTA */}
       <section className="py-16">

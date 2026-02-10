@@ -1,7 +1,8 @@
 /**
  * Structured Logger
  *
- * Provides structured logging with different levels and file output.
+ * Provides structured logging with different levels, file output,
+ * PII masking, and log rotation by size.
  */
 
 import fs from "fs";
@@ -26,6 +27,12 @@ interface LoggerConfig {
   logToFile: boolean;
   logFilePath: string;
   logToConsole: boolean;
+  /** Maximum log file size in bytes before rotation. Default: 10MB */
+  maxFileSize: number;
+  /** Number of rotated log files to keep. Default: 5 */
+  maxFiles: number;
+  /** Enable PII masking in logs. Default: true */
+  maskPii: boolean;
 }
 
 const LOG_LEVELS: Record<LogLevel, number> = {
@@ -44,12 +51,67 @@ const LOG_COLORS: Record<LogLevel, string> = {
 
 const RESET_COLOR = "\x1b[0m";
 
+// PII patterns for masking
+const PII_PATTERNS: Array<{ pattern: RegExp; replacement: string }> = [
+  // Email addresses
+  { pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, replacement: "[EMAIL]" },
+  // Ukrainian phone numbers (+380...)
+  { pattern: /\+?3?8?0\d{9}/g, replacement: "[PHONE]" },
+  // Generic phone patterns (xxx-xxx-xxxx, (xxx) xxx-xxxx)
+  { pattern: /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, replacement: "[PHONE]" },
+  // API keys (sk-..., key_..., etc.)
+  { pattern: /\b(sk-[a-zA-Z0-9]{20,}|key_[a-zA-Z0-9]{20,})\b/g, replacement: "[API_KEY]" },
+  // Password-like fields in JSON
+  { pattern: /"(?:password|passwd|secret|token|apiKey|api_key)":\s*"[^"]*"/gi, replacement: '"$1":"[REDACTED]"' },
+];
+
+/**
+ * Mask PII (Personally Identifiable Information) in a string.
+ */
+function maskPii(text: string): string {
+  let masked = text;
+  for (const { pattern, replacement } of PII_PATTERNS) {
+    masked = masked.replace(pattern, replacement);
+  }
+  return masked;
+}
+
+/**
+ * Deep-mask PII in an object. Returns a new object with PII values replaced.
+ */
+function maskPiiInData(data: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    // Mask known sensitive field names entirely
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey.includes("password") ||
+      lowerKey.includes("secret") ||
+      lowerKey.includes("token") ||
+      lowerKey === "apikey" ||
+      lowerKey === "api_key"
+    ) {
+      result[key] = "[REDACTED]";
+    } else if (typeof value === "string") {
+      result[key] = maskPii(value);
+    } else if (value && typeof value === "object" && !Array.isArray(value)) {
+      result[key] = maskPiiInData(value as Record<string, unknown>);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 // Default configuration
 let config: LoggerConfig = {
   minLevel: "info",
   logToFile: true,
   logFilePath: path.join(process.cwd(), "logs", "automation.log"),
   logToConsole: true,
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  maxFiles: 5,
+  maskPii: true,
 };
 
 /**
@@ -64,6 +126,38 @@ export function configureLogger(newConfig: Partial<LoggerConfig>) {
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true });
     }
+  }
+}
+
+/**
+ * Rotate log file if it exceeds maxFileSize.
+ * Renames automation.log -> automation.log.1 -> automation.log.2 etc.
+ */
+function rotateIfNeeded(): void {
+  if (!config.logToFile) return;
+
+  try {
+    if (!fs.existsSync(config.logFilePath)) return;
+
+    const stat = fs.statSync(config.logFilePath);
+    if (stat.size < config.maxFileSize) return;
+
+    // Rotate existing numbered logs (remove oldest if limit reached)
+    for (let i = config.maxFiles - 1; i >= 1; i--) {
+      const from = i === 1 ? config.logFilePath : `${config.logFilePath}.${i - 1}`;
+      const to = `${config.logFilePath}.${i}`;
+      if (fs.existsSync(from)) {
+        fs.renameSync(from, to);
+      }
+    }
+
+    // Current log becomes .1 (renameSync above already moved it if maxFiles > 1)
+    // If maxFiles is 1, just truncate
+    if (config.maxFiles <= 1) {
+      fs.truncateSync(config.logFilePath, 0);
+    }
+  } catch {
+    // Rotation failure should not crash the logger
   }
 }
 
@@ -89,7 +183,7 @@ function formatForConsole(entry: LogEntry): string {
 }
 
 /**
- * Format log entry for file
+ * Format log entry for file (JSON lines format)
  */
 function formatForFile(entry: LogEntry): string {
   return JSON.stringify(entry);
@@ -104,6 +198,15 @@ function writeLog(entry: LogEntry) {
     return;
   }
 
+  // Apply PII masking
+  if (config.maskPii) {
+    entry = {
+      ...entry,
+      message: maskPii(entry.message),
+      data: entry.data ? maskPiiInData(entry.data) : entry.data,
+    };
+  }
+
   // Console output
   if (config.logToConsole) {
     const formattedMessage = formatForConsole(entry);
@@ -116,9 +219,10 @@ function writeLog(entry: LogEntry) {
     }
   }
 
-  // File output
+  // File output with rotation
   if (config.logToFile) {
     try {
+      rotateIfNeeded();
       const logLine = formatForFile(entry) + "\n";
       fs.appendFileSync(config.logFilePath, logLine);
     } catch (error) {
@@ -215,27 +319,5 @@ export const publisherLogger = createLogger("Publisher");
 export const validatorLogger = createLogger("Validator");
 export const schedulerLogger = createLogger("Scheduler");
 
-// Initialize logger
+// Initialize logger with defaults
 configureLogger({});
-
-// Test
-async function main() {
-  console.log("Testing Logger...\n");
-
-  const logger = createLogger("Test");
-
-  logger.debug("Debug message", { key: "value" });
-  logger.info("Info message");
-  logger.warn("Warning message", { count: 42 });
-  logger.error("Error message", { code: "ERR_001" });
-
-  // Test timed operation
-  await logger.time("Async operation", async () => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  });
-
-  console.log("\n✅ Logger test complete");
-  console.log(`Log file: ${config.logFilePath}`);
-}
-
-if (process.argv[1]?.includes("logger.ts")) main();

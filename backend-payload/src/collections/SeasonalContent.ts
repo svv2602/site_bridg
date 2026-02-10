@@ -1,3 +1,12 @@
+/**
+ * SeasonalContent Collection
+ *
+ * Season-specific homepage content (hero banners, promotions, CTAs).
+ * Only one entry per season can be active at a time — enforced via
+ * beforeChange hook that deactivates other entries of the same season.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const SeasonalContent: CollectionConfig = {

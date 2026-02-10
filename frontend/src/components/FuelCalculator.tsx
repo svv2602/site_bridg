@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Fuel, TrendingDown, Calculator, Info } from "lucide-react";
+import { formatNumber, formatCurrency } from "@/lib/i18n/format";
 
 // EU Label fuel efficiency ratings
 type EuLabelRating = "A" | "B" | "C" | "D" | "E" | "F" | "G";
@@ -118,7 +119,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
           <span>5,000 км</span>
           <span className="font-medium text-foreground">
-            {annualKm.toLocaleString("uk-UA")} км
+            {formatNumber(annualKm)} км
           </span>
           <span>50,000 км</span>
         </div>
@@ -176,7 +177,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
                 <span className="text-sm text-muted-foreground">Гроші</span>
               </div>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {savings.money.toLocaleString("uk-UA")} ₴
+                {formatCurrency(savings.money)}
               </p>
               <p className="text-xs text-muted-foreground">на рік</p>
             </div>
@@ -248,7 +249,7 @@ export function FuelCalculatorCompact({
       </div>
       <p className="text-green-600 dark:text-green-400">
         <span className="font-bold">{litersPerYear} л</span> та{" "}
-        <span className="font-bold">{moneyPerYear.toLocaleString("uk-UA")} ₴</span> на рік
+        <span className="font-bold">{formatCurrency(moneyPerYear)}</span> на рік
       </p>
       <p className="text-xs text-muted-foreground mt-1">
         порівняно з класом {compareRating}

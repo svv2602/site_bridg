@@ -18,6 +18,7 @@ import {
   type TestResult,
   type TestResultEntry,
 } from "./db/test-results.js";
+import { normalizeRating } from "./scrapers/parsers.js";
 
 // Bridgestone & Firestone brand names to detect in test results
 const OUR_BRANDS = ["bridgestone", "firestone"];
@@ -114,8 +115,9 @@ function planTestSummaryArticles(since: string, minRating: number): PlannedArtic
     if (ourResults.length === 0) continue;
 
     // Check if any are in top-3 or have good ratings
+    // Normalize ratings to unified 1.0-5.0 scale for cross-source comparison
     const topResults = ourResults.filter(
-      (r) => r.position <= 3 || r.ratingNumeric <= minRating
+      (r) => r.position <= 3 || normalizeRating(r.ratingNumeric, test.source) <= minRating
     );
 
     if (topResults.length === 0) continue;

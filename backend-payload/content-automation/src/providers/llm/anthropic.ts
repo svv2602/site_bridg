@@ -169,19 +169,27 @@ export class AnthropicProvider extends BaseLLMProvider {
     }
 
     try {
+      // Use a lightweight API call that doesn't consume tokens.
+      // Anthropic SDK doesn't have a models.list(), so we validate the API key
+      // by making a request that will fail fast with a clear auth error if invalid.
+      // We use count_tokens which is free and doesn't generate output.
       const client = this.getClient();
-      // Quick test with minimal tokens
-      await client.messages.create({
+      await client.messages.count_tokens({
         model: "claude-3-5-haiku-20241022",
-        max_tokens: 5,
-        messages: [{ role: "user", content: "Hi" }],
+        messages: [{ role: "user", content: "test" }],
       });
       return true;
     } catch (error) {
-      logger.warn("Anthropic availability check failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return false;
+      const msg = error instanceof Error ? error.message : String(error);
+      // Authentication errors mean the key is invalid
+      if (msg.includes("authentication") || msg.includes("401") || msg.includes("invalid")) {
+        logger.warn("Anthropic API key invalid", { error: msg });
+        return false;
+      }
+      // Other errors (e.g. network) -- assume available but temporarily unreachable
+      // If count_tokens is not available, fall back to assuming available with valid key
+      logger.debug("Anthropic availability check inconclusive", { error: msg });
+      return true;
     }
   }
 

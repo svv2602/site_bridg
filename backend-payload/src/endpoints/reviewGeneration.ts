@@ -2,23 +2,9 @@ import type { Endpoint } from 'payload';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
+import { saveJob, updateJob, getJob, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
 
 const execAsync = promisify(exec);
-
-// Store for background job status
-interface ReviewJobStatus {
-  id: string;
-  status: 'running' | 'completed' | 'failed';
-  startedAt: string;
-  completedAt?: string;
-  tyreId: number;
-  tyreName?: string;
-  count: number;
-  createdReviewIds?: number[];
-  error?: string;
-}
-
-const reviewJobs: Map<string, ReviewJobStatus> = new Map();
 
 /**
  * POST /api/reviews/generate/:tyreId
@@ -38,6 +24,24 @@ export const generateReviewsEndpoint: Endpoint = {
     const tyreId = parseInt((req.routeParams?.tyreId as string) || '0', 10);
     if (!tyreId) {
       return Response.json({ error: 'Tyre ID is required' }, { status: 400 });
+    }
+
+    // Concurrency check: prevent duplicate jobs for the same tyre
+    const existing = findActiveByTarget('review', tyreId);
+    if (existing) {
+      return Response.json({
+        message: 'Review generation already running for this tyre',
+        jobId: existing.id,
+        checkStatus: `/api/reviews/generate/status/${existing.id}`,
+      });
+    }
+
+    // Rate limit: max 5 concurrent AI jobs
+    if (countActiveJobs() >= 5) {
+      return Response.json(
+        { error: 'Too many concurrent jobs. Please wait and try again.' },
+        { status: 429 }
+      );
     }
 
     // Get tyre info
@@ -60,17 +64,19 @@ export const generateReviewsEndpoint: Endpoint = {
 
     const count = Math.min(Math.max(body.count || 3, 1), 10);
 
-    // Create job
+    // Create job in unified store
     const jobId = `review-${Date.now()}`;
-    const job: ReviewJobStatus = {
+    const job: JobStatus = {
       id: jobId,
+      type: 'review',
       status: 'running',
       startedAt: new Date().toISOString(),
-      tyreId,
-      tyreName: tyre.name as string,
+      command: `generate-reviews --tyreId=${tyreId} --count=${count}`,
+      targetId: tyreId,
+      targetName: tyre.name as string,
       count,
     };
-    reviewJobs.set(jobId, job);
+    saveJob(job);
 
     req.payload.logger.info(`Starting review generation: ${jobId} for tyre ${tyreId} (${tyre.name}), count: ${count}`);
 
@@ -93,10 +99,13 @@ export const generateReviewsEndpoint: Endpoint = {
         // Try to extract created review IDs from output
         const idsMatch = stdout.match(/Created review IDs: \[([\d,\s]+)\]/);
         if (idsMatch) {
-          job.createdReviewIds = idsMatch[1].split(',').map(id => parseInt(id.trim(), 10));
+          job.resultIds = idsMatch[1].split(',').map(id => parseInt(id.trim(), 10));
         }
 
-        req.payload.logger.info(`Review generation completed: ${jobId}, created ${job.createdReviewIds?.length || 0} reviews`);
+        job.output = stdout.slice(0, 2000);
+        updateJob(job);
+
+        req.payload.logger.info(`Review generation completed: ${jobId}, created ${job.resultIds?.length || 0} reviews`);
 
         if (stderr) {
           req.payload.logger.warn(`Review generation stderr: ${stderr}`);
@@ -106,6 +115,7 @@ export const generateReviewsEndpoint: Endpoint = {
         job.status = 'failed';
         job.completedAt = new Date().toISOString();
         job.error = error.message || String(error);
+        updateJob(job);
         req.payload.logger.error(`Review generation failed: ${jobId} - ${job.error}`);
       });
 
@@ -134,7 +144,7 @@ export const generateReviewsStatusEndpoint: Endpoint = {
       return Response.json({ error: 'Job ID is required' }, { status: 400 });
     }
 
-    const job = reviewJobs.get(jobId);
+    const job = getJob(jobId);
     if (!job) {
       return Response.json({ error: 'Job not found' }, { status: 404 });
     }

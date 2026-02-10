@@ -351,6 +351,7 @@ export interface ModelPricing {
 
 // === Provider Factory Types ===
 
+/** @deprecated Not currently used. Will be implemented when provider management is refactored. */
 export interface ProviderFactory {
   /** Create LLM provider instance */
   createLLM(name: string): LLMProvider;

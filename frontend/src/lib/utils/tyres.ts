@@ -90,28 +90,44 @@ export const featureIconColors = {
 
 export type FeatureIconKey = keyof typeof featureIconColors;
 
-// Vehicle type labels
+// Vehicle type labels (short form for badges, filters)
 export const vehicleTypeLabels: Record<string, string> = {
   passenger: "Легкові",
   suv: "SUV / 4x4",
   lcv: "Легкі вантажні",
+  sport: "Спортивні",
+  van: "Van/LCV",
+};
+
+// Vehicle type labels (extended form for content)
+export const vehicleTypeLabelsLong: Record<string, string> = {
+  passenger: "Легкові авто",
+  suv: "SUV/Кросовери",
+  lcv: "Легкі вантажівки",
+  sport: "Спортивні",
+  van: "Van/LCV",
 };
 
 /**
- * Format tyre size as string (e.g., "205/55 R16")
+ * Format tyre size as string (e.g., "205/55 R16" or "205/55 R16 91H" with full=true)
  */
 export function formatSize(
-  size: { width: number; aspectRatio: number; diameter: number } | null | undefined
+  size: { width: number; aspectRatio: number; diameter: number; loadIndex?: number; speedIndex?: string } | null | undefined,
+  full?: boolean
 ): string {
   if (!size) return "—";
-  return `${size.width}/${size.aspectRatio} R${size.diameter}`;
+  const base = `${size.width}/${size.aspectRatio} R${size.diameter}`;
+  if (!full) return base;
+  const li = size.loadIndex ? ` ${size.loadIndex}` : "";
+  const si = size.speedIndex ?? "";
+  return `${base}${li}${si}`;
 }
 
 /**
  * Format multiple sizes as array of strings
  */
 export function formatSizes(sizes: Array<{ width: number; aspectRatio: number; diameter: number }>): string[] {
-  return sizes.map(formatSize);
+  return sizes.map((size) => formatSize(size));
 }
 
 /**
@@ -148,9 +164,3 @@ export function formatVehicleTypes(model: TyreModel): string {
   return labels.join(", ") || "Універсальні";
 }
 
-/**
- * Get site URL from env or fallback
- */
-export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://bridgestone.ua";
-}

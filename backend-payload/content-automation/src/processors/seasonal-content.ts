@@ -12,6 +12,7 @@ import {
   type SeasonalConfig,
   type SeasonalPeriod,
 } from "../config/seasonal.js";
+import { getPayloadClient } from "../publishers/payload-client.js";
 
 // Types
 export interface FeaturedTyre {
@@ -120,10 +121,64 @@ const DEFAULT_FEATURED_TYRES: Record<string, FeaturedTyre[]> = {
 };
 
 /**
- * Get featured tyres for current season
+ * Get featured tyres for current season.
+ * Tries to fetch from Payload CMS first; falls back to hardcoded defaults if CMS is unavailable.
  */
-export function getFeaturedTyres(season: "summer" | "winter" | "allseason"): FeaturedTyre[] {
+export async function getFeaturedTyres(season: "summer" | "winter" | "allseason"): Promise<FeaturedTyre[]> {
+  try {
+    const client = getPayloadClient();
+    const tyres = await client.getAllTyres(10);
+
+    // Filter by season and map to FeaturedTyre format
+    const seasonTyres = tyres.filter((t) => t.season === season);
+
+    if (seasonTyres.length >= 2) {
+      return seasonTyres.slice(0, 3).map((t) => ({
+        name: t.name,
+        slug: t.slug,
+        tag: formatTyreTag(t.season, t.vehicleTypes),
+        description: t.shortDescription || "",
+        rating: 4.5,
+        season: t.season,
+      }));
+    }
+  } catch {
+    // CMS unavailable — use hardcoded fallback
+  }
+
   return DEFAULT_FEATURED_TYRES[season] || DEFAULT_FEATURED_TYRES.summer;
+}
+
+/**
+ * Get featured tyres synchronously (hardcoded fallback only, no CMS).
+ * Use when async is not available.
+ */
+export function getFeaturedTyresSync(season: "summer" | "winter" | "allseason"): FeaturedTyre[] {
+  return DEFAULT_FEATURED_TYRES[season] || DEFAULT_FEATURED_TYRES.summer;
+}
+
+/**
+ * Format tyre tag from season and vehicle types
+ */
+function formatTyreTag(season: string, vehicleTypes?: string[]): string {
+  const seasonLabel: Record<string, string> = {
+    summer: "Літня",
+    winter: "Зимова",
+    allseason: "Всесезонна",
+  };
+  const vehicleLabel = vehicleTypes?.length
+    ? vehicleTypes.map((v) => {
+        const labels: Record<string, string> = {
+          passenger: "Легковий авто",
+          suv: "SUV",
+          van: "Фургон",
+          sport: "Спортивний",
+        };
+        return labels[v] || v;
+      }).join(" / ")
+    : "Легковий авто";
+
+  return `${seasonLabel[season] || season} • ${vehicleLabel}`;
 }
 
 /**
@@ -146,12 +201,13 @@ function generateCtaText(config: SeasonalConfig, isTireChange: boolean): { text:
 
 /**
  * Generate full seasonal content
+ * Async version that fetches featured tyres from CMS with hardcoded fallback.
  */
-export function generateSeasonalContent(date?: Date): SeasonalContent {
+export async function generateSeasonalContent(date?: Date): Promise<SeasonalContent> {
   const config = getSeasonalConfig(date);
   const period = getCurrentPeriod(date);
   const isTireChange = isTireChangeSeason(date);
-  const featuredTyres = getFeaturedTyres(config.featuredSeason);
+  const featuredTyres = await getFeaturedTyres(config.featuredSeason);
   const cta = generateCtaText(config, isTireChange);
 
   return {
@@ -172,12 +228,13 @@ export function generateSeasonalContent(date?: Date): SeasonalContent {
 /**
  * Export as JSON for API endpoint
  */
-export function getSeasonalContentJSON(date?: Date): string {
-  return JSON.stringify(generateSeasonalContent(date), null, 2);
+export async function getSeasonalContentJSON(date?: Date): Promise<string> {
+  const content = await generateSeasonalContent(date);
+  return JSON.stringify(content, null, 2);
 }
 
 // Test
-function main() {
+async function main() {
   console.log("Testing Seasonal Content...\n");
 
   // Test different dates
@@ -189,7 +246,7 @@ function main() {
   ];
 
   for (const date of testDates) {
-    const content = generateSeasonalContent(date);
+    const content = await generateSeasonalContent(date);
     console.log(`\n=== ${date.toLocaleDateString()} ===`);
     console.log(`Period: ${content.period}`);
     console.log(`Tire change season: ${content.isTireChangeSeason}`);

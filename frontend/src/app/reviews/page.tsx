@@ -3,6 +3,7 @@ import { MessageSquare, Star, Filter } from "lucide-react";
 import { ReviewCard } from "@/components/ReviewCard";
 import { getReviews } from "@/lib/api/reviews";
 import { Breadcrumb } from "@/components/ui";
+import { seasonLabelsShort, vehicleTypeLabels } from "@/lib/utils/tyres";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -17,18 +18,6 @@ interface ReviewsPageProps {
     vehicleType?: "passenger" | "suv" | "van";
   }>;
 }
-
-const seasonLabels = {
-  summer: "Літні",
-  winter: "Зимові",
-  allseason: "Всесезонні",
-};
-
-const vehicleTypeLabels = {
-  passenger: "Легкові",
-  suv: "SUV",
-  van: "Van/LCV",
-};
 
 export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
   const params = await searchParams;
@@ -64,7 +53,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
 
   // Get active filter label
   const activeFilters: string[] = [];
-  if (season) activeFilters.push(seasonLabels[season]);
+  if (season) activeFilters.push(seasonLabelsShort[season]);
   if (vehicleType) activeFilters.push(vehicleTypeLabels[vehicleType]);
 
   return (
@@ -162,7 +151,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
                   }`}
                 >
-                  {seasonLabels[s]}
+                  {seasonLabelsShort[s]}
                 </Link>
               ))}
             </div>

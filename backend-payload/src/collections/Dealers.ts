@@ -1,3 +1,12 @@
+/**
+ * Dealers Collection
+ *
+ * Authorized Bridgestone dealer locations with name, address, coordinates,
+ * phone/email, services, opening hours, and active status.
+ * Used for the "Where to buy" dealer locator on the frontend.
+ *
+ * Access: public read, auth-required write.
+ */
 import type { CollectionConfig } from 'payload';
 
 export const Dealers: CollectionConfig = {

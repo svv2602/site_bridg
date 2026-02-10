@@ -245,48 +245,6 @@ function SelectField({
   );
 }
 
-function SelectFieldSimple({
-  label,
-  value,
-  onChange,
-  options,
-  disabled,
-  loading,
-  icon: Icon,
-  placeholder = "Оберіть",
-}: Omit<SelectFieldProps, "searchable">) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-foreground">
-        {label}
-      </label>
-      <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
-        {loading ? (
-          <div className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <select
-            className="w-full appearance-none rounded-xl border border-border bg-card py-3 pl-10 pr-8 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            disabled={disabled || options.length === 0}
-          >
-            <option value="">{placeholder}</option>
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        )}
-        <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-      </div>
-    </div>
-  );
-}
-
 interface TyreSizeCardProps {
   sizes: CarTyreSize[];
   type: "oem" | "tuning";
@@ -432,7 +390,7 @@ interface VehicleTyreSelectorProps {
 }
 
 export function VehicleTyreSelector({ initialMake, initialModel, initialYear, initialKit, initialSeason }: VehicleTyreSelectorProps) {
-  console.log('[VehicleSelector] Rendered with props:', { initialMake, initialModel, initialYear, initialKit, initialSeason });
+  // console.log('[VehicleSelector] Rendered with props:', { initialMake, initialModel, initialYear, initialKit, initialSeason });
 
   // Стан вибору
   const [brandId, setBrandId] = useState("");
@@ -480,10 +438,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
   // Ініціалізація з props - крок 1: вибір марки
   useEffect(() => {
-    console.log('[VehicleSelector] Init step 1 check:', { initStep, brandsCount: brands?.length, initialMake });
+    // console.log('[VehicleSelector] Init step 1 check:', { initStep, brandsCount: brands?.length, initialMake });
     if (initStep !== 'brand' || !brands || !initialMake) return;
     const brand = brands.find(b => b.name.toLowerCase() === initialMake.toLowerCase());
-    console.log('[VehicleSelector] Found brand:', brand);
+    // console.log('[VehicleSelector] Found brand:', brand);
     if (brand) {
       setBrandId(String(brand.id));
       setInitStep('model');
@@ -494,10 +452,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
   // Ініціалізація з props - крок 2: вибір моделі
   useEffect(() => {
-    console.log('[VehicleSelector] Init step 2 check:', { initStep, modelsCount: models?.length, initialModel });
+    // console.log('[VehicleSelector] Init step 2 check:', { initStep, modelsCount: models?.length, initialModel });
     if (initStep !== 'model' || !models || !initialModel) return;
     const model = models.find(m => m.name.toLowerCase() === initialModel.toLowerCase());
-    console.log('[VehicleSelector] Found model:', model);
+    // console.log('[VehicleSelector] Found model:', model);
     if (model) {
       setModelId(String(model.id));
       setInitStep('year');
@@ -508,10 +466,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
   // Ініціалізація з props - крок 3: вибір року
   useEffect(() => {
-    console.log('[VehicleSelector] Init step 3 check:', { initStep, yearsCount: years?.length, initialYear });
+    // console.log('[VehicleSelector] Init step 3 check:', { initStep, yearsCount: years?.length, initialYear });
     if (initStep !== 'year' || !years || !initialYear) return;
     const yearNum = parseInt(initialYear);
-    console.log('[VehicleSelector] Checking year:', yearNum, 'in', years);
+    // console.log('[VehicleSelector] Checking year:', yearNum, 'in', years);
     if (years.includes(yearNum)) {
       setYear(initialYear);
       // Якщо є initialKit, переходимо до вибору комплектації
@@ -523,10 +481,10 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
   // Ініціалізація з props - крок 4: вибір комплектації
   useEffect(() => {
-    console.log('[VehicleSelector] Init step 4 check:', { initStep, kitsCount: kits?.length, initialKit });
+    // console.log('[VehicleSelector] Init step 4 check:', { initStep, kitsCount: kits?.length, initialKit });
     if (initStep !== 'kit' || !kits || !initialKit) return;
     const kit = kits.find(k => k.name.toLowerCase() === initialKit.toLowerCase());
-    console.log('[VehicleSelector] Found kit:', kit);
+    // console.log('[VehicleSelector] Found kit:', kit);
     if (kit) {
       setKitId(String(kit.id));
     }
@@ -541,7 +499,7 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
     // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
-    console.log('[VehicleSelector] Resetting model/year/kit due to brand change');
+    // console.log('[VehicleSelector] Resetting model/year/kit due to brand change');
     setModelId("");
     setYear("");
     setKitId("");
@@ -555,7 +513,7 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
     // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
-    console.log('[VehicleSelector] Resetting year/kit due to model change');
+    // console.log('[VehicleSelector] Resetting year/kit due to model change');
     setYear("");
     setKitId("");
     setSearchResult(null);
@@ -568,7 +526,7 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
 
     // Скидаємо тільки якщо ініціалізація завершена або не почалась
     if (initStep !== 'idle' && initStep !== 'done') return;
-    console.log('[VehicleSelector] Resetting kit due to year change');
+    // console.log('[VehicleSelector] Resetting kit due to year change');
     setKitId("");
     setSearchResult(null);
   }, [year, initStep]);
@@ -638,7 +596,7 @@ export function VehicleTyreSelector({ initialMake, initialModel, initialYear, in
     // Перевіряємо що це була ініціалізація з props (не ручний вибір)
     if (!initialKit) return;
 
-    console.log('[VehicleSelector] Auto-search triggered after initialization');
+    // console.log('[VehicleSelector] Auto-search triggered after initialization');
     autoSearchDoneRef.current = true;
     handleSearch();
   }, [initStep, kitId, initialKit, handleSearch]);

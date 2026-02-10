@@ -7,8 +7,6 @@ services:
       POSTGRES_DB: bridgestone
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bridgestone"]
       interval: 5s
@@ -40,14 +38,6 @@ services:
       # Telegram notifications (optional)
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
-    volumes:
-      - ./backend-payload/media:/app/media
-      - ./backend-payload/db_size_auto:/app/db_size_auto:ro
-      - ./backend-payload/logs:/app/logs
-      - ./backend-payload/data:/app/data
-      - ./backend-payload/content-automation/data:/app/content-automation/data
-    ports:
-      - "3001:3001"
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,10 +69,6 @@ services:
       NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
       # Google Maps for dealers page (optional)
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
-      # Skip Next.js image optimization (localhost resolves to private IP in Docker)
-      SKIP_IMAGE_OPTIMIZATION: "true"
-    ports:
-      - "3010:3010"
     depends_on:
       backend:
         condition: service_healthy
