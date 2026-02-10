@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { type Dealer } from "@/lib/data";
 import { getDealers } from "@/lib/api/dealers";
-import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation, LocateFixed } from "lucide-react";
+import { MapPin, Phone, Loader2 } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
-import { Breadcrumb, ErrorState } from "@/components/ui";
+import { Breadcrumb } from "@/components/ui";
+import { DealerFilters } from "./components/DealerFilters";
+import { DealerList } from "./components/DealerList";
 
 // Lazy load Google Maps component (saves ~30KB initial bundle)
 const DealersMap = dynamic(
@@ -28,15 +29,8 @@ const DealersMap = dynamic(
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
-  distance?: number; // distance in km from user position
+  distance?: number;
 };
-
-const dealerTypes = [
-  { key: "all", label: "Всі типи" },
-  { key: "official", label: "Офіційний дилер" },
-  { key: "partner", label: "Партнер" },
-  { key: "service", label: "Сервісний центр" },
-];
 
 interface UserPosition {
   lat: number;
@@ -48,7 +42,7 @@ function haversineDistance(
   lat1: number, lng1: number,
   lat2: number, lng2: number,
 ): number {
-  const R = 6371; // Earth radius in km
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
@@ -116,11 +110,16 @@ export default function DealersPage() {
         } else {
           setGeoError("Не вдалося визначити місцезнаходження");
         }
-        // Clear error after 5 seconds
         setTimeout(() => setGeoError(null), 5000);
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setCityQuery("");
+    setSelectedType("all");
+    setUserPosition(null);
   }, []);
 
   const normalizedQuery = cityQuery.trim().toLowerCase();
@@ -150,7 +149,6 @@ export default function DealersPage() {
     if (selectedType !== "all") {
       filtered = filtered.filter((dealer) => dealer.type === selectedType);
     }
-    // Sort by distance if user position is available
     if (userPosition) {
       filtered = [...filtered].sort((a, b) => {
         if (a.distance == null && b.distance == null) return 0;
@@ -161,14 +159,6 @@ export default function DealersPage() {
     }
     return filtered;
   }, [dealers, normalizedQuery, selectedType, userPosition]);
-
-  const buildRouteUrl = (dealer: Dealer) => {
-    if (dealer.latitude && dealer.longitude) {
-      return `https://www.google.com/maps/dir/?api=1&destination=${dealer.latitude},${dealer.longitude}`;
-    }
-    const address = encodeURIComponent(`${dealer.address}, ${dealer.city}, Україна`);
-    return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
-  };
 
   const dealerSchemas = allDealers.map((dealer) => generateLocalBusinessSchema(dealer));
   const breadcrumbSchema = generateBreadcrumbSchema([
@@ -193,9 +183,6 @@ export default function DealersPage() {
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div
-            
-            
-            
             className="mx-auto flex max-w-4xl flex-col gap-4 text-left md:gap-5"
           >
             <Breadcrumb
@@ -223,104 +210,19 @@ export default function DealersPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
-                {/* Service image at top - hidden on mobile */}
-                <div className="relative hidden min-h-[180px] flex-1 lg:block">
-                  <Image
-                    src="/images/hero/hero-dealer-service.webp"
-                    alt="Професійний шиномонтаж Bridgestone"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 0vw, 66vw"
-                  />
-                </div>
-                {/* Search form */}
-                <div className="p-6">
-                  <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
-                  <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-                    <div className="flex-1">
-                      <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">
-                        Місто або адреса
-                      </label>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-                        <input
-                          type="text"
-                          id="city-search"
-                          placeholder="Наприклад, Київ, Львів..."
-                          value={cityQuery}
-                          onChange={(e) => setCityQuery(e.target.value)}
-                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground outline-none focus:border-primary"
-                        />
-                      </div>
-                    </div>
-                    <div className="sm:w-48">
-                      <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-foreground">Тип точки</label>
-                      <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-                        <select
-                          id="dealer-type"
-                          value={selectedType}
-                          onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-full appearance-none rounded-xl border border-border bg-background py-3 pl-10 pr-8 text-sm text-foreground outline-none focus:border-primary"
-                        >
-                          {dealerTypes.map((type) => (
-                            <option key={type.key} value={type.key}>
-                              {type.label}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Знайдено дилерів:{" "}
-                        <span className="text-2xl font-bold text-foreground">
-                          {isLoading ? "..." : filteredDealers.length}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        onClick={requestGeolocation}
-                        disabled={geoLoading}
-                        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-                          userPosition
-                            ? "border-green-500 bg-green-50 text-green-700 dark:border-green-600 dark:bg-green-900/30 dark:text-green-300"
-                            : "border-stone-300 bg-transparent text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-                        } disabled:cursor-wait disabled:opacity-60`}
-                      >
-                        {geoLoading ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <LocateFixed className="h-4 w-4" />
-                        )}
-                        {userPosition ? "Локація визначена" : "Моє місцезнаходження"}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCityQuery("");
-                          setSelectedType("all");
-                          setUserPosition(null);
-                        }}
-                        className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-                      >
-                        Скинути фільтри
-                      </button>
-                    </div>
-                  </div>
-                  {/* Geolocation error toast */}
-                  {geoError && (
-                    <div className="mt-3 flex items-center gap-2 rounded-xl border border-stone-300 bg-stone-100 px-4 py-2.5 text-sm text-stone-700 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300">
-                      <MapPin className="h-4 w-4 shrink-0 text-stone-500" />
-                      {geoError}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <DealerFilters
+                cityQuery={cityQuery}
+                onCityQueryChange={setCityQuery}
+                selectedType={selectedType}
+                onSelectedTypeChange={setSelectedType}
+                filteredCount={filteredDealers.length}
+                isLoading={isLoading}
+                userPosition={userPosition}
+                geoLoading={geoLoading}
+                geoError={geoError}
+                onRequestGeolocation={requestGeolocation}
+                onResetFilters={handleResetFilters}
+              />
             </div>
 
             {/* Interactive Map - hidden on mobile to show results immediately */}
@@ -346,161 +248,14 @@ export default function DealersPage() {
       <section className="pb-8">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <h2 className="mb-4 text-2xl font-bold">Результати пошуку</h2>
-
-          {error ? (
-            <ErrorState
-              title="Помилка завантаження"
-              message={error}
-              onRetry={fetchDealers}
-            />
-          ) : isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-3 text-muted-foreground">Завантаження дилерів...</span>
-            </div>
-          ) : filteredDealers.length === 0 ? (
-            <div
-              
-              
-              className="rounded-2xl border border-border bg-card p-12 text-center"
-            >
-              <Search className="mx-auto h-12 w-12 text-muted" />
-              <h3 className="mt-4 text-xl font-semibold">Дилерів не знайдено</h3>
-              <p className="mt-2 text-muted-foreground">
-                Спробуйте змінити параметри пошуку або обрати інше місто.
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
-              {filteredDealers.map((dealer, idx) => (
-                <article
-                  key={dealer.id}
-                  
-                  
-                  
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-                >
-                  <div className="p-6">
-                    <div className="mb-4 flex items-start justify-between">
-                      <div>
-                        <span
-                          className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${dealer.type === "official"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
-                              : dealer.type === "partner"
-                                ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200"
-                                : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                            }`}
-                        >
-                          {dealer.type === "official"
-                            ? "Офіційний дилер"
-                            : dealer.type === "partner"
-                              ? "Партнер"
-                              : "Сервісний центр"}
-                        </span>
-                        <h3 className="mt-3 mb-1 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                          {dealer.name}
-                        </h3>
-                        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4 shrink-0" />
-                          <span>{dealer.displayAddress}</span>
-                          {dealer.distance != null && (
-                            <span className="ml-auto shrink-0 rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600 dark:bg-stone-700 dark:text-stone-300">
-                              {dealer.distance < 1
-                                ? `${Math.round(dealer.distance * 1000)} м`
-                                : `${dealer.distance.toFixed(1)} км`}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {dealer.phone && (
-                        <div className="flex items-center gap-3">
-                          <Phone className="h-4 w-4 text-primary" />
-                          <div>
-                            <p className="text-xs text-muted">Телефон</p>
-                            <a
-                              href={`tel:${dealer.phone}`}
-                              className="font-medium hover:text-primary hover:underline"
-                            >
-                              {dealer.phone}
-                            </a>
-                          </div>
-                        </div>
-                      )}
-                      {dealer.website && (
-                        <div className="flex items-center gap-3">
-                          <Globe className="h-4 w-4 text-primary" />
-                          <div>
-                            <p className="text-xs text-muted">Вебсайт</p>
-                            <a
-                              href={dealer.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium hover:text-primary hover:underline"
-                            >
-                              {dealer.website}
-                            </a>
-                          </div>
-                        </div>
-                      )}
-                      {dealer.workingHours && (
-                        <div className="flex items-center gap-3">
-                          <Clock className="h-4 w-4 text-primary" />
-                          <div>
-                            <p className="text-xs text-muted">Години роботи</p>
-                            <p className="font-medium">{dealer.workingHours}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setExpandedDealer(expandedDealer === dealer.id ? null : dealer.id)}
-                        aria-expanded={expandedDealer === dealer.id}
-                        aria-controls={`dealer-details-${dealer.id}`}
-                        className="rounded-full border border-stone-300 bg-transparent px-4 py-2 text-sm font-medium hover:bg-stone-100 dark:border-stone-600 dark:hover:bg-stone-700"
-                      >
-                        {expandedDealer === dealer.id ? "Менше" : "Детальніше"}
-                      </button>
-                      <a
-                        href={buildRouteUrl(dealer)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-text hover:bg-primary-hover"
-                      >
-                        <Navigation className="h-4 w-4" />
-                        Побудувати маршрут
-                      </a>
-                    </div>
-
-                    {expandedDealer === dealer.id && (
-                      <div
-                        id={`dealer-details-${dealer.id}`}
-                        
-                        
-                        className="mt-6 space-y-3 border-t border-border pt-6 text-sm"
-                      >
-                        <p className="font-medium">Додаткова інформація</p>
-                        <p className="text-muted-foreground">
-                          Цей дилер пропонує повний спектр послуг: продаж шин Bridgestone, шиномонтаж,
-                          балансування, зберігання шин та консультації.
-                        </p>
-                        <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-                          <li>Наявність шин на складі</li>
-                          <li>Можливість онлайн‑бронювання</li>
-                          <li>Сервіс «шини на винос»</li>
-                          <li>Гарантія на послуги</li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
+          <DealerList
+            dealers={filteredDealers}
+            isLoading={isLoading}
+            error={error}
+            expandedDealer={expandedDealer}
+            onExpandDealer={setExpandedDealer}
+            onRetry={fetchDealers}
+          />
         </div>
       </section>
 
@@ -508,9 +263,6 @@ export default function DealersPage() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div
-            
-            
-            
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl"
           >
             <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>

@@ -1,321 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import { FormEvent, useState, useEffect, useRef, useCallback } from "react";
 
 import {
-  type Season,
-  type Brand,
-  type TyreModel,
-  type TyreSize,
-} from "@/lib/data";
-import { brandLabels, brandColors, seasonLabels, formatSize } from "@/lib/utils/tyres";
-import {
-  Search,
   Car,
   Ruler,
-  Filter,
-  ChevronRight,
   CheckCircle,
   MapPin,
   Database,
-  Loader2,
 } from "lucide-react";
 import { VehicleTyreSelector } from "@/components/VehicleTyreSelector";
-import { TyreCard } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
-
-type SearchMode = "size" | "car";
-
-interface SizeOption {
-  value: number;
-  count: number;
-}
-
-// Тип даних з sessionStorage
-interface StoredSearchParams {
-  mode: 'size' | 'car';
-  width?: string;
-  aspectRatio?: string;
-  diameter?: string;
-  season?: string;
-  make?: string;
-  model?: string;
-  year?: string;
-  kit?: string;
-  timestamp?: number;
-}
+import { useSearchState } from "./components/useSearchState";
+import { SearchFilters } from "./components/SearchFilters";
+import { SearchResults } from "./components/SearchResults";
 
 export default function TyreSearchPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  // Read initial values from URL params
-  const urlMode = searchParams.get('mode') as SearchMode | null;
-  const urlWidth = searchParams.get('width') || "";
-  const urlProfile = searchParams.get('profile') || "";
-  const urlDiameter = searchParams.get('diameter') || "";
-  const urlSeason = searchParams.get('season') || "";
-  const urlMake = searchParams.get('make') || "";
-  const urlModel = searchParams.get('model') || "";
-  const urlYear = searchParams.get('year') || "";
-
-  const [mode, setMode] = useState<SearchMode>(urlMode === 'car' ? 'car' : 'size');
-  const [width, setWidth] = useState(urlWidth);
-  const [aspectRatio, setAspectRatio] = useState(urlProfile);
-  const [diameter, setDiameter] = useState(urlDiameter);
-  const [season, setSeason] = useState<string>(urlSeason);
-  const [results, setResults] = useState<TyreModel[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [searchedSize, setSearchedSize] = useState("");
-  const [searchedSeason, setSearchedSeason] = useState("");
-  const [selectedBrands, setSelectedBrands] = useState<Brand[]>(["bridgestone", "firestone"]);
-  const [initialSearchDone, setInitialSearchDone] = useState(false);
-  const [restoredFromUrl, setRestoredFromUrl] = useState(false);
-  const resultsRef = useRef<HTMLDivElement>(null);
-  const isUpdatingUrl = useRef(false);
-
-  // Helper: update URL search params without history pollution
-  const updateUrlParams = useCallback((params: Record<string, string>) => {
-    isUpdatingUrl.current = true;
-    const newParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
-      if (value) {
-        newParams.set(key, value);
-      }
-    }
-    const queryString = newParams.toString();
-    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
-    router.replace(newUrl, { scroll: false });
-    // Reset the flag after a tick to allow external URL changes through
-    setTimeout(() => { isUpdatingUrl.current = false; }, 0);
-  }, [router]);
-
-  // Sync URL params when filters change (size mode)
-  const syncSizeParamsToUrl = useCallback((
-    currentMode: SearchMode,
-    currentWidth: string,
-    currentProfile: string,
-    currentDiameter: string,
-    currentSeason: string,
-  ) => {
-    if (currentMode === 'size') {
-      updateUrlParams({
-        mode: 'size',
-        width: currentWidth,
-        profile: currentProfile,
-        diameter: currentDiameter,
-        season: currentSeason,
-      });
-    }
-  }, [updateUrlParams]);
-
-  // Оновлення mode при зміні URL параметрів (навігація в межах сторінки)
-  useEffect(() => {
-    // Skip if we triggered this URL change ourselves
-    if (isUpdatingUrl.current) return;
-    if (urlMode === 'car' || urlMode === 'size') {
-      setMode(urlMode);
-    }
-  }, [urlMode]);
-
-  // Filter results by selected brands
-  const filteredResults = results.filter(tyre => selectedBrands.includes(tyre.brand));
-
-  function toggleBrand(brand: Brand) {
-    setSelectedBrands(prev => {
-      if (prev.includes(brand)) {
-        // Don't allow deselecting all brands
-        if (prev.length === 1) return prev;
-        return prev.filter(b => b !== brand);
-      }
-      return [...prev, brand];
-    });
-  }
-
-  // Check if URL has params to restore (replaces sessionStorage logic)
-  useEffect(() => {
-    if (restoredFromUrl) return;
-    setRestoredFromUrl(true);
-
-    // If URL has size params, mark that we have stored params for auto-search
-    if (urlMode === 'size' && urlWidth && urlProfile && urlDiameter) {
-      // State is already initialized from URL params in useState calls above
-      // We just need to signal that auto-search should happen
-      return;
-    }
-
-    // Legacy: read from sessionStorage for backward compatibility
-    if (typeof window === 'undefined') return;
-    const stored = sessionStorage.getItem('tyreSearchParams');
-    if (stored) {
-      try {
-        const params: StoredSearchParams = JSON.parse(stored);
-        if (params.timestamp && Date.now() - params.timestamp < 5 * 60 * 1000) {
-          setMode(params.mode || 'size');
-          if (params.mode === 'size') {
-            if (params.width) setWidth(params.width);
-            if (params.aspectRatio) setAspectRatio(params.aspectRatio);
-            if (params.diameter) setDiameter(params.diameter);
-            if (params.season) setSeason(params.season);
-          }
-          sessionStorage.removeItem('tyreSearchParams');
-        } else {
-          sessionStorage.removeItem('tyreSearchParams');
-        }
-      } catch {
-        sessionStorage.removeItem('tyreSearchParams');
-      }
-    }
-  }, [restoredFromUrl, urlMode, urlWidth, urlProfile, urlDiameter]);
-
-  // Динамічні опції з бази даних
-  const [widthOptions, setWidthOptions] = useState<SizeOption[]>([]);
-  const [aspectOptions, setAspectOptions] = useState<SizeOption[]>([]);
-  const [diameterOptions, setDiameterOptions] = useState<SizeOption[]>([]);
-  const [loadingWidths, setLoadingWidths] = useState(false);
-  const [loadingAspects, setLoadingAspects] = useState(false);
-  const [loadingDiameters, setLoadingDiameters] = useState(false);
-
-  // Завантаження ширин при монтуванні
-  useEffect(() => {
-    setLoadingWidths(true);
-    fetch('/api/tyres/sizes?type=width')
-      .then(res => res.json())
-      .then(json => {
-        if (json.data) setWidthOptions(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoadingWidths(false));
-  }, []);
-
-  // Завантаження висот при зміні ширини
-  useEffect(() => {
-    if (!width) {
-      setAspectOptions([]);
-      return;
-    }
-    setLoadingAspects(true);
-    fetch(`/api/tyres/sizes?type=height&width=${width}`)
-      .then(res => res.json())
-      .then(json => {
-        if (json.data) setAspectOptions(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoadingAspects(false));
-  }, [width]);
-
-  // Завантаження діаметрів при зміні висоти
-  useEffect(() => {
-    if (!width || !aspectRatio) {
-      setDiameterOptions([]);
-      return;
-    }
-    setLoadingDiameters(true);
-    fetch(`/api/tyres/sizes?type=diameter&width=${width}&height=${aspectRatio}`)
-      .then(res => res.json())
-      .then(json => {
-        if (json.data) setDiameterOptions(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setLoadingDiameters(false));
-  }, [width, aspectRatio]);
-
-  // Функція пошуку (визначена перед useEffect що її використовує)
-  const performSearch = useCallback(async () => {
-    if (!width || !aspectRatio || !diameter) return;
-
-    setSearching(true);
-    setSearchedSize(`${width}/${aspectRatio} R${diameter}`);
-    setSearchedSeason(season);
-
-    try {
-      let url = `/api/tyres/search?width=${width}&height=${aspectRatio}&diameter=${diameter}`;
-      if (season) url += `&season=${season}`;
-      const res = await fetch(url);
-      const json = await res.json();
-
-      if (json.data?.tyres) {
-        setResults(json.data.tyres);
-      } else {
-        setResults([]);
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([]);
-    } finally {
-      setSearching(false);
-      setHasSearched(true);
-      // Scroll to results after DOM updates
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }, [width, aspectRatio, diameter, season]);
-
-  // Авто-пошук при завантаженні сторінки з URL параметрами
-  useEffect(() => {
-    if (initialSearchDone) return;
-    if (loadingWidths || loadingAspects || loadingDiameters) return;
-    if (mode !== 'size') return;
-
-    // Need all three required params to auto-search
-    if (!width || !aspectRatio || !diameter) return;
-
-    // Verify options are loaded and contain the required values
-    const hasWidth = widthOptions.some(o => o.value === parseInt(width));
-    const hasAspect = aspectOptions.some(o => o.value === parseInt(aspectRatio));
-    const hasDiameter = diameterOptions.some(o => o.value === parseInt(diameter));
-
-    if (hasWidth && hasAspect && hasDiameter) {
-      setInitialSearchDone(true);
-      setTimeout(() => {
-        performSearch();
-      }, 0);
-    }
-  }, [width, aspectRatio, diameter, widthOptions, aspectOptions, diameterOptions, loadingWidths, loadingAspects, loadingDiameters, initialSearchDone, mode, performSearch]);
-
-  // Wrapper handlers that sync state to URL
-  function handleModeChange(newMode: SearchMode) {
-    setMode(newMode);
-    if (newMode === 'car') {
-      updateUrlParams({ mode: 'car' });
-    } else {
-      syncSizeParamsToUrl('size', width, aspectRatio, diameter, season);
-    }
-  }
-
-  function handleWidthChange(newWidth: string) {
-    setWidth(newWidth);
-    setAspectRatio("");
-    setDiameter("");
-    syncSizeParamsToUrl('size', newWidth, "", "", season);
-  }
-
-  function handleAspectChange(newAspect: string) {
-    setAspectRatio(newAspect);
-    setDiameter("");
-    syncSizeParamsToUrl('size', width, newAspect, "", season);
-  }
-
-  function handleDiameterChange(newDiameter: string) {
-    setDiameter(newDiameter);
-    syncSizeParamsToUrl('size', width, aspectRatio, newDiameter, season);
-  }
-
-  function handleSeasonChange(newSeason: string) {
-    setSeason(newSeason);
-    syncSizeParamsToUrl('size', width, aspectRatio, diameter, newSeason);
-  }
-
-  async function handleSizeSearch(e: FormEvent) {
-    e.preventDefault();
-    // Ensure URL is up to date before search
-    syncSizeParamsToUrl('size', width, aspectRatio, diameter, season);
-    performSearch();
-  }
+  const {
+    mode,
+    handleModeChange,
+    width,
+    aspectRatio,
+    diameter,
+    season,
+    handleWidthChange,
+    handleAspectChange,
+    handleDiameterChange,
+    handleSeasonChange,
+    widthOptions,
+    aspectOptions,
+    diameterOptions,
+    loadingWidths,
+    loadingAspects,
+    loadingDiameters,
+    results,
+    filteredResults,
+    hasSearched,
+    searching,
+    searchedSize,
+    searchedSeason,
+    selectedBrands,
+    toggleBrand,
+    handleSizeSearch,
+    resultsRef,
+    urlMake,
+    urlModel,
+    urlYear,
+    urlSeason,
+  } = useSearchState();
 
   return (
     <div className="bg-background text-foreground">
@@ -323,9 +55,9 @@ export default function TyreSearchPage() {
       <section className="hero-adaptive py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div
-            
-            
-            
+
+
+
             className="mx-auto flex max-w-5xl flex-col gap-6 text-left md:flex-row md:items-center md:justify-between"
           >
             <div>
@@ -413,219 +145,37 @@ export default function TyreSearchPage() {
                 </div>
 
                 {mode === "size" ? (
-                  <form
-                    id="size-search-panel"
-                    role="tabpanel"
-                    aria-labelledby="size-search-tab"
-                    className="space-y-6"
+                  <SearchFilters
+                    width={width}
+                    aspectRatio={aspectRatio}
+                    diameter={diameter}
+                    season={season}
+                    onWidthChange={handleWidthChange}
+                    onAspectChange={handleAspectChange}
+                    onDiameterChange={handleDiameterChange}
+                    onSeasonChange={handleSeasonChange}
+                    widthOptions={widthOptions}
+                    aspectOptions={aspectOptions}
+                    diameterOptions={diameterOptions}
+                    loadingWidths={loadingWidths}
+                    loadingAspects={loadingAspects}
+                    loadingDiameters={loadingDiameters}
+                    searching={searching}
                     onSubmit={handleSizeSearch}
                   >
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      {/* Ширина */}
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-                          Ширина {widthOptions.length > 0 && <span className="text-stone-500">({widthOptions.length})</span>}
-                        </label>
-                        <div className="relative">
-                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
-                          {loadingWidths ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
-                            </div>
-                          ) : (
-                            <select
-                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
-                              value={width}
-                              onChange={(e) => handleWidthChange(e.target.value)}
-                              required
-                            >
-                              <option value="">Оберіть ширину</option>
-                              {widthOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                  {opt.value} мм
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
-                        </div>
-                      </div>
-
-                      {/* Висота профілю */}
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-                          Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500">({aspectOptions.length})</span>}
-                        </label>
-                        <div className="relative">
-                          <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
-                          {loadingAspects ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
-                            </div>
-                          ) : (
-                            <select
-                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-                              value={aspectRatio}
-                              onChange={(e) => handleAspectChange(e.target.value)}
-                              disabled={!width}
-                              required
-                            >
-                              <option value="">{width ? "Оберіть висоту" : "Спочатку оберіть ширину"}</option>
-                              {aspectOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                  {opt.value}%
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
-                        </div>
-                      </div>
-
-                      {/* Діаметр */}
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-                          Діаметр {diameterOptions.length > 0 && <span className="text-stone-500">({diameterOptions.length})</span>}
-                        </label>
-                        <div className="relative">
-                          <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
-                          {loadingDiameters ? (
-                            <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
-                              <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
-                            </div>
-                          ) : (
-                            <select
-                              className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-                              value={diameter}
-                              onChange={(e) => handleDiameterChange(e.target.value)}
-                              disabled={!aspectRatio}
-                              required
-                            >
-                              <option value="">{aspectRatio ? "Оберіть діаметр" : "Спочатку оберіть висоту"}</option>
-                              {diameterOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                  R{opt.value}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Сезон (опційно) */}
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-                        Сезонність <span className="text-stone-500">(опційно)</span>
-                      </label>
-                      <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
-                        <select
-                          className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
-                          value={season}
-                          onChange={(e) => handleSeasonChange(e.target.value)}
-                        >
-                          <option value="">Не важливо</option>
-                          <option value="summer">Літні</option>
-                          <option value="winter">Зимові</option>
-                          <option value="allseason">Всесезонні</option>
-                        </select>
-                        <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
-                      <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
-                      <span>Точний підбір за офіційними каталогами Bridgestone та Firestone</span>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={!width || !aspectRatio || !diameter || searching}
-                      className="w-full rounded-full bg-brand py-3 text-base font-semibold text-white shadow-lg hover:bg-brand/90 dark:bg-white dark:text-stone-900 dark:hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {searching ? (
-                        <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
-                      ) : (
-                        <Search className="mr-2 inline h-5 w-5" />
-                      )}
-                      {searching ? "Шукаємо..." : "Знайти шини"}
-                    </button>
-
-                    {/* Результати пошуку за розміром - відразу після форми */}
+                    {/* Results rendered inside the form for layout continuity */}
                     {hasSearched && (
-                      <div
+                      <SearchResults
                         ref={resultsRef}
-                        className="mt-8 border-t border-stone-300 pt-6 dark:border-stone-700"
-                        aria-live="polite"
-                        aria-atomic="true"
-                      >
-                        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <h3 className="text-xl font-bold text-stone-900 dark:text-stone-50 flex flex-wrap items-center gap-2">
-                            <span>Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}</span>
-                            {searchedSize && (
-                              <span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
-                                {searchedSize}
-                              </span>
-                            )}
-                            {searchedSeason && (
-                              <span className={`rounded-full px-3 py-1 text-sm font-medium ${
-                                searchedSeason === "summer" ? "bg-amber-500/20 text-amber-400" :
-                                searchedSeason === "winter" ? "bg-blue-500/20 text-blue-400" :
-                                "bg-teal-500/20 text-teal-400"
-                              }`}>
-                                {searchedSeason === "summer" ? "Літні" : searchedSeason === "winter" ? "Зимові" : "Всесезонні"}
-                              </span>
-                            )}
-                          </h3>
-                          {/* Brand filter */}
-                          {results.length > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-stone-500 dark:text-stone-400">Бренд:</span>
-                              {(["bridgestone", "firestone"] as Brand[]).map(brand => (
-                                <button
-                                  key={brand}
-                                  type="button"
-                                  onClick={() => toggleBrand(brand)}
-                                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
-                                    selectedBrands.includes(brand)
-                                      ? `${brandColors[brand].bg} text-white`
-                                      : "bg-stone-200 text-stone-600 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-400 dark:hover:bg-stone-600"
-                                  }`}
-                                >
-                                  {brandLabels[brand]}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        {filteredResults.length === 0 ? (
-                          <div className="rounded-xl border border-stone-300 bg-stone-100 p-6 text-center dark:border-stone-700 dark:bg-stone-800/50">
-                            <Search className="mx-auto h-10 w-10 text-stone-400 dark:text-stone-500" />
-                            <p className="mt-3 text-stone-600 dark:text-stone-400">
-                              {results.length === 0
-                                ? `Шин для розміру ${searchedSize} не знайдено в каталозі.`
-                                : `Шин обраних брендів для розміру ${searchedSize} не знайдено.`
-                              }
-                            </p>
-                            <Link
-                              href="/dealers"
-                              className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                            >
-                              <MapPin className="h-4 w-4" />
-                              Зверніться до дилера
-                            </Link>
-                          </div>
-                        ) : (
-                          <div className="grid gap-4 sm:grid-cols-2">
-                            {filteredResults.map((model) => (
-                              <TyreCard key={model.slug} tyre={model} variant="compact" />
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                        results={results}
+                        filteredResults={filteredResults}
+                        searchedSize={searchedSize}
+                        searchedSeason={searchedSeason}
+                        selectedBrands={selectedBrands}
+                        onToggleBrand={toggleBrand}
+                      />
                     )}
-                  </form>
+                  </SearchFilters>
                 ) : (
                   <div
                     id="car-search-panel"

@@ -23,6 +23,8 @@ import AuditLog from './src/collections/AuditLog';
 import {
   removeBackgroundsEndpoint,
   removeBackgroundsStatusEndpoint,
+  removeBackgroundsBatchEndpoint,
+  removeBackgroundsBatchStatusEndpoint,
 } from './src/endpoints/removeBackgrounds';
 import {
   contentGenerateEndpoint,
@@ -122,6 +124,8 @@ export default buildConfig({
   endpoints: [
     removeBackgroundsEndpoint,
     removeBackgroundsStatusEndpoint,
+    removeBackgroundsBatchEndpoint,
+    removeBackgroundsBatchStatusEndpoint,
     contentGenerateEndpoint,
     contentJobStatusEndpoint,
     contentScrapeEndpoint,
