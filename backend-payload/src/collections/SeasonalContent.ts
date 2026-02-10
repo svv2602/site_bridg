@@ -19,7 +19,8 @@ export const SeasonalContent: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'isActive', 'featuredSeason', 'startDate', 'endDate'],
     group: 'Налаштування',
-    description: 'Керування сезонним контентом на головній сторінці',
+    description:
+      'Сезонний промо-контент на головній. Видимість визначається полями startDate/endDate автоматично (isActive + дата в діапазоні).',
   },
   access: {
     read: () => true,
@@ -57,6 +58,7 @@ export const SeasonalContent: CollectionConfig = {
           name: 'startDate',
           label: 'Дата початку',
           type: 'date',
+          required: true,
           admin: {
             width: '50%',
             date: {
@@ -68,11 +70,22 @@ export const SeasonalContent: CollectionConfig = {
           name: 'endDate',
           label: 'Дата закінчення',
           type: 'date',
+          required: true,
           admin: {
             width: '50%',
             date: {
               pickerAppearance: 'dayOnly',
             },
+          },
+          validate: (value: unknown, { siblingData }: { siblingData: Record<string, unknown> }) => {
+            if (value && siblingData?.startDate) {
+              const end = new Date(value as string);
+              const start = new Date(siblingData.startDate as string);
+              if (end <= start) {
+                return 'Дата закінчення повинна бути після дати початку';
+              }
+            }
+            return true;
           },
         },
       ],
@@ -97,19 +110,19 @@ export const SeasonalContent: CollectionConfig = {
       fields: [
         {
           name: 'heroTitle',
-          label: 'Заголовок Hero',
+          label: 'Промо-заголовок сезону',
           type: 'text',
           required: true,
           admin: {
-            description: 'Основний заголовок на головній сторінці',
+            description: 'НЕ H1 — показується у промо-картці на головній сторінці',
           },
         },
         {
           name: 'heroSubtitle',
-          label: 'Підзаголовок Hero',
+          label: 'Промо-підзаголовок сезону',
           type: 'text',
           admin: {
-            description: 'Додатковий текст під заголовком',
+            description: 'Додатковий текст у промо-картці',
           },
         },
         {

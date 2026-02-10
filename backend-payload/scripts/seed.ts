@@ -889,29 +889,29 @@ const MOCK_VEHICLE_FITMENTS = [
 // Seasonal content
 const MOCK_SEASONAL_CONTENT = [
   {
-    name: 'winter-2025',
+    name: 'winter-2025-2026',
     isActive: true,
     featuredSeason: 'winter' as const,
     heroTitle: 'Зимові шини Bridgestone',
     heroSubtitle: 'Безпека на дорозі взимку',
     ctaText: 'Переглянути зимові моделі',
-    ctaLink: '/passenger-tyres?season=winter',
+    ctaLink: '/passenger-tyres/winter',
     gradient: 'from-blue-900 to-slate-900',
-    promoText: 'Знижки до 15% на зимові шини Blizzak до кінця січня!',
-    startDate: new Date('2024-10-01'),
-    endDate: new Date('2025-03-31'),
+    promoText: 'Знижки до 15% на зимові шини Blizzak до кінця лютого!',
+    startDate: new Date('2025-10-01'),
+    endDate: new Date('2026-03-31'),
   },
   {
-    name: 'summer-2025',
-    isActive: false,
+    name: 'summer-2026',
+    isActive: true,
     featuredSeason: 'summer' as const,
     heroTitle: 'Літні шини Bridgestone',
     heroSubtitle: 'Максимальне зчеплення в теплу пору',
     ctaText: 'Переглянути літні моделі',
-    ctaLink: '/passenger-tyres?season=summer',
+    ctaLink: '/passenger-tyres/summer',
     gradient: 'from-amber-800 to-stone-900',
-    startDate: new Date('2025-04-01'),
-    endDate: new Date('2025-09-30'),
+    startDate: new Date('2026-04-01'),
+    endDate: new Date('2026-09-30'),
   },
 ];
 
@@ -1103,6 +1103,28 @@ async function seed() {
   }
   console.log();
 
+  // Seed Site Settings (global)
+  console.log('⚙️  Seeding site settings...');
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    data: {
+      phoneDisplay: '0 800 123 456',
+      phoneHref: 'tel:+380800123456',
+      emailSupport: 'support@bridgestone.ua',
+      emailPrivacy: 'privacy@bridgestone.ua',
+      emailInfo: 'info@bridgestone.ua',
+      city: 'Київ',
+      addressFull: 'м. Київ, вул. Прикладна, 10',
+      country: 'UA',
+      facebook: 'https://www.facebook.com/BridgestoneUkraine',
+      instagram: 'https://www.instagram.com/bridgestone_ukraine',
+      telegram: 'https://t.me/bridgestone_ua',
+      website: 'https://www.bridgestone.com',
+      workingHours: 'Пн-Пт 9:00-18:00',
+    },
+  });
+  console.log('   ✅ Site settings seeded\n');
+
   console.log('✨ Seed completed successfully!\n');
   console.log('Summary:');
   console.log(`   - ${MOCK_TECHNOLOGIES.length} technologies`);
@@ -1111,7 +1133,8 @@ async function seed() {
   console.log(`   - ${MOCK_ARTICLES.length} articles`);
   console.log(`   - ${MOCK_VEHICLE_FITMENTS.length} vehicle fitments`);
   console.log(`   - ${MOCK_SEASONAL_CONTENT.length} seasonal configs`);
-  console.log(`   - 6 reviews\n`);
+  console.log(`   - 6 reviews`);
+  console.log(`   - 1 site settings global\n`);
   console.log('You can now log in to the admin panel:');
   console.log('   URL: http://localhost:3001/admin');
   console.log('   Email: admin@bridgestone.ua');
