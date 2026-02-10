@@ -6,7 +6,7 @@
  */
 
 import { fallbackLlm } from "../../providers/fallback-llm.js";
-import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand } from "../../prompts/index.js";
+import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand, type RelatedItem } from "../../prompts/index.js";
 import type { RawTyreContent, GeneratedTyreContent, Brand } from "../../types/content.js";
 import { BRAND_NAMES } from "../../types/content.js";
 import { loadFromStorage } from "../../utils/storage.js";
@@ -31,6 +31,7 @@ export interface TireDescriptionInput {
   };
   rawContent?: RawTyreContent[];
   testResults?: string;
+  relatedItems?: RelatedItem[];
 }
 
 /**
@@ -39,7 +40,7 @@ export interface TireDescriptionInput {
 interface DescriptionOutput {
   shortDescription: string;
   fullDescription: string;
-  highlights: string[];
+  keyBenefits: string[];
 }
 
 /**
@@ -84,19 +85,24 @@ ${input.testResults ? `- Результати тестів: ${input.testResults}
 ${advantages.length ? `\nПЕРЕВАГИ:\n${advantages.map((a) => `- ${a}`).join("\n")}` : ""}
 ${Object.keys(specifications).length ? `\nСПЕЦИФІКАЦІЇ:\n${Object.entries(specifications).map(([k, v]) => `- ${k}: ${v}`).join("\n")}` : ""}
 ${rawDescription ? `\nОПИС-РЕФЕРЕНС (НЕ копіювати, лише для розуміння):${rawDescription}` : ""}
+${input.relatedItems?.length ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):\n${input.relatedItems.map((item) => {
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/blog/${item.slug}`;
+  return `- ${item.name}: ${url}`;
+}).join("\n")}` : ""}
 
 ФОРМАТ ВІДПОВІДІ (JSON):
 {
   "shortDescription": "Короткий опис 150-200 символів для картки товару. Головна перевага + для кого підійде.",
-  "fullDescription": "Повний опис 800-1200 слів у форматі Markdown з H2 заголовками. Структура: вступ → ключові переваги → технології → для кого підійде → висновок.",
-  "highlights": ["Перевага 1", "Перевага 2", "Перевага 3", "Перевага 4", "Перевага 5"]
+  "fullDescription": "Повний HTML опис 300-500 слів. Структура: <h2>Вступ</h2><p>...</p><h2>Переваги</h2><ul><li>...</li></ul><h2>Для кого підійде</h2><p>...</p>. Використовуй теги: h2, h3, p, ul, li, strong, a.",
+  "keyBenefits": ["Перевага 1", "Перевага 2", "Перевага 3", "Перевага 4", "Перевага 5"]
 }
 
 ВАЖЛИВО:
 - Відповідь ТІЛЬКИ у форматі JSON
 - Контент має бути 100% унікальним
 - НЕ згадуй ціни
-- highlights: 4-5 конкретних коротких пунктів`;
+- fullDescription у форматі HTML (h2, h3, p, ul, li, strong, a)
+- keyBenefits: 4-5 конкретних коротких пунктів`;
 }
 
 /**
@@ -115,7 +121,7 @@ function parseResponse(response: string): DescriptionOutput {
   return {
     shortDescription: parsed.shortDescription || "",
     fullDescription: parsed.fullDescription || "",
-    highlights: Array.isArray(parsed.highlights) ? parsed.highlights : [],
+    keyBenefits: Array.isArray(parsed.keyBenefits) ? parsed.keyBenefits : [],
   };
 }
 
@@ -137,8 +143,8 @@ function validateContent(content: DescriptionOutput): void {
     errors.push(`fullDescription too short: ${content.fullDescription?.length || 0} chars (min 500)`);
   }
 
-  if (!content.highlights || content.highlights.length < 3) {
-    errors.push(`highlights needs at least 3 items, got ${content.highlights?.length || 0}`);
+  if (!content.keyBenefits || content.keyBenefits.length < 3) {
+    errors.push(`keyBenefits needs at least 3 items, got ${content.keyBenefits?.length || 0}`);
   }
 
   if (errors.length > 0) {
@@ -194,7 +200,7 @@ export async function generateTireDescription(
   logger.info(`Description generated for ${input.modelName}`, {
     shortDescLength: data.shortDescription.length,
     fullDescLength: data.fullDescription.length,
-    highlights: data.highlights.length,
+    keyBenefits: data.keyBenefits.length,
     cost: response.cost.toFixed(4),
   });
 
@@ -296,8 +302,8 @@ async function main() {
     console.log(result.content.fullDescription);
     console.log(`\n(${result.content.fullDescription.length} chars)`);
 
-    console.log("\n=== HIGHLIGHTS ===");
-    result.content.highlights.forEach((h, i) => console.log(`${i + 1}. ${h}`));
+    console.log("\n=== KEY BENEFITS ===");
+    result.content.keyBenefits.forEach((h, i) => console.log(`${i + 1}. ${h}`));
 
     console.log("\n=== METADATA ===");
     console.log(`Provider: ${result.metadata.provider}`);

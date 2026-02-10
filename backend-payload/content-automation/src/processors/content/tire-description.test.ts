@@ -69,7 +69,7 @@ describe("generateTireDescription", () => {
       "Turanza 6 — новітня літня шина преміум-класу від Bridgestone. " +
       Array(100).fill("Тестовий контент для перевірки.").join(" ") +
       "\n\n## Для кого підходить\n\nЦя шина ідеально підходить для щоденних поїздок.",
-    highlights: [
+    keyBenefits: [
       "Технологія ENLITEN для зниження ваги",
       "Відмінне зчеплення на мокрій дорозі",
       "Низький рівень шуму",
@@ -107,7 +107,7 @@ describe("generateTireDescription", () => {
       validDescriptionResponse.shortDescription
     );
     expect(result.content.fullDescription).toBeTruthy();
-    expect(result.content.highlights).toHaveLength(4);
+    expect(result.content.keyBenefits).toHaveLength(4);
     expect(result.metadata.provider).toBe("anthropic");
     expect(result.metadata.cost).toBe(0.0015);
   });
@@ -229,8 +229,8 @@ describe("generateTireDescription", () => {
       );
     });
 
-    it("should throw for fewer than 3 highlights", async () => {
-      setupMockResponse({ highlights: ["One", "Two"] });
+    it("should throw for fewer than 3 keyBenefits", async () => {
+      setupMockResponse({ keyBenefits: ["One", "Two"] });
 
       await expect(generateTireDescription(baseInput)).rejects.toThrow(
         "Validation failed"
@@ -241,7 +241,7 @@ describe("generateTireDescription", () => {
       setupMockResponse({
         shortDescription: "Short",
         fullDescription: "Short",
-        highlights: [],
+        keyBenefits: [],
       });
 
       // Should NOT throw

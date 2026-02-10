@@ -22,6 +22,7 @@ import {
 } from "./db/article-queue.js";
 import { planArticles } from "./article-planner.js";
 import { generateArticle, type ArticleInput } from "./processors/content/article-generator.js";
+import { generateHeroImage } from "./processors/content/article-images.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { getArticlePrompt, type RelatedItem } from "./prompts/index.js";
 import { getTestResult } from "./db/test-results.js";
@@ -190,6 +191,7 @@ async function processQueue(): Promise<{
   const maxPerWeek = getSettingNumber("max_articles_per_week") || 3;
   const autoPublish = getSettingBool("auto_publish");
   const interlink = getSettingBool("interlinking_enabled");
+  const generateImages = getSettingBool("image_generation_enabled");
   const errors: string[] = [];
 
   const pending = getPendingQueue(maxPerWeek);
@@ -213,15 +215,42 @@ async function processQueue(): Promise<{
       // Build context for generation
       const context = await buildGenerationContext(item, interlink);
 
-      // Generate article
+      // Generate article (pass relatedItems for interlinking)
       console.log(`[Generate] Generating: "${item.topic}" (${item.articleType})`);
-      const result = await generateArticle(context.input);
+      const result = await generateArticle({
+        ...context.input,
+        relatedItems: context.relatedItems.length > 0 ? context.relatedItems : undefined,
+      });
 
       generated++;
 
+      // Generate hero image if enabled
+      let imageMediaId: number | undefined;
+      if (generateImages) {
+        try {
+          console.log(`[Generate] Generating hero image for: "${result.article.title}"`);
+          const season = (item.triggerData?.season as "summer" | "winter" | "allseason") || undefined;
+          const heroImage = await generateHeroImage(item.topic, season);
+          if (heroImage.url) {
+            const client = getPayloadClient();
+            const media = await client.uploadImageFromUrl(heroImage.url, {
+              alt: heroImage.alt,
+              filename: `article-${result.article.slug}.png`,
+            });
+            if (media) {
+              imageMediaId = media.id;
+              console.log(`[Generate] Hero image uploaded: media ID ${media.id}`);
+            }
+          }
+        } catch (imgError) {
+          const msg = imgError instanceof Error ? imgError.message : String(imgError);
+          console.warn(`[Generate] Image generation failed (non-blocking): ${msg}`);
+        }
+      }
+
       // Publish or hold for review
       if (autoPublish) {
-        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds);
+        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
         updateQueueItem(item.id, {
           status: "published",
           generatedPayloadId: payloadId,
@@ -231,7 +260,7 @@ async function processQueue(): Promise<{
         console.log(`[Generate] Published: "${result.article.title}" (ID: ${payloadId})`);
       } else {
         // Save to CMS as draft / hold for review
-        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds);
+        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
         updateQueueItem(item.id, {
           status: "review",
           generatedPayloadId: payloadId,
@@ -334,6 +363,19 @@ async function buildGenerationContext(
     tireModels.push(...results.map((r) => r.name));
   }
 
+  // Determine brand from trigger data or related tyres
+  let brand: "bridgestone" | "firestone" | undefined;
+  if (item.triggerData?.brand) {
+    brand = item.triggerData.brand as "bridgestone" | "firestone";
+  } else if (relatedItems.length > 0) {
+    // If all related tyres belong to one brand, use it
+    const tyreNames = relatedItems
+      .filter((r) => r.type === "tyre")
+      .map((r) => r.name.toLowerCase());
+    const allFirestone = tyreNames.length > 0 && tyreNames.every((n) => n.includes("firestone"));
+    if (allFirestone) brand = "firestone";
+  }
+
   // Build keywords based on article type
   const keywords: string[] = ["Bridgestone", "шини"];
   if (item.articleType === "test-summary" && item.triggerData?.source) {
@@ -349,6 +391,7 @@ async function buildGenerationContext(
     input: {
       topic: item.topic,
       type: item.articleType,
+      brand,
       tireModels: tireModels.length > 0 ? tireModels : undefined,
       testData,
       keywords,
@@ -362,7 +405,8 @@ async function buildGenerationContext(
 
 async function publishArticleToCMS(
   article: GeneratedArticle,
-  relatedTyreIds: string[]
+  relatedTyreIds: string[],
+  imageMediaId?: number
 ): Promise<string> {
   const client = getPayloadClient();
 
@@ -370,6 +414,7 @@ async function publishArticleToCMS(
   const articleData = {
     slug: article.slug,
     title: article.title,
+    subtitle: article.subtitle,
     previewText: article.excerpt.slice(0, 300),
     body: article.content,
     tags: article.tags.map((tag) => ({ tag })),
@@ -378,6 +423,8 @@ async function publishArticleToCMS(
     readingTimeMinutes: Math.ceil(
       (article.content?.split(/\s+/).length || 0) / 200
     ),
+    // Featured image
+    ...(imageMediaId && { image: imageMediaId }),
     // relatedTyres populated automatically from CMS IDs
     ...(relatedTyreIds.length > 0 && { relatedTyres: relatedTyreIds }),
   };

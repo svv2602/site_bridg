@@ -97,13 +97,11 @@ export interface GeneratedTyreContent {
 
   // Main content
   shortDescription: string;           // 150-200 chars for product card
-  fullDescription: string;            // Markdown, 800-1200 words
-  fullDescriptionLexical?: object;    // Lexical JSON for Payload CMS
+  fullDescription: string;            // HTML content for CMS
 
   // SEO metadata
   seoTitle: string;                   // up to 60 chars
   seoDescription: string;             // up to 160 chars
-  seoKeywords: string[];
 
   // Structured content
   keyBenefits: { benefit: string; icon?: string }[];
@@ -129,14 +127,13 @@ export interface GeneratedArticle {
 
   // Content
   title: string;
+  subtitle?: string;                   // Subtitle for hero section
   excerpt: string;                     // 150-200 chars
-  content: string;                     // Markdown
-  contentLexical?: object;             // Lexical JSON
+  content: string;                     // HTML content
 
   // SEO
   seoTitle: string;
   seoDescription: string;
-  seoKeywords: string[];
 
   // Images
   heroImage?: GeneratedImage;

@@ -41,37 +41,37 @@
 ## Output Format (JSON)
 ```json
 {
-  "title": "Заголовок статті (50-70 символів)",
-  "excerpt": "Короткий опис для превʼю (150-200 символів)",
-  "content": "Повний текст статті у форматі Markdown",
+  "title": "Заголовок статті (50-70 символів, привабливий для читача)",
+  "subtitle": "Підзаголовок — 1 речення, 60-100 символів. Доповнює title.",
+  "excerpt": "Короткий опис для превʼю (150-200 символів). БЕЗ HTML.",
+  "content": "Повний HTML текст статті: <h2>Секція</h2><p>Текст...</p>",
+  "seoTitle": "SEO-оптимізований заголовок (40-55 символів). НЕ дублюй title.",
+  "seoDescription": "SEO-опис для пошуковиків (150-160 символів, з CTA).",
   "tags": ["тег1", "тег2", "тег3"],
   "readingTime": 5,
   "relatedTyres": ["turanza-6", "blizzak-lm005"]
 }
 ```
 
-## Content Structure
+## Content Structure (HTML)
 
-### Markdown Format
-```markdown
-# {title}
+```html
+<p>{intro paragraph}</p>
 
-{intro paragraph}
+<h2>{Section 1 Title}</h2>
+<p>{content}</p>
 
-## {Section 1 Title}
-{content}
+<h2>{Section 2 Title}</h2>
+<p>{content}</p>
+<ul><li>{list item}</li></ul>
 
-## {Section 2 Title}
-{content}
+<h3>{Subsection if needed}</h3>
+<p>{content}</p>
 
-### {Subsection if needed}
-{content}
+<h2>Висновок</h2>
+<p>{conclusion}</p>
 
-## Висновок
-{conclusion}
-
----
-*Знайдіть свої ідеальні шини на офіційному сайті Bridgestone Україна.*
+<p><strong>Знайдіть свої ідеальні шини на <a href="/dealers">офіційному сайті Bridgestone Україна</a>.</strong></p>
 ```
 
 ## Requirements

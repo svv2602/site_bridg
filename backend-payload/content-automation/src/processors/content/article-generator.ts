@@ -5,7 +5,9 @@
  */
 
 import { fallbackLlm } from "../../providers/fallback-llm.js";
-import { SYSTEM_PROMPTS } from "../../prompts/index.js";
+import { SYSTEM_PROMPTS, getSystemPromptsForBrand, type RelatedItem } from "../../prompts/index.js";
+import type { Brand } from "../../types/content.js";
+import { BRAND_NAMES } from "../../types/content.js";
 import type { GeneratedArticle } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -28,6 +30,7 @@ export type ArticleType =
 export interface ArticleInput {
   topic: string;
   type: ArticleType;
+  brand?: Brand;
   tireModels?: string[];
   testData?: {
     source: string;
@@ -36,6 +39,7 @@ export interface ArticleInput {
   };
   keywords?: string[];
   targetWordCount?: number;
+  relatedItems?: RelatedItem[];
 }
 
 /**
@@ -43,8 +47,11 @@ export interface ArticleInput {
  */
 interface ArticleOutput {
   title: string;
+  subtitle?: string;
   excerpt: string;
   content: string;
+  seoTitle?: string;
+  seoDescription?: string;
   tags: string[];
   readingTime: number;
   relatedTyres?: string[];
@@ -81,6 +88,13 @@ function buildPrompt(input: ArticleInput): string {
   const wordRange = WORD_COUNT_RANGES[input.type];
   const targetWords = input.targetWordCount || Math.round((wordRange.min + wordRange.max) / 2);
 
+  const relatedItemsSection = input.relatedItems?.length
+    ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВКИ (використай 2-3 з них органічно в тексті):\n${input.relatedItems.map((item) => {
+        const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/blog/${item.slug}`;
+        return `- ${item.name}: ${url}`;
+      }).join("\n")}`
+    : "";
+
   return `Напиши статтю для блогу Bridgestone Україна.
 
 ТИП СТАТТІ: ${TYPE_DESCRIPTIONS[input.type]}
@@ -93,25 +107,27 @@ ${input.testData ? `
 - Результати: ${input.testData.results}
 ` : ""}
 ${input.keywords?.length ? `КЛЮЧОВІ СЛОВА: ${input.keywords.join(", ")}` : ""}
+${relatedItemsSection}
 
 ФОРМАТ ВІДПОВІДІ (JSON):
 {
-  "title": "Заголовок статті (50-70 символів)",
-  "excerpt": "Короткий опис для превʼю (150-200 символів)",
-  "content": "Повний текст статті у форматі Markdown (${targetWords} слів)",
+  "title": "Заголовок статті (50-70 символів, привабливий для читача)",
+  "subtitle": "Підзаголовок статті — 1 речення, 60-100 символів. Доповнює title, не дублює.",
+  "excerpt": "Короткий опис для превʼю (150-200 символів). БЕЗ HTML.",
+  "content": "Повний HTML текст статті (${targetWords} слів): <h2>Секція</h2><p>Текст...</p><ul><li>Пункт</li></ul>",
+  "seoTitle": "SEO-оптимізований заголовок (40-55 символів, з ключовим словом). НЕ дублюй title.",
+  "seoDescription": "SEO-опис для пошуковиків (150-160 символів, з CTA). НЕ дублюй excerpt.",
   "tags": ["тег1", "тег2", "тег3"],
   "readingTime": ${Math.ceil(targetWords / 200)},
   "relatedTyres": ["slug-моделі-1", "slug-моделі-2"]
 }
 
-СТРУКТУРА КОНТЕНТУ:
-1. Вступ (1-2 абзаци) - зацікавити читача
-2. Основна частина (3-5 секцій з ## H2)
-3. Підсекції з ### H3 за потреби
-4. Висновок з CTA
-
 ВИМОГИ:
 - ${wordRange.min}-${wordRange.max} слів
+- content у форматі HTML (h2, h3, p, ul, li, strong, a)
+- seoTitle — НЕ включай назву сайту (суфікс додається автоматично), оптимізуй для пошуку
+- seoDescription — включи ключове слово та мотивацію до кліку
+- При ПЕРШІЙ згадці бренду/моделі додай транслітерацію в дужках
 - Українська мова
 - Інформативний стиль, не рекламний
 - Практичні поради
@@ -135,8 +151,11 @@ function parseResponse(response: string): ArticleOutput {
 
   return {
     title: parsed.title || "",
+    subtitle: parsed.subtitle || undefined,
     excerpt: parsed.excerpt || "",
     content: parsed.content || "",
+    seoTitle: parsed.seoTitle || undefined,
+    seoDescription: parsed.seoDescription || undefined,
     tags: Array.isArray(parsed.tags) ? parsed.tags : [],
     readingTime: parsed.readingTime || 5,
     relatedTyres: Array.isArray(parsed.relatedTyres) ? parsed.relatedTyres : undefined,
@@ -249,11 +268,14 @@ export async function generateArticle(
     provider: options?.provider || "default",
   });
 
-  // Use content-generation routing
+  // Use content-generation routing with brand-specific system prompt
   const generator = fallbackLlm.forTask("content-generation");
+  const systemPrompt = input.brand
+    ? getSystemPromptsForBrand(input.brand).article
+    : SYSTEM_PROMPTS.article;
 
   const { data, response } = await generator.generateJSON<ArticleOutput>(prompt, {
-    systemPrompt: SYSTEM_PROMPTS.article,
+    systemPrompt,
     maxTokens: 4000,
     temperature: 0.7,
     ...(options?.provider && { provider: options.provider }),
@@ -276,11 +298,11 @@ export async function generateArticle(
   const article: GeneratedArticle = {
     slug: generateSlug(data.title),
     title: data.title,
+    subtitle: data.subtitle,
     excerpt: data.excerpt,
     content: data.content,
-    seoTitle: data.title,
-    seoDescription: data.excerpt,
-    seoKeywords: data.tags,
+    seoTitle: data.seoTitle || data.title,
+    seoDescription: data.seoDescription || data.excerpt,
     tags: data.tags,
     relatedTyres: data.relatedTyres,
     metadata: {

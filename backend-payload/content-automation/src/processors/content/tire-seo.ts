@@ -31,7 +31,6 @@ export interface TireSEOInput {
 export interface SEOOutput {
   seoTitle: string;
   seoDescription: string;
-  seoKeywords: string[];
 }
 
 /**
@@ -54,15 +53,13 @@ ${input.keyBenefits?.length ? `- Ключові переваги: ${input.keyBen
 
 ФОРМАТ ВІДПОВІДІ (JSON):
 {
-  "seoTitle": "SEO заголовок 50-60 символів. Починається з '${brandName} ${input.modelName}'",
-  "seoDescription": "SEO опис 150-160 символів. Головна перевага + для кого підійде.",
-  "seoKeywords": ["5-10 ключових слів для SEO"]
+  "seoTitle": "SEO заголовок 40-55 символів. Починається з '${brandName} ${input.modelName}'",
+  "seoDescription": "SEO опис 150-160 символів. Головна перевага + для кого підійде."
 }
 
 ВИМОГИ:
-- seoTitle: 50-60 символів, включає назву моделі та сезон
+- seoTitle: 40-55 символів, включає назву моделі та сезон. НЕ включай назву сайту — суфікс "| Bridgestone Україна" додається автоматично.
 - seoDescription: 150-160 символів, привабливий для кліку
-- seoKeywords: включає "${brandName} ${input.modelName}", "${season.name} шини", типи авто
 - НЕ згадуй ціни
 - Українська мова`;
 }
@@ -82,7 +79,6 @@ function parseResponse(response: string): SEOOutput {
   return {
     seoTitle: parsed.seoTitle || "",
     seoDescription: parsed.seoDescription || "",
-    seoKeywords: Array.isArray(parsed.seoKeywords) ? parsed.seoKeywords : [],
   };
 }
 
@@ -106,10 +102,6 @@ function validateSEO(seo: SEOOutput): void {
 
   if (seo.seoDescription && seo.seoDescription.length > 170) {
     errors.push(`seoDescription too long: ${seo.seoDescription.length} chars (max 170)`);
-  }
-
-  if (!seo.seoKeywords || seo.seoKeywords.length < 3) {
-    errors.push(`seoKeywords needs at least 3 items, got ${seo.seoKeywords?.length || 0}`);
   }
 
   if (errors.length > 0) {
@@ -161,7 +153,6 @@ export async function generateTireSEO(
   logger.info(`SEO generated for ${input.modelName}`, {
     titleLength: data.seoTitle.length,
     descLength: data.seoDescription.length,
-    keywords: data.seoKeywords.length,
     cost: response.cost.toFixed(4),
   });
 
@@ -185,7 +176,7 @@ export async function generateTireSEOFromContent(
   season: "summer" | "winter" | "allseason",
   content: {
     shortDescription: string;
-    highlights: string[];
+    keyBenefits: string[];
   },
   options?: {
     provider?: string;
@@ -197,7 +188,7 @@ export async function generateTireSEOFromContent(
     modelName,
     season,
     shortDescription: content.shortDescription,
-    keyBenefits: content.highlights,
+    keyBenefits: content.keyBenefits,
   };
 
   const result = await generateTireSEO(input, options);
@@ -232,9 +223,6 @@ async function main() {
     console.log("\n=== SEO DESCRIPTION ===");
     console.log(result.seo.seoDescription);
     console.log(`(${result.seo.seoDescription.length} chars)`);
-
-    console.log("\n=== SEO KEYWORDS ===");
-    console.log(result.seo.seoKeywords.join(", "));
 
     console.log("\n=== METADATA ===");
     console.log(`Provider: ${result.metadata.provider}`);

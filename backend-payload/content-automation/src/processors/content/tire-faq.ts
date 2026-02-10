@@ -30,6 +30,7 @@ export interface TireFAQInput {
     noiseDb?: number;
   };
   predecessorName?: string;
+  testResults?: string;
 }
 
 /**
@@ -56,8 +57,8 @@ function buildPrompt(input: TireFAQInput): string {
   const brand = input.brand || "bridgestone";
   const brandName = BRAND_NAMES[brand];
 
-  // Standard question templates
-  const questions = [
+  // 3 standard + 2 dynamic questions
+  const standardQuestions = [
     `Для яких автомобілів підходить ${brandName} ${input.modelName}?`,
     input.season === "summer"
       ? `Чи можна використовувати ${brandName} ${input.modelName} взимку?`
@@ -65,11 +66,43 @@ function buildPrompt(input: TireFAQInput): string {
         ? `Чи підходить ${brandName} ${input.modelName} для льоду?`
         : `В яких умовах найкраще працює ${brandName} ${input.modelName}?`,
     `Який термін служби шин ${brandName} ${input.modelName}?`,
-    `Як правильно зберігати шини ${brandName} ${input.modelName}?`,
-    input.predecessorName
-      ? `Чим ${brandName} ${input.modelName} відрізняється від ${input.predecessorName}?`
-      : `Які технології використовуються в ${brandName} ${input.modelName}?`,
   ];
+
+  // Dynamic questions based on available data
+  const dynamicQuestions: string[] = [];
+  if (input.technologies?.length) {
+    dynamicQuestions.push(
+      `Яку роль відіграє технологія ${input.technologies[0]} в ${brandName} ${input.modelName}?`
+    );
+  }
+  if (input.euLabel?.wetGrip === "A") {
+    dynamicQuestions.push(
+      `Що означає клас A мокрого зчеплення для ${brandName} ${input.modelName}?`
+    );
+  } else if (input.euLabel?.fuelEfficiency === "A") {
+    dynamicQuestions.push(
+      `Що означає клас A паливної ефективності для ${brandName} ${input.modelName}?`
+    );
+  }
+  if (input.testResults) {
+    dynamicQuestions.push(
+      `Як ${brandName} ${input.modelName} показав себе в незалежних тестах?`
+    );
+  }
+  if (input.predecessorName) {
+    dynamicQuestions.push(
+      `Чим ${brandName} ${input.modelName} відрізняється від ${input.predecessorName}?`
+    );
+  }
+
+  // If no dynamic questions, add generic technology question
+  if (dynamicQuestions.length === 0) {
+    dynamicQuestions.push(
+      `Які технології використовуються в ${brandName} ${input.modelName}?`
+    );
+  }
+
+  const questions = [...standardQuestions, ...dynamicQuestions.slice(0, 2)];
 
   return `Створи FAQ (5 питань з відповідями) для шини ${brandName} ${input.modelName}.
 
@@ -80,6 +113,7 @@ ${vehicles ? `- Типи авто: ${vehicles}` : ""}
 ${input.technologies?.length ? `- Технології: ${input.technologies.join(", ")}` : ""}
 ${input.euLabel ? `- EU Label: Мокре зчеплення ${input.euLabel.wetGrip || "-"}, Паливна ефективність ${input.euLabel.fuelEfficiency || "-"}` : ""}
 ${input.predecessorName ? `- Попередник: ${input.predecessorName}` : ""}
+${input.testResults ? `- Результати тестів: ${input.testResults}` : ""}
 
 ПИТАННЯ (використай ці або подібні):
 ${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
@@ -89,22 +123,22 @@ ${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
   "faqs": [
     {
       "question": "Питання 1?",
-      "answer": "Відповідь 2-3 речення (50-100 слів)"
+      "answer": "Відповідь 2-3 речення (50-100 слів). Plain text, без HTML тегів."
     },
     {
       "question": "Питання 2?",
-      "answer": "Відповідь 2-3 речення (50-100 слів)"
+      "answer": "Відповідь 2-3 речення (50-100 слів). Plain text, без HTML тегів."
     }
   ]
 }
 
 ВИМОГИ:
-- Відповіді українською
+- Відповіді українською, plain text (без HTML тегів)
 - 2-3 речення на кожну відповідь
 - Конкретні факти, без води
+- Хоча б 2 питання мають бути унікальними для цієї конкретної моделі
 - НЕ вигадуй дані яких немає
 - Термін служби: 40-80 тис км залежно від умов
-- Зберігання: темне прохолодне місце, вертикально або підвішені
 - Оптимізуй для featured snippets (прямі відповіді)`;
 }
 

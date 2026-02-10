@@ -47,9 +47,10 @@ export {
 import { generateTireDescription, type TireDescriptionInput } from "./tire-description.js";
 import { generateTireSEO } from "./tire-seo.js";
 import { generateTireFAQ, generateFAQSchema, type TireFAQInput, type FAQ } from "./tire-faq.js";
-import { markdownToLexical } from "../../utils/markdown-to-lexical.js";
 import { loadFromStorage, saveToStorage } from "../../utils/storage.js";
 import { sanitizeHtml } from "../../utils/sanitize.js";
+import { type RelatedItem } from "../../prompts/index.js";
+import { getPayloadClient } from "../../publishers/payload-client.js";
 import type { RawTyreContent, GeneratedTyreContent } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
@@ -125,21 +126,50 @@ export async function generateFullTyreContent(
     }
 
     const firstSource = rawContent[0];
+    const euLabel = firstSource.euLabel
+      ? {
+          wetGrip: firstSource.euLabel.wetGrip,
+          fuelEfficiency: firstSource.euLabel.fuelEfficiency,
+          noiseDb: firstSource.euLabel.noiseLevel,
+        }
+      : undefined;
+
+    // Collect related items for interlinking
+    let relatedItems: RelatedItem[] = [];
+    try {
+      const client = getPayloadClient();
+      const season = firstSource.season || "summer";
+      const tyres = await client.getAllTyres(10);
+      const sameSeason = tyres.filter(
+        (t) => t.season === season && t.slug !== modelSlug
+      );
+      for (const t of sameSeason.slice(0, 3)) {
+        relatedItems.push({ slug: t.slug, name: t.name, type: "tyre" });
+      }
+      try {
+        const articles = await client.getAllArticles(5);
+        for (const a of articles.slice(0, 2)) {
+          relatedItems.push({ slug: a.slug, name: a.title, type: "article" });
+        }
+      } catch {
+        // Articles fetch failed, continue without
+      }
+    } catch {
+      // Payload CMS unavailable, continue without interlinking
+      logger.warn(`Could not fetch related items for interlinking: ${modelSlug}`);
+    }
 
     // Build input from raw content
     const descriptionInput: TireDescriptionInput = {
       modelSlug,
       modelName: firstSource.modelName,
+      brand: firstSource.brand,
       season: firstSource.season || "summer",
+      vehicleTypes: (firstSource as any).vehicleTypes,
       technologies: firstSource.technologies,
-      euLabel: firstSource.euLabel
-        ? {
-            wetGrip: firstSource.euLabel.wetGrip,
-            fuelEfficiency: firstSource.euLabel.fuelEfficiency,
-            noiseDb: firstSource.euLabel.noiseLevel,
-          }
-        : undefined,
+      euLabel,
       rawContent,
+      relatedItems: relatedItems.length > 0 ? relatedItems : undefined,
     };
 
     // 1. Generate description
@@ -158,8 +188,9 @@ export async function generateFullTyreContent(
         modelName: firstSource.modelName,
         brand: firstSource.brand,
         season: firstSource.season || "summer",
+        vehicleTypes: (firstSource as any).vehicleTypes,
         shortDescription: descResult.content.shortDescription,
-        keyBenefits: descResult.content.highlights,
+        keyBenefits: descResult.content.keyBenefits,
       },
       {
         provider: options?.provider,
@@ -173,9 +204,11 @@ export async function generateFullTyreContent(
     const faqInput: TireFAQInput = {
       modelSlug,
       modelName: firstSource.modelName,
+      brand: firstSource.brand,
       season: firstSource.season || "summer",
+      vehicleTypes: (firstSource as any).vehicleTypes,
       technologies: firstSource.technologies,
-      euLabel: descriptionInput.euLabel,
+      euLabel,
     };
 
     const faqResult = await generateTireFAQ(faqInput, {
@@ -188,20 +221,15 @@ export async function generateFullTyreContent(
     const sanitizedFullDescription = sanitizeHtml(descResult.content.fullDescription);
     const sanitizedShortDescription = sanitizeHtml(descResult.content.shortDescription);
 
-    // 5. Convert to Lexical
-    const fullDescriptionLexical = markdownToLexical(sanitizedFullDescription);
-
-    // 6. Build final content
+    // 5. Build final content
     const content: GeneratedTyreContent = {
       modelSlug,
       brand: firstSource.brand || "bridgestone",
       shortDescription: sanitizedShortDescription,
       fullDescription: sanitizedFullDescription,
-      fullDescriptionLexical,
       seoTitle: seoResult.seo.seoTitle,
       seoDescription: seoResult.seo.seoDescription,
-      seoKeywords: seoResult.seo.seoKeywords,
-      keyBenefits: descResult.content.highlights.map((benefit) => ({ benefit })),
+      keyBenefits: descResult.content.keyBenefits.map((benefit) => ({ benefit })),
       faqs: faqResult.faqs,
       metadata: {
         generatedAt: new Date().toISOString(),
