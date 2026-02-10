@@ -1,4 +1,5 @@
 import type { Endpoint } from 'payload';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 // Default provider configurations
 const DEFAULT_PROVIDERS = [
@@ -213,6 +214,10 @@ export const providersSeedEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: provider management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
     const payload = req.payload;
     let providersCreated = 0;
     let routingCreated = 0;
@@ -311,6 +316,10 @@ export const providersToggleEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: provider management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
     const providerName = req.routeParams?.name as string;
     const payload = req.payload;
 
@@ -349,6 +358,10 @@ export const providersUpdateModelEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: provider management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
 
     const providerName = req.routeParams?.name as string;
     const body = await req.json?.() as { model: string } | undefined;
@@ -394,6 +407,10 @@ export const taskRoutingUpdateEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: routing management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
 
     const taskName = req.routeParams?.task as string;
     const body = await req.json?.() as {

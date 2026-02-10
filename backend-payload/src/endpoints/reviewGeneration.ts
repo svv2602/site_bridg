@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import { saveJob, updateJob, getJob, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
 
@@ -20,6 +21,10 @@ export const generateReviewsEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: review generation requires editor or admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'editor');
+    if (forbidden) return forbidden;
 
     const tyreId = parseInt((req.routeParams?.tyreId as string) || '0', 10);
     if (!tyreId) {

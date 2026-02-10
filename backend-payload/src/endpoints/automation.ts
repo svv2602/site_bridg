@@ -2,6 +2,17 @@ import type { Endpoint } from 'payload';
 import Database from 'better-sqlite3';
 import path from 'path';
 import { getSchedulerStatus, setSchedulerConfig } from '../scheduler';
+import { createRateLimiter, checkRateLimit } from '../lib/rate-limiter';
+import { requireRoleForEndpoint } from '../lib/rbac';
+
+/**
+ * Rate limiter for automation POST endpoints.
+ * 10 requests per IP per hour to prevent abuse.
+ */
+const automationSchedulerRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 10,
+});
 
 // Singleton SQLite connection for article queue / metrics / settings
 // DDL runs only once on first access; connection is never closed (lives for process lifetime).
@@ -169,6 +180,14 @@ export const automationSchedulerEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: scheduler management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationSchedulerRateLimiter, req);
+    if (rateLimited) return rateLimited;
+
     let body: { taskId: string; enabled?: boolean; cronExpression?: string };
     try {
       body = await req.json!();
@@ -261,6 +280,14 @@ export const automationSourcesUpdateEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: source management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationSchedulerRateLimiter, req);
+    if (rateLimited) return rateLimited;
 
     let body: { id: string; enabled?: boolean; checkIntervalHours?: number };
     try {
@@ -383,6 +410,14 @@ export const automationQueueUpdateEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: queue management requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationSchedulerRateLimiter, req);
+    if (rateLimited) return rateLimited;
+
     let body: Record<string, unknown>;
     try {
       body = await req.json!();
@@ -499,6 +534,14 @@ export const automationArticleSettingsUpdateEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: article settings requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationSchedulerRateLimiter, req);
+    if (rateLimited) return rateLimited;
 
     let body: { settings: Record<string, string> };
     try {

@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import path from 'path';
 import { saveJob, updateJob, getJob, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
 import { generatePromptByType, type ImageType } from '../../content-automation/src/config/image-prompts';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
 
@@ -55,6 +56,10 @@ export const regenerateImageEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: image regeneration requires editor or admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'editor');
+    if (forbidden) return forbidden;
 
     // Per-user rate limiting: max 10 regenerations per hour
     const userId = String(req.user.id || 'unknown');

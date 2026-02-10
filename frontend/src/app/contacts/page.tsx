@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, Loader2, AlertCircle } from "lucide-react";
@@ -79,6 +79,12 @@ export default function ContactsPage() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // Bot detection: record page load timestamp
+  const loadedAtRef = useRef<number>(0);
+  useEffect(() => {
+    loadedAtRef.current = Date.now();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -117,7 +123,10 @@ export default function ContactsPage() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(result.data),
+        body: JSON.stringify({
+          ...result.data,
+          _loadedAt: loadedAtRef.current,
+        }),
       });
 
       if (!response.ok) {

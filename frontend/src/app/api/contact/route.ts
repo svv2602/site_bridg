@@ -6,7 +6,16 @@ interface ContactFormData {
   email: string;
   subject?: string;
   message: string;
+  _loadedAt?: number;
 }
+
+/**
+ * Bot detection: verify the form was loaded at least MIN_SUBMIT_TIME_MS ago
+ * and no more than MAX_SUBMIT_TIME_MS ago. Bots submit forms instantly,
+ * while legitimate users need at least a few seconds to fill in the fields.
+ */
+const MIN_SUBMIT_TIME_MS = 3_000;     // 3 seconds
+const MAX_SUBMIT_TIME_MS = 30 * 60_000; // 30 minutes
 
 const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -197,6 +206,35 @@ export async function POST(request: NextRequest) {
         { error: 'Невірний формат електронної пошти' },
         { status: 400 }
       );
+    }
+
+    // Bot detection: timestamp-based check
+    // If _loadedAt is missing, it's either a bot or an old client — reject gracefully
+    if (data._loadedAt) {
+      const now = Date.now();
+      const elapsed = now - data._loadedAt;
+
+      if (elapsed < MIN_SUBMIT_TIME_MS) {
+        console.warn('Bot detection: form submitted too quickly', {
+          elapsed,
+          ip: request.headers.get('x-forwarded-for') || 'unknown',
+        });
+        return NextResponse.json(
+          { error: 'Форму надіслано занадто швидко. Будь ласка, спробуйте ще раз.' },
+          { status: 400 }
+        );
+      }
+
+      if (elapsed > MAX_SUBMIT_TIME_MS) {
+        console.warn('Bot detection: form timestamp too old', {
+          elapsed,
+          ip: request.headers.get('x-forwarded-for') || 'unknown',
+        });
+        return NextResponse.json(
+          { error: 'Сесія форми закінчилася. Будь ласка, оновіть сторінку та спробуйте ще раз.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Log the contact request

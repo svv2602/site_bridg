@@ -5,8 +5,19 @@ import path from 'path';
 import { saveJob, updateJob, getJob, getRecentJobs, findActiveByTarget, countActiveJobs, type JobStatus } from './jobStore';
 import { tryAcquireLock, releaseLock, LOCK_IDS } from '../lib/distributed-lock';
 import { auditLog } from '../lib/audit-log';
+import { createRateLimiter, checkRateLimit } from '../lib/rate-limiter';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
+
+/**
+ * Rate limiter for AI generation endpoints.
+ * 10 requests per IP per hour to prevent abuse of expensive AI calls.
+ */
+const automationRateLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 10,
+});
 
 /**
  * POST /api/content/generate
@@ -23,6 +34,14 @@ export const contentGenerateEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationRateLimiter, req);
+    if (rateLimited) return rateLimited;
 
     const url = new URL(req.url || '', 'http://localhost');
     const modelSlug = url.searchParams.get('model');
@@ -115,6 +134,10 @@ export const contentScrapeEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
     const url = new URL(req.url || '', 'http://localhost');
     const force = url.searchParams.get('force') === 'true';
 
@@ -170,6 +193,10 @@ export const contentImportEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
     const automationDir = path.join(process.cwd(), 'content-automation');
     const command = 'npx tsx src/import-tyres.ts';
 
@@ -223,6 +250,14 @@ export const contentFullPipelineEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationRateLimiter, req);
+    if (rateLimited) return rateLimited;
 
     // Distributed lock: prevent concurrent pipeline runs
     const lock = await tryAcquireLock(req.payload, LOCK_IDS.PIPELINE);
@@ -341,6 +376,10 @@ export const contentRegenerateEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: content regeneration requires editor or admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'editor');
+    if (forbidden) return forbidden;
+
     const slug = req.routeParams?.slug as string;
     if (!slug) {
       return Response.json({ error: 'Slug is required' }, { status: 400 });
@@ -422,6 +461,14 @@ export const contentSmartPipelineEndpoint: Endpoint = {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationRateLimiter, req);
+    if (rateLimited) return rateLimited;
+
     // Distributed lock: prevent concurrent smart pipeline runs
     const lock = await tryAcquireLock(req.payload, LOCK_IDS.SMART_ARTICLES);
     if (!lock.acquired) {
@@ -501,6 +548,14 @@ export const contentPublishEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: automation endpoints require admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
+
+    // Rate limiting: 10 requests per IP per hour
+    const rateLimited = checkRateLimit(automationRateLimiter, req);
+    if (rateLimited) return rateLimited;
 
     const automationDir = path.join(process.cwd(), 'content-automation');
     const command = 'npx tsx src/scheduler.ts publish';

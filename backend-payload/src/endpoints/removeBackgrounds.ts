@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { getRembgPath } from '../utils/rembg';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
 
@@ -45,6 +46,10 @@ export const removeBackgroundsEndpoint: Endpoint = {
     if (!req.user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // RBAC: background removal requires admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'admin');
+    if (forbidden) return forbidden;
 
     // Check if rembg is available
     try {

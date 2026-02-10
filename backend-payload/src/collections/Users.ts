@@ -6,8 +6,20 @@
  * API keys used by the content automation pipeline.
  *
  * Access: auth-required for all operations.
+ * Security: Login rate limiting (5 attempts per IP per 15 minutes).
  */
 import type { CollectionConfig } from 'payload';
+import { createRateLimiter, extractIp } from '../lib/rate-limiter';
+import { APIError } from 'payload';
+
+/**
+ * Login rate limiter: 5 attempts per IP per 15 minutes.
+ * Prevents brute-force attacks on admin credentials.
+ */
+const loginRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 5,
+});
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -23,6 +35,50 @@ export const Users: CollectionConfig = {
     group: 'Налаштування',
     description: 'Адміністратори системи',
   },
+  hooks: {
+    beforeLogin: [
+      async ({ req }) => {
+        // Rate limit login attempts by IP address
+        const ip = extractIp(req as unknown as Request);
+        const result = loginRateLimiter.check(ip);
+        if (!result.allowed) {
+          throw new APIError(
+            'Забагато спроб. Спробуйте пізніше.',
+            429,
+          );
+        }
+      },
+    ],
+    afterLogin: [
+      async ({ req }) => {
+        // Reset rate limiter on successful login so legitimate users aren't penalized
+        const ip = extractIp(req as unknown as Request);
+        loginRateLimiter.reset(ip);
+      },
+    ],
+  },
+  access: {
+    // Only admins can create, update, or delete users
+    create: ({ req }) => {
+      if (!req.user) return false;
+      return (req.user as { role?: string }).role === 'admin';
+    },
+    update: ({ req }) => {
+      if (!req.user) return false;
+      const user = req.user as { id?: string; role?: string };
+      // Admins can update anyone; users can update themselves
+      if (user.role === 'admin') return true;
+      return { id: { equals: user.id } };
+    },
+    delete: ({ req }) => {
+      if (!req.user) return false;
+      return (req.user as { role?: string }).role === 'admin';
+    },
+    // All authenticated users can read users list
+    read: ({ req }) => {
+      return !!req.user;
+    },
+  },
   fields: [
     {
       name: 'name',
@@ -37,6 +93,12 @@ export const Users: CollectionConfig = {
       ],
       defaultValue: 'editor',
       required: true,
+      access: {
+        // Only admins can change roles
+        update: ({ req }) => {
+          return (req.user as { role?: string })?.role === 'admin';
+        },
+      },
     },
   ],
 };
