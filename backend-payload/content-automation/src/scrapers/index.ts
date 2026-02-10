@@ -11,7 +11,6 @@ import type { Brand } from "../types/content.js";
 export {
   scrapeProkoleso,
   scrapeProkolesoBrand,
-  saveResults,
   mergeAndSaveResults,
   loadExistingData,
   findTireUrlsByBrand,

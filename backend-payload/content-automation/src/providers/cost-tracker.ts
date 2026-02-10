@@ -1,139 +1,118 @@
 /**
  * Cost Tracker
  *
- * Tracks API costs across all providers.
+ * Tracks API costs across all providers using SQLite for atomic, crash-safe writes.
  * Provides daily/monthly limits and notifications.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import Database from "better-sqlite3";
+import path from "path";
 import type { CostEntry, CostSummary, CostLimits, TaskType } from "./types.js";
 import { COST_LIMITS } from "../config/providers.js";
 import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger("CostTracker");
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, "../../data");
-const COSTS_FILE = join(DATA_DIR, "costs.json");
+// ============ DATABASE ============
 
-interface CostsData {
-  entries: CostEntry[];
-  lastUpdated: string;
+let db: Database.Database | null = null;
+
+function getDb(): Database.Database {
+  if (db) return db;
+
+  const dbPath =
+    process.env.SQLITE_PATH || path.join(process.cwd(), "data", "content-automation.db");
+  db = new Database(dbPath);
+  initCostSchema(db);
+  return db;
 }
+
+function initCostSchema(database: Database.Database): void {
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS cost_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      model TEXT NOT NULL,
+      task_type TEXT NOT NULL,
+      input_tokens INTEGER,
+      output_tokens INTEGER,
+      cost REAL NOT NULL,
+      latency_ms INTEGER NOT NULL DEFAULT 0,
+      success INTEGER NOT NULL DEFAULT 1,
+      error TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_cost_records_timestamp ON cost_records(timestamp);
+    CREATE INDEX IF NOT EXISTS idx_cost_records_provider ON cost_records(provider);
+  `);
+}
+
+// ============ ROW MAPPING ============
+
+interface CostRow {
+  id: number;
+  timestamp: string;
+  provider: string;
+  model: string;
+  task_type: string;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  cost: number;
+  latency_ms: number;
+  success: number;
+  error: string | null;
+}
+
+function mapRow(row: CostRow): CostEntry {
+  return {
+    timestamp: new Date(row.timestamp),
+    provider: row.provider,
+    model: row.model,
+    taskType: row.task_type as TaskType,
+    inputTokens: row.input_tokens ?? undefined,
+    outputTokens: row.output_tokens ?? undefined,
+    cost: row.cost,
+    latencyMs: row.latency_ms,
+    success: row.success === 1,
+    error: row.error ?? undefined,
+  };
+}
+
+// ============ COST TRACKER ============
 
 /**
  * Cost Tracker singleton
  */
 class CostTrackerImpl {
   private limits: CostLimits;
-  private entries: CostEntry[] = [];
-  private loaded = false;
-  private saveTimer: ReturnType<typeof setTimeout> | null = null;
-  private savePending = false;
-  private static readonly SAVE_DEBOUNCE_MS = 300;
 
   constructor(limits?: CostLimits) {
     this.limits = limits || COST_LIMITS;
-    this.ensureDataDir();
-  }
-
-  /**
-   * Ensure data directory exists
-   */
-  private ensureDataDir(): void {
-    if (!existsSync(DATA_DIR)) {
-      mkdirSync(DATA_DIR, { recursive: true });
-    }
-  }
-
-  /**
-   * Load costs from file
-   */
-  private load(): void {
-    if (this.loaded) return;
-
-    try {
-      if (existsSync(COSTS_FILE)) {
-        const data = JSON.parse(readFileSync(COSTS_FILE, "utf-8")) as CostsData;
-        this.entries = data.entries.map((e) => ({
-          ...e,
-          timestamp: new Date(e.timestamp),
-        }));
-      }
-    } catch (error) {
-      logger.warn("Failed to load costs data", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.entries = [];
-    }
-
-    this.loaded = true;
-  }
-
-  /**
-   * Schedule a debounced save to prevent race conditions with concurrent writes.
-   * Batches multiple record() calls within SAVE_DEBOUNCE_MS into a single write.
-   */
-  private save(): void {
-    this.savePending = true;
-
-    if (this.saveTimer) {
-      return; // Already scheduled
-    }
-
-    this.saveTimer = setTimeout(() => {
-      this.saveTimer = null;
-      this.savePending = false;
-      this.flushToDisk();
-    }, CostTrackerImpl.SAVE_DEBOUNCE_MS);
-  }
-
-  /**
-   * Immediately write costs to disk
-   */
-  private flushToDisk(): void {
-    try {
-      const data: CostsData = {
-        entries: this.entries,
-        lastUpdated: new Date().toISOString(),
-      };
-      writeFileSync(COSTS_FILE, JSON.stringify(data, null, 2), "utf-8");
-    } catch (error) {
-      logger.error("Failed to save costs data", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
-
-  /**
-   * Flush pending changes to disk immediately (call before process exit)
-   */
-  flush(): void {
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer);
-      this.saveTimer = null;
-    }
-    if (this.savePending) {
-      this.flushToDisk();
-      this.savePending = false;
-    }
   }
 
   /**
    * Record a cost entry
    */
   record(entry: Omit<CostEntry, "timestamp">): void {
-    this.load();
+    const database = getDb();
+    const now = new Date().toISOString();
 
-    const fullEntry: CostEntry = {
-      ...entry,
-      timestamp: new Date(),
-    };
-
-    this.entries.push(fullEntry);
-    this.save();
+    database.prepare(`
+      INSERT INTO cost_records (timestamp, provider, model, task_type, input_tokens, output_tokens, cost, latency_ms, success, error)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      now,
+      entry.provider,
+      entry.model,
+      entry.taskType,
+      entry.inputTokens ?? null,
+      entry.outputTokens ?? null,
+      entry.cost,
+      entry.latencyMs,
+      entry.success ? 1 : 0,
+      entry.error ?? null,
+    );
 
     // Check limits and warn if needed
     this.checkLimits();
@@ -153,7 +132,6 @@ class CostTrackerImpl {
     const dailyCost = this.getDailyCost();
     const monthlyCost = this.getMonthlyCost();
 
-    // Warn if approaching daily limit
     if (dailyCost > this.limits.dailyLimit * this.limits.warningThreshold) {
       logger.warn("Approaching daily cost limit", {
         current: dailyCost.toFixed(2),
@@ -162,7 +140,6 @@ class CostTrackerImpl {
       });
     }
 
-    // Warn if approaching monthly limit
     if (monthlyCost > this.limits.monthlyLimit * this.limits.warningThreshold) {
       logger.warn("Approaching monthly cost limit", {
         current: monthlyCost.toFixed(2),
@@ -176,9 +153,6 @@ class CostTrackerImpl {
    * Check if a request should be allowed based on cost
    */
   canAfford(estimatedCost: number): { allowed: boolean; reason?: string } {
-    this.load();
-
-    // Check per-request limit
     if (estimatedCost > this.limits.perRequestLimit) {
       return {
         allowed: false,
@@ -186,7 +160,6 @@ class CostTrackerImpl {
       };
     }
 
-    // Check daily limit
     const dailyCost = this.getDailyCost();
     if (dailyCost + estimatedCost > this.limits.dailyLimit) {
       return {
@@ -195,7 +168,6 @@ class CostTrackerImpl {
       };
     }
 
-    // Check monthly limit
     const monthlyCost = this.getMonthlyCost();
     if (monthlyCost + estimatedCost > this.limits.monthlyLimit) {
       return {
@@ -211,37 +183,38 @@ class CostTrackerImpl {
    * Get today's total cost
    */
   getDailyCost(): number {
-    this.load();
-
+    const database = getDb();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return this.entries
-      .filter((e) => new Date(e.timestamp) >= today)
-      .reduce((sum, e) => sum + e.cost, 0);
+    const row = database.prepare(
+      `SELECT COALESCE(SUM(cost), 0) as total FROM cost_records WHERE timestamp >= ?`
+    ).get(today.toISOString()) as { total: number };
+
+    return row.total;
   }
 
   /**
    * Get current month's total cost
    */
   getMonthlyCost(): number {
-    this.load();
-
+    const database = getDb();
     const monthStart = new Date();
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
 
-    return this.entries
-      .filter((e) => new Date(e.timestamp) >= monthStart)
-      .reduce((sum, e) => sum + e.cost, 0);
+    const row = database.prepare(
+      `SELECT COALESCE(SUM(cost), 0) as total FROM cost_records WHERE timestamp >= ?`
+    ).get(monthStart.toISOString()) as { total: number };
+
+    return row.total;
   }
 
   /**
    * Get cost summary for a period
    */
   getSummary(period: "day" | "week" | "month"): CostSummary {
-    this.load();
-
+    const database = getDb();
     const now = new Date();
     let startDate: Date;
 
@@ -262,9 +235,9 @@ class CostTrackerImpl {
         break;
     }
 
-    const periodEntries = this.entries.filter(
-      (e) => new Date(e.timestamp) >= startDate
-    );
+    const rows = database.prepare(
+      `SELECT * FROM cost_records WHERE timestamp >= ? ORDER BY timestamp`
+    ).all(startDate.toISOString()) as CostRow[];
 
     const byProvider: Record<string, number> = {};
     const byModel: Record<string, number> = {};
@@ -274,15 +247,13 @@ class CostTrackerImpl {
     let successCount = 0;
     let totalLatency = 0;
 
-    for (const entry of periodEntries) {
-      totalCost += entry.cost;
-
-      byProvider[entry.provider] = (byProvider[entry.provider] || 0) + entry.cost;
-      byModel[entry.model] = (byModel[entry.model] || 0) + entry.cost;
-      byTaskType[entry.taskType] = (byTaskType[entry.taskType] || 0) + entry.cost;
-
-      if (entry.success) successCount++;
-      totalLatency += entry.latencyMs;
+    for (const row of rows) {
+      totalCost += row.cost;
+      byProvider[row.provider] = (byProvider[row.provider] || 0) + row.cost;
+      byModel[row.model] = (byModel[row.model] || 0) + row.cost;
+      byTaskType[row.task_type as TaskType] = (byTaskType[row.task_type as TaskType] || 0) + row.cost;
+      if (row.success) successCount++;
+      totalLatency += row.latency_ms;
     }
 
     return {
@@ -293,9 +264,9 @@ class CostTrackerImpl {
       byProvider,
       byModel,
       byTaskType,
-      requestCount: periodEntries.length,
-      successRate: periodEntries.length > 0 ? successCount / periodEntries.length : 1,
-      avgLatencyMs: periodEntries.length > 0 ? totalLatency / periodEntries.length : 0,
+      requestCount: rows.length,
+      successRate: rows.length > 0 ? successCount / rows.length : 1,
+      avgLatencyMs: rows.length > 0 ? totalLatency / rows.length : 0,
     };
   }
 
@@ -303,39 +274,48 @@ class CostTrackerImpl {
    * Get recent entries
    */
   getRecentEntries(limit: number = 50): CostEntry[] {
-    this.load();
-    return this.entries.slice(-limit).reverse();
+    const database = getDb();
+    const rows = database.prepare(
+      `SELECT * FROM cost_records ORDER BY id DESC LIMIT ?`
+    ).all(limit) as CostRow[];
+
+    return rows.map(mapRow);
   }
 
   /**
    * Clear old entries (older than 90 days)
    */
   cleanup(): number {
-    this.load();
-
+    const database = getDb();
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 90);
 
-    const originalCount = this.entries.length;
-    this.entries = this.entries.filter((e) => new Date(e.timestamp) >= cutoff);
+    const result = database.prepare(
+      `DELETE FROM cost_records WHERE timestamp < ?`
+    ).run(cutoff.toISOString());
 
-    if (this.entries.length < originalCount) {
-      this.flushToDisk(); // Immediate save for cleanup operations
-      const removed = originalCount - this.entries.length;
+    const removed = result.changes;
+    if (removed > 0) {
       logger.info(`Cleaned up ${removed} old cost entries`);
-      return removed;
     }
-
-    return 0;
+    return removed;
   }
 
   /**
    * Reset all data (for testing)
    */
   reset(): void {
-    this.entries = [];
-    this.flushToDisk(); // Immediate save for reset
+    const database = getDb();
+    database.prepare(`DELETE FROM cost_records`).run();
     logger.info("Cost tracker reset");
+  }
+
+  /**
+   * No-op (SQLite writes are atomic, no flush needed)
+   * Kept for backward compatibility with callers.
+   */
+  flush(): void {
+    // SQLite writes are immediate and atomic — no flush needed
   }
 }
 

@@ -6,13 +6,13 @@
  * Combined approach: collects model URLs from catalog, then scrapes each model page for full data
  */
 
-import puppeteer, { type Browser, type Page } from "puppeteer";
+import { chromium, type Browser, type Page } from "playwright";
 import { writeFileSync, readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import type { RawTyreContent, Brand } from "../types/content.js";
 import type { ScrapedTireSize, EuLabel, ScrapedTire, ExistingTireRecord, ScrapeOptions, ScrapeResult } from "./types.js";
-import { MAX_CATALOG_PAGES, BRAND_CATALOGS, ADDITIONAL_MODEL_URLS } from "./config.js";
+import { MAX_CATALOG_PAGES, BRAND_CATALOGS, ADDITIONAL_MODEL_URLS, getRandomUserAgent, AdaptiveDelay } from "./config.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -90,7 +90,7 @@ function parseLoadIndex(text: string): string | undefined {
  */
 async function scrapeEuLabel(page: Page, sizeUrl: string): Promise<EuLabel | null> {
   try {
-    await page.goto(sizeUrl, { waitUntil: "networkidle2", timeout: 30000 });
+    await page.goto(sizeUrl, { waitUntil: "networkidle", timeout: 30000 });
 
     // Click on Євроетикетка tab
     await page.evaluate(() => {
@@ -105,7 +105,7 @@ async function scrapeEuLabel(page: Page, sizeUrl: string): Promise<EuLabel | nul
     });
 
     // Wait for content to load
-    await new Promise((r) => setTimeout(r, 1000));
+    await page.waitForTimeout(1000);
 
     // Parse EU label from visible text
     const euLabel = await page.evaluate(() => {
@@ -156,7 +156,7 @@ async function findModelUrlsForBrand(page: Page, brand: Brand): Promise<string[]
       console.log(`    Page ${pageNum}: ${catalogUrl}`);
 
       try {
-        await page.goto(catalogUrl, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(catalogUrl, { waitUntil: "networkidle", timeout: 30000 });
 
         const brandPattern = brand; // Pass brand to evaluate context
         const urls = await page.evaluate((b: string) => {
@@ -190,7 +190,7 @@ async function findModelUrlsForBrand(page: Page, brand: Brand): Promise<string[]
 
         if (!hasNext) break;
 
-        await new Promise((r) => setTimeout(r, 300));
+        await page.waitForTimeout(300);
       } catch (error) {
         console.log(`      Error loading page: ${error}`);
         break;
@@ -218,11 +218,11 @@ async function findModelUrls(page: Page): Promise<string[]> {
  */
 async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTire | null> {
   try {
-    await page.goto(modelUrl, { waitUntil: "networkidle2", timeout: 30000 });
+    await page.goto(modelUrl, { waitUntil: "networkidle", timeout: 30000 });
 
     // Scroll to load lazy content
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await new Promise((r) => setTimeout(r, 500));
+    await page.waitForTimeout(500);
 
     const data = await page.evaluate(() => {
       // Model name from h1
@@ -394,15 +394,12 @@ async function scrapeProkolesoBrand(brand: Brand): Promise<ScrapedTire[]> {
   let browser: Browser | null = null;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await chromium.launch({ headless: true });
 
     const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    );
+    await page.setExtraHTTPHeaders({ "User-Agent": getRandomUserAgent() });
+
+    const delay = new AdaptiveDelay();
 
     // Step 1: Find all model URLs for brand
     console.log(`\n[Step 1] Finding ${brandName} model URLs from catalog...`);
@@ -420,13 +417,15 @@ async function scrapeProkolesoBrand(brand: Brand): Promise<ScrapedTire[]> {
 
       if (tire) {
         scrapedTires.push(tire);
+        delay.onSuccess();
         console.log(`  ✓ ${tire.name} (${tire.brand}, ${tire.season}, ${tire.sizes.length} sizes)`);
         console.log(`    sourceSlug: ${tire.sourceSlug}`);
         console.log(`    canonicalSlug: ${tire.canonicalSlug}`);
+      } else {
+        delay.onError();
       }
 
-      // Delay between requests
-      await new Promise((r) => setTimeout(r, 500));
+      await delay.wait();
     }
 
     console.log(`\n[Done] Scraped ${scrapedTires.length} ${brandName} tire models`);
@@ -464,15 +463,12 @@ async function scrapeProkoleso(brands?: Brand[], options?: ScrapeOptions): Promi
   const allTires: ScrapedTire[] = [];
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await chromium.launch({ headless: true });
 
     const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    );
+    await page.setExtraHTTPHeaders({ "User-Agent": getRandomUserAgent() });
+
+    const delay = new AdaptiveDelay();
 
     for (const brand of brandsToScrape) {
       const brandName = brand === "bridgestone" ? "Bridgestone" : "Firestone";
@@ -509,13 +505,15 @@ async function scrapeProkoleso(brands?: Brand[], options?: ScrapeOptions): Promi
 
         if (tire) {
           allTires.push(tire);
+          delay.onSuccess();
           console.log(`  ✓ ${tire.name} (${tire.brand}, ${tire.season}, ${tire.sizes.length} sizes)`);
           console.log(`    sourceSlug: ${tire.sourceSlug}`);
           console.log(`    canonicalSlug: ${tire.canonicalSlug}`);
+        } else {
+          delay.onError();
         }
 
-        // Delay between requests
-        await new Promise((r) => setTimeout(r, 500));
+        await delay.wait();
       }
     }
 
@@ -638,23 +636,18 @@ export async function scrapeModelDescription(
 
   try {
     if (!browser) {
-      browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
+      browser = await chromium.launch({ headless: true });
     }
 
     const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    );
+    await page.setExtraHTTPHeaders({ "User-Agent": getRandomUserAgent() });
 
     console.log(`Scraping content from: ${pageUrl}`);
-    await page.goto(pageUrl, { waitUntil: "networkidle2", timeout: 30000 });
+    await page.goto(pageUrl, { waitUntil: "networkidle", timeout: 30000 });
 
     // Scroll to load content
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await new Promise((r) => setTimeout(r, 500));
+    await page.waitForTimeout(500);
 
     const content = await page.evaluate(() => {
       // Model name
@@ -735,16 +728,11 @@ export async function findTireUrlsByBrand(brand: Brand, browser?: Browser): Prom
 
   try {
     if (!browser) {
-      browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
+      browser = await chromium.launch({ headless: true });
     }
 
     const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    );
+    await page.setExtraHTTPHeaders({ "User-Agent": getRandomUserAgent() });
 
     const urls = await findModelUrlsForBrand(page, brand);
 
@@ -764,19 +752,6 @@ export async function findTireUrlsByBrand(brand: Brand, browser?: Browser): Prom
   }
 }
 
-/**
- * Find all Bridgestone tire model URLs from catalog (legacy function for backward compatibility)
- */
-export async function findBridgestoneTireUrls(browser?: Browser): Promise<string[]> {
-  return findTireUrlsByBrand("bridgestone", browser);
-}
-
-/**
- * Find all Firestone tire model URLs from catalog
- */
-export async function findFirestoneTireUrls(browser?: Browser): Promise<string[]> {
-  return findTireUrlsByBrand("firestone", browser);
-}
 
 // Main execution
 async function main() {
@@ -814,4 +789,4 @@ if (isMainModule) {
   main();
 }
 
-export { scrapeProkoleso, scrapeProkolesoBrand, saveResults, mergeAndSaveResults, loadExistingData };
+export { scrapeProkoleso, scrapeProkolesoBrand, mergeAndSaveResults, loadExistingData };

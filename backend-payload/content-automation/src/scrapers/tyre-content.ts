@@ -5,8 +5,9 @@
  * Supports multi-brand (Bridgestone & Firestone).
  */
 
-import puppeteer, { type Browser } from "puppeteer";
-import { scrapeModelDescription, findTireUrlsByBrand, findBridgestoneTireUrls } from "./prokoleso.js";
+import { chromium, type Browser } from "playwright";
+import { scrapeModelDescription, findTireUrlsByBrand } from "./prokoleso.js";
+import { getRandomUserAgent } from "./config.js";
 import type { RawTyreContent, RawTyreContentCollection, Brand } from "../types/content.js";
 import { createLogger } from "../utils/logger.js";
 import { saveRawContentCollection, loadRawContentCollection, hasRawContent } from "../utils/storage.js";
@@ -55,10 +56,7 @@ export async function scrapeContentForModel(
 
   try {
     if (!activeBrowser) {
-      activeBrowser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
+      activeBrowser = await chromium.launch({ headless: true });
     }
 
     // Find URLs for this model
@@ -128,10 +126,7 @@ export async function scrapeContentForModels(
   let browser: Browser | null = null;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await chromium.launch({ headless: true });
 
     for (let i = 0; i < modelSlugs.length; i++) {
       const slug = modelSlugs[i];
@@ -176,10 +171,7 @@ export async function scrapeAllContentByBrand(
   let browser: Browser | null = null;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await chromium.launch({ headless: true });
 
     // Find all tire URLs for brand
     const allUrls = await findTireUrlsByBrand(brand, browser);

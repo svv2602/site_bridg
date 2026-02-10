@@ -1,7 +1,7 @@
 /**
  * Tests for cost-tracker module.
  */
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CostTrackerImpl } from '../cost-tracker';
 import type { CostLimits, TaskType } from '../types';
 
@@ -15,13 +15,8 @@ vi.mock('../../utils/logger.js', () => ({
   }),
 }));
 
-// Mock fs to avoid writing to disk during tests
-vi.mock('fs', () => ({
-  existsSync: vi.fn().mockReturnValue(false),
-  mkdirSync: vi.fn(),
-  readFileSync: vi.fn().mockReturnValue('{"entries":[]}'),
-  writeFileSync: vi.fn(),
-}));
+// Use in-memory SQLite for tests
+vi.stubEnv('SQLITE_PATH', ':memory:');
 
 const testLimits: CostLimits = {
   dailyLimit: 10,
@@ -54,6 +49,12 @@ function makeCostEntry(overrides: Partial<{
 }
 
 describe('CostTrackerImpl', () => {
+  beforeEach(() => {
+    // Reset data between tests
+    const tracker = makeTracker();
+    tracker.reset();
+  });
+
   describe('record', () => {
     it('should record a cost entry', () => {
       const tracker = makeTracker();
