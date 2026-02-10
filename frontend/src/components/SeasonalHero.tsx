@@ -15,8 +15,8 @@ const heroImages: Record<string, string> = {
 };
 
 interface SeasonalData {
-  heroTitle: string;
-  heroSubtitle: string;
+  promoTitle: string;
+  promoSubtitle: string;
   featuredSeason: 'summer' | 'winter' | 'allseason' | null;
   gradient: string;
   ctaText: string;
@@ -25,8 +25,8 @@ interface SeasonalData {
 }
 
 const defaultData: SeasonalData = {
-  heroTitle: 'Безпека на кожному кілометрі',
-  heroSubtitle: 'Bridgestone & Firestone — офіційний представник в Україні',
+  promoTitle: '',
+  promoSubtitle: '',
   featuredSeason: null,
   gradient: 'from-stone-800 to-stone-900',
   ctaText: 'Переглянути каталог',
@@ -75,11 +75,11 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
               )}
             </div>
 
-            {/* Dynamic Title */}
+            {/* Stable H1 — never changes, good for SEO */}
             <h1 className="hero-title-adaptive text-3xl md:text-4xl lg:text-[2.9rem]">
-              {seasonalData.heroTitle}
+              Шини Bridgestone в Україні
               <span className="hero-subtitle-adaptive mt-1 block text-base md:text-lg">
-                {seasonalData.heroSubtitle}
+                Офіційний сайт Bridgestone та Firestone
               </span>
             </h1>
 
@@ -153,18 +153,22 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
               </div>
               <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
                 <h2 className="text-xl font-semibold text-stone-900 dark:text-white">
-                  {seasonalData.featuredSeason === 'summer'
-                    ? t('hero.readyForSummer')
-                    : seasonalData.featuredSeason === 'winter'
-                    ? t('hero.readyForWinter')
-                    : t('hero.readyForAny')}
+                  {seasonalData.promoTitle || (
+                    seasonalData.featuredSeason === 'summer'
+                      ? t('hero.readyForSummer')
+                      : seasonalData.featuredSeason === 'winter'
+                      ? t('hero.readyForWinter')
+                      : t('hero.readyForAny')
+                  )}
                 </h2>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
-                  {seasonalData.featuredSeason === 'summer'
-                    ? t('hero.summerDescription')
-                    : seasonalData.featuredSeason === 'winter'
-                    ? t('hero.winterDescription')
-                    : t('hero.anyWeatherDescription')}
+                  {seasonalData.promoSubtitle || (
+                    seasonalData.featuredSeason === 'summer'
+                      ? t('hero.summerDescription')
+                      : seasonalData.featuredSeason === 'winter'
+                      ? t('hero.winterDescription')
+                      : t('hero.anyWeatherDescription')
+                  )}
                 </p>
               </div>
             </div>

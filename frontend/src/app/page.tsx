@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ChevronRight, Star, Phone, Award } from "lucide-react";
-import { PHONE_HREF } from "@/lib/constants";
+import { getSiteSettingsWithDefaults } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Bridgestone Україна — офіційний сайт | Шини для легкових авто, SUV, фургонів",
@@ -174,9 +174,10 @@ async function DealerLocatorSection() {
 // ---- Main page component ----
 
 export default async function Home() {
-  const [seasonalData, allTyres] = await Promise.all([
+  const [seasonalData, allTyres, settings] = await Promise.all([
     getSeasonalContent(),
     getTyreModels(),
+    getSiteSettingsWithDefaults(),
   ]);
 
   const popularTyres = allTyres.filter(t => t.isPopular);
@@ -257,28 +258,42 @@ export default async function Home() {
                 {t('home.tyresBySeasonDescription')}
               </p>
               <div className="space-y-4">
-                {tyreCategories.map((cat, idx) => (
-                  <AnimatedCardX
-                    key={cat.id}
-                    delay={idx * 0.1}
-                    direction="left"
-                    className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm"
-                  >
-                    <div className={`rounded-full bg-gradient-to-br ${cat.color} p-3`}>
-                      <cat.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold">{cat.name}</h3>
-                      <p className="text-sm text-muted-foreground">{cat.description}</p>
-                    </div>
-                    <Link
-                      href={cat.href}
-                      className="rounded-full border border-stone-300 bg-transparent px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+                {tyreCategories.map((cat, idx) => {
+                  const isFeatured = cat.id === seasonalData.featuredSeason;
+                  return (
+                    <AnimatedCardX
+                      key={cat.id}
+                      delay={idx * 0.1}
+                      direction="left"
+                      className={`flex items-center gap-4 rounded-2xl border p-5 shadow-sm ${
+                        isFeatured
+                          ? 'border-primary/40 ring-1 ring-primary/20 bg-card'
+                          : 'border-border bg-card'
+                      }`}
                     >
-                      Обрати шини
-                    </Link>
-                  </AnimatedCardX>
-                ))}
+                      <div className={`rounded-full bg-gradient-to-br ${cat.color} p-3`}>
+                        <cat.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold">{cat.name}</h3>
+                          {isFeatured && (
+                            <span className="rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
+                              Рекомендовано
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{cat.description}</p>
+                      </div>
+                      <Link
+                        href={cat.href}
+                        className="rounded-full border border-stone-300 bg-transparent px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+                      >
+                        Обрати шини
+                      </Link>
+                    </AnimatedCardX>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -400,7 +415,7 @@ export default async function Home() {
                 Допоможіть мені обрати
               </Link>
               <a
-                href={PHONE_HREF}
+                href={settings.phoneHref}
                 className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" />

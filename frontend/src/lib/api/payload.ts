@@ -135,8 +135,8 @@ export interface PayloadSeasonalContent {
   id: string;
   name: string;
   isActive: boolean;
-  startDate?: string;
-  endDate?: string;
+  startDate: string;
+  endDate: string;
   featuredSeason: 'winter' | 'summer' | 'allseason';
   heroTitle: string;
   heroSubtitle?: string;
@@ -144,6 +144,22 @@ export interface PayloadSeasonalContent {
   ctaLink: string;
   gradient?: string;
   promoText?: string;
+}
+
+export interface SiteSettings {
+  phoneDisplay?: string;
+  phoneHref?: string;
+  emailSupport?: string;
+  emailPrivacy?: string;
+  emailInfo?: string;
+  city?: string;
+  addressFull?: string;
+  country?: string;
+  facebook?: string;
+  instagram?: string;
+  telegram?: string;
+  website?: string;
+  workingHours?: string;
 }
 
 interface PayloadResponse<T> {
@@ -184,6 +200,38 @@ async function fetchPayload<T>(
   }
 
   return response.json();
+}
+
+// Globals API (returns object directly, not { docs: [...] })
+async function fetchPayloadGlobal<T>(
+  slug: string,
+  options?: RequestInit & { revalidate?: number }
+): Promise<T | null> {
+  const { revalidate = CACHE_TTL.LONG, ...fetchOptions } = options || {};
+
+  try {
+    const response = await fetch(`${PAYLOAD_API_URL}/api/globals/${slug}`, {
+      ...fetchOptions,
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions?.headers,
+      },
+      next: { revalidate },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch {
+    return null;
+  }
+}
+
+// Site Settings (rarely changes - use long cache)
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  return fetchPayloadGlobal<SiteSettings>('site-settings');
 }
 
 // Tyres API
@@ -502,17 +550,25 @@ export async function getPayloadVehicleFitmentByCarParams(
 // Seasonal content (may change for promotions - use short cache)
 export async function getSeasonalContent() {
   try {
-    // Try to get active seasonal content from CMS
+    // Query: active + current date falls within startDate..endDate range
+    const now = new Date().toISOString();
+    const params = new URLSearchParams();
+    params.set('where[isActive][equals]', 'true');
+    params.set('where[startDate][less_than_equal]', now);
+    params.set('where[endDate][greater_than_equal]', now);
+    params.set('sort', '-startDate');
+    params.set('limit', '1');
+
     const data = await fetchPayload<PayloadSeasonalContent>(
-      'seasonal-content?where[isActive][equals]=true&limit=1',
+      `seasonal-content?${params.toString()}`,
       { revalidate: CACHE_TTL.SHORT }
     );
 
     if (data.docs.length > 0) {
       const content = data.docs[0];
       return {
-        heroTitle: content.heroTitle,
-        heroSubtitle: content.heroSubtitle || 'Офіційний представник в Україні',
+        promoTitle: content.heroTitle,
+        promoSubtitle: content.heroSubtitle || '',
         featuredSeason: content.featuredSeason,
         gradient: content.gradient || 'from-stone-800 to-stone-900',
         ctaText: content.ctaText,
@@ -529,8 +585,8 @@ export async function getSeasonalContent() {
   const isWinter = month >= 9 || month <= 2; // Oct-Feb = winter season
 
   return {
-    heroTitle: isWinter ? 'Зимові шини Bridgestone' : 'Шини Bridgestone',
-    heroSubtitle: 'Офіційний представник в Україні',
+    promoTitle: isWinter ? 'Зимові шини Bridgestone' : 'Літні шини Bridgestone',
+    promoSubtitle: isWinter ? 'Безпека на дорозі взимку' : 'Максимальне зчеплення влітку',
     featuredSeason: isWinter ? ('winter' as const) : ('summer' as const),
     gradient: 'from-stone-800 to-stone-900',
     ctaText: isWinter ? 'Зимові моделі' : 'Переглянути каталог',
@@ -582,12 +638,17 @@ export function transformPayloadArticle(article: PayloadArticle) {
     ? (article.image.url.startsWith('http') ? article.image.url : `${PAYLOAD_URL}${article.image.url}`)
     : undefined;
 
+  // Transform relative media URLs in body HTML to absolute URLs pointing to backend
+  const content = typeof article.body === 'string'
+    ? article.body.replaceAll('/api/media/', `${PAYLOAD_URL}/api/media/`)
+    : article.body;
+
   return {
     slug: article.slug,
     title: article.title,
     subtitle: article.subtitle,
     previewText: article.previewText,
-    content: article.body, // Lexical rich text content
+    content,
     readingTimeMinutes: article.readingTimeMinutes || 5,
     publishedAt: article.createdAt, // Use createdAt as publishedAt
     tags: article.tags?.map(t => t.tag) || [],

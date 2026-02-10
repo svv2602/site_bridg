@@ -104,6 +104,8 @@ const mockSeasonalContent: PayloadSeasonalContent = {
   id: "sc1",
   name: "Winter 2024",
   isActive: true,
+  startDate: "2024-10-01T00:00:00.000Z",
+  endDate: "2025-03-31T00:00:00.000Z",
   featuredSeason: "winter",
   heroTitle: "Зимові шини Bridgestone",
   heroSubtitle: "Безпека взимку",
@@ -526,21 +528,32 @@ describe("payload.ts API Client", () => {
 
   // --- getSeasonalContent ---
   describe("getSeasonalContent", () => {
-    it("returns CMS data when available", async () => {
+    it("returns CMS data when available (promoTitle/promoSubtitle)", async () => {
       mockFetchSuccess(makePayloadResponse([mockSeasonalContent]));
       const result = await getSeasonalContent();
-      expect(result.heroTitle).toBe("Зимові шини Bridgestone");
+      expect(result.promoTitle).toBe("Зимові шини Bridgestone");
+      expect(result.promoSubtitle).toBe("Безпека взимку");
       expect(result.featuredSeason).toBe("winter");
       expect(result.ctaText).toBe("Зимові моделі");
       expect(result.gradient).toBe("from-blue-800 to-blue-900");
     });
 
+    it("includes date-range parameters in query URL", async () => {
+      mockFetchSuccess(makePayloadResponse([mockSeasonalContent]));
+      await getSeasonalContent();
+      const url = getLastFetchUrl();
+      expect(url).toContain("startDate");
+      expect(url).toContain("less_than_equal");
+      expect(url).toContain("endDate");
+      expect(url).toContain("greater_than_equal");
+      expect(url).toContain("sort=-startDate");
+    });
+
     it("returns fallback content when CMS returns no docs", async () => {
       mockFetchSuccess(makePayloadResponse([]));
       const result = await getSeasonalContent();
-      expect(result.heroSubtitle).toBe("Офіційний представник в Україні");
-      // Should have some title based on month
-      expect(result.heroTitle).toBeTruthy();
+      expect(result.promoTitle).toBeTruthy();
+      expect(result.promoSubtitle).toBeTruthy();
       expect(result.ctaText).toBeTruthy();
       expect(result.ctaLink).toBeTruthy();
     });
@@ -548,14 +561,14 @@ describe("payload.ts API Client", () => {
     it("returns fallback content on network error", async () => {
       mockFetchNetworkError();
       const result = await getSeasonalContent();
-      expect(result.heroSubtitle).toBe("Офіційний представник в Україні");
+      expect(result.promoSubtitle).toBeTruthy();
       expect(result.gradient).toBe("from-stone-800 to-stone-900");
     });
 
     it("returns fallback content on API error", async () => {
       mockFetchError(500);
       const result = await getSeasonalContent();
-      expect(result.heroSubtitle).toBe("Офіційний представник в Україні");
+      expect(result.promoTitle).toBeTruthy();
     });
   });
 
