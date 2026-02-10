@@ -29,7 +29,7 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
           </div>
           <div>
             <h2 className="text-2xl font-bold">Часті запитання</h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-stone-500 dark:text-stone-400">
               Відповіді на популярні питання про {tireName}
             </p>
           </div>
@@ -42,6 +42,7 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
               className="overflow-hidden rounded-lg border border-border bg-card"
             >
               <button
+                id={`faq-button-${index}`}
                 onClick={() => toggleItem(index)}
                 className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-stone-100 dark:hover:bg-stone-700"
                 aria-expanded={openIndex === index}
@@ -49,18 +50,22 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
               >
                 <span className="pr-4 font-medium">{faq.question}</span>
                 {openIndex === index ? (
-                  <ChevronUp className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <ChevronUp className="h-5 w-5 shrink-0 text-stone-500 dark:text-stone-400" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 dark:text-stone-400" />
                 )}
               </button>
-              {openIndex === index && (
-                <div id={`faq-panel-${index}`} className="border-t border-border px-6 py-4">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {faq.answer}
-                  </p>
-                </div>
-              )}
+              <div
+                id={`faq-panel-${index}`}
+                role="region"
+                aria-labelledby={`faq-button-${index}`}
+                hidden={openIndex !== index}
+                className="border-t border-border px-6 py-4"
+              >
+                <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
             </div>
           ))}
         </div>

@@ -1,8 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, ArrowRight } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
 import { PHONE_DISPLAY, PHONE_HREF } from "@/lib/constants";
 import { ContactForm } from "./ContactForm";
+
+export const metadata: Metadata = {
+  title: "Контакти",
+  description:
+    "Зв'яжіться з Bridgestone Україна: гаряча лінія, електронна пошта, форма зворотного зв'язку. Консультація щодо підбору шин та пошук офіційних дилерів.",
+  alternates: {
+    canonical: "/contacts",
+  },
+  openGraph: {
+    title: "Контакти — Bridgestone Україна",
+    description:
+      "Зв'яжіться з Bridgestone Україна: гаряча лінія, електронна пошта, форма зворотного зв'язку.",
+  },
+};
 
 const contactMethods = [
   {
@@ -103,7 +118,7 @@ export default function ContactsPage() {
                 <div className={`mb-4 inline-flex rounded-full ${method.color.bg} p-3`}>
                   <method.icon className={`h-6 w-6 ${method.color.text}`} />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold">{method.title}</h3>
+                <h2 className="mb-2 text-lg font-semibold">{method.title}</h2>
                 <p className="mb-1 break-all text-xl font-bold text-secondary md:text-2xl">
                   {method.details}
                 </p>
@@ -141,14 +156,14 @@ export default function ContactsPage() {
               <div
                 className="rounded-2xl border border-border bg-gradient-to-br from-card to-secondary/5 p-8"
               >
-                <h3 className="mb-6 text-2xl font-bold">Часті запитання</h3>
+                <h2 className="mb-6 text-2xl font-bold">Часті запитання</h2>
                 <div className="space-y-4">
                   {faqs.map((faq, idx) => (
                     <div
                       key={idx}
                       className="rounded-xl border border-border bg-background p-4"
                     >
-                      <h4 className="font-semibold text-secondary">{faq.question}</h4>
+                      <h3 className="font-semibold text-secondary">{faq.question}</h3>
                       <p className="mt-2 text-sm text-muted-foreground">{faq.answer}</p>
                     </div>
                   ))}
@@ -164,7 +179,7 @@ export default function ContactsPage() {
               <div
                 className="overflow-hidden rounded-2xl border border-border bg-gradient-to-tr from-primary/5 to-secondary/5 p-8"
               >
-                <h3 className="mb-4 text-2xl font-bold">Ми на карті</h3>
+                <h2 className="mb-4 text-2xl font-bold">Ми на карті</h2>
                 <div className="h-64 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="mx-auto h-12 w-12 text-primary" />
@@ -192,7 +207,7 @@ export default function ContactsPage() {
           <div
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700"
           >
-            <h3 className="mb-4 text-3xl font-bold">Потрібна негайна допомога?</h3>
+            <h2 className="mb-4 text-3xl font-bold">Потрібна негайна допомога?</h2>
             <p className="mb-8 text-lg">
               Зателефонуйте на гарячу лінію або напишіть у месенджер — ми відповімо протягом 15 хвилин.
             </p>

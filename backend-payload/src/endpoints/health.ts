@@ -40,14 +40,18 @@ export const healthEndpoint: Endpoint = {
     const isHealthy = Object.values(checks).every((c) => c.status === 'healthy');
     const totalLatency = Date.now() - startTime;
 
-    const response = {
+    const response: Record<string, unknown> = {
       status: isHealthy ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
       latency: totalLatency,
-      version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
       checks,
     };
+
+    // Expose version and environment only to authenticated users
+    if (req.user) {
+      response.version = process.env.npm_package_version || '1.0.0';
+      response.environment = process.env.NODE_ENV || 'development';
+    }
 
     return Response.json(response, {
       status: isHealthy ? 200 : 503,

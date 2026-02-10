@@ -9,6 +9,8 @@ import { tyresMenuData, primaryNav, fullNav } from "@/lib/navigation";
 export function MainHeader() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   // Close menu on click outside
   useEffect(() => {
@@ -21,6 +23,48 @@ export function MainHeader() {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  // Handle Escape key and focus trap for mobile menu
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        burgerRef.current?.focus();
+        return;
+      }
+
+      // Focus trap: keep Tab within the mobile menu
+      if (e.key === "Tab" && navRef.current) {
+        const focusable = navRef.current.querySelectorAll<HTMLElement>("a, button");
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  // Auto-focus first link when mobile menu opens
+  useEffect(() => {
+    if (open && navRef.current) {
+      requestAnimationFrame(() => {
+        const firstLink = navRef.current?.querySelector<HTMLElement>("a");
+        firstLink?.focus();
+      });
+    }
   }, [open]);
 
   return (
@@ -72,6 +116,7 @@ export function MainHeader() {
           {/* Burger menu (mobile + additional items on desktop) */}
           <div ref={menuRef}>
             <button
+              ref={burgerRef}
               type="button"
               onClick={() => setOpen((prev) => !prev)}
               className="flex items-center justify-center rounded-full border border-stone-700 p-2 min-w-11 min-h-11 transition-colors hover:bg-stone-800 lg:border-transparent"
@@ -86,7 +131,7 @@ export function MainHeader() {
             </button>
 
             {open && (
-              <div className="absolute right-4 top-full mt-2 w-64 rounded-2xl border border-stone-800 bg-stone-900/98 p-2 text-sm shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+              <div ref={navRef} className="absolute right-4 top-full mt-2 w-64 rounded-2xl border border-stone-800 bg-stone-900/98 p-2 text-sm shadow-[0_18px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
                 <nav className="flex flex-col">
                   {fullNav.map((item) => (
                     <Link

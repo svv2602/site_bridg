@@ -9,6 +9,7 @@ import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb } from "@/components/ui";
 import { seasonLabelsShort, brandLabels, vehicleTypeLabelsLong } from "@/lib/utils/tyres";
 import { pluralize } from "@/lib/utils/pluralize";
+import { TrackComparisonView } from "@/components/AnalyticsEvents";
 import { SITE_URL } from "@/lib/constants";
 
 // Comparison attributes
@@ -353,7 +354,7 @@ export default async function ComparisonPage({
         </section>
 
         {/* Verdict */}
-        <section className="py-12 bg-muted/30">
+        <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold mb-6">Висновок</h2>
             <div className="bg-card border border-border rounded-xl p-6 md:p-8">
@@ -394,6 +395,7 @@ export default async function ComparisonPage({
           </div>
         </section>
       </main>
+      <TrackComparisonView tyreNames={compareTyres.map((t) => t.name)} />
     </>
   );
 }

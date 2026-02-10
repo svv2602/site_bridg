@@ -1,8 +1,24 @@
+import type { Metadata } from "next";
 import { getDealers } from "@/lib/api/dealers";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { SITE_URL } from "@/lib/constants";
 import { Breadcrumb } from "@/components/ui";
+import { TrackDealerSearch } from "@/components/AnalyticsEvents";
 import { DealersClient } from "./DealersClient";
+
+export const metadata: Metadata = {
+  title: "Де купити | Дилери Bridgestone в Україні",
+  description:
+    "Знайдіть офіційного дилера Bridgestone поруч з вами. Інтерактивна карта авторизованих точок продажу та сервісних центрів по всій Україні.",
+  alternates: {
+    canonical: "/dealers",
+  },
+  openGraph: {
+    title: "Де купити | Дилери Bridgestone в Україні",
+    description:
+      "Інтерактивна карта офіційних дилерів Bridgestone по всій Україні. Пошук за містом та адресою.",
+  },
+};
 
 export default async function DealersPage() {
   const allDealers = await getDealers();
@@ -70,6 +86,7 @@ export default async function DealersPage() {
 
       {/* Interactive client parts (filters, map, geolocation, dealer list) */}
       <DealersClient initialDealers={allDealers} />
+      <TrackDealerSearch />
     </div>
   );
 }

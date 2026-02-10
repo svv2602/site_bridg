@@ -164,7 +164,8 @@ export default buildConfig({
   ],
   editor: lexicalEditor(),
   // Secret must be set via PAYLOAD_SECRET env variable (min 32 chars in production)
-  secret: process.env.PAYLOAD_SECRET || 'dev-only-secret-not-for-production',
+  // In production, the guard at line 80 ensures PAYLOAD_SECRET is set and ≥32 chars
+  secret: process.env.PAYLOAD_SECRET || 'dev-only-secret-change-me-in-production-min-32-chars',
   db: postgresAdapter({
     pool: {
       // DATABASE_URI must be set via environment variable in production

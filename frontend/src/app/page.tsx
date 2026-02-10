@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ChevronRight, Star, Phone, Award } from "lucide-react";
 import { PHONE_HREF } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "Bridgestone Україна — офіційний сайт | Шини для легкових авто, SUV, фургонів",
+  description:
+    "Офіційний сайт Bridgestone в Україні. Підберіть літні, зимові та всесезонні шини преміум-класу для легкових авто, SUV та комерційного транспорту. Знайдіть дилера поруч.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Bridgestone Україна — офіційний сайт | Шини для легкових авто, SUV, фургонів",
+    description:
+      "Підберіть літні, зимові та всесезонні шини Bridgestone преміум-класу. Пошук за розміром та авто, карта дилерів, поради експертів.",
+  },
+};
 import { tyreCategories, features } from "./page-data";
 import { SeasonalHero } from "@/components/SeasonalHero";
 import { QuickSearchForm } from "@/components/QuickSearchForm";
@@ -372,7 +387,7 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h3 className="mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</h3>
+            <h2 className="mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</h2>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини саме для вас —
               з урахуванням вашого стилю водіння та бюджету.

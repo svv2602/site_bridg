@@ -151,7 +151,7 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
     "@type": "Organization",
     name: "Bridgestone Ukraine",
     url: baseUrl,
-    logo: `${baseUrl}/images/logo.png`,
+    logo: `${baseUrl}/og-image.webp`,
     sameAs: [
       "https://www.facebook.com/BridgestoneUkraine",
       "https://www.instagram.com/bridgestone_ukraine",
@@ -232,6 +232,12 @@ export function generateProductSchemaWithReviews(
     ...(reviews.length > 0 && {
       review: reviews.slice(0, 5).map((r) => generateReviewSchema(r, baseUrl)),
     }),
+    offers: {
+      "@type": "AggregateOffer",
+      availability: "https://schema.org/InStock",
+      priceCurrency: "UAH",
+      ...(tyre.sizes && tyre.sizes.length > 0 && { offerCount: tyre.sizes.length }),
+    },
     ...(tyre.euLabel && {
       additionalProperty: [
         tyre.euLabel.wetGrip && {

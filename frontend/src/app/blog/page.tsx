@@ -34,10 +34,13 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   if (searchQuery) title = `Пошук: "${searchQuery}" — Блог Bridgestone`;
   if (currentPage > 1) title = `${title} — Сторінка ${currentPage}`;
 
+  // Dynamic canonical for paginated pages
+  const canonical = currentPage > 1 ? `/blog?page=${currentPage}` : '/blog';
+
   return {
     title,
     description: "Блог Bridgestone Україна: поради з вибору шин, огляди новинок, сезонні рекомендації та експертні статті.",
-    alternates: { canonical: '/blog' },
+    alternates: { canonical },
     openGraph: {
       title: `${title} | Bridgestone Україна`,
       description: "Поради з вибору шин, огляди новинок та експертні статті від Bridgestone.",

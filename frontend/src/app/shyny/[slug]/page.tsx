@@ -16,6 +16,7 @@ import { KeyBenefits } from "@/components/KeyBenefits";
 import { Breadcrumb } from "@/components/ui";
 import { SizesByDiameter } from "@/components/SizesByDiameter";
 import { ReviewsSectionWithMore } from "@/components/ReviewsSectionWithMore";
+import { TrackTyreView } from "@/components/AnalyticsEvents";
 import { seasonLabels, SeasonIcons, formatVehicleTypes } from "@/lib/utils/tyres";
 import { SITE_URL } from "@/lib/constants";
 
@@ -53,7 +54,8 @@ export async function generateMetadata({
     openGraph: {
       title: model.seoTitle || buildTitle(model),
       description: model.shortDescription || `Шини ${model.name} від Bridgestone`,
-      type: 'website',
+      // 'product' is valid per OG protocol but not in Next.js types
+      type: 'product' as const as 'website',
       locale: 'uk_UA',
       siteName: 'Bridgestone Україна',
       images: model.imageUrl ? [{ url: model.imageUrl, alt: model.name }] : undefined,
@@ -399,6 +401,7 @@ export default async function TyreModelPage({
           </div>
         </section>
       )}
+      <TrackTyreView slug={model.slug} name={model.name} season={model.season} />
     </div>
   );
 }

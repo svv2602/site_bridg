@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { MainHeader } from "@/components/MainHeader";
 import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
-import { Analytics } from "@/components/Analytics";
+import { Analytics, NavigationTracker } from "@/components/Analytics";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL_WHITE, PHONE_SCHEMA, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants";
 
 const geistSans = Geist({
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
     languages: {
-      'uk': '/',
-      'x-default': '/',
+      'uk': SITE_URL,
+      'x-default': SITE_URL,
     },
     types: {
       'application/rss+xml': '/feed.xml',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.webp',
         width: 1200,
         height: 630,
         alt: 'Bridgestone Україна — офіційний сайт шин',
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Bridgestone Україна — офіційний сайт шин",
     description: "Офіційний сайт шин Bridgestone для кінцевих споживачів в Україні.",
-    images: ['/og-image.jpg'],
+    images: ['/og-image.webp'],
   },
   robots: {
     index: true,
@@ -151,7 +151,7 @@ export default function RootLayout({
                   <MapPin className="h-3 w-3" />
                   <span>Знайти дилера поруч</span>
                 </Link>
-                <div className="hidden items-center gap-1.5 sm:flex text-muted">
+                <div className="hidden items-center gap-1.5 sm:flex text-stone-500 dark:text-stone-400">
                   <Phone className="h-3 w-3" />
                   <span>Гаряча лінія: {PHONE_DISPLAY}</span>
                 </div>
@@ -173,6 +173,7 @@ export default function RootLayout({
 
           {/* Analytics (GA4 + Meta Pixel) - loads after consent */}
           <Analytics />
+          <NavigationTracker />
         </div>
       </body>
     </html>

@@ -272,6 +272,10 @@ export const providersStatusEndpoint: Endpoint = {
   path: '/providers/status',
   method: 'get',
   handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const payload = req.payload;
 
     const providers = await payload.find({

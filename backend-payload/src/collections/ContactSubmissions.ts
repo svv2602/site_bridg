@@ -24,6 +24,8 @@ export const ContactSubmissions: CollectionConfig = {
   access: {
     read: ({ req }) => !!req.user,
     create: () => true,
+    update: ({ req }) => !!req.user,
+    delete: ({ req }) => (req.user as { role?: string })?.role === 'admin',
   },
   fields: [
     {

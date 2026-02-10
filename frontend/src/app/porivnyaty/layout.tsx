@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/porivnyaty',
   },
+  openGraph: {
+    title: "Порівняння шин — Bridgestone Україна",
+    description: "Порівняйте характеристики шин Bridgestone. Оберіть найкращі шини для вашого автомобіля та стилю водіння.",
+  },
 };
 
 export default function CompareLayout({

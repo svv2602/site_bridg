@@ -114,7 +114,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
           step="1000"
           value={annualKm}
           onChange={(e) => setAnnualKm(parseInt(e.target.value))}
-          className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+          className="w-full h-2 bg-stone-200 dark:bg-stone-700 rounded-lg appearance-none cursor-pointer accent-primary"
         />
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
           <span>5,000 км</span>

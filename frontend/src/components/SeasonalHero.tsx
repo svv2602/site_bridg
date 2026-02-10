@@ -4,15 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, Car, Shield, MapPin, Zap, Sun, Snowflake } from 'lucide-react';
-import { getSeasonalContent } from '@/lib/api/payload';
 import { t } from '@/lib/i18n';
 
 // Mapping сезон → зображення шини для hero
 const heroImages: Record<string, string> = {
-  summer: '/images/hero/turanza-hero.png',
-  winter: '/images/hero/blizzak-hero.png',
-  'all-season': '/images/hero/turanza-all-season-hero.png',
-  default: '/images/hero/turanza-hero.png',
+  summer: '/images/hero/turanza-hero.webp',
+  winter: '/images/hero/blizzak-hero.webp',
+  'all-season': '/images/hero/turanza-all-season-hero.webp',
+  default: '/images/hero/turanza-hero.webp',
 };
 
 interface SeasonalData {
@@ -40,32 +39,12 @@ interface SeasonalHeroProps {
 }
 
 export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHeroProps) {
-  const [seasonalData, setSeasonalData] = useState<SeasonalData>(serverData || defaultData);
-  const [isLoading, setIsLoading] = useState(!serverData);
+  const seasonalData = serverData || defaultData;
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // If data was provided via props (server-side fetch), skip client-side fetch
-    if (serverData) {
-      requestAnimationFrame(() => setIsVisible(true));
-      return;
-    }
-
-    async function fetchSeasonalData() {
-      try {
-        const data = await getSeasonalContent();
-        setSeasonalData(data as SeasonalData);
-      } catch (error) {
-        console.warn('Failed to fetch seasonal content, using defaults:', error);
-        setSeasonalData(defaultData);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchSeasonalData();
-    // Trigger animation after mount
     requestAnimationFrame(() => setIsVisible(true));
-  }, [serverData]);
+  }, []);
 
   const SeasonIcon = seasonalData.featuredSeason === 'winter' ? Snowflake : Sun;
 
@@ -98,17 +77,9 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
 
             {/* Dynamic Title */}
             <h1 className="hero-title-adaptive text-3xl md:text-4xl lg:text-[2.9rem]">
-              {isLoading ? (
-                <span className="animate-pulse rounded bg-stone-300 dark:bg-white/20 inline-block h-[2.25rem] w-[80%] md:h-[2.5rem]" aria-hidden="true" />
-              ) : (
-                seasonalData.heroTitle
-              )}
+              {seasonalData.heroTitle}
               <span className="hero-subtitle-adaptive mt-1 block text-base md:text-lg">
-                {isLoading ? (
-                  <span className="animate-pulse rounded bg-stone-200 dark:bg-white/10 inline-block h-[1.25rem] w-[60%] md:h-[1.5rem]" aria-hidden="true" />
-                ) : (
-                  seasonalData.heroSubtitle
-                )}
+                {seasonalData.heroSubtitle}
               </span>
             </h1>
 
@@ -145,7 +116,7 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
             </ul>
 
             {/* Seasonal CTA */}
-            {seasonalData.featuredSeason && !isLoading && (
+            {seasonalData.featuredSeason && (
               <Link
                 href={seasonalData.ctaLink}
                 className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-stone-700 hover:scale-105 hover:shadow-xl dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
@@ -181,13 +152,13 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
-                <h3 className="text-xl font-semibold text-stone-900 dark:text-white">
+                <h2 className="text-xl font-semibold text-stone-900 dark:text-white">
                   {seasonalData.featuredSeason === 'summer'
                     ? t('hero.readyForSummer')
                     : seasonalData.featuredSeason === 'winter'
                     ? t('hero.readyForWinter')
                     : t('hero.readyForAny')}
-                </h3>
+                </h2>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
                   {seasonalData.featuredSeason === 'summer'
                     ? t('hero.summerDescription')

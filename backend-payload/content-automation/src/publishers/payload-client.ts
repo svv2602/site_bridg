@@ -91,9 +91,18 @@ class PayloadClient {
    * Authenticate with Payload CMS
    */
   async authenticate(email?: string, password?: string): Promise<void> {
+    const adminEmail = email || process.env.PAYLOAD_ADMIN_EMAIL;
+    const adminPassword = password || process.env.PAYLOAD_ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      throw new Error(
+        'PAYLOAD_ADMIN_EMAIL and PAYLOAD_ADMIN_PASSWORD environment variables are required for content automation'
+      );
+    }
+
     const credentials = {
-      email: email || process.env.PAYLOAD_ADMIN_EMAIL || "admin@bridgestone.ua",
-      password: password || process.env.PAYLOAD_ADMIN_PASSWORD || "admin123",
+      email: adminEmail,
+      password: adminPassword,
     };
 
     try {

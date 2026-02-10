@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/reviews',
   },
+  openGraph: {
+    title: "Відгуки про шини Bridgestone — Bridgestone Україна",
+    description: "Реальні відгуки покупців про шини Bridgestone та Firestone. Дізнайтесь думку водіїв про якість, комфорт та безпеку шин.",
+  },
 };
 
 interface ReviewsPageProps {
@@ -94,7 +98,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
       )}
       <div className="min-h-screen bg-background">
         {/* Hero */}
-      <section className="border-b border-stone-200 bg-gradient-to-br from-stone-100 via-stone-50 to-stone-50 py-12 dark:border-stone-800 dark:from-stone-950 dark:via-stone-900 dark:to-stone-800 md:py-16">
+      <section className="hero-adaptive py-12 md:py-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <Breadcrumb
             className="mb-4"

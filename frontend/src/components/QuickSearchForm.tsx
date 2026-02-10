@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Ruler, Car, Filter, ChevronRight } from 'lucide-react';
+import analytics from '@/lib/analytics';
 
 type SearchTab = 'size' | 'car';
 
@@ -258,6 +259,11 @@ export function QuickSearchForm() {
   const handleSizeSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
+    analytics.trackTyreSearch({
+      width: width ? Number(width) : undefined,
+      aspectRatio: aspectRatio ? Number(aspectRatio) : undefined,
+      diameter: diameter ? Number(diameter) : undefined,
+    });
     const params = new URLSearchParams();
     params.set('mode', 'size');
     if (width) params.set('width', width);
@@ -273,6 +279,10 @@ export function QuickSearchForm() {
     const selectedBrand = brands.find(b => b.id === parseInt(brandId));
     const selectedModel = models.find(m => m.id === parseInt(modelId));
     const selectedKit = kits.find(k => k.id === parseInt(kitId));
+    analytics.trackTyreSearch({
+      make: selectedBrand?.name,
+      model: selectedModel?.name,
+    });
     const params = new URLSearchParams();
     params.set('mode', 'car');
     if (selectedBrand?.name) params.set('make', selectedBrand.name);

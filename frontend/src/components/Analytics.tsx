@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import Script from "next/script";
+import { trackGA4PageView, trackFBPageView } from "@/lib/analytics";
 
 const STORAGE_KEY = "bridgestone_cookies_consent";
 
@@ -95,4 +97,20 @@ export function Analytics() {
       )}
     </>
   );
+}
+
+// Track page views on client-side SPA navigation
+export function NavigationTracker() {
+  const pathname = usePathname();
+  const prevPathname = useRef(pathname);
+
+  useEffect(() => {
+    if (prevPathname.current !== pathname) {
+      trackGA4PageView(pathname);
+      trackFBPageView();
+      prevPathname.current = pathname;
+    }
+  }, [pathname]);
+
+  return null;
 }

@@ -169,7 +169,7 @@ export function TableOfContents({
                   item.level === 3 ? "pl-6" : ""
                 } ${
                   activeId === item.id
-                    ? "bg-primary/10 font-medium text-primary"
+                    ? "bg-stone-200 font-medium text-stone-900 dark:bg-stone-700 dark:text-stone-100"
                     : "text-muted-foreground hover:bg-stone-100 hover:text-foreground dark:hover:bg-stone-800"
                 }`}
               >

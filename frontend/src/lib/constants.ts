@@ -29,7 +29,7 @@ export const SOCIAL_LINKS = {
 
 // Assets
 export const LOGO_URL_WHITE = '/bridgestone-logo-white.svg';
-export const OG_IMAGE = '/og-image.jpg';
+export const OG_IMAGE = '/og-image.webp';
 
 // Cookie consent
 export const COOKIES_CONSENT_STORAGE_KEY = 'bridgestone_cookies_consent';

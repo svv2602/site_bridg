@@ -5,6 +5,7 @@ import { CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui";
 import { contactFormSchema, type ContactFormData } from "@/lib/schemas/contact";
+import analytics from "@/lib/analytics";
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -120,6 +121,7 @@ export function ContactForm() {
       }
 
       setStatus('success');
+      analytics.trackFormSubmit('contact');
       setFormData({ name: '', phone: '', email: '', subject: '', message: '' });
       setConsent(false);
     } catch (error) {

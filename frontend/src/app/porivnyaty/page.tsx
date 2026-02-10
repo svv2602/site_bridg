@@ -68,7 +68,7 @@ export default function ComparisonSelectionPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
-      <section className="bg-gradient-to-br from-stone-900 to-stone-800 text-white py-12">
+      <section className="hero-dark py-12">
         <div className="container mx-auto px-4">
           <Breadcrumb
             className="mb-4"
@@ -197,9 +197,9 @@ export default function ComparisonSelectionPage() {
                   key={i}
                   className="bg-card border border-border rounded-xl p-4 animate-pulse"
                 >
-                  <div className="aspect-square bg-muted rounded-lg mb-4" />
-                  <div className="h-5 bg-muted rounded mb-2" />
-                  <div className="h-4 bg-muted rounded w-2/3" />
+                  <div className="aspect-square bg-stone-200 dark:bg-stone-700 rounded-lg mb-4" />
+                  <div className="h-5 bg-stone-200 dark:bg-stone-700 rounded mb-2" />
+                  <div className="h-4 bg-stone-200 dark:bg-stone-700 rounded w-2/3" />
                 </div>
               ))}
             </div>
@@ -264,7 +264,7 @@ export default function ComparisonSelectionPage() {
       </section>
 
       {/* Popular Comparisons */}
-      <section className="py-12 bg-muted/30">
+      <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Популярні порівняння</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">

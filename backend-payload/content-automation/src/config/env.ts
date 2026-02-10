@@ -48,8 +48,21 @@ export const ENV = {
 
 // Validation
 export function validateEnv(): { valid: boolean; missing: string[] } {
-  const required = ["ANTHROPIC_API_KEY"];
-  const missing = required.filter((key) => !ENV[key as keyof typeof ENV]);
+  const llmKeys = [
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "GOOGLE_AI_API_KEY",
+    "GROQ_API_KEY",
+    "OPENROUTER_API_KEY",
+  ] as const;
+
+  const hasAnyLlmKey = llmKeys.some((key) => !!ENV[key as keyof typeof ENV]);
+  const missing: string[] = [];
+
+  if (!hasAnyLlmKey) {
+    missing.push(`at least one LLM API key (${llmKeys.join(" | ")})`);
+  }
 
   return {
     valid: missing.length === 0,
@@ -60,6 +73,6 @@ export function validateEnv(): { valid: boolean; missing: string[] } {
 // Check env on import
 const { valid, missing } = validateEnv();
 if (!valid) {
-  console.warn(`Warning: Missing environment variables: ${missing.join(", ")}`);
-  console.warn("Some features may not work. Create a .env file in backend/content-automation/");
+  console.warn(`Warning: ${missing.join(", ")}`);
+  console.warn("Some features may not work. Create a .env file in backend-payload/");
 }

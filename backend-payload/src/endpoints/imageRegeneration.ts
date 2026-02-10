@@ -223,6 +223,10 @@ export const regenerateImageStatusEndpoint: Endpoint = {
   path: '/image-regeneration/status/:jobId',
   method: 'get',
   handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const jobId = req.routeParams?.jobId as string;
     if (!jobId) {
       return Response.json({ error: 'Job ID is required' }, { status: 400 });
@@ -250,6 +254,10 @@ export const generatePromptEndpoint: Endpoint = {
   path: '/image-regeneration/prompt',
   method: 'get',
   handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url || '', 'http://localhost');
     const type = url.searchParams.get('type') || 'content';
     const season = url.searchParams.get('season') || undefined;

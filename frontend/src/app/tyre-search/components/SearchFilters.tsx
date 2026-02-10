@@ -90,7 +90,7 @@ export function SearchFilters({
                 ))}
               </select>
             )}
-            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
+            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export function SearchFilters({
                 ))}
               </select>
             )}
-            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
+            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
           </div>
         </div>
 
@@ -156,7 +156,7 @@ export function SearchFilters({
                 ))}
               </select>
             )}
-            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted" />
+            <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
           </div>
         </div>
       </div>

@@ -15,10 +15,18 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const openedWithKeyboard = useRef(false);
+
+  const closeMenu = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => setIsOpen(false), 150);
+  }, []);
 
   const handleMouseEnter = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
+      openedWithKeyboard.current = false;
       setIsOpen(true);
       requestAnimationFrame(() => setIsVisible(true));
     }, 150);
@@ -27,34 +35,85 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
   const handleMouseLeave = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(() => setIsOpen(false), 150);
+      closeMenu();
     }, 100);
+  }, [closeMenu]);
+
+  // Get all focusable menuitem elements inside the dropdown
+  const getMenuItems = useCallback((): HTMLElement[] => {
+    if (!menuRef.current) return [];
+    return Array.from(menuRef.current.querySelectorAll<HTMLElement>('[role="menuitem"]'));
   }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleTriggerKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      setIsVisible(false);
-      setTimeout(() => setIsOpen(false), 150);
+      closeMenu();
     }
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       if (isOpen) {
-        setIsVisible(false);
-        setTimeout(() => setIsOpen(false), 150);
+        closeMenu();
       } else {
+        openedWithKeyboard.current = true;
         setIsOpen(true);
         requestAnimationFrame(() => setIsVisible(true));
       }
     }
-  }, [isOpen]);
+    if (e.key === 'ArrowDown' && !isOpen) {
+      e.preventDefault();
+      openedWithKeyboard.current = true;
+      setIsOpen(true);
+      requestAnimationFrame(() => setIsVisible(true));
+    }
+  }, [isOpen, closeMenu]);
+
+  // Handle Arrow key navigation inside the menu
+  const handleMenuKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const items = getMenuItems();
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(e.target as HTMLElement);
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+      items[next].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+      items[prev].focus();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      items[0].focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      items[items.length - 1].focus();
+    } else if (e.key === 'Escape') {
+      closeMenu();
+      triggerRef.current?.focus();
+    } else if (e.key === 'Tab') {
+      // Close menu on Tab out (natural browser behavior)
+      closeMenu();
+    }
+  }, [getMenuItems, closeMenu]);
+
+  // Auto-focus first menuitem when opened with keyboard
+  useEffect(() => {
+    if (isOpen && isVisible && openedWithKeyboard.current) {
+      requestAnimationFrame(() => {
+        const items = getMenuItems();
+        if (items.length > 0) {
+          items[0].focus();
+        }
+      });
+      openedWithKeyboard.current = false;
+    }
+  }, [isOpen, isVisible, getMenuItems]);
 
   // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsVisible(false);
-        setTimeout(() => setIsOpen(false), 150);
+        closeMenu();
       }
     }
     if (isOpen) {
@@ -71,8 +130,7 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
   }, []);
 
   const handleLinkClick = () => {
-    setIsVisible(false);
-    setTimeout(() => setIsOpen(false), 150);
+    closeMenu();
   };
 
   return (
@@ -83,11 +141,12 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
       onMouseLeave={handleMouseLeave}
     >
       <button
+        ref={triggerRef}
         type="button"
         className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-stone-300 transition-colors hover:bg-stone-800 hover:text-stone-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-stone-900"
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        onKeyDown={handleKeyDown}
+        onKeyDown={handleTriggerKeyDown}
       >
         {trigger}
         <ChevronDown
@@ -99,6 +158,7 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
         <div
           className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2"
           role="menu"
+          onKeyDown={handleMenuKeyDown}
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(-10px)',

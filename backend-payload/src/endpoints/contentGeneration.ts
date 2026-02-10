@@ -110,6 +110,10 @@ export const contentJobStatusEndpoint: Endpoint = {
   path: '/content/job/:id',
   method: 'get',
   handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const jobId = req.routeParams?.id as string;
     const job = getJob(jobId);
 
@@ -358,7 +362,11 @@ export const contentFullPipelineEndpoint: Endpoint = {
 export const contentJobsListEndpoint: Endpoint = {
   path: '/content/jobs',
   method: 'get',
-  handler: async () => {
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     return Response.json({ jobs: getRecentJobs(20) });
   },
 };

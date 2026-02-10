@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ErrorState } from "@/components/ui";
+import analytics from "@/lib/analytics";
 import { type FilteredDealer, buildRouteUrl } from "../types";
 
 export interface DealerListProps {
@@ -127,6 +128,7 @@ export function DealerList({
                     <a
                       href={`tel:${dealer.phone}`}
                       className="font-medium hover:text-primary hover:underline"
+                      onClick={() => analytics.trackPhoneClick(dealer.phone!, dealer.name)}
                     >
                       {dealer.phone}
                     </a>
@@ -174,6 +176,7 @@ export function DealerList({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-text hover:bg-primary-hover"
+                onClick={() => analytics.trackDealerClick({ id: dealer.id, name: dealer.name, city: dealer.city || '' })}
               >
                 <Navigation className="h-4 w-4" />
                 Побудувати маршрут

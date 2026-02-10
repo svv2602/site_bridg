@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/karta-saitu',
   },
+  openGraph: {
+    title: 'Карта сайту — Bridgestone Україна',
+    description: 'Карта сайту Bridgestone Україна. Швидкий доступ до всіх розділів офіційного сайту.',
+  },
 };
 
 const sitemapSections = [

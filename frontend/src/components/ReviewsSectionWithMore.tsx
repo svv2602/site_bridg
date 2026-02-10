@@ -114,7 +114,7 @@ export function ReviewsSectionWithMore({
             <button
               onClick={loadMore}
               disabled={isLoading}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold transition-colors hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-stone-800"
+              className="inline-flex items-center gap-2 rounded-full border border-stone-300 dark:border-stone-600 bg-card px-6 py-3 font-semibold transition-colors hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-stone-800"
             >
               {isLoading ? (
                 <>

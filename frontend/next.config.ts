@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
           },
           // Content Security Policy
           // Allows: self, Google Maps, Google Analytics, Meta Pixel, Sentry, inline styles (Next.js)
+          // NOTE: 'unsafe-eval' is required by Google Maps JavaScript API (uses eval() internally)
+          // NOTE: 'unsafe-inline' is required by Next.js for inline scripts; nonce-based CSP can replace this in future
           {
             key: 'Content-Security-Policy',
             value: [
@@ -50,12 +52,11 @@ const nextConfig: NextConfig = {
               "form-action 'self'",
             ].join('; '),
           },
-          // HSTS -- activate only on production with HTTPS configured
-          // Uncomment on production after SSL setup:
-          // {
-          //   key: 'Strict-Transport-Security',
-          //   value: 'max-age=31536000; includeSubDomains; preload',
-          // },
+          // HSTS — enabled in production when HTTPS is configured
+          ...(process.env.NODE_ENV === 'production' ? [{
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          }] : []),
         ],
       },
       {
@@ -150,6 +151,20 @@ const nextConfig: NextConfig = {
         source: '/tekhnolohiyi',
         destination: '/technology',
         permanent: true,
+      },
+      {
+        source: '/shyny',
+        destination: '/passenger-tyres',
+        permanent: true,
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: '/feed.xml',
+        destination: '/feed',
       },
     ];
   },

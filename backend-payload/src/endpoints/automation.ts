@@ -103,7 +103,11 @@ function getLastRunDate(db: Database.Database): string | null {
 export const automationStatsEndpoint: Endpoint = {
   path: '/automation/stats',
   method: 'get',
-  handler: async () => {
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
       const db = getArticleQueueDb();
 
@@ -160,7 +164,11 @@ export const automationStatsEndpoint: Endpoint = {
 export const automationStatusEndpoint: Endpoint = {
   path: '/automation/status',
   method: 'get',
-  handler: async () => {
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const tasks = getSchedulerStatus();
     return Response.json({ tasks });
   },
@@ -225,7 +233,11 @@ export const automationSchedulerEndpoint: Endpoint = {
 export const automationSourcesEndpoint: Endpoint = {
   path: '/automation/sources',
   method: 'get',
-  handler: async () => {
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
       const db = getArticleQueueDb();
 
@@ -342,6 +354,10 @@ export const automationQueueEndpoint: Endpoint = {
   path: '/automation/queue',
   method: 'get',
   handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
       const db = getArticleQueueDb();
 
@@ -483,7 +499,11 @@ export const automationQueueUpdateEndpoint: Endpoint = {
 export const automationArticleSettingsEndpoint: Endpoint = {
   path: '/automation/article-settings',
   method: 'get',
-  handler: async () => {
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
       const db = getArticleQueueDb();
 

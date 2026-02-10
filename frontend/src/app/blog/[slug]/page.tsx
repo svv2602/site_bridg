@@ -189,11 +189,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 />
               ) : (
                 <div className="prose max-w-none">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-stone-600 dark:text-stone-400">
                     {article.previewText}
-                  </p>
-                  <p className="mt-6 text-[13px] text-muted-foreground">
-                    Повний текст статті буде підтягуватися з CMS.
                   </p>
                 </div>
               )}
