@@ -54,8 +54,7 @@ export async function generateMetadata({
     openGraph: {
       title: model.seoTitle || buildTitle(model),
       description: model.shortDescription || `Шини ${model.name} від Bridgestone`,
-      // 'product' is valid per OG protocol but not in Next.js types
-      type: 'product' as const as 'website',
+      type: 'website',
       locale: 'uk_UA',
       siteName: 'Bridgestone Україна',
       images: model.imageUrl ? [{ url: model.imageUrl, alt: model.name }] : undefined,

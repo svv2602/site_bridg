@@ -554,7 +554,7 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     name: tyre.name,
     brand: tyre.brand || 'bridgestone', // Default to bridgestone for existing data
     season: tyre.season,
-    vehicleTypes: tyre.vehicleTypes?.map(v => v === 'van' ? 'lcv' : v),
+    vehicleTypes: tyre.vehicleTypes?.map(v => v === 'van' ? 'lcv' : v) || [],
     isNew: tyre.isNew,
     isPopular: tyre.isPopular,
     shortDescription: tyre.shortDescription || '',
