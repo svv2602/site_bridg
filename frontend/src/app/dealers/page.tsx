@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { type Dealer } from "@/lib/data";
 import { getDealers } from "@/lib/api/dealers";
-import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation } from "lucide-react";
+import { Search, MapPin, Phone, Globe, Clock, Filter, ChevronDown, Loader2, Navigation, LocateFixed } from "lucide-react";
 import { generateLocalBusinessSchema, generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { Breadcrumb, ErrorState } from "@/components/ui";
 
@@ -28,6 +28,7 @@ const DealersMap = dynamic(
 
 type FilteredDealer = Dealer & {
   displayAddress: string;
+  distance?: number; // distance in km from user position
 };
 
 const dealerTypes = [
@@ -37,6 +38,29 @@ const dealerTypes = [
   { key: "service", label: "Сервісний центр" },
 ];
 
+interface UserPosition {
+  lat: number;
+  lng: number;
+}
+
+/** Haversine formula: calculate distance between two lat/lng points in km */
+function haversineDistance(
+  lat1: number, lng1: number,
+  lat2: number, lng2: number,
+): number {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export default function DealersPage() {
   const [cityQuery, setCityQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -44,6 +68,9 @@ export default function DealersPage() {
   const [allDealers, setAllDealers] = useState<Dealer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userPosition, setUserPosition] = useState<UserPosition | null>(null);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   // Fetch dealers on mount
   const fetchDealers = async () => {
@@ -64,6 +91,38 @@ export default function DealersPage() {
     fetchDealers();
   }, []);
 
+  // Geolocation handler
+  const requestGeolocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setGeoError("Геолокація не підтримується вашим браузером");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserPosition({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setGeoLoading(false);
+      },
+      (err) => {
+        setGeoLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError("Доступ до геолокації відхилено");
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGeoError("Місцезнаходження недоступне");
+        } else {
+          setGeoError("Не вдалося визначити місцезнаходження");
+        }
+        // Clear error after 5 seconds
+        setTimeout(() => setGeoError(null), 5000);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+    );
+  }, []);
+
   const normalizedQuery = cityQuery.trim().toLowerCase();
 
   const dealers: FilteredDealer[] = useMemo(
@@ -71,8 +130,12 @@ export default function DealersPage() {
       allDealers.map((d) => ({
         ...d,
         displayAddress: [d.city, d.address].filter(Boolean).join(", "),
+        distance:
+          userPosition && d.latitude && d.longitude
+            ? haversineDistance(userPosition.lat, userPosition.lng, d.latitude, d.longitude)
+            : undefined,
       })),
-    [allDealers],
+    [allDealers, userPosition],
   );
 
   const filteredDealers = useMemo(() => {
@@ -87,8 +150,17 @@ export default function DealersPage() {
     if (selectedType !== "all") {
       filtered = filtered.filter((dealer) => dealer.type === selectedType);
     }
+    // Sort by distance if user position is available
+    if (userPosition) {
+      filtered = [...filtered].sort((a, b) => {
+        if (a.distance == null && b.distance == null) return 0;
+        if (a.distance == null) return 1;
+        if (b.distance == null) return -1;
+        return a.distance - b.distance;
+      });
+    }
     return filtered;
-  }, [dealers, normalizedQuery, selectedType]);
+  }, [dealers, normalizedQuery, selectedType, userPosition]);
 
   const buildRouteUrl = (dealer: Dealer) => {
     if (dealer.latitude && dealer.longitude) {
@@ -211,16 +283,42 @@ export default function DealersPage() {
                         </span>
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setCityQuery("");
-                        setSelectedType("all");
-                      }}
-                      className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
-                    >
-                      Скинути фільтри
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={requestGeolocation}
+                        disabled={geoLoading}
+                        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                          userPosition
+                            ? "border-green-500 bg-green-50 text-green-700 dark:border-green-600 dark:bg-green-900/30 dark:text-green-300"
+                            : "border-stone-300 bg-transparent text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+                        } disabled:cursor-wait disabled:opacity-60`}
+                      >
+                        {geoLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <LocateFixed className="h-4 w-4" />
+                        )}
+                        {userPosition ? "Локація визначена" : "Моє місцезнаходження"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCityQuery("");
+                          setSelectedType("all");
+                          setUserPosition(null);
+                        }}
+                        className="rounded-full border border-stone-300 bg-transparent px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-700"
+                      >
+                        Скинути фільтри
+                      </button>
+                    </div>
                   </div>
+                  {/* Geolocation error toast */}
+                  {geoError && (
+                    <div className="mt-3 flex items-center gap-2 rounded-xl border border-stone-300 bg-stone-100 px-4 py-2.5 text-sm text-stone-700 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300">
+                      <MapPin className="h-4 w-4 shrink-0 text-stone-500" />
+                      {geoError}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -236,6 +334,7 @@ export default function DealersPage() {
                   dealers={allDealers}
                   selectedDealerId={expandedDealer}
                   onDealerSelect={(id) => setExpandedDealer(id)}
+                  userPosition={userPosition}
                 />
               </div>
             </div>
@@ -302,8 +401,15 @@ export default function DealersPage() {
                           {dealer.name}
                         </h3>
                         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
+                          <MapPin className="h-4 w-4 shrink-0" />
                           <span>{dealer.displayAddress}</span>
+                          {dealer.distance != null && (
+                            <span className="ml-auto shrink-0 rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600 dark:bg-stone-700 dark:text-stone-300">
+                              {dealer.distance < 1
+                                ? `${Math.round(dealer.distance * 1000)} м`
+                                : `${dealer.distance.toFixed(1)} км`}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

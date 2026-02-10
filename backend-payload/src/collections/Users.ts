@@ -10,6 +10,7 @@
  */
 import type { CollectionConfig } from 'payload';
 import { createRateLimiter, extractIp } from '../lib/rate-limiter';
+import { validatePasswordComplexity } from '../lib/password-validation';
 import { APIError } from 'payload';
 
 /**
@@ -36,6 +37,18 @@ export const Users: CollectionConfig = {
     description: 'Адміністратори системи',
   },
   hooks: {
+    beforeChange: [
+      async ({ data }) => {
+        // Validate password complexity only when password is being set/changed
+        if (data?.password) {
+          const result = validatePasswordComplexity(data.password);
+          if (!result.valid) {
+            throw new APIError(result.errors.join('. '), 400);
+          }
+        }
+        return data;
+      },
+    ],
     beforeLogin: [
       async ({ req }) => {
         // Rate limit login attempts by IP address

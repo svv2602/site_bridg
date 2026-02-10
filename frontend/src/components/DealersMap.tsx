@@ -1,14 +1,43 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow, MarkerClusterer } from "@react-google-maps/api";
 import { MapPin, Phone, Globe, Clock, Navigation } from "lucide-react";
 import type { Dealer, DealerType } from "@/lib/data";
+
+// Cluster styles using stone palette
+const clusterStyles = [
+  {
+    // Small clusters (2-9)
+    textColor: "#1c1917", // stone-950
+    textSize: 13,
+    height: 40,
+    width: 40,
+    url: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="20" r="18" fill="#d6d3d1" stroke="#a8a29e" stroke-width="2"/></svg>')}`,
+  },
+  {
+    // Medium clusters (10-49)
+    textColor: "#1c1917",
+    textSize: 14,
+    height: 48,
+    width: 48,
+    url: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#a8a29e" stroke="#78716c" stroke-width="2"/></svg>')}`,
+  },
+  {
+    // Large clusters (50+)
+    textColor: "#fafaf9", // stone-50
+    textSize: 15,
+    height: 56,
+    width: 56,
+    url: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="28" cy="28" r="26" fill="#78716c" stroke="#57534e" stroke-width="2"/></svg>')}`,
+  },
+];
 
 interface DealersMapProps {
   dealers: Dealer[];
   selectedDealerId?: string | null;
   onDealerSelect?: (dealerId: string | null) => void;
+  userPosition?: { lat: number; lng: number } | null;
 }
 
 const containerStyle = {
@@ -104,6 +133,7 @@ export function DealersMap({
   dealers,
   selectedDealerId,
   onDealerSelect,
+  userPosition,
 }: DealersMapProps) {
   const [infoWindowDealer, setInfoWindowDealer] = useState<Dealer | null>(null);
 
@@ -120,8 +150,6 @@ export function DealersMap({
   );
 
   const center = useMemo(() => {
-    if (dealersWithCoords.length === 0) return defaultCenter;
-
     // If a dealer is selected, center on it
     if (selectedDealerId) {
       const selected = dealersWithCoords.find((d) => d.id === selectedDealerId);
@@ -130,6 +158,13 @@ export function DealersMap({
       }
     }
 
+    // If user position is available, center on it
+    if (userPosition) {
+      return { lat: userPosition.lat, lng: userPosition.lng };
+    }
+
+    if (dealersWithCoords.length === 0) return defaultCenter;
+
     // Otherwise, calculate center from all dealers
     const sumLat = dealersWithCoords.reduce((sum, d) => sum + (d.latitude || 0), 0);
     const sumLng = dealersWithCoords.reduce((sum, d) => sum + (d.longitude || 0), 0);
@@ -137,7 +172,7 @@ export function DealersMap({
       lat: sumLat / dealersWithCoords.length,
       lng: sumLng / dealersWithCoords.length,
     };
-  }, [dealersWithCoords, selectedDealerId]);
+  }, [dealersWithCoords, selectedDealerId, userPosition]);
 
   const handleMarkerClick = useCallback((dealer: Dealer) => {
     setInfoWindowDealer(dealer);
@@ -195,7 +230,7 @@ export function DealersMap({
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
-        zoom={selectedDealerId ? 12 : 6}
+        zoom={selectedDealerId ? 12 : userPosition ? 10 : 6}
         options={{
           disableDefaultUI: false,
           zoomControl: true,
@@ -204,18 +239,30 @@ export function DealersMap({
           fullscreenControl: true,
         }}
       >
-      {dealersWithCoords.map((dealer) => (
-        <Marker
-          key={dealer.id}
-          position={{ lat: dealer.latitude!, lng: dealer.longitude! }}
-          onClick={() => handleMarkerClick(dealer)}
-          icon={{
-            url: getMarkerIcon(dealer.type),
-            scaledSize: new google.maps.Size(32, 40),
-            anchor: new google.maps.Point(16, 40),
-          }}
-        />
-      ))}
+      <MarkerClusterer
+        styles={clusterStyles}
+        maxZoom={14}
+        gridSize={60}
+        minimumClusterSize={3}
+      >
+        {(clusterer) => (
+          <>
+            {dealersWithCoords.map((dealer) => (
+              <Marker
+                key={dealer.id}
+                position={{ lat: dealer.latitude!, lng: dealer.longitude! }}
+                onClick={() => handleMarkerClick(dealer)}
+                clusterer={clusterer}
+                icon={{
+                  url: getMarkerIcon(dealer.type),
+                  scaledSize: new google.maps.Size(32, 40),
+                  anchor: new google.maps.Point(16, 40),
+                }}
+              />
+            ))}
+          </>
+        )}
+      </MarkerClusterer>
 
       {infoWindowDealer && infoWindowDealer.latitude && infoWindowDealer.longitude && (
         <InfoWindow
