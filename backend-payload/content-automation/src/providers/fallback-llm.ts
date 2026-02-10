@@ -19,6 +19,7 @@ import {
   loadProvidersFromDatabase,
   loadTaskRoutingFromDatabase,
   getTaskRoutingFromDB,
+  getProviderConfigFromDB,
   hasApiKey,
 } from "../config/database-providers.js";
 
@@ -104,6 +105,22 @@ function getProvider(name: string): LLMProvider | null {
 }
 
 /**
+ * Resolve model for a provider: use routing's preferredModel only for the
+ * preferred provider; for fallback providers use their own defaultModel.
+ */
+async function resolveModel(
+  providerName: string,
+  routing: TaskRouting,
+  explicitModel?: string
+): Promise<string> {
+  if (explicitModel) return explicitModel;
+  if (providerName === routing.preferredProvider) return routing.preferredModel;
+  // Fallback provider — use its own default model
+  const cfg = await getProviderConfigFromDB(providerName);
+  return cfg?.defaultModel || routing.preferredModel;
+}
+
+/**
  * Result of a fallback-aware generation
  */
 export interface FallbackResult<T = LLMResponse> {
@@ -172,8 +189,9 @@ export async function generateWithFallback(
       let response: LLMResponse;
       try {
         // Try fallback models within the same provider first
+        const primaryModel = await resolveModel(providerName, routing, options?.model);
         const modelsToTry = [
-          options?.model || routing.preferredModel,
+          primaryModel,
           ...(routing.fallbackModels || []),
         ];
 
@@ -314,8 +332,9 @@ export async function generateJSONWithFallback<T = unknown>(
       let result: { data: T; response: LLMResponse };
       try {
         // Try fallback models within the same provider
+        const primaryModel = await resolveModel(providerName, routing, options?.model);
         const modelsToTry = [
-          options?.model || routing.preferredModel,
+          primaryModel,
           ...(routing.fallbackModels || []),
         ];
 
