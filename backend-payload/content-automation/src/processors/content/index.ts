@@ -44,6 +44,11 @@ export {
   type ArticleImageInput,
 } from "./article-images.js";
 
+export {
+  translateToUkrainian,
+  type TranslateOptions,
+} from "./translate.js";
+
 import { generateTireDescription, type TireDescriptionInput } from "./tire-description.js";
 import { generateTireSEO } from "./tire-seo.js";
 import { generateTireFAQ, generateFAQSchema, type TireFAQInput, type FAQ } from "./tire-faq.js";

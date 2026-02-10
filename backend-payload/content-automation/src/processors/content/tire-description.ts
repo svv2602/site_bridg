@@ -11,6 +11,7 @@ import type { RawTyreContent, GeneratedTyreContent, Brand } from "../../types/co
 import { BRAND_NAMES } from "../../types/content.js";
 import { loadFromStorage } from "../../utils/storage.js";
 import { createLogger } from "../../utils/logger.js";
+import { translateToUkrainian } from "./translate.js";
 
 const logger = createLogger("TireDescriptionGenerator");
 
@@ -106,6 +107,66 @@ ${input.relatedItems?.length ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВ
 }
 
 /**
+ * Build English prompt for two-stage generation
+ */
+function buildPromptEN(input: TireDescriptionInput): string {
+  const season = { summer: "summer", winter: "winter", allseason: "all-season" }[input.season];
+  const brand = input.brand || "bridgestone";
+  const brandName = BRAND_NAMES[brand];
+
+  let rawDescription = "";
+  let advantages: string[] = [];
+  let specifications: Record<string, string> = {};
+
+  if (input.rawContent && input.rawContent.length > 0) {
+    for (const raw of input.rawContent) {
+      if (raw.fullDescription) {
+        rawDescription += `\n[${raw.source}]: ${raw.fullDescription}\n`;
+      }
+      if (raw.advantages) {
+        advantages.push(...raw.advantages);
+      }
+      if (raw.specifications) {
+        specifications = { ...specifications, ...raw.specifications };
+      }
+    }
+    advantages = [...new Set(advantages)];
+  }
+
+  return `Create unique content for the ${brandName} ${input.modelName} tire.
+
+INPUT DATA:
+- Model: ${brandName} ${input.modelName}
+- Season: ${season}
+${input.vehicleTypes?.length ? `- Vehicle types: ${input.vehicleTypes.join(", ")}` : ""}
+${input.technologies?.length ? `- Technologies: ${input.technologies.join(", ")}` : ""}
+${input.euLabel ? `- EU Label: Wet grip ${input.euLabel.wetGrip || "-"}, Fuel efficiency ${input.euLabel.fuelEfficiency || "-"}, Noise ${input.euLabel.noiseDb || "-"}dB` : ""}
+${input.testResults ? `- Test results: ${input.testResults}` : ""}
+${advantages.length ? `\nADVANTAGES:\n${advantages.map((a) => `- ${a}`).join("\n")}` : ""}
+${Object.keys(specifications).length ? `\nSPECIFICATIONS:\n${Object.entries(specifications).map(([k, v]) => `- ${k}: ${v}`).join("\n")}` : ""}
+${rawDescription ? `\nREFERENCE DESCRIPTION (do NOT copy, just for context):${rawDescription}` : ""}
+${input.relatedItems?.length ? `\nINTERLINKING URLs (use 2-3 organically in the text):\n${input.relatedItems.map((item) => {
+  const url = item.type === "tyre" ? `/shyny/${item.slug}` : `/blog/${item.slug}`;
+  return `- ${item.name}: ${url}`;
+}).join("\n")}` : ""}
+
+RESPONSE FORMAT (JSON):
+{
+  "shortDescription": "Short description 150-200 characters for product card. Main advantage + who it's for.",
+  "fullDescription": "Full HTML description 300-500 words. Structure: <h2>Introduction</h2><p>...</p><h2>Advantages</h2><ul><li>...</li></ul><h2>Who it's for</h2><p>...</p>. Use tags: h2, h3, p, ul, li, strong, a.",
+  "keyBenefits": ["Benefit 1", "Benefit 2", "Benefit 3", "Benefit 4", "Benefit 5"]
+}
+
+IMPORTANT:
+- Response ONLY in JSON format
+- Content must be 100% unique
+- Do NOT mention prices
+- fullDescription in HTML format (h2, h3, p, ul, li, strong, a)
+- keyBenefits: 4-5 specific short items
+- Write in ENGLISH (will be translated to Ukrainian later)`;
+}
+
+/**
  * Parse JSON response from LLM
  */
 function parseResponse(response: string): DescriptionOutput {
@@ -161,6 +222,8 @@ export async function generateTireDescription(
     provider?: string;
     model?: string;
     skipValidation?: boolean;
+    /** Generate in English first, then translate to Ukrainian */
+    twoStage?: boolean;
   }
 ): Promise<{
   content: DescriptionOutput;
@@ -171,16 +234,99 @@ export async function generateTireDescription(
     completionTokens: number;
     cost: number;
     latencyMs: number;
+    twoStage?: boolean;
+    translationProvider?: string;
+    translationCost?: number;
   };
 }> {
-  const prompt = buildPrompt(input);
   const brand = input.brand || "bridgestone";
+
+  // Two-stage mode: generate in English → translate to Ukrainian
+  if (options?.twoStage) {
+    const promptEN = buildPromptEN(input);
+
+    logger.info(`Generating description (EN→UA) for ${input.modelName} (${brand})`, {
+      provider: options?.provider || "default",
+      twoStage: true,
+    });
+
+    const generator = fallbackLlm.forTask("content-generation");
+
+    const systemPromptEN = `You are a professional SEO copywriter for the official ${BRAND_NAMES[brand]} website.
+
+Rules:
+- Write in professional but accessible English
+- Highlight technical advantages and safety
+- NEVER mention prices
+- Avoid clichés and excessive adjectives
+- Focus on driver benefits
+- Use specific facts from the input data
+- Use HTML tags: h2, h3, p, ul, li, strong, a
+- Write detailed, comprehensive content (300-500 words for fullDescription)`;
+
+    const { data: englishData, response: genResponse } = await generator.generateJSON<DescriptionOutput>(promptEN, {
+      systemPrompt: systemPromptEN,
+      maxTokens: 4000,
+      temperature: 0.7,
+      ...(options?.provider && { provider: options.provider }),
+      ...(options?.model && { model: options.model }),
+    });
+
+    logger.info(`English content generated for ${input.modelName}`, {
+      shortDescLength: englishData.shortDescription.length,
+      fullDescLength: englishData.fullDescription.length,
+      keyBenefits: englishData.keyBenefits.length,
+      cost: genResponse.cost.toFixed(4),
+    });
+
+    // Translate to Ukrainian
+    const { data: ukrainianData, translationMeta } = await translateToUkrainian<DescriptionOutput>(
+      englishData,
+      {
+        brand,
+        keywords: input.technologies,
+        contentType: "tire-description",
+      }
+    );
+
+    // Validate translated content
+    if (!options?.skipValidation) {
+      validateContent(ukrainianData);
+    }
+
+    const totalCost = genResponse.cost + translationMeta.cost;
+
+    logger.info(`Description generated (EN→UA) for ${input.modelName}`, {
+      shortDescLength: ukrainianData.shortDescription.length,
+      fullDescLength: ukrainianData.fullDescription.length,
+      keyBenefits: ukrainianData.keyBenefits.length,
+      totalCost: totalCost.toFixed(4),
+      translationProvider: translationMeta.provider,
+    });
+
+    return {
+      content: ukrainianData,
+      metadata: {
+        provider: genResponse.provider,
+        model: genResponse.model,
+        promptTokens: genResponse.usage.promptTokens,
+        completionTokens: genResponse.usage.completionTokens,
+        cost: totalCost,
+        latencyMs: genResponse.latencyMs + translationMeta.latencyMs,
+        twoStage: true,
+        translationProvider: translationMeta.provider,
+        translationCost: translationMeta.cost,
+      },
+    };
+  }
+
+  // Standard single-stage mode (Ukrainian directly)
+  const prompt = buildPrompt(input);
 
   logger.info(`Generating description for ${input.modelName} (${brand})`, {
     provider: options?.provider || "default",
   });
 
-  // Use task-specific routing with brand-specific system prompt
   const generator = fallbackLlm.forTask("content-generation");
   const systemPrompts = getSystemPromptsForBrand(brand);
 
