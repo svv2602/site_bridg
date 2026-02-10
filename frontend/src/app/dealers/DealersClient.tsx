@@ -69,7 +69,9 @@ export function DealersClient({ initialDealers }: DealersClientProps) {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   // Only render the map on large screens (lg: breakpoint = 1024px)
   // This avoids loading ~30KB Google Maps JS on mobile where the map is hidden
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia("(min-width: 1024px)").matches
+  );
 
   // Sync filter state to URL params
   const syncFiltersToUrl = useCallback(
@@ -118,7 +120,6 @@ export function DealersClient({ initialDealers }: DealersClientProps) {
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
-    setIsLargeScreen(mql.matches);
     const handler = (e: MediaQueryListEvent) => setIsLargeScreen(e.matches);
     mql.addEventListener("change", handler);
     return () => mql.removeEventListener("change", handler);

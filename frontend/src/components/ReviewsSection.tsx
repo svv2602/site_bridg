@@ -2,7 +2,6 @@ import { MessageSquare, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { ReviewCard } from './ReviewCard';
 import {
-  getReviews,
   getReviewsByTyre,
   getReviewsBySeason,
   getReviewsByVehicleType,

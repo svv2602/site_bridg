@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumb } from '@/components/ui';
-import { PHONE_DISPLAY, PHONE_HREF, EMAIL_PRIVACY } from '@/lib/constants';
+import { PHONE_DISPLAY, EMAIL_PRIVACY } from '@/lib/constants';
 
 export const dynamic = 'force-static';
 

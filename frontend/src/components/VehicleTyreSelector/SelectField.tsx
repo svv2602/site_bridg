@@ -53,11 +53,13 @@ export function SelectField({
 
   // Reset search when options change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset on prop change
     setSearch("");
   }, [options.length]);
 
   // Reset active index when dropdown opens/closes or filtered options change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset on state change
     setActiveIndex(-1);
   }, [isOpen, filteredOptions.length]);
 

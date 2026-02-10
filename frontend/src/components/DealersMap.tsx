@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, MarkerClusterer } from "@react-google-maps/api";
-import { MapPin, Phone, Globe, Clock, Navigation } from "lucide-react";
+import { MapPin, Phone, Clock, Navigation } from "lucide-react";
 import type { Dealer, DealerType } from "@/lib/data";
 
 // Cluster styles using stone palette

@@ -40,6 +40,7 @@ export function ReviewsSectionWithMore({
       if (!response.ok) throw new Error('Failed to fetch');
 
       const data = await response.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Payload API response
       const newReviews: Review[] = (data.docs || []).map((doc: any) => ({
         id: doc.id,
         authorName: doc.authorName,

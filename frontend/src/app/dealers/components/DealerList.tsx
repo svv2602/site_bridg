@@ -37,6 +37,7 @@ export function DealerList({
 
   // Reset visible count when dealer list changes (e.g. filter/search)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset on prop change
     setVisibleCount(DEALERS_PER_PAGE);
   }, [dealers]);
 
