@@ -179,7 +179,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
       <section className="border-b border-border py-4">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="flex flex-wrap items-center gap-3">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Filter className="h-4 w-4 text-stone-500 dark:text-stone-400" />
             <span className="text-sm text-muted-foreground">Фільтр:</span>
 
             {/* Season filters */}

@@ -29,11 +29,28 @@ export async function getDealers(limit?: number): Promise<Dealer[]> {
 
 /**
  * Повертає дилера за ідентифікатором або null, якщо не знайдено.
+ * Використовує прямий запит до API замість завантаження всіх дилерів.
  */
 export async function getDealerById(id: string): Promise<Dealer | null> {
-  const all = await getDealers();
-  const dealer = all.find((d) => d.id === id);
-  return dealer ?? null;
+  try {
+    const { getPayloadDealerById } = await import("./payload");
+    const d = await getPayloadDealerById(id);
+    if (!d) return null;
+    return {
+      id: d.id,
+      name: d.name,
+      type: d.type,
+      city: d.city,
+      address: d.address,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      phone: d.phone,
+      website: d.website,
+      workingHours: d.workingHours,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function normalize(str: string | undefined | null): string {

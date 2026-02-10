@@ -177,14 +177,47 @@ function validateArticle(article: ArticleOutput, type: ArticleType): void {
 }
 
 /**
- * Generate slug from title
+ * Ukrainian-to-Latin transliteration map
+ */
+const UA_TRANSLIT_MAP: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "h", ґ: "g", д: "d", е: "e", є: "ye",
+  ж: "zh", з: "z", и: "y", і: "i", ї: "yi", й: "y", к: "k", л: "l",
+  м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u",
+  ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ь: "",
+  ю: "yu", я: "ya", "'": "", "\u2019": "",
+};
+
+/**
+ * Transliterate Ukrainian text to Latin characters
+ */
+function transliterateUkrainian(text: string): string {
+  return text
+    .split("")
+    .map((char) => {
+      const lower = char.toLowerCase();
+      if (lower in UA_TRANSLIT_MAP) {
+        const result = UA_TRANSLIT_MAP[lower];
+        // Preserve original case for the first character of multi-char transliterations
+        if (char !== lower && result.length > 0) {
+          return result.charAt(0).toUpperCase() + result.slice(1);
+        }
+        return result;
+      }
+      return char;
+    })
+    .join("");
+}
+
+/**
+ * Generate slug from title (transliterates Ukrainian to Latin)
  */
 function generateSlug(title: string): string {
-  return title
+  return transliterateUkrainian(title)
     .toLowerCase()
-    .replace(/[^а-яїієґa-z0-9\s-]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
     .slice(0, 60);
 }
 

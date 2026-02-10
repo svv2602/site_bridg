@@ -5,7 +5,9 @@
  */
 
 import { fallbackLlm } from "../../providers/fallback-llm.js";
-import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes } from "../../prompts/index.js";
+import { SYSTEM_PROMPTS, SEASON_LABELS, formatVehicleTypes, getSystemPromptsForBrand } from "../../prompts/index.js";
+import type { Brand } from "../../types/content.js";
+import { BRAND_NAMES } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 
 const logger = createLogger("TireSEOGenerator");
@@ -16,6 +18,7 @@ const logger = createLogger("TireSEOGenerator");
 export interface TireSEOInput {
   modelSlug: string;
   modelName: string;
+  brand?: Brand;
   season: "summer" | "winter" | "allseason";
   vehicleTypes?: string[];
   shortDescription?: string;
@@ -37,11 +40,13 @@ export interface SEOOutput {
 function buildPrompt(input: TireSEOInput): string {
   const season = SEASON_LABELS[input.season];
   const vehicles = input.vehicleTypes ? formatVehicleTypes(input.vehicleTypes) : "";
+  const brand = input.brand || "bridgestone";
+  const brandName = BRAND_NAMES[brand];
 
-  return `Створи SEO мета-теги для сторінки шини Bridgestone ${input.modelName}.
+  return `Створи SEO мета-теги для сторінки шини ${brandName} ${input.modelName}.
 
 ВХІДНІ ДАНІ:
-- Модель: Bridgestone ${input.modelName}
+- Модель: ${brandName} ${input.modelName}
 - Сезон: ${season.name}
 ${vehicles ? `- Типи авто: ${vehicles}` : ""}
 ${input.shortDescription ? `- Короткий опис: ${input.shortDescription}` : ""}
@@ -49,7 +54,7 @@ ${input.keyBenefits?.length ? `- Ключові переваги: ${input.keyBen
 
 ФОРМАТ ВІДПОВІДІ (JSON):
 {
-  "seoTitle": "SEO заголовок 50-60 символів. Починається з 'Bridgestone ${input.modelName}'",
+  "seoTitle": "SEO заголовок 50-60 символів. Починається з '${brandName} ${input.modelName}'",
   "seoDescription": "SEO опис 150-160 символів. Головна перевага + для кого підійде.",
   "seoKeywords": ["5-10 ключових слів для SEO"]
 }
@@ -57,7 +62,7 @@ ${input.keyBenefits?.length ? `- Ключові переваги: ${input.keyBen
 ВИМОГИ:
 - seoTitle: 50-60 символів, включає назву моделі та сезон
 - seoDescription: 150-160 символів, привабливий для кліку
-- seoKeywords: включає "Bridgestone ${input.modelName}", "${season.name} шини", типи авто
+- seoKeywords: включає "${brandName} ${input.modelName}", "${season.name} шини", типи авто
 - НЕ згадуй ціни
 - Українська мова`;
 }
@@ -132,14 +137,16 @@ export async function generateTireSEO(
   };
 }> {
   const prompt = buildPrompt(input);
+  const brand = input.brand || "bridgestone";
 
-  logger.info(`Generating SEO for ${input.modelName}`);
+  logger.info(`Generating SEO for ${input.modelName} (${brand})`);
 
-  // Use content-generation routing (DeepSeek available, Groq requires separate key)
+  // Use content-generation routing with brand-specific system prompt
   const generator = fallbackLlm.forTask("content-generation");
+  const systemPrompts = getSystemPromptsForBrand(brand);
 
   const { data, response } = await generator.generateJSON<SEOOutput>(prompt, {
-    systemPrompt: SYSTEM_PROMPTS.tireSEO,
+    systemPrompt: systemPrompts.tireSEO,
     maxTokens: 500,
     temperature: 0.5,
     ...(options?.provider && { provider: options.provider }),

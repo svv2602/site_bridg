@@ -440,6 +440,20 @@ export async function getPayloadDealers(params?: {
   return data.docs;
 }
 
+// Single dealer by ID
+export async function getPayloadDealerById(id: string): Promise<PayloadDealer | null> {
+  try {
+    const response = await fetch(`${PAYLOAD_API_URL}/api/dealers/${id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: CACHE_TTL.MEDIUM },
+    });
+    if (!response.ok) return null;
+    return response.json();
+  } catch {
+    return null;
+  }
+}
+
 // Technologies API (rarely changes - use long cache)
 export async function getPayloadTechnologies(): Promise<PayloadTechnology[]> {
   const data = await fetchPayload<PayloadTechnology>('technologies?limit=100', {

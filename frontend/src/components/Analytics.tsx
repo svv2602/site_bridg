@@ -20,28 +20,27 @@ export function Analytics() {
     setConsent(stored);
     setIsLoaded(true);
 
-    // Listen for consent changes
+    // Listen for cross-tab consent changes via storage event
     const handleStorage = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
         setConsent(e.newValue);
       }
     };
 
-    window.addEventListener("storage", handleStorage);
+    // Listen for same-tab consent changes via CustomEvent (from CookiesBanner)
+    const handleConsentChanged = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setConsent(detail?.consent ?? null);
+    };
 
-    // Also check periodically for same-tab changes
-    const interval = setInterval(() => {
-      const current = localStorage.getItem(STORAGE_KEY);
-      if (current !== consent) {
-        setConsent(current);
-      }
-    }, 1000);
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("consent-changed", handleConsentChanged);
 
     return () => {
       window.removeEventListener("storage", handleStorage);
-      clearInterval(interval);
+      window.removeEventListener("consent-changed", handleConsentChanged);
     };
-  }, [consent]);
+  }, []);
 
   // Don't render if not loaded yet
   if (!isLoaded) {
@@ -80,20 +79,33 @@ export function Analytics() {
 
       {/* Meta Pixel */}
       {metaPixelId && (
-        <Script id="meta-pixel-init" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${metaPixelId}');
-            fbq('track', 'PageView');
-          `}
-        </Script>
+        <>
+          <Script id="meta-pixel-init" strategy="afterInteractive">
+            {`
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${metaPixelId}');
+              fbq('track', 'PageView');
+            `}
+          </Script>
+          {/* noscript fallback for Meta Pixel */}
+          <noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
+        </>
       )}
     </>
   );

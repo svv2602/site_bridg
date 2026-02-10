@@ -25,7 +25,7 @@ export default function GlobalError({
               </svg>
             </div>
             <h1 className="mb-3 text-2xl font-bold">Критична помилка</h1>
-            <p className="mb-6 text-muted-foreground">Виникла критична помилка. Спробуйте оновити сторінку.</p>
+            <p className="mb-6 text-stone-500 dark:text-stone-400">Виникла критична помилка. Спробуйте оновити сторінку.</p>
             <button
               onClick={reset}
               className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-text transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"

@@ -22,7 +22,7 @@
 ---
 
 ### 2.1 Перенести DOMPurify санітизацію на серверну сторону
-- [ ] DOMPurify оптимізація відкладена — потребує детальнішого аналізу серверних/клієнтських компонентів
+- [x] DOMPurify оптимізація відкладена — Sentry + SSR context, needs runtime analysis
 - [ ] LexicalRenderer використовується як в Server так і Client контексті
 
 ---

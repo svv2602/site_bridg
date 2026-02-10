@@ -246,8 +246,14 @@ export function useVehicleSearch({
   }, [kits, kitId]);
 
   // Search handler
+  const searchAbortRef = useRef<AbortController | null>(null);
   const handleSearch = useCallback(async () => {
     if (!kitId) return;
+
+    // Abort any in-flight search
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
 
     setSearching(true);
     setSearchError(null);
@@ -257,7 +263,7 @@ export function useVehicleSearch({
       if (season) {
         url += `&season=${season}`;
       }
-      const res = await fetch(url);
+      const res = await fetch(url, { signal: controller.signal });
       const json = await res.json();
 
       if (json.error) {
@@ -265,7 +271,8 @@ export function useVehicleSearch({
       } else {
         setSearchResult(json.data);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setSearchError("Помилка пошуку шин");
     } finally {
       setSearching(false);

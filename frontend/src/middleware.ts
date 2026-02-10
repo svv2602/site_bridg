@@ -1,10 +1,38 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Simple in-memory brute-force protection for Basic Auth
+const failedAttempts = new Map<string, { count: number; blockedUntil: number }>();
+const MAX_FAILED_ATTEMPTS = 10;
+const BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkBruteForce(ip: string): boolean {
+  const record = failedAttempts.get(ip);
+  if (!record) return false;
+  if (Date.now() < record.blockedUntil) return true;
+  if (record.blockedUntil > 0) failedAttempts.delete(ip);
+  return false;
+}
+
+function recordFailedAttempt(ip: string): void {
+  const record = failedAttempts.get(ip) || { count: 0, blockedUntil: 0 };
+  record.count++;
+  if (record.count >= MAX_FAILED_ATTEMPTS) {
+    record.blockedUntil = Date.now() + BLOCK_DURATION_MS;
+  }
+  failedAttempts.set(ip, record);
+}
+
 export function middleware(request: NextRequest) {
   // Only protect admin routes
   if (!request.nextUrl.pathname.startsWith('/admin')) {
     return NextResponse.next();
+  }
+
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+
+  if (checkBruteForce(ip)) {
+    return new NextResponse('Too many failed attempts. Try again later.', { status: 429 });
   }
 
   const authHeader = request.headers.get('authorization');
@@ -31,11 +59,15 @@ export function middleware(request: NextRequest) {
     }
 
     if (username !== validUsername || password !== validPassword) {
+      recordFailedAttempt(ip);
       return new NextResponse('Invalid credentials', {
         status: 401,
         headers: { 'WWW-Authenticate': 'Basic realm="Admin Area"' },
       });
     }
+
+    // Reset failed attempts on successful login
+    failedAttempts.delete(ip);
 
     return NextResponse.next();
   } catch {

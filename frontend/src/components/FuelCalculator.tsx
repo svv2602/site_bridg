@@ -163,7 +163,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <Fuel className="h-4 w-4 text-muted-foreground" />
+                <Fuel className="h-4 w-4 text-stone-500 dark:text-stone-400" />
                 <span className="text-sm text-muted-foreground">Паливо</span>
               </div>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">

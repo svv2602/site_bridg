@@ -62,6 +62,7 @@ async function main() {
   const seoResult = await generateTireSEO({
     modelSlug: tyre.slug,
     modelName: tyre.name,
+    brand: tireBrand,
     season: tireSeason,
     shortDescription: descResult.content.shortDescription,
     keyBenefits: descResult.content.highlights,

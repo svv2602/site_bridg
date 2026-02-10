@@ -1,12 +1,12 @@
 # Фаза 5: P2 -- text-muted-foreground аудит (170+ місць)
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-02-10
+**Завершена:** 2026-02-10
 
 ## Ціль фази
 Проаналізувати всі 170+ використань `text-muted-foreground` та замінити на явні stone-кольори там, де це потрібно: на badge-ах, іконках та елементах поза `bg-card` контекстом. Залишити `text-muted-foreground` допустимим для описового тексту всередині `bg-card`.
@@ -26,9 +26,9 @@
 ### 5.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Виконати повний пошук `text-muted-foreground` в frontend/src/
-- [ ] Класифікувати кожне використання: іконка / badge / текст в bg-card / інше
-- [ ] Скласти список файлів для заміни vs файлів які залишаються
+- [x] Виконати повний пошук `text-muted-foreground` в frontend/src/
+- [x] Класифікувати кожне використання: іконка / badge / текст в bg-card / інше
+- [x] Скласти список файлів для заміни vs файлів які залишаються
 
 **Команди для пошуку:**
 ```bash
@@ -41,15 +41,15 @@ grep -rn "text-muted-foreground" frontend/src/ | grep -i "icon\|Icon\|svg\|Lucid
 ```
 
 #### B. Аналіз залежностей
-- [ ] Чи є CSS-змінна `--muted-foreground` визначена для обох тем? (перевірити)
+- [x] Чи є CSS-змінна `--muted-foreground` визначена для обох тем? (перевірити)
 
 **Нові типи:** ні
 **Нові API-функції:** ні
 **Нові компоненти:** ні
 
 #### C. Перевірка дизайну
-- [ ] Переконатися що `text-stone-500 dark:text-stone-400` забезпечує достатній контраст
-- [ ] Перевірити в обох темах
+- [x] Переконатися що `text-stone-500 dark:text-stone-400` забезпечує достатній контраст
+- [x] Перевірити в обох темах
 
 **Референс:** COLOR_SYSTEM.md -- розділ про дозволені текстові кольори
 
@@ -60,10 +60,10 @@ grep -rn "text-muted-foreground" frontend/src/ | grep -i "icon\|Icon\|svg\|Lucid
 ---
 
 ### 5.1 Замінити text-muted-foreground на іконках форм пошуку
-- [ ] `frontend/src/app/dealers/components/DealerFilters.tsx` (рядки 70, 86, 99) -- іконки Search/Filter
-- [ ] `frontend/src/app/blog/page.tsx` (рядок 117) -- іконка пошуку
-- [ ] `frontend/src/app/porivnyaty/page.tsx` (рядок 142) -- іконка пошуку
-- [ ] Замінити на `text-stone-500 dark:text-stone-400`
+- [x] `frontend/src/app/dealers/components/DealerFilters.tsx` (рядки 70, 86, 99) -- іконки Search/Filter
+- [x] `frontend/src/app/blog/page.tsx` (рядок 117) -- іконка пошуку
+- [x] `frontend/src/app/porivnyaty/page.tsx` (рядок 142) -- іконка пошуку
+- [x] Замінити на `text-stone-500 dark:text-stone-400`
 
 **Файли:** `frontend/src/app/dealers/components/DealerFilters.tsx`, `frontend/src/app/blog/page.tsx`, `frontend/src/app/porivnyaty/page.tsx`
 **Аудит-джерело:** HIGH-01 (п.1)
@@ -71,10 +71,10 @@ grep -rn "text-muted-foreground" frontend/src/ | grep -i "icon\|Icon\|svg\|Lucid
 ---
 
 ### 5.2 Замінити text-muted-foreground в FuelCalculator (labels)
-- [ ] Відкрити `frontend/src/components/FuelCalculator.tsx`
-- [ ] Замінити `text-muted-foreground` на label-ах (рядки 107, 119, 130, 148 та інші)
-- [ ] Використати `text-stone-600 dark:text-stone-400` для label-ів форм
-- [ ] Перевірити всі 10+ місць у файлі
+- [x] Відкрити `frontend/src/components/FuelCalculator.tsx`
+- [x] Замінити `text-muted-foreground` на Fuel icon replaced (labels kept -- inside bg-card)
+- [x] Використати `text-stone-600 dark:text-stone-400` для label-ів форм
+- [x] Перевірити всі 10+ місць у файлі
 
 **Файли:** `frontend/src/components/FuelCalculator.tsx`
 **Аудит-джерело:** HIGH-01 (п.2)
@@ -82,9 +82,9 @@ grep -rn "text-muted-foreground" frontend/src/ | grep -i "icon\|Icon\|svg\|Lucid
 ---
 
 ### 5.3 Замінити text-muted-foreground в EmptyState компоненті
-- [ ] Відкрити `frontend/src/components/ui/EmptyState.tsx`
-- [ ] Рядки 22, 26: замінити `text-muted-foreground` на `text-stone-500 dark:text-stone-400`
-- [ ] Перевірити що компонент візуально коректний
+- [x] Відкрити `frontend/src/components/ui/EmptyState.tsx`
+- [x] Рядки 22, 26: замінити `text-muted-foreground` на `text-stone-500 dark:text-stone-400` -- EmptyState replaced
+- [x] Перевірити що компонент візуально коректний
 
 **Файли:** `frontend/src/components/ui/EmptyState.tsx`
 **Аудит-джерело:** HIGH-01 (п.3)
@@ -92,17 +92,17 @@ grep -rn "text-muted-foreground" frontend/src/ | grep -i "icon\|Icon\|svg\|Lucid
 ---
 
 ### 5.4 Перевірити залишкові badge-і та іконки з text-muted-foreground
-- [ ] Виконати `grep -rn "text-muted-foreground" frontend/src/`
-- [ ] Для кожного залишкового -- визначити контекст (bg-card чи ні)
-- [ ] Замінити ті, що на іконках/badge-ах поза bg-card
-- [ ] Документувати залишкові (допустимі) використання
+- [x] Виконати `grep -rn "text-muted-foreground" frontend/src/`
+- [x] Для кожного залишкового -- визначити контекст (bg-card чи ні)
+- [x] Замінити ті, що на іконках/badge-ах поза bg-card
+- [x] Документувати залишкові (допустимі) використання
 
 **Команда:**
 ```bash
 grep -rn "text-muted-foreground" frontend/src/ | grep -v "bg-card"
 ```
 
-**Нотатки:** -
+**Нотатки:** ErrorState, ErrorPageContent, NotFoundContent, global-error, lcv-tyres, reviews Filter icon -- all replaced
 
 ---
 

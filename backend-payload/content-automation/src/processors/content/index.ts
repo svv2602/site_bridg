@@ -156,6 +156,7 @@ export async function generateFullTyreContent(
       {
         modelSlug,
         modelName: firstSource.modelName,
+        brand: firstSource.brand,
         season: firstSource.season || "summer",
         shortDescription: descResult.content.shortDescription,
         keyBenefits: descResult.content.highlights,

@@ -65,10 +65,10 @@ export function SearchFilters({
         {/* Width */}
         <div>
           <label htmlFor="filter-width" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-            Ширина {widthOptions.length > 0 && <span className="text-stone-500">({widthOptions.length})</span>}
+            Ширина {widthOptions.length > 0 && <span className="text-stone-500 dark:text-stone-400">({widthOptions.length})</span>}
           </label>
           <div className="relative">
-            <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+            <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
             {loadingWidths ? (
               <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                 <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -97,10 +97,10 @@ export function SearchFilters({
         {/* Aspect ratio */}
         <div>
           <label htmlFor="filter-aspect" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-            Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500">({aspectOptions.length})</span>}
+            Висота профілю {aspectOptions.length > 0 && <span className="text-stone-500 dark:text-stone-400">({aspectOptions.length})</span>}
           </label>
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+            <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
             {loadingAspects ? (
               <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                 <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -130,10 +130,10 @@ export function SearchFilters({
         {/* Diameter */}
         <div>
           <label htmlFor="filter-diameter" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-            Діаметр {diameterOptions.length > 0 && <span className="text-stone-500">({diameterOptions.length})</span>}
+            Діаметр {diameterOptions.length > 0 && <span className="text-stone-500 dark:text-stone-400">({diameterOptions.length})</span>}
           </label>
           <div className="relative">
-            <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+            <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
             {loadingDiameters ? (
               <div className="flex h-12 w-full items-center justify-center rounded-xl border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900">
                 <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -164,10 +164,10 @@ export function SearchFilters({
       {/* Season (optional) */}
       <div>
         <label htmlFor="filter-season" className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-100">
-          Сезонність <span className="text-stone-500">(опційно)</span>
+          Сезонність <span className="text-stone-500 dark:text-stone-400">(опційно)</span>
         </label>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+          <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
           <select
             id="filter-season"
             className="w-full appearance-none rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-8 text-sm text-stone-900 outline-none focus:border-primary dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50"
@@ -179,7 +179,7 @@ export function SearchFilters({
             <option value="winter">Зимові</option>
             <option value="allseason">Всесезонні</option>
           </select>
-          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+          <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
         </div>
       </div>
 

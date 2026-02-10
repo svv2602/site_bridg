@@ -36,7 +36,7 @@ export function ErrorPageContent({
           </svg>
         </div>
         <Heading className="mb-3 text-2xl font-bold text-foreground">{title}</Heading>
-        <p className="mb-6 text-muted-foreground">{description}</p>
+        <p className="mb-6 text-stone-500 dark:text-stone-400">{description}</p>
         {process.env.NODE_ENV === "development" && error?.message && (
           <pre className="mb-6 max-h-32 overflow-auto rounded-lg bg-stone-100 p-4 text-left text-xs text-stone-700 dark:bg-stone-800 dark:text-stone-300">
             {error.message}

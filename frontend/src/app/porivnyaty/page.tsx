@@ -139,7 +139,7 @@ export default function ComparisonSelectionPage() {
               <label htmlFor="search-tyres" className="sr-only">
                 Пошук шин за назвою
               </label>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-500 dark:text-stone-400" aria-hidden="true" />
               <input
                 type="text"
                 id="search-tyres"
@@ -152,7 +152,7 @@ export default function ComparisonSelectionPage() {
 
             {/* Season Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <Filter className="h-4 w-4 text-stone-500 dark:text-stone-400" aria-hidden="true" />
               <div className="flex gap-2" role="group" aria-label="Фільтр за сезоном">
                 <button
                   onClick={() => setSeasonFilter("all")}

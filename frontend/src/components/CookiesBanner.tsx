@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Cookie, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -21,16 +21,19 @@ export function useCookiesConsent() {
   const accept = () => {
     localStorage.setItem(STORAGE_KEY, "accepted");
     setConsent("accepted");
+    window.dispatchEvent(new CustomEvent("consent-changed", { detail: { consent: "accepted" } }));
   };
 
   const reject = () => {
     localStorage.setItem(STORAGE_KEY, "rejected");
     setConsent("rejected");
+    window.dispatchEvent(new CustomEvent("consent-changed", { detail: { consent: "rejected" } }));
   };
 
   const reset = () => {
     localStorage.removeItem(STORAGE_KEY);
     setConsent(null);
+    window.dispatchEvent(new CustomEvent("consent-changed", { detail: { consent: null } }));
   };
 
   return {
@@ -49,6 +52,7 @@ export function CookiesBanner() {
   const { isLoaded, accept, reject, hasDecided } = useCookiesConsent();
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const acceptButtonRef = useRef<HTMLButtonElement>(null);
 
   // Check if banner should be shown
   const bannerEnabled = process.env.NEXT_PUBLIC_COOKIES_BANNER_ENABLED !== "false";
@@ -60,6 +64,13 @@ export function CookiesBanner() {
       return () => clearTimeout(timer);
     }
   }, [isLoaded, hasDecided, bannerEnabled]);
+
+  // Auto-focus accept button when banner appears
+  useEffect(() => {
+    if (isVisible && acceptButtonRef.current) {
+      acceptButtonRef.current.focus();
+    }
+  }, [isVisible]);
 
   const handleAccept = () => {
     setIsExiting(true);
@@ -84,6 +95,8 @@ export function CookiesBanner() {
 
   return (
     <div
+      role="dialog"
+      aria-label="Згода на cookies"
       className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-md"
       style={{
         opacity: isExiting ? 0 : 1,
@@ -117,7 +130,7 @@ export function CookiesBanner() {
             className="rounded-full p-1 hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-primary dark:hover:bg-stone-700"
             aria-label="Закрити"
           >
-            <X className="h-4 w-4 text-muted-foreground" />
+            <X className="h-4 w-4 text-stone-500 dark:text-stone-400" />
           </button>
         </div>
 
@@ -129,6 +142,7 @@ export function CookiesBanner() {
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
+            ref={acceptButtonRef}
             onClick={handleAccept}
             variant="primary"
             size="lg"

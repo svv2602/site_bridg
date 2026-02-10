@@ -270,14 +270,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Log the contact request
-    console.log('Contact form submission:', {
+    // Structured log for contact submission
+    console.log(JSON.stringify({
+      level: 'info',
+      event: 'contact_form_submission',
       timestamp: new Date().toISOString(),
-      name: data.name,
-      phone: data.phone,
-      email: data.email,
-      subject: data.subject || 'other',
-    });
+      data: { name: data.name, phone: data.phone, email: data.email, subject: data.subject || 'other' },
+    }));
 
     // Execute all notifications in parallel
     const [savedToDb, telegramSent, emailSent] = await Promise.all([
@@ -286,12 +285,13 @@ export async function POST(request: NextRequest) {
       sendEmailNotification(data),
     ]);
 
-    // Log results
-    console.log('Contact form processing results:', {
-      savedToDb,
-      telegramSent,
-      emailSent,
-    });
+    // Structured log for processing results
+    console.log(JSON.stringify({
+      level: 'info',
+      event: 'contact_form_result',
+      timestamp: new Date().toISOString(),
+      data: { savedToDb, telegramSent, emailSent },
+    }));
 
     // If database save failed, report error to the user
     if (!savedToDb) {

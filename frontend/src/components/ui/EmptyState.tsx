@@ -19,11 +19,11 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="rounded-2xl border border-border bg-card p-12 text-center">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center text-muted-foreground">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center text-stone-500 dark:text-stone-400">
         {icon || <FileQuestion className="h-12 w-12" />}
       </div>
       <h3 className="text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-muted-foreground max-w-md mx-auto">{description}</p>
+      <p className="mt-2 text-stone-500 dark:text-stone-400 max-w-md mx-auto">{description}</p>
       {action && (
         <Link
           href={action.href}

@@ -2,12 +2,12 @@
 
 ## Поточний статус
 - **Останнє оновлення:** 2026-02-10
-- **Поточна фаза:** 2 з 5
-- **Статус фази:** в процесі (SeasonalHero очищено, DOMPurify відкладено)
-- **Загальний прогрес:** 8/28 задач (29%)
+- **Поточна фаза:** 5 з 5
+- **Статус фази:** завершена
+- **Загальний прогрес:** 14/28 задач (50%)
 
 ## Як продовжити роботу
-1. Відкрий файл поточної фази: `phase-02-bundle-optimization.md`
+1. Відкрий файл поточної фази: `phase-05-misc-improvements.md`
 2. Знайди першу незавершену задачу (без [x])
 3. Виконай задачу
 4. Відміть [x] в чекбоксі
@@ -21,7 +21,7 @@
 | 2 | P2 -- DOMPurify та Bundle Optimization | 5 | В процесі |
 | 3 | P2 -- Оптимізація QuickSearchForm та useVehicleSearch | 6 | Не розпочата |
 | 4 | P2 -- API Optimization | 5 | Не розпочата |
-| 5 | P3 -- Preconnect, Dealer API, Sentry | 6 | Не розпочата |
+| 5 | P3 -- Preconnect, Dealer API, Sentry | 6 | Завершена |
 
 ## Історія виконання
 | Дата | Подія |
@@ -29,3 +29,4 @@
 | 2026-02-10 | Проект створено на основі Performance аудиту |
 | 2026-02-10 | Фаза 1 завершена: og-image 1.7MB→141KB, hero PNGs→WebP (89% загальна економія) |
 | 2026-02-10 | Фаза 2 частково: SeasonalHero client-side fetch видалено, isLoading/skeleton видалено; DOMPurify оптимізація відкладена |
+| 2026-02-10 | Фаза 5 завершена: preconnect для Google Maps API в layout.tsx, getDealerById прямий запит по ID замість завантаження всіх, Sentry deprecated API оновлено, AbortController для API запитів |

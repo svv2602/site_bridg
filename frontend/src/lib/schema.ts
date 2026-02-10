@@ -149,10 +149,13 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Bridgestone Ukraine",
+    name: "Bridgestone Україна",
+    alternateName: "Bridgestone Ukraine",
     url: baseUrl,
-    logo: `${baseUrl}/og-image.webp`,
+    logo: `${baseUrl}/bridgestone-logo-white.svg`,
+    description: "Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.",
     sameAs: [
+      "https://www.bridgestone.com",
       "https://www.facebook.com/BridgestoneUkraine",
       "https://www.instagram.com/bridgestone_ukraine",
     ],
@@ -161,6 +164,7 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
       telephone: "+380-800-123-456",
       contactType: "customer service",
       availableLanguage: ["Ukrainian"],
+      areaServed: "UA",
     },
   };
 }

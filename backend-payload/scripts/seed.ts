@@ -1080,6 +1080,29 @@ async function seed() {
   }
   console.log(`   Total: ${MOCK_SEASONAL_CONTENT.length} seasonal configs\n`);
 
+  // Seed Reviews
+  console.log('⭐ Seeding reviews...');
+  const tyresResult = await payload.find({ collection: 'tyres', limit: 10 });
+  const tyreIds = tyresResult.docs.map((t: { id: number }) => t.id);
+  if (tyreIds.length > 0) {
+    const MOCK_REVIEWS = [
+      { tyre: tyreIds[0], authorName: 'Олександр', authorCity: 'Київ', rating: 5, title: 'Відмінні шини для зими', content: 'Встановив на Camry, проїхав вже 10 000 км. Чудове зчеплення на мокрій дорозі та снігу. Рівень шуму мінімальний.', vehicleInfo: 'Toyota Camry 2021', usagePeriod: '6 місяців', pros: [{ text: 'Відмінне зчеплення' }, { text: 'Низький рівень шуму' }], cons: [{ text: 'Ціна вища за середню' }], isPublished: true },
+      { tyre: tyreIds[1 % tyreIds.length], authorName: 'Марина', authorCity: 'Львів', rating: 4, title: 'Хороший баланс ціна-якість', content: 'Шини тримають дорогу впевнено. На мокрому асфальті гальмування передбачуване. Знос рівномірний.', vehicleInfo: 'Volkswagen Golf 2020', usagePeriod: '1 рік', pros: [{ text: 'Стабільність на швидкості' }, { text: 'Рівномірний знос' }], cons: [{ text: 'Жорсткуваті на ямах' }], isPublished: true },
+      { tyre: tyreIds[2 % tyreIds.length], authorName: 'Віктор', authorCity: 'Одеса', rating: 5, title: 'Найкращі всесезонні шини', content: 'Їжджу цілий рік на одному комплекті. Навіть в легкий сніг почуваюся впевнено. Рекомендую для тих, хто не хоче міняти шини двічі на рік.', vehicleInfo: 'Mazda CX-5 2022', usagePeriod: '1.5 роки', pros: [{ text: 'Універсальність' }, { text: 'Комфорт' }, { text: 'Тихі' }], cons: [], isPublished: true },
+      { tyre: tyreIds[0], authorName: 'Ірина', authorCity: 'Харків', rating: 4, title: 'Задоволена покупкою', content: 'Взяла за рекомендацією дилера. Шини м\'які, комфортні. На мокрій дорозі тримають добре.', vehicleInfo: 'Hyundai Tucson 2021', usagePeriod: '8 місяців', pros: [{ text: 'Комфорт' }, { text: 'Тиха робота' }], cons: [{ text: 'На гравію трохи ковзають' }], isPublished: true },
+      { tyre: tyreIds[3 % tyreIds.length], authorName: 'Дмитро', authorCity: 'Дніпро', rating: 5, title: 'Топові літні шини', content: 'Вже другий комплект Bridgestone на моєму авто. Попередні відходили 50 000 км. Ці також не розчаровують — чудове зчеплення і мінімальний шум.', vehicleInfo: 'BMW 3 Series 2020', usagePeriod: '2 роки', pros: [{ text: 'Довговічність' }, { text: 'Зчеплення' }, { text: 'Керованість' }], cons: [], isPublished: true },
+      { tyre: tyreIds[1 % tyreIds.length], authorName: 'Андрій', authorCity: 'Запоріжжя', rating: 3, title: 'Нормальні шини, але є нюанси', content: 'На сухому асфальті все чудово. На мокрому гальмівний шлях трохи довший ніж очікував. Загалом за свою ціну — нормальний варіант.', vehicleInfo: 'Skoda Octavia 2019', usagePeriod: '4 місяці', pros: [{ text: 'Ціна' }], cons: [{ text: 'Гальмування на мокрому' }], isPublished: true },
+    ];
+
+    for (const review of MOCK_REVIEWS) {
+      await payload.create({ collection: 'reviews', data: review });
+    }
+    console.log(`   ✅ ${MOCK_REVIEWS.length} reviews created`);
+  } else {
+    console.log('   ⚠️ No tyres found, skipping reviews');
+  }
+  console.log();
+
   console.log('✨ Seed completed successfully!\n');
   console.log('Summary:');
   console.log(`   - ${MOCK_TECHNOLOGIES.length} technologies`);
@@ -1087,7 +1110,8 @@ async function seed() {
   console.log(`   - ${MOCK_DEALERS.length} dealers`);
   console.log(`   - ${MOCK_ARTICLES.length} articles`);
   console.log(`   - ${MOCK_VEHICLE_FITMENTS.length} vehicle fitments`);
-  console.log(`   - ${MOCK_SEASONAL_CONTENT.length} seasonal configs\n`);
+  console.log(`   - ${MOCK_SEASONAL_CONTENT.length} seasonal configs`);
+  console.log(`   - 6 reviews\n`);
   console.log('You can now log in to the admin panel:');
   console.log('   URL: http://localhost:3001/admin');
   console.log('   Email: admin@bridgestone.ua');

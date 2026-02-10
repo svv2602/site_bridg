@@ -250,6 +250,7 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
         const seoResult = await generateTireSEO({
           modelSlug: slug,
           modelName: tire.name,
+          brand: tireBrand,
           season: tire.season || "summer",
           shortDescription: descResult.content.shortDescription,
           keyBenefits: descResult.content.highlights,

@@ -224,9 +224,10 @@ export default withSentryConfig(nextConfig, {
     deleteSourcemapsAfterUpload: true,
   },
 
-  // Disable logger instrumentation (reduces bundle size)
-  disableLogger: true,
-
-  // Automatically instrument Next.js data fetching
-  automaticVercelMonitors: true,
+  // Reduce bundle size by removing debug logging
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    excludeReplayIframe: true,
+    excludeReplayShadowDom: true,
+  },
 });

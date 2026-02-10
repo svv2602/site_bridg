@@ -370,7 +370,7 @@ export function QuickSearchForm() {
             <div>
               <label htmlFor="tyre-width" className={labelClass}>Ширина</label>
               <div className="relative">
-                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 {loadingWidths ? (
                   <div className={loadingClass}>
                     <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -392,13 +392,13 @@ export function QuickSearchForm() {
                     ))}
                   </select>
                 )}
-                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
               </div>
             </div>
             <div>
               <label htmlFor="tyre-aspect-ratio" className={labelClass}>Профіль</label>
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 {loadingHeights ? (
                   <div className={loadingClass}>
                     <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -420,13 +420,13 @@ export function QuickSearchForm() {
                     ))}
                   </select>
                 )}
-                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
               </div>
             </div>
             <div>
               <label htmlFor="tyre-diameter" className={labelClass}>Діаметр</label>
               <div className="relative">
-                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 {loadingDiameters ? (
                   <div className={loadingClass}>
                     <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -445,14 +445,14 @@ export function QuickSearchForm() {
                     ))}
                   </select>
                 )}
-                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
               </div>
             </div>
           </div>
           <div>
             <label htmlFor="tyre-season" className={labelClass}>Сезонність</label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
               <select
                 id="tyre-season"
                 value={season}
@@ -464,7 +464,7 @@ export function QuickSearchForm() {
                 <option value="winter">Зимові</option>
                 <option value="allseason">Всесезонні</option>
               </select>
-              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
             </div>
           </div>
           <button
@@ -493,7 +493,7 @@ export function QuickSearchForm() {
           <div>
             <label htmlFor="car-brand" className={labelClass}>Марка авто</label>
             <div className="relative">
-              <Car className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <Car className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
               {loadingBrands ? (
                 <div className={loadingClass}>
                   <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -515,14 +515,14 @@ export function QuickSearchForm() {
                   ))}
                 </select>
               )}
-              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="car-model" className={labelClass}>Модель</label>
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 {loadingModels ? (
                   <div className={loadingClass}>
                     <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -544,13 +544,13 @@ export function QuickSearchForm() {
                     ))}
                   </select>
                 )}
-                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
               </div>
             </div>
             <div>
               <label htmlFor="car-year" className={labelClass}>Рік</label>
               <div className="relative">
-                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+                <Ruler className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 {loadingYears ? (
                   <div className={loadingClass}>
                     <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -572,14 +572,14 @@ export function QuickSearchForm() {
                     ))}
                   </select>
                 )}
-                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+                <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
               </div>
             </div>
           </div>
           <div>
             <label htmlFor="car-kit" className={labelClass}>Комплектація</label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
               {loadingKits ? (
                 <div className={loadingClass}>
                   <Loader2 className="h-5 w-5 animate-spin text-stone-400" />
@@ -598,13 +598,13 @@ export function QuickSearchForm() {
                   ))}
                 </select>
               )}
-              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
             </div>
           </div>
           <div>
             <label htmlFor="car-tyre-season" className={labelClass}>Тип шини</label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500" />
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
               <select
                 id="car-tyre-season"
                 value={carSeason}
@@ -616,7 +616,7 @@ export function QuickSearchForm() {
                 <option value="winter">Зимова</option>
                 <option value="allseason">Всесезонна</option>
               </select>
-              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500" />
+              <ChevronRight className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-stone-500 dark:text-stone-400" />
             </div>
           </div>
           <button

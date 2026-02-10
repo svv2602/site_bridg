@@ -15,9 +15,10 @@ export {
   mergeAndSaveResults,
   loadExistingData,
   findTireUrlsByBrand,
-  type ScrapedTire,
-  type ScrapedTireSize,
 } from "./prokoleso.js";
+
+// Scraper types (canonical source)
+export { type ScrapedTire, type ScrapedTireSize } from "./types.js";
 
 // Test results scrapers
 export { scrapeADAC, type ADACScraperResult } from "./adac.js";

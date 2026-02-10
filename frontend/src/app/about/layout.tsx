@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { generateOrganizationSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Про Bridgestone | Офіційний представник в Україні",
@@ -23,28 +24,21 @@ export const metadata: Metadata = {
   },
 };
 
+const orgSchema = generateOrganizationSchema();
 const aboutPageSchema = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   name: "Про Bridgestone Україна",
   description: "Офіційна сторінка про компанію Bridgestone в Україні",
   mainEntity: {
+    ...orgSchema,
     "@type": "Organization",
-    name: "Bridgestone",
-    alternateName: "Bridgestone Corporation",
-    url: "https://bridgestone.ua",
-    logo: "https://bridgestone.ua/bridgestone-logo-white.svg",
     foundingDate: "1931",
     founder: {
       "@type": "Person",
       name: "Shojiro Ishibashi",
     },
-    description: "Світовий лідер у виробництві шин з понад 90-річною історією інновацій",
     areaServed: "Worldwide",
-    sameAs: [
-      "https://www.bridgestone.com",
-      "https://www.facebook.com/BridgestoneUkraine",
-    ],
   },
 };
 

@@ -117,7 +117,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <form action="/blog" method="GET" role="search" className="mb-6">
             <div className="relative max-w-md">
               <label htmlFor="blog-search" className="sr-only">Пошук статей</label>
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
               <input
                 type="text"
                 id="blog-search"

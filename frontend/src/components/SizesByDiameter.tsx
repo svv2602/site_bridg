@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { type TyreSize } from "@/lib/data";
 import { formatSize } from "@/lib/utils/tyres";
 
@@ -32,6 +32,28 @@ export function SizesByDiameter({ sizes, modelSlug }: SizesByDiameterProps) {
 
   const { grouped, sortedDiameters } = sizesByDiameter;
   const [activeDiameter, setActiveDiameter] = useState(sortedDiameters[0]);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleTabKeyDown = useCallback(
+    (e: React.KeyboardEvent, index: number) => {
+      let newIndex = index;
+      if (e.key === 'ArrowRight') {
+        newIndex = (index + 1) % sortedDiameters.length;
+      } else if (e.key === 'ArrowLeft') {
+        newIndex = (index - 1 + sortedDiameters.length) % sortedDiameters.length;
+      } else if (e.key === 'Home') {
+        newIndex = 0;
+      } else if (e.key === 'End') {
+        newIndex = sortedDiameters.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      setActiveDiameter(sortedDiameters[newIndex]);
+      tabRefs.current[newIndex]?.focus();
+    },
+    [sortedDiameters],
+  );
 
   if (sizes.length === 0) {
     return (
@@ -55,14 +77,18 @@ export function SizesByDiameter({ sizes, modelSlug }: SizesByDiameterProps) {
     <div>
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Діаметри шин">
-        {sortedDiameters.map((diameter) => {
+        {sortedDiameters.map((diameter, index) => {
           const isActive = activeDiameter === diameter;
           return (
             <button
               key={diameter}
+              ref={(el) => { tabRefs.current[index] = el; }}
               role="tab"
               aria-selected={isActive}
+              aria-controls={`sizes-panel-${diameter}`}
+              tabIndex={isActive ? 0 : -1}
               onClick={() => setActiveDiameter(diameter)}
+              onKeyDown={(e) => handleTabKeyDown(e, index)}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-primary text-primary-text"
@@ -79,10 +105,16 @@ export function SizesByDiameter({ sizes, modelSlug }: SizesByDiameterProps) {
       </div>
 
       {/* Active tab content */}
-      <SizesTable
-        sizes={grouped[activeDiameter]}
-        modelSlug={modelSlug}
-      />
+      <div
+        id={`sizes-panel-${activeDiameter}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${activeDiameter}`}
+      >
+        <SizesTable
+          sizes={grouped[activeDiameter]}
+          modelSlug={modelSlug}
+        />
+      </div>
     </div>
   );
 }

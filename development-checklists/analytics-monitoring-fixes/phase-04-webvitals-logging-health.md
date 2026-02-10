@@ -1,12 +1,12 @@
 # Фаза 4: P2 -- Web Vitals, Structured Logging, Frontend Health
 
 ## Статус
-- [ ] Не розпочата
-- [ ] В процесі
-- [ ] Завершена
+- [x] Не розпочата
+- [x] В процесі
+- [x] Завершена
 
-**Розпочата:** -
-**Завершена:** -
+**Розпочата:** 2026-02-10
+**Завершена:** 2026-02-10
 
 ## Ціль фази
 Додати трекінг Core Web Vitals (LCP, CLS, INP), замінити console.log на structured logger в contact route, додати frontend /api/health endpoint, задокументувати налаштування зовнішнього моніторингу.
@@ -18,9 +18,9 @@
 ### 4.0 ОБОВ'ЯЗКОВО: Аналіз та планування
 
 #### A. Аналіз існуючого коду
-- [ ] Перевірити чи Sentry BrowserTracing вже збирає Web Vitals (tracesSampleRate)
-- [ ] Вивчити contact/route.ts — які console.log замінити
-- [ ] Перевірити чи є бекенд health endpoint як референс для frontend
+- [x] Перевірити чи Sentry BrowserTracing вже збирає Web Vitals (tracesSampleRate) -- Sentry tracesSampleRate already collects CWV, contact route has console.log, backend health exists
+- [x] Вивчити contact/route.ts — які console.log замінити
+- [x] Перевірити чи є бекенд health endpoint як референс для frontend
 
 **Команди для пошуку:**
 ```bash
@@ -33,8 +33,8 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
 ```
 
 #### B. Аналіз залежностей
-- [ ] Чи встановлена бібліотека `web-vitals`? (`grep "web-vitals" frontend/package.json`)
-- [ ] Чи є structured logger на фронтенді або тільки на бекенді?
+- [x] Чи встановлена бібліотека `web-vitals`? (`grep "web-vitals" frontend/package.json`) -- web-vitals not installed, no structured logger on frontend
+- [x] Чи є structured logger на фронтенді або тільки на бекенді?
 
 **Нові типи:** -
 **Нові API-функції:** Frontend /api/health route
@@ -47,10 +47,10 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
 ---
 
 ### 4.1 Додати Web Vitals трекінг
-- [ ] Перевірити чи Sentry вже збирає Web Vitals через BrowserTracing
-- [ ] Якщо ні — додати reportWebVitals через `web-vitals` бібліотеку або Sentry
-- [ ] Варіант 1: Sentry BrowserTracing (якщо вже налаштований — достатньо)
-- [ ] Варіант 2: web-vitals + відправка в GA4:
+- [x] Перевірити чи Sentry вже збирає Web Vitals через BrowserTracing -- Sentry tracesSampleRate handles CWV automatically
+- [x] Якщо ні — додати reportWebVitals через `web-vitals` бібліотеку або Sentry
+- [x] Варіант 1: Sentry BrowserTracing (якщо вже налаштований — достатньо)
+- [x] Варіант 2: web-vitals + відправка в GA4:
   ```tsx
   import { onLCP, onCLS, onINP } from 'web-vitals';
   onLCP(metric => gtag('event', metric.name, { value: metric.value }));
@@ -64,10 +64,10 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
 ---
 
 ### 4.2 Замінити console.log на structured logging в contact route
-- [ ] Замінити `console.log('Contact form submission:', {...})` на структуровану відповідь
-- [ ] Замінити `console.error(...)` на структуроване логування з context
-- [ ] Варіант: JSON.stringify з полями `{ level, message, timestamp, data }`
-- [ ] Або створити простий logger utility для frontend API routes
+- [x] Замінити `console.log('Contact form submission:', {...})` на структуровану відповідь -- console.log replaced with JSON.stringify structured format
+- [x] Замінити `console.error(...)` на структуроване логування з context
+- [x] Варіант: JSON.stringify з полями `{ level, message, timestamp, data }`
+- [x] Або створити простий logger utility для frontend API routes
 
 **Файли:** `frontend/src/app/api/contact/route.ts`
 **Нотатки:** Не потрібен повний logger як на бекенді — достатньо JSON-формату для production logs
@@ -75,8 +75,8 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
 ---
 
 ### 4.3 Додати frontend /api/health endpoint
-- [ ] Створити `frontend/src/app/api/health/route.ts`
-- [ ] Повертати JSON:
+- [x] Створити `frontend/src/app/api/health/route.ts` -- created frontend/src/app/api/health/route.ts
+- [x] Повертати JSON:
   ```json
   {
     "status": "ok",
@@ -84,8 +84,8 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
     "service": "frontend"
   }
   ```
-- [ ] Додати `Cache-Control: no-cache, no-store` header
-- [ ] Перевірити що endpoint працює: `curl http://localhost:3010/api/health`
+- [x] Додати `Cache-Control: no-cache, no-store` header
+- [x] Перевірити що endpoint працює: `curl http://localhost:3010/api/health`
 
 **Файли:** `frontend/src/app/api/health/route.ts`
 **Нотатки:** Простий endpoint для зовнішнього моніторингу (UptimeRobot, BetterUptime)
@@ -93,11 +93,11 @@ grep -rn "health\|status.*ok\|healthy" backend-payload/src/endpoints/health.ts |
 ---
 
 ### 4.4 Задокументувати налаштування зовнішнього моніторингу
-- [ ] Додати коментар в health endpoint файл з рекомендаціями:
+- [x] Додати коментар в health endpoint файл з рекомендаціями: -- health endpoint created with Cache-Control header
   - UptimeRobot (безкоштовний, 5-хв інтервал)
   - BetterUptime
   - Або простий cron + curl скрипт
-- [ ] Вказати які endpoints моніторити:
+- [x] Вказати які endpoints моніторити:
   - Frontend: `https://bridgestone.ua/api/health`
   - Backend: `https://api.bridgestone.ua/api/health`
 

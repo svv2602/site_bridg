@@ -32,7 +32,7 @@ export function NotFoundContent({
       <div className="max-w-md text-center">
         <p className="mb-4 text-7xl font-bold text-primary">404</p>
         <h1 className="mb-3 text-2xl font-bold text-foreground">{title}</h1>
-        <p className="mb-8 text-muted-foreground">{description}</p>
+        <p className="mb-8 text-stone-500 dark:text-stone-400">{description}</p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           {suggestedLinks.map((link) => {
             const Icon = iconMap[link.icon];

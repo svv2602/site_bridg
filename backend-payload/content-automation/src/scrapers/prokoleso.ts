@@ -11,71 +11,10 @@ import { writeFileSync, readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import type { RawTyreContent, Brand } from "../types/content.js";
+import type { ScrapedTireSize, EuLabel, ScrapedTire, ExistingTireRecord, ScrapeOptions, ScrapeResult } from "./types.js";
+import { MAX_CATALOG_PAGES, BRAND_CATALOGS, ADDITIONAL_MODEL_URLS } from "./config.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// Types
-export interface ScrapedTireSize {
-  width: number;
-  aspectRatio: number;
-  diameter: number;
-  loadIndex?: string;
-  speedIndex?: string;
-  country?: string;
-}
-
-export interface EuLabel {
-  fuelEfficiency?: string;
-  wetGrip?: string;
-  noiseClass?: string;
-  noiseDb?: number;
-}
-
-export interface ScrapedTire {
-  name: string;              // Model name from page (e.g., "Blizzak 6 ENLITEN")
-  brand: Brand;              // Brand: bridgestone or firestone
-  sourceSlug: string;        // Slug from URL (e.g., "blizzak-6")
-  canonicalSlug: string;     // Generated slug (e.g., "blizzak-6-enliten")
-  season: "summer" | "winter" | "allseason";
-  sizes: ScrapedTireSize[];
-  euLabel?: EuLabel;         // EU label from first available size
-  description: string;
-  imageUrl: string;
-  sourceUrl: string;
-  scrapedAt: string;
-}
-
-// Config
-const BASE_URL = "https://prokoleso.ua";
-const MAX_CATALOG_PAGES = 5; // Pages per catalog
-
-// Catalog configurations for each brand
-const BRAND_CATALOGS: Record<Brand, string[]> = {
-  bridgestone: [
-    `${BASE_URL}/shiny/bridgestone/`,             // Main Bridgestone catalog
-    `${BASE_URL}/shiny/letnie/bridgestone/`,      // Summer
-    `${BASE_URL}/shiny/zimnie/bridgestone/`,      // Winter
-    `${BASE_URL}/shiny/vsesezonie/bridgestone/`,  // All-season
-  ],
-  firestone: [
-    `${BASE_URL}/shiny/firestone/`,               // Main Firestone catalog
-    `${BASE_URL}/shiny/letnie/firestone/`,        // Summer
-    `${BASE_URL}/shiny/zimnie/firestone/`,        // Winter
-    `${BASE_URL}/shiny/vsesezonie/firestone/`,    // All-season
-  ],
-};
-
-// Legacy alias for backward compatibility
-const BRIDGESTONE_CATALOGS = BRAND_CATALOGS.bridgestone;
-
-// Model pages that exist but aren't linked from catalogs
-const ADDITIONAL_MODEL_URLS: Record<Brand, string[]> = {
-  bridgestone: [
-    `${BASE_URL}/ua/shiny/bridgestone/turanza-all-season-6/`,
-    `${BASE_URL}/ua/shiny/bridgestone/weather-control-a005-evo/`,
-  ],
-  firestone: [],
-};
 
 // Helpers
 function determineSeason(text: string, modelName: string): ScrapedTire["season"] {
@@ -503,16 +442,6 @@ async function scrapeProkolesoBrand(brand: Brand): Promise<ScrapedTire[]> {
   }
 }
 
-interface ScrapeOptions {
-  force?: boolean;
-}
-
-interface ScrapeResult {
-  tires: ScrapedTire[];
-  skippedSlugs: Set<string>;
-  existingData: Map<string, ExistingTireRecord>;
-}
-
 /**
  * Main scraper - scrapes model pages for all brands (Bridgestone + Firestone)
  *
@@ -604,18 +533,6 @@ async function scrapeProkoleso(brands?: Brand[], options?: ScrapeOptions): Promi
     }
   }
 }
-
-// Processing flags that downstream pipeline adds to scraped records
-interface ProcessingFlags {
-  aiGenerated?: boolean;
-  generatedContent?: unknown;
-  publishedToPayload?: boolean;
-  publishedAt?: string;
-  skippedReason?: string;
-  missingFields?: string[];
-}
-
-type ExistingTireRecord = ScrapedTire & ProcessingFlags;
 
 const DATA_FILE_PATH = join(__dirname, "../../data/prokoleso-tires.json");
 

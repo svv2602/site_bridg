@@ -9,7 +9,8 @@ import { MainHeader } from "@/components/MainHeader";
 import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
 import { Analytics, NavigationTracker } from "@/components/Analytics";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, LOGO_URL_WHITE, PHONE_SCHEMA, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants";
+import { generateOrganizationSchema } from "@/lib/schema";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,26 +77,7 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: SITE_NAME,
-  alternateName: "Bridgestone Ukraine",
-  url: SITE_URL,
-  logo: `${SITE_URL}${LOGO_URL_WHITE}`,
-  description: SITE_DESCRIPTION,
-  contactPoint: {
-    "@type": "ContactPoint",
-    telephone: PHONE_SCHEMA,
-    contactType: "customer service",
-    availableLanguage: "Ukrainian",
-    areaServed: "UA",
-  },
-  sameAs: [
-    SOCIAL_LINKS.website,
-    SOCIAL_LINKS.facebook,
-  ],
-};
+const organizationSchema = generateOrganizationSchema(SITE_URL);
 
 const websiteSchema = {
   "@context": "https://schema.org",
@@ -124,6 +106,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk" className="scroll-smooth">
+      <head>
+        {/* Preconnect to external resources for faster loading */}
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="dns-prefetch" href="https://maps.googleapis.com" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >

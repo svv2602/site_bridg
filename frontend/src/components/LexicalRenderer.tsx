@@ -268,10 +268,30 @@ export function LexicalRenderer({
       ADD_TAGS: ["iframe"], // Allow iframes for embedded content
       ADD_ATTR: ["target", "rel", "allowfullscreen", "frameborder", "loading", "decoding", "fetchpriority", "sizes"], // Allow common + image optimization attrs
       ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+      ALLOW_UNKNOWN_PROTOCOLS: false,
     });
 
+    // Post-sanitize: restrict iframe src to trusted domains only
+    const ALLOWED_IFRAME_DOMAINS = [
+      'youtube.com', 'www.youtube.com', 'youtube-nocookie.com',
+      'google.com', 'maps.google.com',
+      'player.vimeo.com',
+    ];
+    const iframeFiltered = sanitizedContent.replace(
+      /<iframe\b[^>]*\bsrc=["']([^"']*)["'][^>]*>[\s\S]*?<\/iframe>/gi,
+      (match, src: string) => {
+        try {
+          const url = new URL(src);
+          if (ALLOWED_IFRAME_DOMAINS.some(d => url.hostname === d || url.hostname.endsWith(`.${d}`))) {
+            return match;
+          }
+        } catch { /* invalid URL */ }
+        return '';
+      }
+    );
+
     // Add lazy loading and decoding attributes to img tags in HTML content
-    const optimizedContent = sanitizedContent.replace(
+    const optimizedContent = iframeFiltered.replace(
       /<img\b(?![^>]*\bloading=)/gi,
       '<img loading="lazy" decoding="async"'
     );

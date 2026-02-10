@@ -58,6 +58,7 @@ export async function generateMetadata(
       publishedTime: article.publishedAt,
       ...(article.updatedAt && { modifiedTime: article.updatedAt }),
       ...(article.tags?.[0] && { section: article.tags[0] }),
+      authors: ['Bridgestone Ukraine'],
       images: article.featuredImage ? [{ url: article.featuredImage, alt: article.title }] : undefined,
     },
   };

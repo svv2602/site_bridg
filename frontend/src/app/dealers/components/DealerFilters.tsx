@@ -67,7 +67,7 @@ export function DealerFilters({
               Місто або адреса
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" aria-hidden="true" />
               <input
                 type="text"
                 id="city-search"
@@ -83,7 +83,7 @@ export function DealerFilters({
           <div className="sm:w-48">
             <label htmlFor="dealer-type" className="mb-2 block text-sm font-medium text-foreground">Тип точки</label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Filter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-500 dark:text-stone-400" aria-hidden="true" />
               <select
                 id="dealer-type"
                 value={selectedType}
@@ -96,7 +96,7 @@ export function DealerFilters({
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 dark:text-stone-400" aria-hidden="true" />
             </div>
           </div>
         </div>

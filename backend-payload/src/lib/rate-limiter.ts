@@ -10,6 +10,12 @@
  *   - Configurable windowMs and maxRequests
  *   - Automatic cleanup of expired entries via lazy purge + periodic sweep
  *   - 429 response with Retry-After header
+ *
+ * Limitations:
+ *   - In-memory only — state is lost on process restart and not shared between instances.
+ *   - For horizontal scaling (multiple instances), migrate to Redis-based rate limiting
+ *     (e.g., `rate-limiter-flexible` with RedisStore or ioredis).
+ *   - Sufficient for current single-instance deployment.
  */
 
 export interface RateLimiterOptions {
