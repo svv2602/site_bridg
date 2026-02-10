@@ -9,7 +9,7 @@ import { MainHeader } from "@/components/MainHeader";
 import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
 import { Analytics, NavigationTracker } from "@/components/Analytics";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants";
+import { SITE_URL, SITE_NAME, getSiteSettingsWithDefaults } from "@/lib/constants";
 import { generateOrganizationSchema } from "@/lib/schema";
 
 const geistSans = Geist({
@@ -77,8 +77,6 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationSchema = generateOrganizationSchema(SITE_URL);
-
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -99,11 +97,13 @@ const websiteSchema = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettingsWithDefaults();
+  const organizationSchema = generateOrganizationSchema(SITE_URL, settings);
   return (
     <html lang="uk" className="scroll-smooth">
       <head>
@@ -140,7 +140,7 @@ export default function RootLayout({
                 </Link>
                 <div className="hidden items-center gap-1.5 sm:flex text-stone-500 dark:text-stone-400">
                   <Phone className="h-3 w-3" />
-                  <span>Гаряча лінія: {PHONE_DISPLAY}</span>
+                  <span>Гаряча лінія: {settings.phoneDisplay}</span>
                 </div>
               </div>
               <ThemeToggle />

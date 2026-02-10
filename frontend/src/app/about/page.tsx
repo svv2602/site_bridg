@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Globe, Target, Phone } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
-import { PHONE_HREF } from "@/lib/constants";
+import { getSiteSettingsWithDefaults } from "@/lib/constants";
 import { stats, values, timelineEvents } from "./data";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettingsWithDefaults();
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
@@ -185,7 +186,7 @@ export default function AboutPage() {
                 Знайти дилера
               </Link>
               <a
-                href={PHONE_HREF}
+                href={settings.phoneHref}
                 className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
                 <Phone className="h-4 w-4" aria-hidden="true" />

@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumb } from '@/components/ui';
-import { PHONE_DISPLAY, EMAIL_INFO } from '@/lib/constants';
-
-export const dynamic = 'force-static';
+import { getSiteSettingsWithDefaults } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Умови використання',
@@ -19,7 +17,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const settings = await getSiteSettingsWithDefaults();
   return (
     <div className="bg-background py-12">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
@@ -80,9 +79,9 @@ export default function TermsPage() {
           <p>
             З питань щодо умов використання звертайтесь:
             <br />
-            Email: <a href={`mailto:${EMAIL_INFO}`}>{EMAIL_INFO}</a>
+            Email: <a href={`mailto:${settings.emailInfo}`}>{settings.emailInfo}</a>
             <br />
-            Телефон: {PHONE_DISPLAY}
+            Телефон: {settings.phoneDisplay}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">

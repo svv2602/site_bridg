@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin, ChevronRight } from 'lucide-react';
-import { PHONE_HREF, PHONE_DISPLAY, EMAIL_SUPPORT } from '@/lib/constants';
+import { getSiteSettingsWithDefaults } from '@/lib/constants';
 
 const productLinks = [
   { href: '/passenger-tyres', label: 'Легкові шини' },
@@ -44,7 +44,8 @@ const socialLinks = [
   },
 ];
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getSiteSettingsWithDefaults();
   return (
     <footer className="border-t border-border bg-stone-50 dark:bg-stone-900">
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
@@ -150,10 +151,10 @@ export function Footer() {
                 <div>
                   <p className="text-xs text-muted-foreground">Гаряча лінія:</p>
                   <a
-                    href={PHONE_HREF}
+                    href={settings.phoneHref}
                     className="text-lg font-bold text-foreground hover:text-primary"
                   >
-                    {PHONE_DISPLAY}
+                    {settings.phoneDisplay}
                   </a>
                 </div>
               </div>
@@ -163,10 +164,10 @@ export function Footer() {
                 <div>
                   <p className="text-xs text-muted-foreground">Email:</p>
                   <a
-                    href={`mailto:${EMAIL_SUPPORT}`}
+                    href={`mailto:${settings.emailSupport}`}
                     className="text-foreground hover:text-primary"
                   >
-                    {EMAIL_SUPPORT}
+                    {settings.emailSupport}
                   </a>
                 </div>
               </div>
@@ -175,7 +176,7 @@ export function Footer() {
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Графік роботи:</p>
-                  <p>Пн-Пт 9:00-18:00</p>
+                  <p>{settings.workingHours}</p>
                 </div>
               </div>
             </address>

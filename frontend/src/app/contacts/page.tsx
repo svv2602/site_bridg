@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Send, ArrowRight } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
-import { PHONE_DISPLAY, PHONE_HREF } from "@/lib/constants";
+import { getSiteSettingsWithDefaults } from "@/lib/constants";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
@@ -18,45 +18,6 @@ export const metadata: Metadata = {
       "Зв'яжіться з Bridgestone Україна: гаряча лінія, електронна пошта, форма зворотного зв'язку.",
   },
 };
-
-const contactMethods = [
-  {
-    icon: Phone,
-    title: "Телефон гарячої лінії",
-    details: PHONE_DISPLAY,
-    subtitle: "Безкоштовно з усіх телефонів",
-    action: "Зателефонувати",
-    href: PHONE_HREF,
-    color: { bg: "bg-green-500/15", text: "text-green-500" },
-  },
-  {
-    icon: Mail,
-    title: "Електронна пошта",
-    details: "support@bridgestone.ua",
-    subtitle: "Відповідь протягом 24 годин",
-    action: "Написати",
-    href: "mailto:support@bridgestone.ua",
-    color: { bg: "bg-blue-500/15", text: "text-blue-500" },
-  },
-  {
-    icon: MapPin,
-    title: "Офіційне представництво",
-    details: "м. Київ, вул. Прикладна, 10",
-    subtitle: "Пн\u2011Пт 9:00\u201318:00",
-    action: "Знайти дилера",
-    href: "/dealers",
-    color: { bg: "bg-rose-500/15", text: "text-rose-500" },
-  },
-  {
-    icon: Clock,
-    title: "Графік роботи",
-    details: "Пн\u2011Пт: 9:00\u201318:00",
-    subtitle: "Сб\u2011Нд: вихідні",
-    action: "Наші контакти",
-    href: "#contact-form",
-    color: { bg: "bg-amber-500/15", text: "text-amber-500" },
-  },
-];
 
 const faqs = [
   {
@@ -77,7 +38,48 @@ const faqs = [
   },
 ];
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const settings = await getSiteSettingsWithDefaults();
+
+  const contactMethods = [
+    {
+      icon: Phone,
+      title: "Телефон гарячої лінії",
+      details: settings.phoneDisplay,
+      subtitle: "Безкоштовно з усіх телефонів",
+      action: "Зателефонувати",
+      href: settings.phoneHref,
+      color: { bg: "bg-green-500/15", text: "text-green-500" },
+    },
+    {
+      icon: Mail,
+      title: "Електронна пошта",
+      details: settings.emailSupport,
+      subtitle: "Відповідь протягом 24 годин",
+      action: "Написати",
+      href: `mailto:${settings.emailSupport}`,
+      color: { bg: "bg-blue-500/15", text: "text-blue-500" },
+    },
+    {
+      icon: MapPin,
+      title: "Офіційне представництво",
+      details: settings.addressFull,
+      subtitle: settings.workingHours,
+      action: "Знайти дилера",
+      href: "/dealers",
+      color: { bg: "bg-rose-500/15", text: "text-rose-500" },
+    },
+    {
+      icon: Clock,
+      title: "Графік роботи",
+      details: settings.workingHours,
+      subtitle: "Сб\u2011Нд: вихідні",
+      action: "Наші контакти",
+      href: "#contact-form",
+      color: { bg: "bg-amber-500/15", text: "text-amber-500" },
+    },
+  ];
+
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
@@ -213,14 +215,14 @@ export default function ContactsPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href={PHONE_HREF}
+                href={settings.phoneHref}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />
                 Зателефонувати зараз
               </a>
               <a
-                href="https://t.me/bridgestone_ua"
+                href={settings.socialLinks.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"

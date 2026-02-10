@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getDealers } from "@/lib/api/dealers";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
-import { SITE_URL } from "@/lib/constants";
+import { SITE_URL, getSiteSettingsWithDefaults } from "@/lib/constants";
 import { Breadcrumb } from "@/components/ui";
 import { TrackDealerSearch } from "@/components/AnalyticsEvents";
 import { DealersClient } from "./DealersClient";
@@ -21,7 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DealersPage() {
-  const allDealers = await getDealers();
+  const [allDealers, settings] = await Promise.all([
+    getDealers(),
+    getSiteSettingsWithDefaults(),
+  ]);
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Головна", url: `${SITE_URL}/` },
@@ -85,7 +88,7 @@ export default async function DealersPage() {
       </noscript>
 
       {/* Interactive client parts (filters, map, geolocation, dealer list) */}
-      <DealersClient initialDealers={allDealers} />
+      <DealersClient initialDealers={allDealers} phoneHref={settings.phoneHref} />
       <TrackDealerSearch />
     </div>
   );

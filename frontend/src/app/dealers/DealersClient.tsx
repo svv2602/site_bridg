@@ -6,7 +6,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { type Dealer } from "@/lib/data";
 import { MapPin, Phone, Loader2, List, Map as MapIcon } from "lucide-react";
-import { PHONE_HREF } from "@/lib/constants";
+import { PHONE_HREF as DEFAULT_PHONE_HREF } from "@/lib/constants";
 import { DealerFilters } from "./components/DealerFilters";
 import { DealerList } from "./components/DealerList";
 import { type FilteredDealer, type UserPosition } from "./types";
@@ -47,9 +47,11 @@ function haversineDistance(
 
 interface DealersClientProps {
   initialDealers: Dealer[];
+  phoneHref?: string;
 }
 
-export function DealersClient({ initialDealers }: DealersClientProps) {
+export function DealersClient({ initialDealers, phoneHref }: DealersClientProps) {
+  const resolvedPhoneHref = phoneHref || DEFAULT_PHONE_HREF;
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -329,7 +331,7 @@ export function DealersClient({ initialDealers }: DealersClientProps) {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href={PHONE_HREF}
+                href={resolvedPhoneHref}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
               >
                 <Phone className="h-4 w-4" />

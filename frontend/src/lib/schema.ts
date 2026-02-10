@@ -2,6 +2,7 @@
 
 import type { TyreModel, Dealer, Article, FAQ } from "./data";
 import type { Review } from "@/components/ReviewCard";
+import type { MergedSiteSettings } from "@/lib/constants";
 import { seasonLabels } from "@/lib/utils/tyres";
 
 // Review stats interface
@@ -145,7 +146,7 @@ export function generateFAQSchema(faqs: FAQ[]) {
 }
 
 // Organization schema for the main site
-export function generateOrganizationSchema(baseUrl: string = "https://bridgestone.ua") {
+export function generateOrganizationSchema(baseUrl: string = "https://bridgestone.ua", settings?: MergedSiteSettings) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -154,14 +155,20 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
     url: baseUrl,
     logo: `${baseUrl}/bridgestone-logo-white.svg`,
     description: "Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.",
-    sameAs: [
-      "https://www.bridgestone.com",
-      "https://www.facebook.com/BridgestoneUkraine",
-      "https://www.instagram.com/bridgestone_ukraine",
-    ],
+    sameAs: settings
+      ? [
+          settings.socialLinks.website,
+          settings.socialLinks.facebook,
+          settings.socialLinks.instagram,
+        ]
+      : [
+          "https://www.bridgestone.com",
+          "https://www.facebook.com/BridgestoneUkraine",
+          "https://www.instagram.com/bridgestone_ukraine",
+        ],
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+380-800-123-456",
+      telephone: settings?.phoneSchema || "+380-800-123-456",
       contactType: "customer service",
       availableLanguage: ["Ukrainian"],
       areaServed: "UA",

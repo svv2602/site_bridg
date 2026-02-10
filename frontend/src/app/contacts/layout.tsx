@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PHONE_SCHEMA, SITE_URL, LOGO_URL_WHITE, ADDRESS_CITY } from "@/lib/constants";
+import { SITE_URL, LOGO_URL_WHITE, getSiteSettingsWithDefaults } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Контакти | Bridgestone Україна",
@@ -16,36 +16,38 @@ export const metadata: Metadata = {
   },
 };
 
-const contactPageSchema = {
-  "@context": "https://schema.org",
-  "@type": "ContactPage",
-  name: "Контакти Bridgestone Україна",
-  description: "Офіційна контактна сторінка Bridgestone в Україні",
-  mainEntity: {
-    "@type": "Organization",
-    name: "Bridgestone Україна",
-    url: SITE_URL,
-    logo: `${SITE_URL}${LOGO_URL_WHITE}`,
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: PHONE_SCHEMA,
-      contactType: "customer service",
-      availableLanguage: "Ukrainian",
-      areaServed: "UA",
-    },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: ADDRESS_CITY,
-      addressCountry: "UA",
-    },
-  },
-};
-
-export default function ContactsLayout({
+export default async function ContactsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettingsWithDefaults();
+
+  const contactPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Контакти Bridgestone Україна",
+    description: "Офіційна контактна сторінка Bridgestone в Україні",
+    mainEntity: {
+      "@type": "Organization",
+      name: "Bridgestone Україна",
+      url: SITE_URL,
+      logo: `${SITE_URL}${LOGO_URL_WHITE}`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: settings.phoneSchema,
+        contactType: "customer service",
+        availableLanguage: "Ukrainian",
+        areaServed: "UA",
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: settings.city,
+        addressCountry: settings.country,
+      },
+    },
+  };
+
   return (
     <>
       <script

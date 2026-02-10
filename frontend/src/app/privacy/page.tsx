@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumb } from '@/components/ui';
-import { PHONE_DISPLAY, EMAIL_PRIVACY } from '@/lib/constants';
-
-export const dynamic = 'force-static';
+import { getSiteSettingsWithDefaults } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Політика конфіденційності',
@@ -19,7 +17,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const settings = await getSiteSettingsWithDefaults();
   return (
     <div className="bg-background py-12">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
@@ -84,9 +83,9 @@ export default function PrivacyPage() {
           <p>
             З питань щодо політики конфіденційності звертайтесь:
             <br />
-            Email: <a href={`mailto:${EMAIL_PRIVACY}`}>{EMAIL_PRIVACY}</a>
+            Email: <a href={`mailto:${settings.emailPrivacy}`}>{settings.emailPrivacy}</a>
             <br />
-            Телефон: {PHONE_DISPLAY}
+            Телефон: {settings.phoneDisplay}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">
