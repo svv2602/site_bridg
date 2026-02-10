@@ -20,6 +20,7 @@ import {
   Reviews,
 } from './src/collections';
 import AuditLog from './src/collections/AuditLog';
+import { SiteSettings } from './src/globals';
 import {
   removeBackgroundsEndpoint,
   removeBackgroundsStatusEndpoint,
@@ -121,6 +122,7 @@ export default buildConfig({
     Reviews,
     AuditLog,
   ],
+  globals: [SiteSettings],
   endpoints: [
     removeBackgroundsEndpoint,
     removeBackgroundsStatusEndpoint,
