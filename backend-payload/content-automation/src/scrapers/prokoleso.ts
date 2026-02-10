@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import type { RawTyreContent, Brand } from "../types/content.js";
 import type { ScrapedTireSize, EuLabel, ScrapedTire, ExistingTireRecord, ScrapeOptions, ScrapeResult } from "./types.js";
 import { MAX_CATALOG_PAGES, BRAND_CATALOGS, ADDITIONAL_MODEL_URLS, getRandomUserAgent, AdaptiveDelay } from "./config.js";
+import { withRetry } from "../utils/retry.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -90,7 +91,11 @@ function parseLoadIndex(text: string): string | undefined {
  */
 async function scrapeEuLabel(page: Page, sizeUrl: string): Promise<EuLabel | null> {
   try {
-    await page.goto(sizeUrl, { waitUntil: "networkidle", timeout: 30000 });
+    const navResult = await withRetry(
+      () => page.goto(sizeUrl, { waitUntil: "networkidle", timeout: 30000 }),
+      { maxRetries: 1, initialDelayMs: 500 },
+    );
+    if (!navResult.success) return null;
 
     // Click on Євроетикетка tab
     await page.evaluate(() => {
@@ -218,7 +223,14 @@ async function findModelUrls(page: Page): Promise<string[]> {
  */
 async function scrapeModelPage(page: Page, modelUrl: string): Promise<ScrapedTire | null> {
   try {
-    await page.goto(modelUrl, { waitUntil: "networkidle", timeout: 30000 });
+    const navResult = await withRetry(
+      () => page.goto(modelUrl, { waitUntil: "networkidle", timeout: 30000 }),
+      { maxRetries: 2, initialDelayMs: 1000 },
+    );
+    if (!navResult.success) {
+      console.log(`  Warning: Failed to load ${modelUrl} after ${navResult.attempts} attempts`);
+      return null;
+    }
 
     // Scroll to load lazy content
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

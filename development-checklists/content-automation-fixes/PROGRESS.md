@@ -2,9 +2,9 @@
 
 ## Поточний статус
 - **Останнє оновлення:** 2026-02-10
-- **Поточна фаза:** 5 з 5
-- **Статус фази:** в процесі
-- **Загальний прогрес:** 30/35 задач (86%)
+- **Поточна фаза:** завершено
+- **Статус фази:** всі фази завершені
+- **Загальний прогрес:** 35/35 задач (100%)
 
 ## Як продовжити роботу
 1. Відкрий файл поточної фази: `phase-01-hardcoded-credentials.md`
@@ -20,7 +20,7 @@
 | 02 | P1 -- Рефакторинг дублювання в ProKoleso Scraper | 7 | завершена |
 | 03 | P2 -- Tire SEO Multi-brand і Slug транслітерація | 6 | завершена |
 | 04 | P2 -- Уніфікація Browser Automation і Scheduler | 7 | завершена |
-| 05 | P3 -- Cost Tracker, Logger, User-Agent | 8 | в процесі |
+| 05 | P3 -- Cost Tracker, Logger, User-Agent | 8 | завершена |
 
 ## Історія виконання
 | Дата | Подія |
@@ -31,3 +31,4 @@
 | 2026-02-10 | Фаза 3 завершена: multi-brand support в tire-seo.ts (brand field, getSystemPromptsForBrand), UA транслітерація в article-generator.ts (UA_TRANSLIT_MAP, transliterateUkrainian), index.ts передає brand |
 | 2026-02-10 | Фаза 4 завершена: Puppeteer→Playwright міграція в prokoleso.ts та tyre-content.ts, getRandomUserAgent() замість hardcoded Chrome/120, AdaptiveDelay замість фіксованого 500ms, legacy exports видалено, puppeteer видалено з package.json |
 | 2026-02-10 | Фаза 5 (частково): cost-tracker мігрований з JSON на SQLite (cost_records таблиця), всі 21 тест проходять, Payload scheduler вже працює |
+| 2026-02-10 | Фаза 5 завершена: logger appendFileSync→WriteStream (async), withRetry для page.goto в prokoleso.ts, User-Agent вже оновлено в фазі 4 |

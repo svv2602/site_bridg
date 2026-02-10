@@ -114,6 +114,37 @@ let config: LoggerConfig = {
   maskPii: true,
 };
 
+// Buffered write stream for async file output
+let writeStream: fs.WriteStream | null = null;
+
+function getWriteStream(): fs.WriteStream {
+  if (writeStream && !writeStream.destroyed) return writeStream;
+
+  const logDir = path.dirname(config.logFilePath);
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
+  writeStream = fs.createWriteStream(config.logFilePath, { flags: "a" });
+  writeStream.on("error", (err) => {
+    console.error("Log write stream error:", err);
+    writeStream = null;
+  });
+  return writeStream;
+}
+
+// Flush on process exit
+function flushLogStream(): void {
+  if (writeStream && !writeStream.destroyed) {
+    writeStream.end();
+    writeStream = null;
+  }
+}
+
+process.on("exit", flushLogStream);
+process.on("SIGINT", () => { flushLogStream(); process.exit(0); });
+process.on("SIGTERM", () => { flushLogStream(); process.exit(0); });
+
 /**
  * Configure logger
  */
@@ -155,6 +186,12 @@ function rotateIfNeeded(): void {
     // If maxFiles is 1, just truncate
     if (config.maxFiles <= 1) {
       fs.truncateSync(config.logFilePath, 0);
+    }
+
+    // Close the write stream so it reopens to the new file
+    if (writeStream && !writeStream.destroyed) {
+      writeStream.end();
+      writeStream = null;
     }
   } catch {
     // Rotation failure should not crash the logger
@@ -219,12 +256,13 @@ function writeLog(entry: LogEntry) {
     }
   }
 
-  // File output with rotation
+  // File output with rotation (async via write stream)
   if (config.logToFile) {
     try {
       rotateIfNeeded();
       const logLine = formatForFile(entry) + "\n";
-      fs.appendFileSync(config.logFilePath, logLine);
+      const stream = getWriteStream();
+      stream.write(logLine);
     } catch (error) {
       console.error("Failed to write to log file:", error);
     }
