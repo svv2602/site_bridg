@@ -374,7 +374,7 @@ async function importTyres() {
         imageId = await downloadAndUploadImage(tire.imageUrl, tire.name, brandLabel);
       }
 
-      const payload: PayloadTyre & { isPublished: boolean; image?: number } = {
+      const payload: PayloadTyre & { isPublished?: boolean; image?: number } = {
         slug,
         name: tire.name,
         brand,
@@ -382,7 +382,6 @@ async function importTyres() {
         vehicleTypes: determineVehicleTypes(tire.name),
         sizes: tire.sizes,
         euLabel: tire.euLabel,
-        isPublished: true,
       };
 
       // Add image reference if uploaded
@@ -391,10 +390,13 @@ async function importTyres() {
       }
 
       if (existing) {
+        // Don't override isPublished — respect admin's decision
         await updateTyre(existing.id, payload);
         console.log(`  Updated: ${tire.name} (${tire.sizes.length} sizes)${imageId ? ' [+image]' : ''}`);
         updated++;
       } else {
+        // New tyres start as published
+        payload.isPublished = true;
         await createTyre(payload);
         console.log(`  Created: ${tire.name} (${tire.sizes.length} sizes)${imageId ? ' [+image]' : ''}`);
         created++;
