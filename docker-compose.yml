@@ -5,6 +5,8 @@ services:
       POSTGRES_USER: bridgestone
       POSTGRES_PASSWORD: bridgestone
       POSTGRES_DB: bridgestone
+    ports:
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

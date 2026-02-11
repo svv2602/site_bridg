@@ -181,7 +181,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       // DATABASE_URI must be set via environment variable in production
-      connectionString: process.env.DATABASE_URI || 'postgresql://bridgestone:bridgestone@localhost:5433/bridgestone',
+      connectionString: process.env.DATABASE_URI || 'postgresql://bridgestone:bridgestone@localhost:5434/bridgestone',
     },
   }),
   typescript: {

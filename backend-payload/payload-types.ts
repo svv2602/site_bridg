@@ -76,9 +76,12 @@ export interface Config {
     'vehicle-fitments': VehicleFitment;
     'contact-submissions': ContactSubmission;
     'seasonal-content': SeasonalContent;
+    'holiday-banners': HolidayBanner;
     'provider-settings': ProviderSetting;
     'task-routing': TaskRouting;
     reviews: Review;
+    'category-pages': CategoryPage;
+    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -95,9 +98,12 @@ export interface Config {
     'vehicle-fitments': VehicleFitmentsSelect<false> | VehicleFitmentsSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'seasonal-content': SeasonalContentSelect<false> | SeasonalContentSelect<true>;
+    'holiday-banners': HolidayBannersSelect<false> | HolidayBannersSelect<true>;
     'provider-settings': ProviderSettingsSelect<false> | ProviderSettingsSelect<true>;
     'task-routing': TaskRoutingSelect<false> | TaskRoutingSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'category-pages': CategoryPagesSelect<false> | CategoryPagesSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -107,12 +113,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | 'uk' | 'uk'[];
-  globals: {};
-  globalsSelect: {};
-  locale: 'uk';
-  user: User & {
-    collection: 'users';
+  globals: {
+    'site-settings': SiteSetting;
   };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
+  locale: 'uk';
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -166,6 +174,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * Зображення та файли
@@ -435,6 +444,10 @@ export interface Dealer {
    */
   workingHours?: string | null;
   services?: ('tire-fitting' | 'alignment' | 'balancing' | 'storage' | 'repair')[] | null;
+  /**
+   * Вимкніть для м'якого деактивування дилера без видалення
+   */
+  isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -483,7 +496,7 @@ export interface ContactSubmission {
   createdAt: string;
 }
 /**
- * Керування сезонним контентом на головній сторінці
+ * Сезонний промо-контент на головній. Видимість визначається полями startDate/endDate автоматично (isActive + дата в діапазоні).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seasonal-content".
@@ -498,15 +511,15 @@ export interface SeasonalContent {
    * Тільки один сезонний контент може бути активним
    */
   isActive?: boolean | null;
-  startDate?: string | null;
-  endDate?: string | null;
+  startDate: string;
+  endDate: string;
   featuredSeason: 'winter' | 'summer' | 'allseason';
   /**
-   * Основний заголовок на головній сторінці
+   * НЕ H1 — показується у промо-картці на головній сторінці
    */
   heroTitle: string;
   /**
-   * Додатковий текст під заголовком
+   * Додатковий текст у промо-картці
    */
   heroSubtitle?: string | null;
   ctaText: string;
@@ -522,6 +535,70 @@ export interface SeasonalContent {
    * Додатковий промо-текст для сезонної кампанії
    */
   promoText?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Святкові банери, що показуються автоматично за розкладом (місяць+день). Вищий пріоритет = показується першим.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "holiday-banners".
+ */
+export interface HolidayBanner {
+  id: number;
+  /**
+   * Наприклад: Новий рік, 8 березня, День Незалежності
+   */
+  name: string;
+  isActive?: boolean | null;
+  /**
+   * Вищий = показується першим (1–100)
+   */
+  priority?: number | null;
+  holidayMonth: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12';
+  holidayDay: number;
+  showDaysBefore?: number | null;
+  showDaysAfter?: number | null;
+  displayOn?: ('homepage' | 'all-pages' | 'specific-pages') | null;
+  /**
+   * Шляхи сторінок, наприклад: /passenger-tyres, /advice
+   */
+  specificPages?:
+    | {
+        path: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Напр. 🎄
+   */
+  emoji?: string | null;
+  /**
+   * Напр. "З Новим Роком!"
+   */
+  title: string;
+  /**
+   * Напр. "Знижки на зимові шини"
+   */
+  subtitle?: string | null;
+  /**
+   * URL для кнопки CTA
+   */
+  link?: string | null;
+  /**
+   * Текст кнопки CTA
+   */
+  linkText?: string | null;
+  bannerImage?: (number | null) | Media;
+  bannerImageMobile?: (number | null) | Media;
+  /**
+   * Tailwind клас, напр. bg-primary, bg-red-600
+   */
+  backgroundColor?: string | null;
+  /**
+   * Tailwind клас, напр. text-white, text-stone-900
+   */
+  textColor?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -678,11 +755,160 @@ export interface Review {
     | null;
   vehicleInfo?: string | null;
   usagePeriod?: string | null;
+  /**
+   * Нові відгуки потребують ручного затвердження перед публікацією
+   */
   isPublished?: boolean | null;
   /**
    * Автоматично встановлюється при генерації
    */
   isGenerated?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Контент для сторінок категорій (легкові, SUV, LCV, літні, зимові, всесезонні).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "category-pages".
+ */
+export interface CategoryPage {
+  id: number;
+  /**
+   * Наприклад: passenger-tyres, summer
+   */
+  slug: string;
+  pageType: 'vehicle' | 'season';
+  vehicleType?: ('passenger' | 'suv' | 'van') | null;
+  season?: ('summer' | 'winter' | 'allseason') | null;
+  /**
+   * Заголовок для <title> та Open Graph (до 70 символів)
+   */
+  seoTitle?: string | null;
+  /**
+   * Meta description (до 170 символів)
+   */
+  seoDescription?: string | null;
+  title: string;
+  subtitle?: string | null;
+  heroDescription?: string | null;
+  heroImage?: (number | null) | Media;
+  heroImageAlt?: string | null;
+  /**
+   * Текст для хлібних крихт (наприклад: "Шини для легкових авто")
+   */
+  breadcrumbLabel?: string | null;
+  heroOverlay?: {
+    icon?:
+      | (
+          | 'car'
+          | 'shield'
+          | 'zap'
+          | 'star'
+          | 'mountain'
+          | 'truck'
+          | 'weight'
+          | 'gauge'
+          | 'snowflake'
+          | 'thermometer'
+          | 'cloud'
+          | 'sun'
+        )
+      | null;
+    /**
+     * Tailwind клас, напр. bg-blue-500/15
+     */
+    iconBg?: string | null;
+    /**
+     * Tailwind клас, напр. text-blue-500
+     */
+    iconText?: string | null;
+    title?: string | null;
+    description?: string | null;
+  };
+  /**
+   * Переваги/характеристики для Hero секції (до 6)
+   */
+  features?:
+    | {
+        icon:
+          | 'car'
+          | 'shield'
+          | 'zap'
+          | 'star'
+          | 'mountain'
+          | 'truck'
+          | 'weight'
+          | 'gauge'
+          | 'snowflake'
+          | 'thermometer'
+          | 'cloud'
+          | 'sun';
+        title: string;
+        description: string;
+        /**
+         * Tailwind клас, напр. bg-blue-500/15
+         */
+        colorBg?: string | null;
+        /**
+         * Tailwind клас, напр. text-blue-500
+         */
+        colorText?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  seasonSectionDescription?: string | null;
+  seasonDescriptionSummer?: string | null;
+  seasonDescriptionWinter?: string | null;
+  seasonDescriptionAllseason?: string | null;
+  seasonInitialCount?: number | null;
+  featuredTitle?: string | null;
+  featuredCount?: number | null;
+  filterPopular?: boolean | null;
+  reviewsVehicleType?: ('passenger' | 'suv' | 'van') | null;
+  reviewsTitle?: string | null;
+  reviewsLimit?: number | null;
+  reviewsShowAllLink?: boolean | null;
+  ctaTitle?: string | null;
+  ctaDescription?: string | null;
+  ctaPrimaryLabel?: string | null;
+  ctaPrimaryHref?: string | null;
+  ctaSecondaryLabel?: string | null;
+  ctaSecondaryHref?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Immutable log of security and administrative events.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  action:
+    | 'login_success'
+    | 'login_failed'
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'automation_run'
+    | 'automation_error'
+    | 'config_change'
+    | 'access_denied';
+  actor?: string | null;
+  target?: string | null;
+  targetId?: string | null;
+  details?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  ip?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -747,6 +973,10 @@ export interface PayloadLockedDocument {
         value: number | SeasonalContent;
       } | null)
     | ({
+        relationTo: 'holiday-banners';
+        value: number | HolidayBanner;
+      } | null)
+    | ({
         relationTo: 'provider-settings';
         value: number | ProviderSetting;
       } | null)
@@ -757,6 +987,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'category-pages';
+        value: number | CategoryPage;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1032,6 +1270,7 @@ export interface DealersSelect<T extends boolean = true> {
   website?: T;
   workingHours?: T;
   services?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1099,6 +1338,37 @@ export interface SeasonalContentSelect<T extends boolean = true> {
   ctaLink?: T;
   gradient?: T;
   promoText?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "holiday-banners_select".
+ */
+export interface HolidayBannersSelect<T extends boolean = true> {
+  name?: T;
+  isActive?: T;
+  priority?: T;
+  holidayMonth?: T;
+  holidayDay?: T;
+  showDaysBefore?: T;
+  showDaysAfter?: T;
+  displayOn?: T;
+  specificPages?:
+    | T
+    | {
+        path?: T;
+        id?: T;
+      };
+  emoji?: T;
+  title?: T;
+  subtitle?: T;
+  link?: T;
+  linkText?: T;
+  bannerImage?: T;
+  bannerImageMobile?: T;
+  backgroundColor?: T;
+  textColor?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1180,6 +1450,77 @@ export interface ReviewsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "category-pages_select".
+ */
+export interface CategoryPagesSelect<T extends boolean = true> {
+  slug?: T;
+  pageType?: T;
+  vehicleType?: T;
+  season?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  title?: T;
+  subtitle?: T;
+  heroDescription?: T;
+  heroImage?: T;
+  heroImageAlt?: T;
+  breadcrumbLabel?: T;
+  heroOverlay?:
+    | T
+    | {
+        icon?: T;
+        iconBg?: T;
+        iconText?: T;
+        title?: T;
+        description?: T;
+      };
+  features?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        colorBg?: T;
+        colorText?: T;
+        id?: T;
+      };
+  seasonSectionDescription?: T;
+  seasonDescriptionSummer?: T;
+  seasonDescriptionWinter?: T;
+  seasonDescriptionAllseason?: T;
+  seasonInitialCount?: T;
+  featuredTitle?: T;
+  featuredCount?: T;
+  filterPopular?: T;
+  reviewsVehicleType?: T;
+  reviewsTitle?: T;
+  reviewsLimit?: T;
+  reviewsShowAllLink?: T;
+  ctaTitle?: T;
+  ctaDescription?: T;
+  ctaPrimaryLabel?: T;
+  ctaPrimaryHref?: T;
+  ctaSecondaryLabel?: T;
+  ctaSecondaryHref?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  action?: T;
+  actor?: T;
+  target?: T;
+  targetId?: T;
+  details?: T;
+  ip?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1217,6 +1558,79 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Контактні дані, адреса, соцмережі та графік роботи
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Наприклад: 0 800 123 456
+   */
+  phoneDisplay?: string | null;
+  /**
+   * Наприклад: tel:+380800123456
+   */
+  phoneHref?: string | null;
+  emailSupport?: string | null;
+  emailPrivacy?: string | null;
+  emailInfo?: string | null;
+  city?: string | null;
+  /**
+   * Наприклад: м. Київ, вул. Прикладна, 10
+   */
+  addressFull?: string | null;
+  /**
+   * ISO 3166-1 alpha-2, наприклад: UA
+   */
+  country?: string | null;
+  /**
+   * URL сторінки у Facebook
+   */
+  facebook?: string | null;
+  /**
+   * URL сторінки в Instagram
+   */
+  instagram?: string | null;
+  /**
+   * URL каналу/бота в Telegram
+   */
+  telegram?: string | null;
+  /**
+   * URL глобального сайту Bridgestone
+   */
+  website?: string | null;
+  /**
+   * Наприклад: Пн-Пт 9:00-18:00
+   */
+  workingHours?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  phoneDisplay?: T;
+  phoneHref?: T;
+  emailSupport?: T;
+  emailPrivacy?: T;
+  emailInfo?: T;
+  city?: T;
+  addressFull?: T;
+  country?: T;
+  facebook?: T;
+  instagram?: T;
+  telegram?: T;
+  website?: T;
+  workingHours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
