@@ -10,7 +10,9 @@
  */
 
 import cron from "node-cron";
-import { logger } from "./utils/logger.js";
+import { createLogger } from "./utils/logger.js";
+
+const logger = createLogger("Cron");
 import { notify } from "./publishers/telegram-bot.js";
 import { runWeeklyAutomation } from "./scheduler.js";
 import { setRunStatus } from "./publishers/telegram-commands.js";

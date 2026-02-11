@@ -265,20 +265,24 @@ async function runScheduledPipeline(): Promise<void> {
     job.stepLabel = label;
     updateJob(job);
     try {
+      schedulerLogger.info(`Pipeline step ${step}/${steps.length}: ${label} — starting`);
       const { stdout, stderr } = await execAsync(cmd, {
         cwd: automationDir,
         timeout: 600000, // 10 min per step
+        maxBuffer: 10 * 1024 * 1024, // 10MB
         env: { ...process.env },
       });
       allOutput += stdout + (stderr ? `\nSTDERR:\n${stderr}` : '') + '\n';
+      schedulerLogger.info(`Pipeline step ${step}/${steps.length}: ${label} — done`);
     } catch (error: unknown) {
-      const err = error as { message: string; stdout?: string };
+      const err = error as { message: string; stdout?: string; stderr?: string };
       job.status = 'failed';
       job.completedAt = new Date().toISOString();
       job.error = `Крок "${label}" не вдався: ${err.message}`;
       job.output = allOutput + (err.stdout || '');
       updateJob(job);
       schedulerLogger.error(`Pipeline failed at step "${label}": ${err.message}`);
+      if (err.stderr) schedulerLogger.error(`STDERR: ${err.stderr.slice(0, 2000)}`);
       return;
     }
   }

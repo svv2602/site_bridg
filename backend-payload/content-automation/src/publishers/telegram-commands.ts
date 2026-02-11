@@ -9,7 +9,9 @@ import { ENV } from "../config/env.js";
 import { notify, escapeHtml } from "./telegram-bot.js";
 import { runWeeklyAutomation } from "../scheduler.js";
 import { getMetricsSummary, formatSummaryForTelegram } from "../utils/metrics.js";
-import { logger } from "../utils/logger.js";
+import { createLogger } from "../utils/logger.js";
+
+const logger = createLogger("TelegramBot");
 import { withRetry } from "../utils/retry.js";
 
 // Constants

@@ -13,7 +13,9 @@
  * - Telegram bot for interactive commands
  */
 
-import { logger } from "./utils/logger.js";
+import { createLogger } from "./utils/logger.js";
+
+const logger = createLogger("Daemon");
 import { startCronJobs, getNextRunTime } from "./cron.js";
 import { startPolling, stopPolling } from "./publishers/telegram-commands.js";
 import { ENV } from "./config/env.js";
