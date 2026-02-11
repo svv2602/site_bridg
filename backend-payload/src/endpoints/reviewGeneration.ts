@@ -17,14 +17,14 @@ interface ReviewGenerationInput {
 }
 
 /**
- * POST /api/reviews/generate/:tyreId
+ * POST /api/review-ops/generate/:tyreId
  *
  * Generate reviews for a specific tyre using AI.
  * Body:
  *   - count: Number of reviews to generate (default: 3, max: 10)
  */
 export const generateReviewsEndpoint: Endpoint = {
-  path: '/reviews/generate/:tyreId',
+  path: '/review-ops/generate/:tyreId',
   method: 'post',
   handler: createBackgroundJobHandler<ReviewGenerationInput>({
     type: 'review',
@@ -74,7 +74,7 @@ export const generateReviewsEndpoint: Endpoint = {
       count: input.count,
     }),
 
-    statusPath: (jobId) => `/api/reviews/generate/status/${jobId}`,
+    statusPath: (jobId) => `/api/review-ops/generate/status/${jobId}`,
     responseMessage: 'Review generation started',
 
     execute: async (input, ctx) => {
@@ -110,12 +110,12 @@ export const generateReviewsEndpoint: Endpoint = {
 };
 
 /**
- * GET /api/reviews/generate/status/:jobId
+ * GET /api/review-ops/generate/status/:jobId
  *
  * Get status of review generation job.
  */
 export const generateReviewsStatusEndpoint: Endpoint = {
-  path: '/reviews/generate/status/:jobId',
+  path: '/review-ops/generate/status/:jobId',
   method: 'get',
   handler: async (req) => {
     const jobId = req.routeParams?.jobId as string;
@@ -133,12 +133,12 @@ export const generateReviewsStatusEndpoint: Endpoint = {
 };
 
 /**
- * GET /api/reviews/stats/:tyreId
+ * GET /api/review-ops/stats/:tyreId
  *
  * Get review statistics for a tyre.
  */
 export const reviewStatsEndpoint: Endpoint = {
-  path: '/reviews/stats/:tyreId',
+  path: '/review-ops/stats/:tyreId',
   method: 'get',
   handler: async (req) => {
     const tyreId = parseInt((req.routeParams?.tyreId as string) || '0', 10);
@@ -191,7 +191,7 @@ interface BatchReviewInput {
 }
 
 /**
- * POST /api/reviews/generate/batch
+ * POST /api/review-ops/generate/batch
  *
  * Batch generate reviews for multiple tyres.
  * Body:
@@ -199,7 +199,7 @@ interface BatchReviewInput {
  *   - defaultCount: Default number of reviews per tyre (default: 3, max: 10)
  */
 export const generateReviewsBatchEndpoint: Endpoint = {
-  path: '/reviews/generate/batch',
+  path: '/review-ops/generate/batch',
   method: 'post',
   handler: createBackgroundJobHandler<BatchReviewInput>({
     type: 'review',
@@ -243,7 +243,7 @@ export const generateReviewsBatchEndpoint: Endpoint = {
     buildCommand: (input) =>
       `generate-reviews --batch --count=${input.items.length}`,
 
-    statusPath: (jobId) => `/api/reviews/generate/batch/status/${jobId}`,
+    statusPath: (jobId) => `/api/review-ops/generate/batch/status/${jobId}`,
     responseMessage: 'Batch review generation started',
 
     execute: async (input, ctx) => {
@@ -335,12 +335,12 @@ export const generateReviewsBatchEndpoint: Endpoint = {
 };
 
 /**
- * GET /api/reviews/generate/batch/status/:jobId
+ * GET /api/review-ops/generate/batch/status/:jobId
  *
  * Get status of a batch review generation job.
  */
 export const generateReviewsBatchStatusEndpoint: Endpoint = {
-  path: '/reviews/generate/batch/status/:jobId',
+  path: '/review-ops/generate/batch/status/:jobId',
   method: 'get',
   handler: async (req) => {
     const jobId = req.routeParams?.jobId as string;
@@ -370,13 +370,13 @@ export const generateReviewsBatchStatusEndpoint: Endpoint = {
 };
 
 /**
- * GET /api/reviews/bulk-stats
+ * GET /api/review-ops/bulk-stats
  *
  * Get all tyres with their review counts and average ratings.
  * Used for the bulk review generation table.
  */
 export const reviewBulkStatsEndpoint: Endpoint = {
-  path: '/reviews/bulk-stats',
+  path: '/review-ops/bulk-stats',
   method: 'get',
   handler: async (req) => {
     if (!req.user) {

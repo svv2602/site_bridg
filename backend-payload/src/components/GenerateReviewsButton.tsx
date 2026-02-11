@@ -18,7 +18,7 @@ const GenerateReviewsButton: React.FC = () => {
 
     const fetchReviewCount = async () => {
       try {
-        const response = await fetch(`/api/reviews/stats/${id}`);
+        const response = await fetch(`/api/review-ops/stats/${id}`);
         if (response.ok) {
           const data = await response.json();
           setReviewCount(data.totalCount);
@@ -44,7 +44,7 @@ const GenerateReviewsButton: React.FC = () => {
 
     try {
       // Call generate endpoint
-      const response = await fetch(`/api/reviews/generate/${id}`, {
+      const response = await fetch(`/api/review-ops/generate/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const GenerateReviewsButton: React.FC = () => {
       while (attempts < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        const jobResponse = await fetch(`/api/reviews/generate/status/${jobId}`);
+        const jobResponse = await fetch(`/api/review-ops/generate/status/${jobId}`);
         const job = await jobResponse.json();
 
         if (job.status === 'completed') {

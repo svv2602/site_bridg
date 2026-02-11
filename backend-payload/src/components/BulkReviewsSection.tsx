@@ -56,7 +56,7 @@ export const BulkReviewsSection: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/reviews/bulk-stats', { credentials: 'include' })
+      const res = await fetch('/api/review-ops/bulk-stats', { credentials: 'include' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
       const data = json.data || json
@@ -79,7 +79,7 @@ export const BulkReviewsSection: React.FC = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/reviews/generate/batch/status/${jobId}`, {
+        const res = await fetch(`/api/review-ops/generate/batch/status/${jobId}`, {
           credentials: 'include',
         })
         if (!res.ok) return
@@ -135,7 +135,7 @@ export const BulkReviewsSection: React.FC = () => {
 
     try {
       const items = Array.from(selected).map((tyreId) => ({ tyreId }))
-      const res = await fetch('/api/reviews/generate/batch', {
+      const res = await fetch('/api/review-ops/generate/batch', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
