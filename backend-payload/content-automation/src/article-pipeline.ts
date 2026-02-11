@@ -15,6 +15,7 @@ import {
   getPendingQueue,
   getQueueItem,
   updateQueueItem,
+  deleteQueueItem,
   getSettingBool,
   getSettingNumber,
   type ContentSource,
@@ -207,8 +208,8 @@ export async function processSingleQueueItem(
   if (!item) {
     return { success: false, error: `Queue item #${itemId} not found` };
   }
-  if (item.status !== "pending") {
-    return { success: false, error: `Queue item #${itemId} status is "${item.status}", expected "pending"` };
+  if (item.status !== "pending" && item.status !== "generating") {
+    return { success: false, error: `Queue item #${itemId} status is "${item.status}", expected "pending" or "generating"` };
   }
 
   // Read settings from DB, overridden by options
@@ -269,7 +270,11 @@ export async function processSingleQueueItem(
     // Publish or hold for review
     const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
 
-    if (shouldPublish) {
+    if (isManual) {
+      // Manual items: remove from queue after successful generation (article lives as draft in CMS)
+      deleteQueueItem(item.id);
+      console.log(`[Generate] Manual article generated and removed from queue: "${result.article.title}" (ID: ${payloadId})`);
+    } else if (shouldPublish) {
       updateQueueItem(item.id, {
         status: "published",
         generatedPayloadId: payloadId,
@@ -315,7 +320,10 @@ async function processQueue(): Promise<{
   const generateImages = getSettingBool("image_generation_enabled");
   const errors: string[] = [];
 
-  const pending = getPendingQueue(maxPerWeek);
+  // Fetch more than needed since we'll filter out manual items
+  const allPending = getPendingQueue(maxPerWeek + 10);
+  // Scheduled pipeline skips manual items — they are only processed on demand
+  const pending = allPending.filter((item) => item.triggerType !== "manual").slice(0, maxPerWeek);
 
   if (pending.length === 0) {
     console.log("[Generate] No pending articles in queue");

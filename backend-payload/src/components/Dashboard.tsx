@@ -724,6 +724,18 @@ export const Dashboard: React.FC<any> = () => {
     } catch { /* ignore */ }
   }
 
+  const generateQueueItem = async (id: number) => {
+    try {
+      await fetch('/api/automation/queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'generate', id }),
+      })
+      refreshQueue()
+    } catch { /* ignore */ }
+  }
+
   const refreshArticleSettings = async () => {
     try {
       const res = await fetch('/api/automation/article-settings')
@@ -1545,6 +1557,13 @@ export const Dashboard: React.FC<any> = () => {
                           title="Відхилити"
                         >✗</button>
                       </>
+                    )}
+                    {item.status === 'pending' && item.triggerType === 'manual' && (
+                      <button
+                        onClick={() => generateQueueItem(item.id)}
+                        className="dashboard__queue-btn dashboard__queue-btn--approve"
+                        title="Згенерувати зараз"
+                      >▶</button>
                     )}
                     {(item.status === 'pending' || item.status === 'failed' || item.status === 'rejected') && (
                       <button

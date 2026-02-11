@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload';
 import Database from 'better-sqlite3';
 import path from 'path';
+import { spawn } from 'child_process';
 import { getSchedulerStatus, setSchedulerConfig } from '../scheduler';
 import { createRateLimiter, checkRateLimit } from '../lib/rate-limiter';
 import { requireRoleForEndpoint } from '../lib/rbac';
@@ -417,6 +418,7 @@ export const automationQueueEndpoint: Endpoint = {
  * Body for add: { action: 'add', topic: string, articleType: string, priority?: number }
  * Body for update: { action: 'update', id: number, status: string }
  * Body for delete: { action: 'delete', id: number }
+ * Body for generate: { action: 'generate', id: number }
  */
 export const automationQueueUpdateEndpoint: Endpoint = {
   path: '/automation/queue',
@@ -481,7 +483,37 @@ export const automationQueueUpdateEndpoint: Endpoint = {
         return Response.json({ success: true });
       }
 
-      return Response.json({ error: 'Invalid action. Use add, update, or delete' }, { status: 400 });
+      if (action === 'generate') {
+        const id = body.id as number;
+        if (!id) {
+          return Response.json({ error: 'id is required' }, { status: 400 });
+        }
+
+        // Validate item exists and is pending
+        const item = db.prepare('SELECT id, status, trigger_type FROM article_queue WHERE id = ?').get(id) as { id: number; status: string; trigger_type: string } | undefined;
+        if (!item) {
+          return Response.json({ error: 'Queue item not found' }, { status: 404 });
+        }
+        if (item.status !== 'pending') {
+          return Response.json({ error: `Item status is "${item.status}", expected "pending"` }, { status: 400 });
+        }
+
+        // Mark as generating immediately
+        db.prepare('UPDATE article_queue SET status = ? WHERE id = ?').run('generating', id);
+
+        // Spawn background process to generate the article
+        const scriptPath = path.join(process.cwd(), 'content-automation', 'src', 'article-pipeline.ts');
+        const child = spawn('npx', ['tsx', scriptPath, `--process-item=${id}`], {
+          cwd: process.cwd(),
+          stdio: 'ignore',
+          detached: true,
+        });
+        child.unref();
+
+        return Response.json({ success: true });
+      }
+
+      return Response.json({ error: 'Invalid action. Use add, update, delete, or generate' }, { status: 400 });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       return Response.json({ error: msg }, { status: 500 });
