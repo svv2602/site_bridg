@@ -79,7 +79,7 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
     >
       {/* Image Section - Large and prominent */}
-      <div className={`relative ${imageHeight} overflow-hidden bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800`}>
+      <div className={`relative ${imageHeight} overflow-hidden`}>
         {tyre.imageUrl ? (
           <Image
             src={tyre.imageUrl}
