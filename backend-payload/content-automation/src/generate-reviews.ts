@@ -79,7 +79,7 @@ interface ReviewData {
   isGenerated: boolean;
 }
 
-interface TyreInfo {
+export interface TyreInfo {
   id: number;
   name: string;
   brand: string;
@@ -170,7 +170,7 @@ ${tyre.shortDescription ? `- Опис: ${tyre.shortDescription}` : ""}
 - Без markdown, без пояснень, тільки валідний JSON масив`;
 }
 
-interface GeneratedReview {
+export interface GeneratedReview {
   authorName: string;
   authorCity: string;
   rating: number;
@@ -239,7 +239,7 @@ ${tyre.shortDescription ? `- Опис: ${tyre.shortDescription}` : ""}
 /**
  * Generate reviews using LLM (one at a time for reliability)
  */
-async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Promise<GeneratedReview[]> {
+export async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Promise<GeneratedReview[]> {
   logger.info(`Generating ${count} reviews for ${tyre.name}...`);
 
   const reviews: GeneratedReview[] = [];
@@ -281,7 +281,7 @@ async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Promise<Ge
 /**
  * Convert generated review to ReviewData format
  */
-function convertToReviewData(tyreId: number, review: GeneratedReview): ReviewData {
+export function convertToReviewData(tyreId: number, review: GeneratedReview): ReviewData {
   return {
     tyre: tyreId,
     authorName: review.authorName,

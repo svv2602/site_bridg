@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { BulkReviewsSection } from './BulkReviewsSection'
 
 interface Stats {
   tyres: number
@@ -1897,6 +1898,8 @@ export const Dashboard: React.FC<any> = () => {
           </div>
         )}
       </div>
+
+      <BulkReviewsSection />
 
       <style>{`
         .dashboard {

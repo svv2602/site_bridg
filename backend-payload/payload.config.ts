@@ -54,6 +54,9 @@ import {
   generateReviewsEndpoint,
   generateReviewsStatusEndpoint,
   reviewStatsEndpoint,
+  generateReviewsBatchEndpoint,
+  generateReviewsBatchStatusEndpoint,
+  reviewBulkStatsEndpoint,
 } from './src/endpoints/reviewGeneration';
 import {
   automationStatsEndpoint,
@@ -148,6 +151,9 @@ export default buildConfig({
     generateReviewsEndpoint,
     generateReviewsStatusEndpoint,
     reviewStatsEndpoint,
+    generateReviewsBatchEndpoint,
+    generateReviewsBatchStatusEndpoint,
+    reviewBulkStatsEndpoint,
     // Automation metrics & scheduler
     automationStatsEndpoint,
     automationStatusEndpoint,

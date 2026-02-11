@@ -2,8 +2,10 @@ import type { Endpoint } from 'payload';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
-import { getJob } from './jobStore';
+import { getJob, updateJob } from './jobStore';
 import { createBackgroundJobHandler } from './createBackgroundJob';
+import { apiResponse, apiError } from './api-response';
+import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
 
@@ -176,5 +178,268 @@ export const reviewStatsEndpoint: Endpoint = {
       publishedCount: publishedReviews.totalDocs,
       averageRating,
     });
+  },
+};
+
+// ============================================================
+// Bulk review generation endpoints
+// ============================================================
+
+/** Parsed input for batch review generation */
+interface BatchReviewInput {
+  items: Array<{ tyreId: number; count: number }>;
+}
+
+/**
+ * POST /api/reviews/generate/batch
+ *
+ * Batch generate reviews for multiple tyres.
+ * Body:
+ *   - items: Array of { tyreId, count? }
+ *   - defaultCount: Default number of reviews per tyre (default: 3, max: 10)
+ */
+export const generateReviewsBatchEndpoint: Endpoint = {
+  path: '/reviews/generate/batch',
+  method: 'post',
+  handler: createBackgroundJobHandler<BatchReviewInput>({
+    type: 'review',
+    jobPrefix: 'review-batch',
+    minRole: 'editor',
+    maxConcurrentJobs: 3,
+
+    parseInput: async (req) => {
+      let body: { items?: Array<{ tyreId: number; count?: number }>; defaultCount?: number } = {};
+      try {
+        body = await req.json?.() || {};
+      } catch {
+        throw new Error('Invalid JSON body');
+      }
+
+      if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
+        throw new Error('items array is required and must not be empty');
+      }
+
+      if (body.items.length > 100) {
+        throw new Error('Maximum 100 tyres per batch');
+      }
+
+      const defaultCount = Math.min(Math.max(body.defaultCount || 3, 1), 10);
+
+      const items = body.items.map((item) => ({
+        tyreId: item.tyreId,
+        count: Math.min(Math.max(item.count || defaultCount, 1), 10),
+      }));
+
+      // Validate all tyreIds are positive integers
+      for (const item of items) {
+        if (!Number.isInteger(item.tyreId) || item.tyreId <= 0) {
+          throw new Error(`Invalid tyre ID: ${item.tyreId}`);
+        }
+      }
+
+      return { items };
+    },
+
+    buildCommand: (input) =>
+      `generate-reviews --batch --count=${input.items.length}`,
+
+    statusPath: (jobId) => `/api/reviews/generate/batch/status/${jobId}`,
+    responseMessage: 'Batch review generation started',
+
+    execute: async (input, ctx) => {
+      const { payload, job } = ctx;
+      const { items } = input;
+      const automationDir = path.join(process.cwd(), 'content-automation');
+
+      const total = items.length;
+      let completed = 0;
+      let totalReviewsCreated = 0;
+      let failed = 0;
+      const allResultIds: number[] = [];
+      const errors: Array<{ tyreId: number; error: string }> = [];
+
+      job.totalSteps = total;
+      job.currentStep = 0;
+      job.stepLabel = `Підготовка (0/${total})`;
+      updateJob(job);
+
+      for (const item of items) {
+        try {
+          // Get tyre name for progress display
+          let tyreName = `ID ${item.tyreId}`;
+          try {
+            const tyre = await payload.findByID({ collection: 'tyres', id: item.tyreId });
+            if (tyre) tyreName = tyre.name as string;
+          } catch {
+            // Use ID as fallback
+          }
+
+          job.stepLabel = `${completed}/${total}: ${tyreName}`;
+          updateJob(job);
+
+          // Run CLI subprocess for each tyre
+          const command = `npx tsx src/generate-reviews.ts --tyreId=${item.tyreId} --count=${item.count}`;
+          const { stdout, stderr } = await execAsync(command, {
+            cwd: automationDir,
+            timeout: 300000,
+            env: { ...process.env },
+          });
+
+          if (stderr) {
+            payload.logger.warn(`Review generation stderr for tyre ${item.tyreId}: ${stderr}`);
+          }
+
+          // Extract created review IDs from CLI output
+          const idsMatch = stdout.match(/Created review IDs: \[([\d,\s]+)\]/);
+          if (idsMatch) {
+            const ids = idsMatch[1].split(',').map((id: string) => parseInt(id.trim(), 10));
+            allResultIds.push(...ids);
+            totalReviewsCreated += ids.length;
+          }
+
+          // Extract count from "Created N reviews" pattern
+          const countMatch = stdout.match(/Created (\d+) reviews in database/);
+          if (countMatch && !idsMatch) {
+            totalReviewsCreated += parseInt(countMatch[1], 10);
+          }
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          errors.push({ tyreId: item.tyreId, error: errMsg });
+          failed++;
+          payload.logger.error(`Batch review error for tyre ${item.tyreId}: ${errMsg}`);
+        }
+
+        completed++;
+        job.currentStep = completed;
+        job.stepLabel = `${completed}/${total} (${totalReviewsCreated} відгуків, ${failed} помилок)`;
+        updateJob(job);
+
+        // Small delay between tyres to avoid rate limits
+        if (completed < total) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+
+      return {
+        output: JSON.stringify({
+          totalTyres: total,
+          completedTyres: completed,
+          failedTyres: failed,
+          totalReviewsCreated,
+          errors,
+        }),
+        resultIds: allResultIds,
+      };
+    },
+  }),
+};
+
+/**
+ * GET /api/reviews/generate/batch/status/:jobId
+ *
+ * Get status of a batch review generation job.
+ */
+export const generateReviewsBatchStatusEndpoint: Endpoint = {
+  path: '/reviews/generate/batch/status/:jobId',
+  method: 'get',
+  handler: async (req) => {
+    const jobId = req.routeParams?.jobId as string;
+    if (!jobId) {
+      return Response.json({ error: 'Job ID is required' }, { status: 400 });
+    }
+
+    const job = getJob(jobId);
+    if (!job) {
+      return Response.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    let progress: Record<string, unknown> | undefined;
+    if (job.status === 'completed' && job.output) {
+      try {
+        progress = JSON.parse(job.output);
+      } catch {
+        // Not JSON
+      }
+    }
+
+    return Response.json({
+      ...job,
+      ...(progress ? { progress } : {}),
+    });
+  },
+};
+
+/**
+ * GET /api/reviews/bulk-stats
+ *
+ * Get all tyres with their review counts and average ratings.
+ * Used for the bulk review generation table.
+ */
+export const reviewBulkStatsEndpoint: Endpoint = {
+  path: '/reviews/bulk-stats',
+  method: 'get',
+  handler: async (req) => {
+    if (!req.user) {
+      return apiError('Unauthorized', 401);
+    }
+
+    const forbidden = requireRoleForEndpoint(req.user, 'editor');
+    if (forbidden) return forbidden;
+
+    try {
+      // Get all tyres
+      const tyres = await req.payload.find({
+        collection: 'tyres',
+        limit: 500,
+        sort: 'name',
+      });
+
+      // Get all reviews grouped by tyre
+      const reviews = await req.payload.find({
+        collection: 'reviews',
+        limit: 10000,
+        depth: 0,
+      });
+
+      // Build stats map: tyreId -> { count, totalRating }
+      const statsMap = new Map<number, { count: number; totalRating: number }>();
+      for (const review of reviews.docs) {
+        const tyreId = typeof review.tyre === 'number' ? review.tyre : (review.tyre as any)?.id;
+        if (!tyreId) continue;
+        const existing = statsMap.get(tyreId) || { count: 0, totalRating: 0 };
+        existing.count++;
+        existing.totalRating += (review.rating as number) || 0;
+        statsMap.set(tyreId, existing);
+      }
+
+      const tyreStats = tyres.docs.map((tyre) => {
+        const stats = statsMap.get(tyre.id) || { count: 0, totalRating: 0 };
+        return {
+          id: tyre.id,
+          name: tyre.name,
+          brand: tyre.brand,
+          season: tyre.season,
+          reviewCount: stats.count,
+          averageRating: stats.count > 0
+            ? Math.round((stats.totalRating / stats.count) * 10) / 10
+            : 0,
+        };
+      });
+
+      const totalTyres = tyreStats.length;
+      const totalReviews = reviews.totalDocs;
+      const tyresWithoutReviews = tyreStats.filter((t) => t.reviewCount === 0).length;
+
+      return apiResponse({
+        tyres: tyreStats,
+        summary: {
+          totalTyres,
+          totalReviews,
+          tyresWithoutReviews,
+        },
+      });
+    } catch (error) {
+      return apiError(`Failed to fetch bulk stats: ${error}`, 500);
+    }
   },
 };
