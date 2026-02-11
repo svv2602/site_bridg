@@ -5,6 +5,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname, basename } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -141,15 +142,45 @@ async function findMediaByFilename(filename: string): Promise<number | null> {
   return data.docs?.length > 0 ? data.docs[0].id : null;
 }
 
+/**
+ * Remove background from image buffer using rembg CLI.
+ * Returns processed buffer or original if rembg is unavailable.
+ */
+function removeBackground(inputBuffer: Buffer): Buffer {
+  const rembgPath = process.env.REMBG_PATH || "/opt/venv/bin/rembg";
+  const tmpDir = "/tmp";
+  const inputPath = join(tmpDir, `rembg-input-${Date.now()}.png`);
+  const outputPath = join(tmpDir, `rembg-output-${Date.now()}.png`);
+
+  try {
+    const fs = require("fs");
+    fs.writeFileSync(inputPath, inputBuffer);
+    execSync(`${rembgPath} i "${inputPath}" "${outputPath}"`, {
+      timeout: 60000,
+      stdio: "pipe",
+    });
+    const result = fs.readFileSync(outputPath);
+    // Cleanup
+    try { fs.unlinkSync(inputPath); } catch {}
+    try { fs.unlinkSync(outputPath); } catch {}
+    return result;
+  } catch (error) {
+    console.log(`    Warning: rembg failed, using original image`);
+    // Cleanup on error
+    try { require("fs").unlinkSync(inputPath); } catch {}
+    try { require("fs").unlinkSync(outputPath); } catch {}
+    return inputBuffer;
+  }
+}
+
 async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBrand: string = 'Bridgestone'): Promise<number | null> {
   if (!imageUrl || imageUrl.includes("logo") || imageUrl.includes(".svg")) {
     return null;
   }
 
   try {
-    // Generate a consistent filename based on tyre name
-    const extension = imageUrl.split(".").pop()?.split("?")[0] || "png";
-    const filename = `${tyreName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.${extension}`;
+    // Always use png for processed images
+    const filename = `${tyreName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.png`;
 
     // Check cache first
     if (mediaCache.has(filename)) {
@@ -170,13 +201,16 @@ async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBr
       return null;
     }
 
-    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+    let imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+
+    // Remove background
+    console.log(`    Removing background...`);
+    imageBuffer = removeBackground(imageBuffer);
 
     // Create FormData for multipart upload
     const formData = new FormData();
-    const blob = new Blob([imageBuffer], { type: `image/${extension}` });
+    const blob = new Blob([imageBuffer], { type: "image/png" });
     formData.append("file", blob, filename);
-    // Payload CMS expects _payload JSON field for additional data
     formData.append("_payload", JSON.stringify({ alt: `${tyreBrand} ${tyreName}` }));
 
     // Upload to Payload Media
@@ -223,17 +257,6 @@ function determineVehicleTypes(name: string): string[] {
   return types;
 }
 
-function createShortDescription(tire: ScrapedTire): string {
-  const seasonNames: Record<string, string> = {
-    summer: "Літня",
-    winter: "Зимова",
-    allseason: "Всесезонна",
-  };
-
-  const season = seasonNames[tire.season] || "Літня";
-  const brandName = tire.brand === "firestone" ? "Firestone" : "Bridgestone";
-  return `${season} шина ${brandName} ${tire.name}. Доступно ${tire.sizes.length} типорозмірів.`;
-}
 
 async function importTyres() {
   // Login first
@@ -270,7 +293,6 @@ async function importTyres() {
         brand,
         season: tire.season,
         vehicleTypes: determineVehicleTypes(tire.name),
-        shortDescription: createShortDescription(tire),
         sizes: tire.sizes,
         euLabel: tire.euLabel,
         isPublished: true,
