@@ -1,7 +1,7 @@
 /**
  * Google AI (Gemini) LLM Provider
  *
- * Integration with Gemini 2.0 Flash, Gemini Pro models.
+ * Integration with Gemini 2.5 Flash, Gemini Pro models.
  */
 
 import type { LLMMessage, LLMOptions, LLMResponse, LLMStreamChunk } from "../types.js";
@@ -12,10 +12,10 @@ const logger = createLogger("GoogleProvider");
 
 // Google AI model identifiers
 export const GOOGLE_MODELS = [
-  "gemini-2.0-flash-exp",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
   "gemini-1.5-flash",
   "gemini-1.5-pro",
-  "gemini-1.0-pro",
 ] as const;
 
 export type GoogleModel = (typeof GOOGLE_MODELS)[number];
@@ -45,7 +45,7 @@ interface GeminiResponse {
 export class GoogleProvider extends BaseLLMProvider {
   readonly name = "google";
   readonly models = GOOGLE_MODELS;
-  readonly defaultModel: GoogleModel = "gemini-2.0-flash-exp";
+  readonly defaultModel: GoogleModel = "gemini-2.5-flash";
 
   constructor(config: BaseLLMConfig) {
     super(config);

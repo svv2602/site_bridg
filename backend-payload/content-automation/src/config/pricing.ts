@@ -100,12 +100,12 @@ export const LLM_PRICING: ModelPricing[] = [
   // Google
   {
     provider: "google",
-    model: "gemini-2.0-flash-exp",
-    inputPer1M: 0.075,
-    outputPer1M: 0.3,
+    model: "gemini-2.5-flash",
+    inputPer1M: 0.15,
+    outputPer1M: 0.6,
     contextWindow: 1000000,
     maxOutput: 8192,
-    updatedAt: new Date("2024-12-11"),
+    updatedAt: new Date("2026-02-11"),
   },
   {
     provider: "google",

@@ -18,7 +18,7 @@ export const OPENROUTER_MODELS = [
   "anthropic/claude-3-haiku",
   "openai/gpt-4o",
   "openai/gpt-4o-mini",
-  "google/gemini-2.0-flash-exp:free",
+  "google/gemini-2.5-flash",
   "meta-llama/llama-3.3-70b-instruct",
   "deepseek/deepseek-chat",
   "mistralai/mistral-large",

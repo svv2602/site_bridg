@@ -53,7 +53,7 @@ describe("translateToUkrainian", () => {
       data,
       response: {
         provider: "google",
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-2.5-flash",
         usage: { promptTokens: 300, completionTokens: 400 },
         cost: 0.0003,
         latencyMs: 800,

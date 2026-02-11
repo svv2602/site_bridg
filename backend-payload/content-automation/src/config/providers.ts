@@ -55,7 +55,7 @@ export const LLM_PROVIDERS: ProviderConfig[] = [
     apiKey: ENV.GOOGLE_AI_API_KEY,
     enabled: Boolean(ENV.GOOGLE_AI_API_KEY),
     priority: 4,
-    defaultModel: "gemini-2.0-flash-exp",
+    defaultModel: "gemini-2.5-flash",
     options: {
       maxTokens: 8192,
     },
@@ -241,7 +241,7 @@ export const TASK_ROUTING: TaskRouting[] = [
   {
     task: "content-translation",
     preferredProvider: "google",
-    preferredModel: "gemini-2.0-flash-exp",
+    preferredModel: "gemini-2.5-flash",
     fallbackProviders: ["anthropic", "deepseek"],
     maxRetries: 2,
     timeoutMs: 30000,
