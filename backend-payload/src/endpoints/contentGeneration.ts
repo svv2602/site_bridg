@@ -545,6 +545,177 @@ export const contentSmartPipelineEndpoint: Endpoint = {
 };
 
 /**
+ * POST /api/content/generate-article
+ *
+ * Generate a single article from a user-provided topic.
+ * Creates a queue entry and processes it via the manual article CLI.
+ *
+ * Body (JSON):
+ *   - topic (required, string, 10-500 chars)
+ *   - articleType (required, one of: seasonal-guide, model-review, test-summary, comparison, technology, tips)
+ *   - keywords (optional, string[])
+ *   - relatedTyres (optional, string[] of slugs)
+ *   - brand (optional, "bridgestone" | "firestone")
+ */
+export const contentGenerateArticleEndpoint: Endpoint = {
+  path: '/content/generate-article',
+  method: 'post',
+  handler: async (req) => {
+    if (!req.user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // RBAC: article generation requires editor or admin role
+    const forbidden = requireRoleForEndpoint(req.user, 'editor');
+    if (forbidden) return forbidden;
+
+    // Rate limiting
+    const rateLimited = checkRateLimit(automationRateLimiter, req);
+    if (rateLimited) return rateLimited;
+
+    // Concurrency check
+    if (countActiveJobs() >= 5) {
+      return Response.json(
+        { error: 'Too many concurrent jobs. Please wait and try again.' },
+        { status: 429 }
+      );
+    }
+
+    // Parse and validate body
+    let body: {
+      topic?: string;
+      articleType?: string;
+      keywords?: string[];
+      relatedTyres?: string[];
+      brand?: string;
+    };
+    try {
+      body = await req.json!();
+    } catch {
+      return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const { topic, articleType, keywords, relatedTyres, brand } = body;
+
+    if (!topic || typeof topic !== 'string' || topic.length < 10 || topic.length > 500) {
+      return Response.json(
+        { error: 'topic is required and must be 10-500 characters' },
+        { status: 400 }
+      );
+    }
+
+    const validTypes = ['seasonal-guide', 'model-review', 'test-summary', 'comparison', 'technology', 'tips'];
+    if (!articleType || !validTypes.includes(articleType)) {
+      return Response.json(
+        { error: `articleType must be one of: ${validTypes.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    if (brand && !['bridgestone', 'firestone'].includes(brand)) {
+      return Response.json(
+        { error: 'brand must be "bridgestone" or "firestone"' },
+        { status: 400 }
+      );
+    }
+
+    if (keywords && (!Array.isArray(keywords) || keywords.some((k) => typeof k !== 'string'))) {
+      return Response.json({ error: 'keywords must be an array of strings' }, { status: 400 });
+    }
+
+    if (relatedTyres && (!Array.isArray(relatedTyres) || relatedTyres.some((s) => typeof s !== 'string'))) {
+      return Response.json({ error: 'relatedTyres must be an array of strings' }, { status: 400 });
+    }
+
+    const automationDir = path.join(process.cwd(), 'content-automation');
+
+    // Build params JSON for CLI
+    const params = JSON.stringify({
+      topic: topic.trim(),
+      articleType,
+      ...(keywords?.length ? { keywords } : {}),
+      ...(relatedTyres?.length ? { relatedTyres } : {}),
+      ...(brand ? { brand } : {}),
+    });
+
+    // Escape single quotes in the JSON string for shell safety
+    const escapedParams = params.replace(/'/g, "'\\''");
+    const command = `npx tsx src/generate-manual-article.ts '${escapedParams}'`;
+
+    const jobId = `article-${Date.now()}`;
+    const job: JobStatus = {
+      id: jobId,
+      type: 'content',
+      status: 'running',
+      startedAt: new Date().toISOString(),
+      command,
+      stepLabel: 'Генерація статті',
+      currentStep: 1,
+      totalSteps: 3,
+    };
+    saveJob(job);
+
+    // Audit log
+    const userEmail = (req.user as { email?: string }).email;
+    auditLog(req.payload, {
+      action: 'automation_run',
+      actor: userEmail,
+      target: 'generate-article',
+      details: { jobId, topic, articleType },
+    }).catch(() => {});
+
+    // Run in background
+    execAsync(command, {
+      cwd: automationDir,
+      timeout: 600000, // 10 minutes
+      env: { ...process.env },
+    })
+      .then(({ stdout, stderr }) => {
+        // Parse the JSON result from stdout (last line)
+        const lines = stdout.trim().split('\n');
+        const lastLine = lines[lines.length - 1];
+        let result: { success?: boolean; payloadId?: string; articleTitle?: string; articleSlug?: string; error?: string } = {};
+        try {
+          result = JSON.parse(lastLine);
+        } catch {
+          // Couldn't parse — treat as completed with raw output
+        }
+
+        if (result.success) {
+          job.status = 'completed';
+          job.stepLabel = 'Завершено';
+          if (result.payloadId) {
+            job.targetName = result.payloadId;
+          }
+        } else {
+          job.status = 'failed';
+          job.error = result.error || 'Unknown error';
+        }
+        job.completedAt = new Date().toISOString();
+        job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+        updateJob(job);
+        req.payload.logger.info(`Article generation completed: ${jobId}`);
+      })
+      .catch((error) => {
+        job.status = 'failed';
+        job.completedAt = new Date().toISOString();
+        job.error = error.message;
+        job.output = error.stdout || '';
+        updateJob(job);
+        req.payload.logger.error(`Article generation failed: ${error.message}`);
+      });
+
+    return Response.json({
+      message: 'Article generation started',
+      jobId,
+      topic,
+      articleType,
+      checkStatus: `/api/content/job/${jobId}`,
+    });
+  },
+};
+
+/**
  * POST /api/content/publish
  *
  * Publish generated content to Payload CMS

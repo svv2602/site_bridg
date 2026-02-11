@@ -24,8 +24,10 @@ function recordFailedAttempt(ip: string): void {
 }
 
 export function middleware(request: NextRequest) {
-  // Only protect admin routes
-  if (!request.nextUrl.pathname.startsWith('/admin')) {
+  // Only protect admin routes and admin API routes
+  const isAdmin = request.nextUrl.pathname.startsWith('/admin');
+  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin');
+  if (!isAdmin && !isAdminApi) {
     return NextResponse.next();
   }
 
@@ -79,5 +81,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };

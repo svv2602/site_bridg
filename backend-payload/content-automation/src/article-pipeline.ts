@@ -13,6 +13,7 @@ import {
   getDueSources,
   updateSource,
   getPendingQueue,
+  getQueueItem,
   updateQueueItem,
   getSettingBool,
   getSettingNumber,
@@ -182,6 +183,126 @@ async function runScraper(
 
 // ============ PHASE 3: PROCESS QUEUE ============
 
+export interface SingleItemResult {
+  success: boolean;
+  payloadId?: string;
+  articleTitle?: string;
+  articleSlug?: string;
+  error?: string;
+}
+
+/**
+ * Process a single queue item: generate article, optionally image, publish to CMS.
+ * Used by both the batch processQueue() and the manual generation CLI.
+ */
+export async function processSingleQueueItem(
+  itemId: number,
+  options?: {
+    autoPublish?: boolean;
+    generateImages?: boolean;
+    interlink?: boolean;
+  }
+): Promise<SingleItemResult> {
+  const item = getQueueItem(itemId);
+  if (!item) {
+    return { success: false, error: `Queue item #${itemId} not found` };
+  }
+  if (item.status !== "pending") {
+    return { success: false, error: `Queue item #${itemId} status is "${item.status}", expected "pending"` };
+  }
+
+  // Read settings from DB, overridden by options
+  const autoPublish = options?.autoPublish ?? getSettingBool("auto_publish");
+  const interlink = options?.interlink ?? getSettingBool("interlinking_enabled");
+  const generateImagesEnabled = options?.generateImages ?? getSettingBool("image_generation_enabled");
+
+  // For manual items, always save as draft for review
+  const isManual = item.triggerType === "manual";
+  const shouldPublish = isManual ? false : autoPublish;
+
+  try {
+    updateQueueItem(item.id, { status: "generating" });
+
+    const context = await buildGenerationContext(item, interlink);
+
+    // Merge user-provided keywords for manual items
+    if (isManual && item.triggerData?.keywords) {
+      const userKeywords = item.triggerData.keywords as string[];
+      const existing = new Set(context.input.keywords || []);
+      for (const kw of userKeywords) {
+        if (!existing.has(kw)) {
+          context.input.keywords = [...(context.input.keywords || []), kw];
+        }
+      }
+    }
+
+    console.log(`[Generate] Generating: "${item.topic}" (${item.articleType})`);
+    const result = await generateArticle({
+      ...context.input,
+      relatedItems: context.relatedItems.length > 0 ? context.relatedItems : undefined,
+    }, { twoStage: true });
+
+    // Generate hero image if enabled
+    let imageMediaId: number | undefined;
+    if (generateImagesEnabled) {
+      try {
+        console.log(`[Generate] Generating hero image for: "${result.article.title}"`);
+        const season = (item.triggerData?.season as "summer" | "winter" | "allseason") || undefined;
+        const heroImage = await generateHeroImage(item.topic, season);
+        if (heroImage.url) {
+          const client = getPayloadClient();
+          const media = await client.uploadImageFromUrl(heroImage.url, {
+            alt: heroImage.alt,
+            filename: `article-${result.article.slug}.png`,
+          });
+          if (media) {
+            imageMediaId = media.id;
+            console.log(`[Generate] Hero image uploaded: media ID ${media.id}`);
+          }
+        }
+      } catch (imgError) {
+        const msg = imgError instanceof Error ? imgError.message : String(imgError);
+        console.warn(`[Generate] Image generation failed (non-blocking): ${msg}`);
+      }
+    }
+
+    // Publish or hold for review
+    const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
+
+    if (shouldPublish) {
+      updateQueueItem(item.id, {
+        status: "published",
+        generatedPayloadId: payloadId,
+        processedAt: new Date().toISOString(),
+      });
+      console.log(`[Generate] Published: "${result.article.title}" (ID: ${payloadId})`);
+    } else {
+      updateQueueItem(item.id, {
+        status: "review",
+        generatedPayloadId: payloadId,
+        processedAt: new Date().toISOString(),
+      });
+      console.log(`[Generate] For review: "${result.article.title}" (ID: ${payloadId})`);
+    }
+
+    return {
+      success: true,
+      payloadId,
+      articleTitle: result.article.title,
+      articleSlug: result.article.slug,
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    updateQueueItem(item.id, {
+      status: "failed",
+      error: msg,
+      processedAt: new Date().toISOString(),
+    });
+    console.error(`[Generate] Failed: "${item.topic}": ${msg}`);
+    return { success: false, error: msg };
+  }
+}
+
 async function processQueue(): Promise<{
   generated: number;
   published: number;
@@ -208,76 +329,23 @@ async function processQueue(): Promise<{
   let forReview = 0;
 
   for (const item of pending) {
-    try {
-      // Mark as generating
-      updateQueueItem(item.id, { status: "generating" });
+    const result = await processSingleQueueItem(item.id, {
+      autoPublish,
+      generateImages,
+      interlink,
+    });
 
-      // Build context for generation
-      const context = await buildGenerationContext(item, interlink);
-
-      // Generate article (pass relatedItems for interlinking)
-      console.log(`[Generate] Generating: "${item.topic}" (${item.articleType})`);
-      const result = await generateArticle({
-        ...context.input,
-        relatedItems: context.relatedItems.length > 0 ? context.relatedItems : undefined,
-      });
-
+    if (result.success) {
       generated++;
-
-      // Generate hero image if enabled
-      let imageMediaId: number | undefined;
-      if (generateImages) {
-        try {
-          console.log(`[Generate] Generating hero image for: "${result.article.title}"`);
-          const season = (item.triggerData?.season as "summer" | "winter" | "allseason") || undefined;
-          const heroImage = await generateHeroImage(item.topic, season);
-          if (heroImage.url) {
-            const client = getPayloadClient();
-            const media = await client.uploadImageFromUrl(heroImage.url, {
-              alt: heroImage.alt,
-              filename: `article-${result.article.slug}.png`,
-            });
-            if (media) {
-              imageMediaId = media.id;
-              console.log(`[Generate] Hero image uploaded: media ID ${media.id}`);
-            }
-          }
-        } catch (imgError) {
-          const msg = imgError instanceof Error ? imgError.message : String(imgError);
-          console.warn(`[Generate] Image generation failed (non-blocking): ${msg}`);
-        }
-      }
-
-      // Publish or hold for review
-      if (autoPublish) {
-        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
-        updateQueueItem(item.id, {
-          status: "published",
-          generatedPayloadId: payloadId,
-          processedAt: new Date().toISOString(),
-        });
+      // Check if it was published or sent for review
+      const updatedItem = getQueueItem(item.id);
+      if (updatedItem?.status === "published") {
         published++;
-        console.log(`[Generate] Published: "${result.article.title}" (ID: ${payloadId})`);
       } else {
-        // Save to CMS as draft / hold for review
-        const payloadId = await publishArticleToCMS(result.article, context.relatedTyreIds, imageMediaId);
-        updateQueueItem(item.id, {
-          status: "review",
-          generatedPayloadId: payloadId,
-          processedAt: new Date().toISOString(),
-        });
         forReview++;
-        console.log(`[Generate] For review: "${result.article.title}" (ID: ${payloadId})`);
       }
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      errors.push(`Article #${item.id} "${item.topic}": ${msg}`);
-      updateQueueItem(item.id, {
-        status: "failed",
-        error: msg,
-        processedAt: new Date().toISOString(),
-      });
-      console.error(`[Generate] Failed: "${item.topic}": ${msg}`);
+    } else {
+      errors.push(`Article #${item.id} "${item.topic}": ${result.error}`);
     }
   }
 
@@ -474,6 +542,20 @@ async function main() {
     console.log(
       `Generated: ${result.generated}, Published: ${result.published}, For review: ${result.forReview}`
     );
+    return;
+  }
+
+  // Process a single queue item by ID (used by manual generation CLI)
+  const processItemArg = args.find((a) => a.startsWith("--process-item="));
+  if (processItemArg) {
+    const itemId = parseInt(processItemArg.split("=")[1], 10);
+    if (isNaN(itemId)) {
+      console.error("Invalid item ID");
+      process.exit(1);
+    }
+    const result = await processSingleQueueItem(itemId);
+    // Output JSON result to stdout for subprocess consumption
+    console.log(JSON.stringify(result));
     return;
   }
 
