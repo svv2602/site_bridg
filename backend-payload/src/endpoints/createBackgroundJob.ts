@@ -187,6 +187,7 @@ export function createBackgroundJobHandler<TInput>(
       input = await parseInput(req);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      req.payload.logger.error(`[${jobPrefix}] parseInput failed: ${message}`);
       return apiError(message, 400);
     }
 

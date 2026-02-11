@@ -211,8 +211,14 @@ export const generateReviewsBatchEndpoint: Endpoint = {
       let body: { items?: Array<{ tyreId: number; count?: number }>; defaultCount?: number } = {};
       try {
         body = await req.json?.() || {};
-      } catch {
-        throw new Error('Invalid JSON body');
+      } catch (e) {
+        // req.json() may fail if body already consumed — try text fallback
+        try {
+          const text = await req.text?.();
+          if (text) body = JSON.parse(text);
+        } catch {
+          throw new Error(`Invalid JSON body: ${e instanceof Error ? e.message : String(e)}`);
+        }
       }
 
       if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
