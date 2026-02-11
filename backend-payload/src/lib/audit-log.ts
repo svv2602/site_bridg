@@ -44,7 +44,8 @@ export async function auditLog(
 ): Promise<void> {
   try {
     await payload.create({
-      collection: 'audit-log',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      collection: 'audit-log' as any,
       data: {
         action: event.action,
         actor: event.actor || 'system',

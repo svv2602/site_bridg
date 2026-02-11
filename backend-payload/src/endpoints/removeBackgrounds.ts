@@ -54,7 +54,7 @@ async function checkRembgAvailability(): Promise<Response | null> {
  * Returns the result status string for reporting.
  */
 async function processMediaItem(
-  payload: Parameters<typeof import('payload').BasePayload['update']>[0] extends never ? never : any,
+  payload: any, // Payload instance
   item: { id: number; filename: string; backgroundRemoved?: boolean },
   mediaDir: string,
 ): Promise<{ id: number; filename: string; status: string }> {

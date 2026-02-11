@@ -78,7 +78,7 @@ export const Users: CollectionConfig = {
     },
     update: ({ req }) => {
       if (!req.user) return false;
-      const user = req.user as { id?: string; role?: string };
+      const user = req.user as unknown as { id?: string | number; role?: string };
       // Admins can update anyone; users can update themselves
       if (user.role === 'admin') return true;
       return { id: { equals: user.id } };

@@ -128,7 +128,7 @@ export function createRateLimiter(opts: RateLimiterOptions = {}): RateLimiter {
  * Extract client IP from a Payload CMS v3 request (Web API Request).
  * Falls back to 'unknown' if no IP header is found.
  */
-export function extractIp(req: Request): string {
+export function extractIp(req: Request | { headers: { get(name: string): string | null } }): string {
   // Payload CMS v3 uses Web API Request; headers are accessed via .headers.get()
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) {
@@ -155,7 +155,7 @@ export function extractIp(req: Request): string {
  */
 export function checkRateLimit(
   limiter: RateLimiter,
-  req: Request,
+  req: Request | { headers: { get(name: string): string | null } },
   message = 'Забагато спроб. Спробуйте пізніше.',
 ): Response | null {
   const key = extractIp(req);
