@@ -345,7 +345,7 @@ export async function getPayloadTyres(params?: {
 
 export async function getPayloadTyreBySlug(slug: string): Promise<PayloadTyre | null> {
   const data = await fetchPayload<PayloadTyre>(
-    `tyres?where[slug][equals]=${encodeURIComponent(slug)}&depth=2`
+    `tyres?where[slug][equals]=${encodeURIComponent(slug)}&where[isPublished][equals]=true&depth=2`
   );
   return data.docs[0] || null;
 }
