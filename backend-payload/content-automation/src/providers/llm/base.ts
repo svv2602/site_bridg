@@ -135,18 +135,7 @@ Respond with valid JSON only. No explanations or markdown.`;
         // Not valid JSON, try to extract
       }
 
-      // Try to find a JSON array first
-      const arrayMatch = content.match(/\[[\s\S]*\]/);
-      if (arrayMatch) {
-        try {
-          const data = JSON.parse(arrayMatch[0]) as T;
-          return { data, response };
-        } catch {
-          // Array match wasn't valid JSON
-        }
-      }
-
-      // Try to find a single JSON object using balanced bracket matching
+      // Try to find a single JSON object first (most common LLM response format)
       const extractedObject = extractBalancedJSON(content, '{', '}');
       if (extractedObject) {
         try {
@@ -154,6 +143,17 @@ Respond with valid JSON only. No explanations or markdown.`;
           return { data, response };
         } catch {
           // Extracted object wasn't valid JSON
+        }
+      }
+
+      // Try to find a JSON array (less common)
+      const arrayMatch = content.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        try {
+          const data = JSON.parse(arrayMatch[0]) as T;
+          return { data, response };
+        } catch {
+          // Array match wasn't valid JSON
         }
       }
 
