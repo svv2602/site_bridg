@@ -338,8 +338,21 @@ Rules:
     ...(options?.model && { model: options.model }),
   });
 
-  // Normalize field names (DeepSeek may return snake_case or different keys)
-  const raw = rawData as Record<string, unknown>;
+  // Normalize field names (DeepSeek may return snake_case, wrapped objects, or arrays)
+  let raw = rawData as Record<string, unknown>;
+
+  // If response is an array, take the first object
+  if (Array.isArray(rawData)) {
+    raw = (rawData[0] || {}) as Record<string, unknown>;
+  }
+  // If response is wrapped in a key like "data" or "result", unwrap it
+  if (!raw.shortDescription && !raw.short_description && !raw.fullDescription && !raw.full_description) {
+    const firstValue = Object.values(raw)[0];
+    if (firstValue && typeof firstValue === "object" && !Array.isArray(firstValue)) {
+      raw = firstValue as Record<string, unknown>;
+    }
+  }
+
   const data: DescriptionOutput = {
     shortDescription: (raw.shortDescription || raw.short_description || "") as string,
     fullDescription: (raw.fullDescription || raw.full_description || "") as string,
@@ -348,6 +361,14 @@ Rules:
       : Array.isArray(raw.highlights) ? raw.highlights
       : [],
   };
+
+  // Warn if normalization produced empty results
+  if (!data.shortDescription && !data.fullDescription) {
+    logger.warn(`Empty content after normalization for ${input.modelName}`, {
+      rawKeys: Object.keys(rawData as Record<string, unknown>),
+      rawSample: JSON.stringify(rawData).substring(0, 300),
+    });
+  }
 
   // Validate content
   if (!options?.skipValidation) {
