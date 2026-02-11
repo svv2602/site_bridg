@@ -8,8 +8,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { MainHeader } from "@/components/MainHeader";
 import { Footer } from "@/components/Footer";
 import { CookiesBanner } from "@/components/CookiesBanner";
+import { HolidayBanner } from "@/components/HolidayBanner";
 import { Analytics, NavigationTracker } from "@/components/Analytics";
 import { SITE_URL, SITE_NAME, getSiteSettingsWithDefaults } from "@/lib/constants";
+import { getActiveHolidayBanners } from "@/lib/api/payload";
 import { generateOrganizationSchema } from "@/lib/schema";
 
 const geistSans = Geist({
@@ -102,7 +104,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettingsWithDefaults();
+  const [settings, holidayBanners] = await Promise.all([
+    getSiteSettingsWithDefaults(),
+    getActiveHolidayBanners(),
+  ]);
   const organizationSchema = generateOrganizationSchema(SITE_URL, settings);
   return (
     <html lang="uk" className="scroll-smooth">
@@ -149,6 +154,11 @@ export default async function RootLayout({
 
           {/* Main header */}
           <MainHeader />
+
+          {/* Holiday banners (auto-scheduled by date) */}
+          {holidayBanners.length > 0 && (
+            <HolidayBanner banners={holidayBanners} />
+          )}
 
           <AnimatedMain>{children}</AnimatedMain>
 

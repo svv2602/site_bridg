@@ -162,6 +162,78 @@ export interface SiteSettings {
   workingHours?: string;
 }
 
+export interface PayloadCategoryPage {
+  id: string;
+  slug: string;
+  pageType: 'vehicle' | 'season';
+  vehicleType?: 'passenger' | 'suv' | 'van';
+  season?: 'summer' | 'winter' | 'allseason';
+  seoTitle?: string;
+  seoDescription?: string;
+  title: string;
+  subtitle?: string;
+  heroDescription?: string;
+  heroImage?: PayloadMedia;
+  heroImageAlt?: string;
+  breadcrumbLabel?: string;
+  heroOverlay?: {
+    icon?: string;
+    iconBg?: string;
+    iconText?: string;
+    title?: string;
+    description?: string;
+  };
+  features?: {
+    icon: string;
+    title: string;
+    description: string;
+    colorBg?: string;
+    colorText?: string;
+  }[];
+  seasonSectionDescription?: string;
+  seasonDescriptionSummer?: string;
+  seasonDescriptionWinter?: string;
+  seasonDescriptionAllseason?: string;
+  seasonInitialCount?: number;
+  featuredTitle?: string;
+  featuredCount?: number;
+  filterPopular?: boolean;
+  reviewsVehicleType?: 'passenger' | 'suv' | 'van';
+  reviewsTitle?: string;
+  reviewsLimit?: number;
+  reviewsShowAllLink?: boolean;
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaPrimaryLabel?: string;
+  ctaPrimaryHref?: string;
+  ctaSecondaryLabel?: string;
+  ctaSecondaryHref?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PayloadHolidayBanner {
+  id: string;
+  name: string;
+  isActive: boolean;
+  priority: number;
+  holidayMonth: string;
+  holidayDay: number;
+  showDaysBefore: number;
+  showDaysAfter: number;
+  displayOn: 'homepage' | 'all-pages' | 'specific-pages';
+  specificPages?: { path: string }[];
+  title: string;
+  subtitle?: string;
+  emoji?: string;
+  link?: string;
+  linkText?: string;
+  bannerImage?: PayloadMedia;
+  bannerImageMobile?: PayloadMedia;
+  backgroundColor: string;
+  textColor: string;
+}
+
 interface PayloadResponse<T> {
   docs: T[];
   totalDocs: number;
@@ -594,6 +666,51 @@ export async function getSeasonalContent() {
   };
 }
 
+// Holiday Banners API (recurring annual banners with month+day)
+export async function getActiveHolidayBanners(): Promise<PayloadHolidayBanner[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set('where[isActive][equals]', 'true');
+    params.set('sort', '-priority');
+    params.set('depth', '1');
+    params.set('limit', '50');
+
+    const data = await fetchPayload<PayloadHolidayBanner>(
+      `holiday-banners?${params.toString()}`,
+      { revalidate: CACHE_TTL.SHORT }
+    );
+
+    // Filter by date in JS — Payload can't query recurring month+day logic
+    const now = new Date();
+
+    return data.docs.filter((banner) => {
+      const month = parseInt(banner.holidayMonth, 10);
+      const day = banner.holidayDay;
+      const daysBefore = banner.showDaysBefore ?? 7;
+      const daysAfter = banner.showDaysAfter ?? 1;
+
+      // Check current year and adjacent years for year-boundary holidays (e.g. New Year)
+      for (const yearOffset of [0, -1, 1]) {
+        const year = now.getFullYear() + yearOffset;
+        const holidayDate = new Date(year, month - 1, day);
+        const start = new Date(holidayDate);
+        start.setDate(start.getDate() - daysBefore);
+        const end = new Date(holidayDate);
+        end.setDate(end.getDate() + daysAfter);
+        end.setHours(23, 59, 59, 999);
+
+        if (now >= start && now <= end) {
+          return true;
+        }
+      }
+      return false;
+    });
+  } catch (error) {
+    console.warn('Failed to fetch holiday banners:', error);
+    return [];
+  }
+}
+
 // Transform Payload data to match existing frontend TyreModel type
 export function transformPayloadTyre(tyre: PayloadTyre) {
   // Convert usage from numbers (0-100) to booleans (>0 means true)
@@ -630,6 +747,19 @@ export function transformPayloadTyre(tyre: PayloadTyre) {
     seoTitle: tyre.seoTitle,
     seoDescription: tyre.seoDescription,
   };
+}
+
+// Category Pages API (rarely changes - use long cache)
+export async function getCategoryPageBySlug(slug: string): Promise<PayloadCategoryPage | null> {
+  try {
+    const data = await fetchPayload<PayloadCategoryPage>(
+      `category-pages?where[slug][equals]=${encodeURIComponent(slug)}&depth=1`,
+      { revalidate: CACHE_TTL.LONG }
+    );
+    return data.docs[0] || null;
+  } catch {
+    return null;
+  }
 }
 
 // Transform Payload data to match existing frontend Article type

@@ -15,9 +15,11 @@ import {
   VehicleFitments,
   ContactSubmissions,
   SeasonalContent,
+  HolidayBanners,
   ProviderSettings,
   TaskRouting,
   Reviews,
+  CategoryPages,
 } from './src/collections';
 import AuditLog from './src/collections/AuditLog';
 import { SiteSettings } from './src/globals';
@@ -120,9 +122,11 @@ export default buildConfig({
     VehicleFitments,
     ContactSubmissions,
     SeasonalContent,
+    HolidayBanners,
     ProviderSettings,
     TaskRouting,
     Reviews,
+    CategoryPages,
     AuditLog,
   ],
   globals: [SiteSettings],

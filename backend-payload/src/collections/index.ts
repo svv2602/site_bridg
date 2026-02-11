@@ -7,6 +7,8 @@ export { Technologies } from './Technologies';
 export { VehicleFitments } from './VehicleFitments';
 export { ContactSubmissions } from './ContactSubmissions';
 export { SeasonalContent } from './SeasonalContent';
+export { HolidayBanners } from './HolidayBanners';
 export { ProviderSettings } from './ProviderSettings';
 export { TaskRouting } from './TaskRouting';
 export { Reviews } from './Reviews';
+export { CategoryPages } from './CategoryPages';
