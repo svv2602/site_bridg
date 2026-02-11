@@ -30,6 +30,7 @@ const FALLBACK_ERROR_TYPES = [
   "rate_limit",
   "timeout",
   "service_unavailable",
+  "not_found",         // Model deprecated/removed (e.g. gemini-2.0-flash-exp)
   "authentication_error",
   "connection_error",
   "connection error",  // Match "Connection error." from OpenAI SDK
@@ -39,6 +40,7 @@ const FALLBACK_ERROR_TYPES = [
   "ENOTFOUND",
   "EAI_AGAIN",         // DNS lookup failure
   "ECONNREFUSED",
+  "404",               // Model not found / endpoint removed
   "429",
   "500",
   "502",
