@@ -242,12 +242,18 @@ Image.fromarray(arr).save(sys.argv[2])
 }
 
 const forceImages = process.argv.includes("--force-images");
+if (forceImages) {
+  console.log("Force images mode: will re-download and re-process all images");
+}
 
 async function deleteMedia(id: number): Promise<void> {
-  await fetch(`${PAYLOAD_URL}/api/media/${id}`, {
+  const resp = await fetch(`${PAYLOAD_URL}/api/media/${id}`, {
     method: "DELETE",
     headers: getHeaders(),
   });
+  if (!resp.ok) {
+    console.log(`    Warning: failed to delete media ${id}: ${resp.status}`);
+  }
 }
 
 async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBrand: string = 'Bridgestone'): Promise<number | null> {
