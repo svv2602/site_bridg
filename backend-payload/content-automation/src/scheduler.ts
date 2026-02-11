@@ -349,7 +349,7 @@ async function runPublishPipeline(brand?: Brand) {
         const fullDescriptionHtml = markdownToHtml(content.fullDescription);
 
         // Convert keyBenefits array to Payload format
-        const keyBenefits = content.keyBenefits.map((b: string) => ({
+        const keyBenefits = (content.keyBenefits || []).map((b: string) => ({
           benefit: b,
         }));
 
