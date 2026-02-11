@@ -7,13 +7,7 @@ import { saveJob, updateJob, cleanupOldJobs, type JobStatus } from '../endpoints
 
 const execAsync = promisify(exec);
 
-// ---- Structured logger ----
-
-const schedulerLogger = {
-  info: (msg: string, ...args: unknown[]) => console.log(`[Scheduler] ${msg}`, ...args),
-  warn: (msg: string, ...args: unknown[]) => console.warn(`[Scheduler] ${msg}`, ...args),
-  error: (msg: string, ...args: unknown[]) => console.error(`[Scheduler] ${msg}`, ...args),
-};
+import { schedulerLogger } from '../lib/logger';
 
 // ---- SQLite config persistence ----
 
@@ -175,7 +169,7 @@ async function runWithRetry(taskId: string, callback: () => Promise<void>): Prom
       // Schedule retry
       state.timer = setTimeout(() => {
         runWithRetry(taskId, callback).catch((err) => {
-          schedulerLogger.error(`Retry of "${taskId}" failed:`, err);
+          schedulerLogger.error(`Retry of "${taskId}" failed`, { error: err instanceof Error ? err.message : String(err) });
         });
       }, CRON_RETRY_CONFIG.retryDelayMs);
 
@@ -212,7 +206,7 @@ function startTaskCron(taskId: string): void {
     config.cronExpression,
     () => {
       runWithRetry(taskId, callback).catch((err) => {
-        schedulerLogger.error(`Unhandled error in cron callback for "${taskId}":`, err);
+        schedulerLogger.error(`Unhandled error in cron callback for "${taskId}"`, { error: err instanceof Error ? err.message : String(err) });
       });
     },
     { timezone: config.timezone },
@@ -382,7 +376,7 @@ export function initScheduler(): void {
       schedulerLogger.info(`Cleaned up ${cleaned} old job records`);
     }
   } catch (error) {
-    schedulerLogger.error('Failed to initialize:', error);
+    schedulerLogger.error('Failed to initialize', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 

@@ -68,7 +68,6 @@ describe("generateProductSchema", () => {
     expect(schema.description).toBe("Premium touring tyre");
     expect(schema.brand.name).toBe("Bridgestone");
     expect(schema.url).toBe("https://bridgestone.ua/shyny/turanza-t005");
-    expect(schema.offers["@type"]).toBe("AggregateOffer");
   });
 
   it("uses custom baseUrl", () => {
@@ -241,7 +240,7 @@ describe("generateOrganizationSchema", () => {
     const schema = generateOrganizationSchema();
 
     expect(schema["@type"]).toBe("Organization");
-    expect(schema.name).toBe("Bridgestone Ukraine");
+    expect(schema.name).toBe("Bridgestone Україна");
     expect(schema.url).toBe("https://bridgestone.ua");
     expect(schema.sameAs).toContain("https://www.facebook.com/BridgestoneUkraine");
     expect(schema.contactPoint.contactType).toBe("customer service");

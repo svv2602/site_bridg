@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from 'pg';
+import { importLogger } from '../lib/logger';
 
 // Singleton пул підключень до PostgreSQL для бази автомобілів
 let pool: Pool | null = null;
@@ -39,7 +40,7 @@ export function getVehiclesPool(): Pool {
     });
 
     pool.on('error', (err) => {
-      console.error('Vehicles DB pool error:', err);
+      importLogger.error('Vehicles DB pool error', { error: err.message });
     });
   }
 
@@ -118,7 +119,7 @@ export async function ensureDatabase(): Promise<void> {
 
     if (result.rows.length === 0) {
       await tempPool.query(`CREATE DATABASE ${dbName}`);
-      console.log(`Database ${dbName} created`);
+      importLogger.info(`Database ${dbName} created`);
     }
   } finally {
     await tempPool.end();

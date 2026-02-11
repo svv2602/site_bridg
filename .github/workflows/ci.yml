@@ -79,6 +79,80 @@ jobs:
         env:
           NEXT_PUBLIC_PAYLOAD_URL: http://localhost:3001
 
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend, frontend]
+    if: github.event_name == 'pull_request'
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bridgestone
+          POSTGRES_PASSWORD: bridgestone
+          POSTGRES_DB: bridgestone
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        working-directory: backend-payload
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend
+        working-directory: backend-payload
+        run: npm run dev &
+        env:
+          DATABASE_URI: postgresql://bridgestone:bridgestone@localhost:5432/bridgestone
+          PAYLOAD_SECRET: ci-test-secret-must-be-at-least-32-characters
+          NODE_ENV: development
+
+      - name: Start frontend
+        working-directory: frontend
+        run: npm run dev &
+        env:
+          NEXT_PUBLIC_PAYLOAD_URL: http://localhost:3001
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for backend..."
+          timeout 60 bash -c 'until curl -sf http://localhost:3001/api/health/live; do sleep 2; done' || true
+          echo "Waiting for frontend..."
+          timeout 60 bash -c 'until curl -sf http://localhost:3010; do sleep 2; done' || true
+
+      - name: Run E2E tests
+        run: npx playwright test --project=chromium
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
   docker:
     name: Docker Build & Push
     runs-on: ubuntu-latest

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayloadHMR } from "@payloadcms/next/utilities";
 import configPromise from "@payload-config";
 import { validateAuth, isAdmin, unauthorizedResponse, forbiddenResponse } from "../auth";
+import { serverLogger } from "../../../../lib/logger";
 import { loadGeneratedContent } from "../storage-helper";
 import { markdownToHtml } from "../../../../../content-automation/src/utils/markdown-to-html";
 
@@ -189,9 +190,7 @@ export async function POST(request: NextRequest) {
       data: updateData,
     });
 
-    console.log(
-      `[publish] Updated ${modelSlug}: ${updatedFields.join(", ")}`
-    );
+    serverLogger.info(`[publish] Updated ${modelSlug}: ${updatedFields.join(", ")}`);
 
     return NextResponse.json({
       success: true,
@@ -202,7 +201,7 @@ export async function POST(request: NextRequest) {
       publishedBy: auth.user?.email,
     });
   } catch (error) {
-    console.error("[publish] Error:", error);
+    serverLogger.error("[publish] Error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       {
         success: false,

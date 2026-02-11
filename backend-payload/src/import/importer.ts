@@ -9,6 +9,7 @@ import type {
   CsvTyreSize,
   ImportConfig,
 } from './types';
+import { importLogger } from '../lib/logger';
 
 // Глобальний стан прогресу імпорту
 let importProgress: ImportProgress = createInitialProgress();
@@ -95,7 +96,7 @@ export async function resetTables(): Promise<void> {
     )
   `);
 
-  console.log('Tables reset successfully');
+  importLogger.info('Tables reset successfully');
 }
 
 /**
@@ -156,7 +157,7 @@ async function importBrands(): Promise<Set<number>> {
     await execute(`INSERT INTO car_brands (id, name) VALUES ${batch.join(',')}`);
   }
 
-  console.log(`Imported ${importProgress.stats.brands} brands (skipped ${skipped} invalid)`);
+  importLogger.info(`Imported ${importProgress.stats.brands} brands (skipped ${skipped} invalid)`);
   return validBrandIds;
 }
 
@@ -202,7 +203,7 @@ async function importModels(validBrandIds: Set<number>): Promise<Set<number>> {
     );
   }
 
-  console.log(`Imported ${importProgress.stats.models} models (skipped ${skipped} invalid)`);
+  importLogger.info(`Imported ${importProgress.stats.models} models (skipped ${skipped} invalid)`);
   return validModelIds;
 }
 
@@ -210,7 +211,7 @@ async function importModels(validBrandIds: Set<number>): Promise<Set<number>> {
  * Перший прохід: знаходимо максимальний рік для кожної моделі
  */
 async function findModelMaxYears(): Promise<Map<number, number>> {
-  console.log('Scanning kits to find max year per model...');
+  importLogger.info('Scanning kits to find max year per model...');
   const modelMaxYears = new Map<number, number>();
 
   for await (const row of parseCsvStream<CsvKit>(CSV_FILES.kits)) {
@@ -225,7 +226,7 @@ async function findModelMaxYears(): Promise<Map<number, number>> {
     }
   }
 
-  console.log(`Found max years for ${modelMaxYears.size} models`);
+  importLogger.info(`Found max years for ${modelMaxYears.size} models`);
   return modelMaxYears;
 }
 
@@ -247,7 +248,7 @@ async function importKits(minYear: number, validModelIds: Set<number>): Promise<
       relevantModelIds.add(modelId);
     }
   }
-  console.log(`${relevantModelIds.size} models have max year >= ${minYear}`);
+  importLogger.info(`${relevantModelIds.size} models have max year >= ${minYear}`);
 
   // Другий прохід: імпортуємо комплектації для актуальних моделей (тільки роки >= minYear)
   const BATCH_SIZE = 5000;
@@ -290,7 +291,7 @@ async function importKits(minYear: number, validModelIds: Set<number>): Promise<
     );
   }
 
-  console.log(
+  importLogger.info(
     `Imported ${importProgress.stats.filteredKits} kits (filtered from ${importProgress.stats.kits})`
   );
 
@@ -338,7 +339,7 @@ async function importTyreSizes(validKitIds: Set<number>): Promise<void> {
     );
   }
 
-  console.log(
+  importLogger.info(
     `Imported ${importProgress.stats.filteredSizes} tyre sizes (filtered from ${importProgress.stats.tyreSizes})`
   );
 }
@@ -356,7 +357,7 @@ export async function runImport(
     importProgress.stage = 'preparing';
     importProgress.startedAt = new Date().toISOString();
 
-    console.log(`Starting import with minYear = ${minYear}`);
+    importLogger.info(`Starting import with minYear = ${minYear}`);
 
     // Переконуємось що БД існує
     await ensureDatabase();
@@ -382,13 +383,12 @@ export async function runImport(
     importProgress.stage = 'done';
     importProgress.completedAt = new Date().toISOString();
 
-    console.log('Import completed successfully!');
-    console.log('Stats:', importProgress.stats);
+    importLogger.info('Import completed successfully!', importProgress.stats as unknown as Record<string, unknown>);
   } catch (error) {
     importProgress.stage = 'error';
     importProgress.error =
       error instanceof Error ? error.message : 'Unknown error';
-    console.error('Import failed:', error);
+    importLogger.error('Import failed', { error: error instanceof Error ? error.message : String(error) });
     throw error;
   }
 }

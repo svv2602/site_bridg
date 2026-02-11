@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { getPayload, Payload } from 'payload';
 import config from '../payload.config';
+import { serverLogger } from './lib/logger';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,7 +46,7 @@ const start = async () => {
         },
       });
     } catch (error) {
-      console.error('Error fetching tyres:', error);
+      serverLogger.error('Error fetching tyres', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch tyres' });
     }
   });
@@ -65,7 +66,7 @@ const start = async () => {
 
       res.json({ data: result.docs[0] });
     } catch (error) {
-      console.error('Error fetching tyre:', error);
+      serverLogger.error('Error fetching tyre', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch tyre' });
     }
   });
@@ -94,7 +95,7 @@ const start = async () => {
         },
       });
     } catch (error) {
-      console.error('Error fetching articles:', error);
+      serverLogger.error('Error fetching articles', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch articles' });
     }
   });
@@ -114,7 +115,7 @@ const start = async () => {
 
       res.json({ data: result.docs[0] });
     } catch (error) {
-      console.error('Error fetching article:', error);
+      serverLogger.error('Error fetching article', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch article' });
     }
   });
@@ -143,7 +144,7 @@ const start = async () => {
         },
       });
     } catch (error) {
-      console.error('Error fetching dealers:', error);
+      serverLogger.error('Error fetching dealers', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch dealers' });
     }
   });
@@ -165,7 +166,7 @@ const start = async () => {
         },
       });
     } catch (error) {
-      console.error('Error fetching technologies:', error);
+      serverLogger.error('Error fetching technologies', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch technologies' });
     }
   });
@@ -185,7 +186,7 @@ const start = async () => {
 
       res.json({ data: result.docs[0] });
     } catch (error) {
-      console.error('Error fetching technology:', error);
+      serverLogger.error('Error fetching technology', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch technology' });
     }
   });
@@ -215,7 +216,7 @@ const start = async () => {
         },
       });
     } catch (error) {
-      console.error('Error fetching vehicle fitments:', error);
+      serverLogger.error('Error fetching vehicle fitments', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch vehicle fitments' });
     }
   });
@@ -231,7 +232,7 @@ const start = async () => {
       const makes = [...new Set(result.docs.map((doc: { make: string }) => doc.make))].sort();
       res.json({ data: makes });
     } catch (error) {
-      console.error('Error fetching makes:', error);
+      serverLogger.error('Error fetching makes', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch makes' });
     }
   });
@@ -250,7 +251,7 @@ const start = async () => {
       const models = [...new Set(result.docs.map((doc: { model: string }) => doc.model))].sort();
       res.json({ data: models });
     } catch (error) {
-      console.error('Error fetching models:', error);
+      serverLogger.error('Error fetching models', { error: error instanceof Error ? error.message : String(error) });
       res.status(500).json({ error: 'Failed to fetch models' });
     }
   });
@@ -289,11 +290,11 @@ const start = async () => {
   });
 
   app.listen(PORT, () => {
-    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 Admin panel: http://localhost:${PORT}/admin`);
-    console.log(`📡 API: http://localhost:${PORT}/api`);
-    console.log(`🔧 Automation API: http://localhost:${PORT}/api/automation/status\n`);
+    serverLogger.info(`Server running on http://localhost:${PORT}`);
+    serverLogger.info(`Admin panel: http://localhost:${PORT}/admin`);
+    serverLogger.info(`API: http://localhost:${PORT}/api`);
+    serverLogger.info(`Automation API: http://localhost:${PORT}/api/automation/status`);
   });
 };
 
-start().catch(console.error);
+start().catch((err) => serverLogger.error('Failed to start server', { error: err instanceof Error ? err.message : String(err) }));

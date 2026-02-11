@@ -17,6 +17,8 @@
  * },
  */
 
+import { sentryLogger } from './logger';
+
 let sentryInitialized = false;
 
 /**
@@ -26,7 +28,7 @@ let sentryInitialized = false;
 export function initSentry(): void {
   const dsn = process.env.SENTRY_DSN;
   if (!dsn) {
-    console.log('[Sentry] SENTRY_DSN not set, error tracking disabled');
+    sentryLogger.info('SENTRY_DSN not set, error tracking disabled');
     return;
   }
 
@@ -50,10 +52,10 @@ export function initSentry(): void {
     });
 
     sentryInitialized = true;
-    console.log('[Sentry] Initialized for backend error tracking');
+    sentryLogger.info('Initialized for backend error tracking');
   } catch {
-    console.log('[Sentry] @sentry/node not installed, skipping initialization');
-    console.log('[Sentry] To enable: npm install @sentry/node');
+    sentryLogger.info('@sentry/node not installed, skipping initialization');
+    sentryLogger.info('To enable: npm install @sentry/node');
   }
 }
 
