@@ -330,7 +330,7 @@ Rules:
   const generator = fallbackLlm.forTask("content-generation");
   const systemPrompts = getSystemPromptsForBrand(brand);
 
-  const { data, response } = await generator.generateJSON<DescriptionOutput>(prompt, {
+  const { data: rawData, response } = await generator.generateJSON<DescriptionOutput>(prompt, {
     systemPrompt: systemPrompts.tireDescription,
     maxTokens: 4000,
     temperature: 0.7,
@@ -338,15 +338,26 @@ Rules:
     ...(options?.model && { model: options.model }),
   });
 
+  // Normalize field names (DeepSeek may return snake_case or different keys)
+  const raw = rawData as Record<string, unknown>;
+  const data: DescriptionOutput = {
+    shortDescription: (raw.shortDescription || raw.short_description || "") as string,
+    fullDescription: (raw.fullDescription || raw.full_description || "") as string,
+    keyBenefits: Array.isArray(raw.keyBenefits) ? raw.keyBenefits
+      : Array.isArray(raw.key_benefits) ? raw.key_benefits
+      : Array.isArray(raw.highlights) ? raw.highlights
+      : [],
+  };
+
   // Validate content
   if (!options?.skipValidation) {
     validateContent(data);
   }
 
   logger.info(`Description generated for ${input.modelName}`, {
-    shortDescLength: data.shortDescription.length,
-    fullDescLength: data.fullDescription.length,
-    keyBenefits: data.keyBenefits.length,
+    shortDescLength: data.shortDescription?.length ?? 0,
+    fullDescLength: data.fullDescription?.length ?? 0,
+    keyBenefits: data.keyBenefits?.length ?? 0,
     cost: response.cost.toFixed(4),
   });
 

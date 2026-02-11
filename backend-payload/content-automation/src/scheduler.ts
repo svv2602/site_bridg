@@ -253,19 +253,19 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
           brand: tireBrand,
           season: tire.season || "summer",
           shortDescription: descResult.content.shortDescription,
-          keyBenefits: descResult.content.highlights,
+          keyBenefits: descResult.content.keyBenefits,
         }, { skipValidation: true });
 
         // Combine results into unified content object
         const content = {
           shortDescription: descResult.content.shortDescription,
           fullDescription: descResult.content.fullDescription,
-          keyBenefits: descResult.content.highlights,
+          keyBenefits: descResult.content.keyBenefits,
           seoTitle: seoResult.seo.seoTitle,
           seoDescription: seoResult.seo.seoDescription,
         };
 
-        console.log(`  ✓ Generated: ${content.shortDescription.substring(0, 60)}...`);
+        console.log(`  ✓ Generated: ${(content.shortDescription || '').substring(0, 60)}...`);
         console.log(`    Cost: $${(descResult.metadata.cost + seoResult.metadata.cost).toFixed(4)}`);
 
         // Mark as processed and store generated content

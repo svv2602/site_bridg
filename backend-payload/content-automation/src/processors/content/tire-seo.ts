@@ -137,7 +137,7 @@ export async function generateTireSEO(
   const generator = fallbackLlm.forTask("content-generation");
   const systemPrompts = getSystemPromptsForBrand(brand);
 
-  const { data, response } = await generator.generateJSON<SEOOutput>(prompt, {
+  const { data: rawData, response } = await generator.generateJSON<SEOOutput>(prompt, {
     systemPrompt: systemPrompts.tireSEO,
     maxTokens: 500,
     temperature: 0.5,
@@ -145,14 +145,21 @@ export async function generateTireSEO(
     ...(options?.model && { model: options.model }),
   });
 
+  // Normalize field names (handle snake_case variants)
+  const raw = rawData as Record<string, unknown>;
+  const data: SEOOutput = {
+    seoTitle: (raw.seoTitle || raw.seo_title || "") as string,
+    seoDescription: (raw.seoDescription || raw.seo_description || "") as string,
+  };
+
   // Validate SEO
   if (!options?.skipValidation) {
     validateSEO(data);
   }
 
   logger.info(`SEO generated for ${input.modelName}`, {
-    titleLength: data.seoTitle.length,
-    descLength: data.seoDescription.length,
+    titleLength: data.seoTitle?.length ?? 0,
+    descLength: data.seoDescription?.length ?? 0,
     cost: response.cost.toFixed(4),
   });
 
