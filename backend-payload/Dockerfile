@@ -55,6 +55,9 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/payload.config.ts ./
 
+# Install Playwright Chromium for scraping (content-automation)
+RUN npx playwright install --with-deps chromium
+
 # Create media directory
 RUN mkdir -p media
 
