@@ -2,7 +2,7 @@
  * Import scraped tyres to Payload CMS
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { join, dirname, basename } from "path";
 import { fileURLToPath } from "url";
 import { execSync } from "child_process";
@@ -216,27 +216,25 @@ Image.fromarray(arr).save(sys.argv[2])
 `;
 
   try {
-    const fs = require("fs");
     const scriptPath = join(tmpDir, `rembg-script-${ts}.py`);
-    fs.writeFileSync(inputPath, inputBuffer);
-    fs.writeFileSync(scriptPath, pythonScript);
+    writeFileSync(inputPath, inputBuffer);
+    writeFileSync(scriptPath, pythonScript);
     execSync(`/opt/venv/bin/python "${scriptPath}" "${inputPath}" "${outputPath}"`, {
       timeout: 120000,
       stdio: "pipe",
     });
-    const result = fs.readFileSync(outputPath);
+    const result = readFileSync(outputPath);
     // Cleanup
-    try { fs.unlinkSync(inputPath); } catch {}
-    try { fs.unlinkSync(outputPath); } catch {}
-    try { fs.unlinkSync(scriptPath); } catch {}
+    try { unlinkSync(inputPath); } catch {}
+    try { unlinkSync(outputPath); } catch {}
+    try { unlinkSync(scriptPath); } catch {}
     return result;
   } catch (error) {
     console.log(`    Warning: rembg failed, using original image`);
     // Cleanup on error
-    const fs = require("fs");
-    try { fs.unlinkSync(inputPath); } catch {}
-    try { fs.unlinkSync(outputPath); } catch {}
-    try { fs.unlinkSync(join(tmpDir, `rembg-script-${ts}.py`)); } catch {}
+    try { unlinkSync(inputPath); } catch {}
+    try { unlinkSync(outputPath); } catch {}
+    try { unlinkSync(join(tmpDir, `rembg-script-${ts}.py`)); } catch {}
     return inputBuffer;
   }
 }
