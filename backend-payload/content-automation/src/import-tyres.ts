@@ -143,34 +143,111 @@ async function findMediaByFilename(filename: string): Promise<number | null> {
 }
 
 /**
- * Remove background from image buffer using rembg CLI.
- * Returns processed buffer or original if rembg is unavailable.
+ * Remove background from image using rembg + white cleanup.
+ * After rembg, flood-fills remaining white areas from corners to make them transparent.
+ * Returns processed buffer or original if processing fails.
  */
 function removeBackground(inputBuffer: Buffer): Buffer {
-  const rembgPath = process.env.REMBG_PATH || "/opt/venv/bin/rembg";
   const tmpDir = "/tmp";
-  const inputPath = join(tmpDir, `rembg-input-${Date.now()}.png`);
-  const outputPath = join(tmpDir, `rembg-output-${Date.now()}.png`);
+  const ts = Date.now();
+  const inputPath = join(tmpDir, `rembg-input-${ts}.png`);
+  const outputPath = join(tmpDir, `rembg-output-${ts}.png`);
+
+  const pythonScript = `
+import sys
+from PIL import Image
+import numpy as np
+from rembg import remove
+
+# Load image
+img = Image.open(sys.argv[1])
+
+# Step 1: rembg background removal
+result = remove(img)
+arr = np.array(result)
+
+# Step 2: Flood-fill remaining white/near-white pixels from edges
+# Build mask of near-white pixels (R>240, G>240, B>240) that are still opaque
+h, w = arr.shape[:2]
+white_mask = (arr[:,:,0] > 240) & (arr[:,:,1] > 240) & (arr[:,:,2] > 240) & (arr[:,:,3] > 200)
+
+# BFS flood fill from all edge pixels that are white
+from collections import deque
+visited = np.zeros((h, w), dtype=bool)
+queue = deque()
+
+# Seed from all 4 edges
+for x in range(w):
+    if white_mask[0, x]:
+        queue.append((0, x))
+        visited[0, x] = True
+    if white_mask[h-1, x]:
+        queue.append((h-1, x))
+        visited[h-1, x] = True
+for y in range(h):
+    if white_mask[y, 0]:
+        queue.append((y, 0))
+        visited[y, 0] = True
+    if white_mask[y, w-1]:
+        queue.append((y, w-1))
+        visited[y, w-1] = True
+
+# Also seed from already-transparent pixels adjacent to white
+for y in range(h):
+    for x in range(w):
+        if arr[y, x, 3] == 0:  # transparent pixel
+            for dy, dx in [(-1,0),(1,0),(0,-1),(0,1)]:
+                ny, nx = y+dy, x+dx
+                if 0 <= ny < h and 0 <= nx < w and white_mask[ny, nx] and not visited[ny, nx]:
+                    queue.append((ny, nx))
+                    visited[ny, nx] = True
+
+while queue:
+    cy, cx = queue.popleft()
+    arr[cy, cx, 3] = 0  # Make transparent
+    for dy, dx in [(-1,0),(1,0),(0,-1),(0,1)]:
+        ny, nx = cy+dy, cx+dx
+        if 0 <= ny < h and 0 <= nx < w and not visited[ny, nx] and white_mask[ny, nx]:
+            visited[ny, nx] = True
+            queue.append((ny, nx))
+
+# Save result
+Image.fromarray(arr).save(sys.argv[2])
+`;
 
   try {
     const fs = require("fs");
+    const scriptPath = join(tmpDir, `rembg-script-${ts}.py`);
     fs.writeFileSync(inputPath, inputBuffer);
-    execSync(`${rembgPath} i "${inputPath}" "${outputPath}"`, {
-      timeout: 60000,
+    fs.writeFileSync(scriptPath, pythonScript);
+    execSync(`/opt/venv/bin/python "${scriptPath}" "${inputPath}" "${outputPath}"`, {
+      timeout: 120000,
       stdio: "pipe",
     });
     const result = fs.readFileSync(outputPath);
     // Cleanup
     try { fs.unlinkSync(inputPath); } catch {}
     try { fs.unlinkSync(outputPath); } catch {}
+    try { fs.unlinkSync(scriptPath); } catch {}
     return result;
   } catch (error) {
     console.log(`    Warning: rembg failed, using original image`);
     // Cleanup on error
-    try { require("fs").unlinkSync(inputPath); } catch {}
-    try { require("fs").unlinkSync(outputPath); } catch {}
+    const fs = require("fs");
+    try { fs.unlinkSync(inputPath); } catch {}
+    try { fs.unlinkSync(outputPath); } catch {}
+    try { fs.unlinkSync(join(tmpDir, `rembg-script-${ts}.py`)); } catch {}
     return inputBuffer;
   }
+}
+
+const forceImages = process.argv.includes("--force-images");
+
+async function deleteMedia(id: number): Promise<void> {
+  await fetch(`${PAYLOAD_URL}/api/media/${id}`, {
+    method: "DELETE",
+    headers: getHeaders(),
+  });
 }
 
 async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBrand: string = 'Bridgestone'): Promise<number | null> {
@@ -182,16 +259,22 @@ async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBr
     // Always use png for processed images
     const filename = `${tyreName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.png`;
 
-    // Check cache first
-    if (mediaCache.has(filename)) {
+    // Check cache first (skip if --force-images)
+    if (!forceImages && mediaCache.has(filename)) {
       return mediaCache.get(filename)!;
     }
 
     // Check if already uploaded
     const existingId = await findMediaByFilename(filename);
-    if (existingId) {
+    if (existingId && !forceImages) {
       mediaCache.set(filename, existingId);
       return existingId;
+    }
+
+    // If forcing re-upload, delete existing media first
+    if (existingId && forceImages) {
+      console.log(`    Deleting existing image for re-upload...`);
+      await deleteMedia(existingId);
     }
 
     // Download the image
