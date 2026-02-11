@@ -279,7 +279,7 @@ export const contentFullPipelineEndpoint: Endpoint = {
 
     const scrapeCmd = `npx tsx src/scrapers/prokoleso.ts${force ? ' --force' : ''}`;
     const importCmd = 'npx tsx src/import-tyres.ts';
-    const generateCmd = 'npx tsx src/index.ts --generate';
+    const generateCmd = 'npx tsx src/scheduler.ts generate';
     const command = `${scrapeCmd} && ${importCmd} && ${generateCmd}`;
 
     const steps = [

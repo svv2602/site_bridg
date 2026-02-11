@@ -236,7 +236,7 @@ async function runScheduledPipeline(): Promise<void> {
 
   const scrapeCmd = 'npx tsx src/scrapers/prokoleso.ts';
   const importCmd = 'npx tsx src/import-tyres.ts';
-  const generateCmd = 'npx tsx src/index.ts --generate';
+  const generateCmd = 'npx tsx src/scheduler.ts generate';
   const fullCommand = `${scrapeCmd} && ${importCmd} && ${generateCmd}`;
 
   const steps = [
