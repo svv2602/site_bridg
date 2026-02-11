@@ -55,6 +55,256 @@ async function uploadImageFromUrl(
   }
 }
 
+// Helper to upload local image file to Payload Media
+async function uploadLocalImage(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  relativePath: string,
+  altText: string
+): Promise<string | null> {
+  try {
+    const sourcePath = path.resolve(__dirname, '../../frontend/public', relativePath);
+    if (!fs.existsSync(sourcePath)) {
+      console.log(`      File not found: ${sourcePath}`);
+      return null;
+    }
+
+    const tempDir = path.join(__dirname, '../temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    const filename = path.basename(sourcePath);
+    const tempPath = path.join(tempDir, filename);
+    fs.copyFileSync(sourcePath, tempPath);
+
+    const media = await payload.create({
+      collection: 'media',
+      data: { alt: altText },
+      filePath: tempPath,
+    });
+
+    fs.unlinkSync(tempPath);
+    console.log(`      Uploaded: ${filename}`);
+    return media.id;
+  } catch (error) {
+    console.error(`      Error uploading local image:`, error);
+    return null;
+  }
+}
+
+// Category pages data
+const CATEGORY_PAGES_DATA = [
+  // Vehicle pages
+  {
+    slug: 'passenger-tyres',
+    pageType: 'vehicle' as const,
+    vehicleType: 'passenger' as const,
+    seoTitle: 'Легкові шини Bridgestone | Каталог шин для легкових авто',
+    seoDescription: 'Широкий вибір легкових шин Bridgestone для вашого автомобіля. Літні, зимові та всесезонні моделі з гарантією якості для комфортної та безпечної їзди.',
+    title: 'Легкові шини Bridgestone',
+    subtitle: 'технічний підбір для щоденних поїздок та далеких подорожей',
+    heroDescription: 'Від міських маршрутів до траси — оберіть літні, зимові або всесезонні шини Bridgestone під ваш стиль водіння. Інформація подана в більш «технічному» стилі, узгодженому з пошуком шин.',
+    heroImagePath: 'images/hero/hero-passenger.webp',
+    heroImageAlt: 'Легкові шини Bridgestone',
+    breadcrumbLabel: 'Шини для легкових авто',
+    heroOverlay: {
+      icon: 'car',
+      iconBg: 'bg-blue-500/15',
+      iconText: 'text-blue-500',
+      title: 'Легкові шини Bridgestone',
+      description: 'Комфорт та безпека для щоденних поїздок',
+    },
+    features: [
+      { icon: 'car', title: 'Комфорт та керованість', description: 'Оптимальна жорсткість та форма протектора для комфортної їзди.', colorBg: 'bg-blue-500/15', colorText: 'text-blue-500' },
+      { icon: 'shield', title: 'Безпека на мокрій дорозі', description: 'Глибокі дренажні канали для швидкого відведення води.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'zap', title: 'Економія палива', description: 'Знижений опір коченню завдяки спеціальним матеріалам.', colorBg: 'bg-amber-500/15', colorText: 'text-amber-500' },
+      { icon: 'star', title: 'Довговічність', description: 'Міцна конструкція та стійкість до зносу на українських дорогах.', colorBg: 'bg-purple-500/15', colorText: 'text-purple-500' },
+    ],
+    seasonSectionDescription: 'Кожна модель розроблена з урахуванням специфіки експлуатації легкових авто у різних умовах.',
+    seasonDescriptionSummer: 'Ідеальні для літніх подорожей містом та трасою, забезпечують комфорт та економію палива.',
+    seasonDescriptionWinter: 'Надійне зчеплення на снігу, льоду та сльоті для безпеки в зимових умовах.',
+    seasonDescriptionAllseason: 'Універсальні шини для цілорічної експлуатації в різних дорожніх умовах.',
+    seasonInitialCount: 3,
+    featuredTitle: 'Популярні моделі для легкових авто',
+    featuredCount: 6,
+    filterPopular: true,
+    reviewsVehicleType: 'passenger' as const,
+    reviewsTitle: 'Відгуки про легкові шини',
+    reviewsLimit: 6,
+    reviewsShowAllLink: true,
+    ctaTitle: 'Потрібна допомога у виборі?',
+    ctaDescription: 'Наші експерти допоможуть підібрати ідеальні шини для вашого автомобіля з урахуванням стилю водіння, умов експлуатації та бюджету.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+  {
+    slug: 'suv-4x4-tyres',
+    pageType: 'vehicle' as const,
+    vehicleType: 'suv' as const,
+    seoTitle: 'Шини для SUV та 4x4 Bridgestone | Каталог для позашляховиків',
+    seoDescription: 'Шини Bridgestone для позашляховиків та кросоверів. Підвищена прохідність, надійне зчеплення на будь-якому покритті. Літні, зимові та всесезонні моделі.',
+    title: 'Шини Bridgestone для SUV та 4x4',
+    subtitle: 'технічний підбір для важчих авто, позашляховиків та кросоверів',
+    heroDescription: 'Підкорюйте бездоріжжя, гірські серпантини чи міські бордюри — оберіть шини Bridgestone, розроблені для стабільності та зчеплення потужних автомобілів у різних умовах.',
+    heroImagePath: 'images/hero/hero-suv.webp',
+    heroImageAlt: 'Шини для SUV та 4x4 Bridgestone',
+    breadcrumbLabel: 'Шини для SUV та 4x4',
+    heroOverlay: {
+      icon: 'mountain',
+      iconBg: 'bg-orange-500/15',
+      iconText: 'text-orange-500',
+      title: 'SUV та 4x4 з Bridgestone',
+      description: 'Надійність та прохідність для позашляховиків',
+    },
+    features: [
+      { icon: 'car', title: 'Посилена конструкція', description: 'Каркас, розрахований на великі навантаження та складні дорожні умови.', colorBg: 'bg-blue-500/15', colorText: 'text-blue-500' },
+      { icon: 'shield', title: 'Захист від пошкоджень', description: 'Технології захисту боковини та протектора від каміння та ударів.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'zap', title: 'Висока прохідність', description: 'Малюнок протектора, що забезпечує зчеплення на гравії, снігу та бруді.', colorBg: 'bg-amber-500/15', colorText: 'text-amber-500' },
+      { icon: 'mountain', title: 'Стабільність на швидкості', description: 'Оптимізована форма плеча для стабільної поведінки на трасі.', colorBg: 'bg-orange-500/15', colorText: 'text-orange-500' },
+    ],
+    seasonSectionDescription: 'Кожна модель розроблена з урахуванням специфіки експлуатації SUV та 4x4 у різних умовах.',
+    seasonDescriptionSummer: 'Ідеальні для літніх подорожей містом та трасою, забезпечують комфорт та економію палива.',
+    seasonDescriptionWinter: 'Надійне зчеплення на снігу, льоду та сльоті для безпеки в зимових умовах.',
+    seasonDescriptionAllseason: 'Універсальні шини для цілорічної експлуатації в різних дорожніх умовах.',
+    seasonInitialCount: 2,
+    featuredTitle: 'Популярні моделі для SUV',
+    featuredCount: 6,
+    filterPopular: false,
+    reviewsVehicleType: 'suv' as const,
+    reviewsTitle: 'Відгуки про шини для SUV',
+    reviewsLimit: 3,
+    reviewsShowAllLink: false,
+    ctaTitle: 'Потрібна допомога у виборі?',
+    ctaDescription: 'Наші експерти допоможуть підібрати ідеальні шини для вашого позашляховика з урахуванням стилю водіння, умов експлуатації та бюджету.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+  {
+    slug: 'lcv-tyres',
+    pageType: 'vehicle' as const,
+    vehicleType: 'van' as const,
+    seoTitle: 'Шини для комерційних авто (LCV)',
+    seoDescription: 'Шини Bridgestone для легких комерційних авто: фургони, мікроавтобуси, вантажні мінівени. Літні, зимові та всесезонні шини з високою вантажопідйомністю.',
+    title: 'Шини для комерційних авто',
+    subtitle: 'надійні рішення для вантажних перевезень та бізнесу',
+    heroDescription: 'Шини Bridgestone для фургонів, мікроавтобусів та легких вантажівок. Витримують інтенсивні навантаження, забезпечують економію та безпеку при щоденних комерційних перевезеннях.',
+    heroImagePath: 'images/hero/hero-lcv.webp',
+    heroImageAlt: 'Шини для комерційних авто Bridgestone',
+    breadcrumbLabel: 'Шини для комерційних авто (LCV)',
+    heroOverlay: {
+      icon: 'truck',
+      iconBg: 'bg-stone-500/15',
+      iconText: 'text-stone-400',
+      title: 'Комерційні шини Bridgestone',
+      description: 'Для фургонів, мікроавтобусів та легких вантажівок',
+    },
+    features: [
+      { icon: 'weight', title: 'Висока вантажопідйомність', description: 'Посилена конструкція для перевезення важких вантажів.', colorBg: 'bg-stone-500/15', colorText: 'text-stone-500' },
+      { icon: 'shield', title: 'Стійкість до зносу', description: 'Спеціальна гумова суміш для інтенсивної експлуатації.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'zap', title: 'Економія палива', description: 'Знижений опір коченню для зменшення витрат на пальне.', colorBg: 'bg-amber-500/15', colorText: 'text-amber-500' },
+      { icon: 'gauge', title: 'Безпека при повному завантаженні', description: 'Надійне гальмування та керованість з повним навантаженням.', colorBg: 'bg-cyan-500/15', colorText: 'text-cyan-500' },
+    ],
+    seasonSectionDescription: 'Кожна модель розроблена з урахуванням специфіки експлуатації комерційних авто у різних умовах.',
+    seasonDescriptionSummer: 'Для інтенсивних перевезень у теплий сезон, оптимізовані для високого пробігу.',
+    seasonDescriptionWinter: 'Надійне зчеплення на снігу та льоду для безпечних зимових доставок.',
+    seasonDescriptionAllseason: 'Універсальні шини для цілорічної комерційної експлуатації.',
+    seasonInitialCount: 2,
+    featuredTitle: 'Популярні моделі для комерційних авто',
+    featuredCount: 6,
+    filterPopular: false,
+    reviewsVehicleType: 'van' as const,
+    reviewsTitle: 'Відгуки про комерційні шини',
+    reviewsLimit: 3,
+    reviewsShowAllLink: false,
+    ctaTitle: 'Потрібна консультація для автопарку?',
+    ctaDescription: 'Наші експерти допоможуть підібрати оптимальні шини для вашого комерційного транспорту з урахуванням типу перевезень та інтенсивності експлуатації.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+  // Season pages
+  {
+    slug: 'summer',
+    pageType: 'season' as const,
+    season: 'summer' as const,
+    seoTitle: 'Літні шини Bridgestone | Шини для теплої пори року',
+    seoDescription: 'Літні шини Bridgestone для легкових авто. Оптимальне зчеплення на сухій та мокрій дорозі, економія палива та комфорт у теплу пору року.',
+    title: 'Літні шини Bridgestone',
+    subtitle: 'оптимальні характеристики для теплої пори року',
+    heroDescription: 'Літні шини розроблені для експлуатації при температурі вище +7°C. Спеціальна гумова суміш забезпечує оптимальну еластичність та зчеплення на сухому та мокрому асфальті.',
+    heroImagePath: 'images/hero/hero-summer.webp',
+    heroImageAlt: 'Літні шини Bridgestone',
+    breadcrumbLabel: 'Літні шини',
+    features: [
+      { icon: 'thermometer', title: 'Для температур вище +7°C', description: 'Оптимальна еластичність гуми в теплу пору року.', colorBg: 'bg-red-500/15', colorText: 'text-red-500' },
+      { icon: 'zap', title: 'Знижений опір коченню', description: 'Економія палива до 5% порівняно з всесезонними.', colorBg: 'bg-amber-500/15', colorText: 'text-amber-500' },
+      { icon: 'shield', title: 'Відмінне гальмування', description: 'Скорочення гальмівного шляху на сухій дорозі.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'car', title: 'Тиха їзда', description: 'Оптимізований протектор для низького рівня шуму.', colorBg: 'bg-blue-500/15', colorText: 'text-blue-500' },
+    ],
+    ctaTitle: 'Потрібна допомога у виборі?',
+    ctaDescription: 'Наші експерти допоможуть підібрати ідеальні літні шини для вашого автомобіля з урахуванням стилю водіння та умов експлуатації.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+  {
+    slug: 'winter',
+    pageType: 'season' as const,
+    season: 'winter' as const,
+    seoTitle: 'Зимові шини Bridgestone | Шини для снігу та льоду',
+    seoDescription: 'Зимові шини Bridgestone для безпечної їзди взимку. Надійне зчеплення на снігу, льоду та сльоті, стабільність при низьких температурах.',
+    title: 'Зимові шини Bridgestone',
+    subtitle: 'безпека та контроль у зимових умовах',
+    heroDescription: "Зимові шини обов'язкові при температурі нижче +7°C. Спеціальна м'яка гумова суміш та ламелі забезпечують зчеплення на снігу, льоду та мокрій дорозі.",
+    heroImagePath: 'images/hero/hero-winter.webp',
+    heroImageAlt: 'Зимові шини Bridgestone',
+    breadcrumbLabel: 'Зимові шини',
+    features: [
+      { icon: 'snowflake', title: 'Позначка 3PMSF', description: 'Сертифіковані для суворих зимових умов.', colorBg: 'bg-sky-500/15', colorText: 'text-sky-500' },
+      { icon: 'shield', title: 'Зчеплення на льоду', description: 'Мікро-ламелі для контролю на слизькій поверхні.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'thermometer', title: "М'яка гумова суміш", description: 'Зберігає еластичність при морозі до -40°C.', colorBg: 'bg-red-500/15', colorText: 'text-red-500' },
+      { icon: 'car', title: 'Відведення сльоти', description: 'Глибокі канали для відведення снігу та води.', colorBg: 'bg-blue-500/15', colorText: 'text-blue-500' },
+    ],
+    ctaTitle: 'Потрібна допомога у виборі?',
+    ctaDescription: 'Наші експерти допоможуть підібрати ідеальні зимові шини для вашого автомобіля з урахуванням стилю водіння та умов експлуатації.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+  {
+    slug: 'allseason',
+    pageType: 'season' as const,
+    season: 'allseason' as const,
+    seoTitle: 'Всесезонні шини Bridgestone | Цілорічне використання',
+    seoDescription: 'Всесезонні шини Bridgestone для цілорічної експлуатації. Універсальне рішення для помірного клімату з балансом характеристик для літа та зими.',
+    title: 'Всесезонні шини Bridgestone',
+    subtitle: 'універсальне рішення на весь рік',
+    heroDescription: "Всесезонні шини — компромісне рішення для регіонів з помірним кліматом. Підходять для цілорічної експлуатації без необхідності сезонної заміни.",
+    heroImagePath: 'images/hero/hero-allseason.webp',
+    heroImageAlt: 'Всесезонні шини Bridgestone',
+    breadcrumbLabel: 'Всесезонні шини',
+    features: [
+      { icon: 'cloud', title: 'Цілорічна експлуатація', description: 'Не потребують сезонної заміни шин.', colorBg: 'bg-amber-500/15', colorText: 'text-amber-500' },
+      { icon: 'shield', title: 'Позначка M+S', description: 'Підходять для легкої зими та літа.', colorBg: 'bg-emerald-500/15', colorText: 'text-emerald-500' },
+      { icon: 'zap', title: 'Економія коштів', description: 'Один комплект замість двох сезонних.', colorBg: 'bg-purple-500/15', colorText: 'text-purple-500' },
+      { icon: 'car', title: 'Збалансовані характеристики', description: 'Прийнятні показники в різних умовах.', colorBg: 'bg-blue-500/15', colorText: 'text-blue-500' },
+    ],
+    ctaTitle: 'Потрібна допомога у виборі?',
+    ctaDescription: 'Наші експерти допоможуть підібрати ідеальні всесезонні шини для вашого автомобіля з урахуванням стилю водіння та умов експлуатації.',
+    ctaPrimaryLabel: 'Отримати консультацію',
+    ctaPrimaryHref: '/contacts',
+    ctaSecondaryLabel: 'Знайти дилера',
+    ctaSecondaryHref: '/dealers',
+  },
+];
+
 // Technologies - expanded
 const MOCK_TECHNOLOGIES = [
   {
@@ -929,6 +1179,7 @@ async function seed() {
 
       // Delete in reverse order of dependencies
       const collections = [
+        'category-pages',
         'seasonal-content',
         'contact-submissions',
         'vehicle-fitments',
@@ -1103,6 +1354,29 @@ async function seed() {
   }
   console.log();
 
+  // Seed Category Pages
+  console.log('📄 Seeding category pages...');
+  for (const page of CATEGORY_PAGES_DATA) {
+    const { heroImagePath, heroOverlay, ...rest } = page as typeof page & { heroImagePath?: string; heroOverlay?: Record<string, string> };
+
+    // Upload hero image
+    let heroImageId: string | null = null;
+    if (heroImagePath) {
+      heroImageId = await uploadLocalImage(payload, heroImagePath, rest.heroImageAlt || rest.title);
+    }
+
+    await payload.create({
+      collection: 'category-pages',
+      data: {
+        ...rest,
+        ...(heroImageId && { heroImage: heroImageId }),
+        ...(heroOverlay && { heroOverlay }),
+      },
+    });
+    console.log(`   ✅ ${rest.title} (${rest.slug})`);
+  }
+  console.log(`   Total: ${CATEGORY_PAGES_DATA.length} category pages\n`);
+
   // Seed Site Settings (global)
   console.log('⚙️  Seeding site settings...');
   await payload.updateGlobal({
@@ -1133,6 +1407,7 @@ async function seed() {
   console.log(`   - ${MOCK_ARTICLES.length} articles`);
   console.log(`   - ${MOCK_VEHICLE_FITMENTS.length} vehicle fitments`);
   console.log(`   - ${MOCK_SEASONAL_CONTENT.length} seasonal configs`);
+  console.log(`   - ${CATEGORY_PAGES_DATA.length} category pages`);
   console.log(`   - 6 reviews`);
   console.log(`   - 1 site settings global\n`);
   console.log('You can now log in to the admin panel:');

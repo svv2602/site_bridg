@@ -3,22 +3,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { type Season, type TyreModel } from "@/lib/data";
-import { getPayloadTyres, transformPayloadTyre } from "@/lib/api/payload";
+import { getPayloadTyres, transformPayloadTyre, getCategoryPageBySlug } from "@/lib/api/payload";
 import { TyreCardGrid } from "@/components/TyreCard";
 import { Breadcrumb } from "@/components/ui";
-import { Sun, Snowflake, Cloud, Shield, Zap, Thermometer, Car } from "lucide-react";
 import { seasonLabels, SeasonIcons, seasonTextColors, seasonBgLight } from "@/lib/utils/tyres";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { generateBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import { SITE_URL } from "@/lib/constants";
 import { pluralize } from "@/lib/utils/pluralize";
-
-// Hero images for each season (optimized WebP format)
-const seasonHeroImages: Record<Season, string> = {
-  summer: "/images/hero/hero-summer.webp",
-  winter: "/images/hero/hero-winter.webp",
-  allseason: "/images/hero/hero-allseason.webp",
-};
+import { fallbackSeasonMeta, type SeasonMeta } from "@/lib/fallback/category-pages";
+import { transformToSeasonMeta } from "@/lib/api/transforms/category-page";
 
 // URL slug to internal season mapping
 const slugToSeason: Record<string, Season> = {
@@ -34,123 +28,11 @@ const seasonToSlug: Record<Season, string> = {
   allseason: "all-season",
 };
 
-// Season-specific metadata
-const seasonMeta: Record<
-  Season,
-  {
-    title: string;
-    description: string;
-    h1: string;
-    subtitle: string;
-    heroText: string;
-    features: { icon: typeof Sun; title: string; description: string; color: { bg: string; text: string } }[];
-  }
-> = {
-  summer: {
-    title: "Літні шини Bridgestone | Шини для теплої пори року",
-    description:
-      "Літні шини Bridgestone для легкових авто. Оптимальне зчеплення на сухій та мокрій дорозі, економія палива та комфорт у теплу пору року.",
-    h1: "Літні шини Bridgestone",
-    subtitle: "оптимальні характеристики для теплої пори року",
-    heroText:
-      "Літні шини розроблені для експлуатації при температурі вище +7°C. Спеціальна гумова суміш забезпечує оптимальну еластичність та зчеплення на сухому та мокрому асфальті.",
-    features: [
-      {
-        icon: Thermometer,
-        title: "Для температур вище +7°C",
-        description: "Оптимальна еластичність гуми в теплу пору року.",
-        color: { bg: "bg-red-500/15", text: "text-red-500" },
-      },
-      {
-        icon: Zap,
-        title: "Знижений опір коченню",
-        description: "Економія палива до 5% порівняно з всесезонними.",
-        color: { bg: "bg-amber-500/15", text: "text-amber-500" },
-      },
-      {
-        icon: Shield,
-        title: "Відмінне гальмування",
-        description: "Скорочення гальмівного шляху на сухій дорозі.",
-        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
-      },
-      {
-        icon: Car,
-        title: "Тиха їзда",
-        description: "Оптимізований протектор для низького рівня шуму.",
-        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
-      },
-    ],
-  },
-  winter: {
-    title: "Зимові шини Bridgestone | Шини для снігу та льоду",
-    description:
-      "Зимові шини Bridgestone для безпечної їзди взимку. Надійне зчеплення на снігу, льоду та сльоті, стабільність при низьких температурах.",
-    h1: "Зимові шини Bridgestone",
-    subtitle: "безпека та контроль у зимових умовах",
-    heroText:
-      "Зимові шини обов'язкові при температурі нижче +7°C. Спеціальна м'яка гумова суміш та ламелі забезпечують зчеплення на снігу, льоду та мокрій дорозі.",
-    features: [
-      {
-        icon: Snowflake,
-        title: "Позначка 3PMSF",
-        description: "Сертифіковані для суворих зимових умов.",
-        color: { bg: "bg-sky-500/15", text: "text-sky-500" },
-      },
-      {
-        icon: Shield,
-        title: "Зчеплення на льоду",
-        description: "Мікро-ламелі для контролю на слизькій поверхні.",
-        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
-      },
-      {
-        icon: Thermometer,
-        title: "М'яка гумова суміш",
-        description: "Зберігає еластичність при морозі до -40°C.",
-        color: { bg: "bg-red-500/15", text: "text-red-500" },
-      },
-      {
-        icon: Car,
-        title: "Відведення сльоти",
-        description: "Глибокі канали для відведення снігу та води.",
-        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
-      },
-    ],
-  },
-  allseason: {
-    title: "Всесезонні шини Bridgestone | Цілорічне використання",
-    description:
-      "Всесезонні шини Bridgestone для цілорічної експлуатації. Універсальне рішення для помірного клімату з балансом характеристик для літа та зими.",
-    h1: "Всесезонні шини Bridgestone",
-    subtitle: "універсальне рішення на весь рік",
-    heroText:
-      "Всесезонні шини — компромісне рішення для регіонів з помірним кліматом. Підходять для цілорічної експлуатації без необхідності сезонної заміни.",
-    features: [
-      {
-        icon: Cloud,
-        title: "Цілорічна експлуатація",
-        description: "Не потребують сезонної заміни шин.",
-        color: { bg: "bg-amber-500/15", text: "text-amber-500" },
-      },
-      {
-        icon: Shield,
-        title: "Позначка M+S",
-        description: "Підходять для легкої зими та літа.",
-        color: { bg: "bg-emerald-500/15", text: "text-emerald-500" },
-      },
-      {
-        icon: Zap,
-        title: "Економія коштів",
-        description: "Один комплект замість двох сезонних.",
-        color: { bg: "bg-purple-500/15", text: "text-purple-500" },
-      },
-      {
-        icon: Car,
-        title: "Збалансовані характеристики",
-        description: "Прийнятні показники в різних умовах.",
-        color: { bg: "bg-blue-500/15", text: "text-blue-500" },
-      },
-    ],
-  },
+// CMS slug for each season (may differ from URL slug)
+const seasonToCmsSlug: Record<Season, string> = {
+  summer: "summer",
+  winter: "winter",
+  allseason: "allseason",
 };
 
 interface PageProps {
@@ -171,7 +53,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Сторінку не знайдено" };
   }
 
-  const meta = seasonMeta[season];
+  const page = await getCategoryPageBySlug(seasonToCmsSlug[season]);
+  const meta: SeasonMeta = page ? transformToSeasonMeta(page) : fallbackSeasonMeta[season];
 
   return {
     title: meta.title,
@@ -197,12 +80,15 @@ export default async function SeasonTyresPage({ params }: PageProps) {
     notFound();
   }
 
-  const meta = seasonMeta[season];
+  const [page, payloadTyres] = await Promise.all([
+    getCategoryPageBySlug(seasonToCmsSlug[season]),
+    getPayloadTyres({ season, vehicleType: "passenger" }),
+  ]);
+
+  const meta: SeasonMeta = page ? transformToSeasonMeta(page) : fallbackSeasonMeta[season];
   const Icon = SeasonIcons[season];
 
-  // Get tyres filtered by season and vehicle type (server-side filtering)
-  const payloadTyres = await getPayloadTyres({ season, vehicleType: 'passenger' });
-  const seasonTyres = payloadTyres.map(t => transformPayloadTyre(t) as TyreModel);
+  const seasonTyres = payloadTyres.map((t) => transformPayloadTyre(t) as TyreModel);
 
   // Separate popular and regular tyres
   const popularTyres = seasonTyres.filter((m) => m.isPopular);
@@ -277,7 +163,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
             <div className="relative">
               <div className="hero-card-adaptive relative h-80 overflow-hidden lg:h-full">
                 <Image
-                  src={seasonHeroImages[season]}
+                  src={meta.heroImageSrc}
                   alt={meta.h1}
                   fill
                   className="object-cover"
@@ -393,23 +279,22 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       <section aria-label="Допомога у виборі" className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h2 className="mb-4 text-3xl font-bold">Потрібна допомога у виборі?</h2>
+            <h2 className="mb-4 text-3xl font-bold">{meta.ctaTitle}</h2>
             <p className="mb-8 text-lg opacity-90">
-              Наші експерти допоможуть підібрати ідеальні {seasonLabels[season].toLowerCase()} для
-              вашого автомобіля з урахуванням стилю водіння та умов експлуатації.
+              {meta.ctaDescription}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/contacts"
+                href={meta.ctaPrimaryHref}
                 className="rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
               >
-                Отримати консультацію
+                {meta.ctaPrimaryLabel}
               </Link>
               <Link
-                href="/dealers"
+                href={meta.ctaSecondaryHref}
                 className="rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
               >
-                Знайти дилера
+                {meta.ctaSecondaryLabel}
               </Link>
             </div>
           </div>
