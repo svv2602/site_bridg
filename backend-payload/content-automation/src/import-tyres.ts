@@ -13,6 +13,7 @@ interface ScrapedTire {
   name: string;
   sourceSlug: string;
   canonicalSlug: string;
+  brand?: string;
   season: "summer" | "winter" | "allseason";
   sizes: Array<{
     width: number;
@@ -36,6 +37,7 @@ interface ScrapedTire {
 interface PayloadTyre {
   slug: string;
   name: string;
+  brand: string;
   season: "summer" | "winter" | "allseason";
   vehicleTypes: string[];
   shortDescription?: string;
@@ -139,7 +141,7 @@ async function findMediaByFilename(filename: string): Promise<number | null> {
   return data.docs?.length > 0 ? data.docs[0].id : null;
 }
 
-async function downloadAndUploadImage(imageUrl: string, tyreName: string): Promise<number | null> {
+async function downloadAndUploadImage(imageUrl: string, tyreName: string, tyreBrand: string = 'Bridgestone'): Promise<number | null> {
   if (!imageUrl || imageUrl.includes("logo") || imageUrl.includes(".svg")) {
     return null;
   }
@@ -175,7 +177,7 @@ async function downloadAndUploadImage(imageUrl: string, tyreName: string): Promi
     const blob = new Blob([imageBuffer], { type: `image/${extension}` });
     formData.append("file", blob, filename);
     // Payload CMS expects _payload JSON field for additional data
-    formData.append("_payload", JSON.stringify({ alt: `Bridgestone ${tyreName}` }));
+    formData.append("_payload", JSON.stringify({ alt: `${tyreBrand} ${tyreName}` }));
 
     // Upload to Payload Media
     const uploadResponse = await fetch(`${PAYLOAD_URL}/api/media`, {
@@ -229,7 +231,8 @@ function createShortDescription(tire: ScrapedTire): string {
   };
 
   const season = seasonNames[tire.season] || "Літня";
-  return `${season} шина Bridgestone ${tire.name}. Доступно ${tire.sizes.length} типорозмірів.`;
+  const brandName = tire.brand === "firestone" ? "Firestone" : "Bridgestone";
+  return `${season} шина ${brandName} ${tire.name}. Доступно ${tire.sizes.length} типорозмірів.`;
 }
 
 async function importTyres() {
@@ -254,14 +257,17 @@ async function importTyres() {
       const existing = await findTyreBySlug(slug);
 
       // Upload image if available
+      const brand = tire.brand || "bridgestone";
+      const brandLabel = brand === "firestone" ? "Firestone" : "Bridgestone";
       let imageId: number | null = null;
       if (tire.imageUrl) {
-        imageId = await downloadAndUploadImage(tire.imageUrl, tire.name);
+        imageId = await downloadAndUploadImage(tire.imageUrl, tire.name, brandLabel);
       }
 
       const payload: PayloadTyre & { isPublished: boolean; image?: number } = {
         slug,
         name: tire.name,
+        brand,
         season: tire.season,
         vehicleTypes: determineVehicleTypes(tire.name),
         shortDescription: createShortDescription(tire),
