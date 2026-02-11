@@ -28,6 +28,15 @@ Thumbs.db
 # Payload - root-level media uploads (not API routes)
 /media/
 
+# Runtime data (SQLite, scraped JSON, etc.)
+/data/
+/content-automation/data/*.db
+/content-automation/data/*.db-shm
+/content-automation/data/*.db-wal
+
+# Test coverage
+/coverage/
+
 # TypeScript
 *.tsbuildinfo
 

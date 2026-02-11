@@ -7,3 +7,9 @@
 .gemini/
 .opencode/
 .qwen/
+
+# Vite cache
+node_modules/.vite/
+
+# Temporary plans
+plan/prompt/
