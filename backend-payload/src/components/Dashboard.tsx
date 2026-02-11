@@ -474,6 +474,19 @@ export const Dashboard: React.FC<any> = () => {
     }
   }
 
+  const PROVIDER_ENV_VARS: Record<string, string> = {
+    anthropic: 'ANTHROPIC_API_KEY',
+    openai: 'OPENAI_API_KEY',
+    'openai-dalle': 'OPENAI_API_KEY',
+    deepseek: 'DEEPSEEK_API_KEY',
+    google: 'GOOGLE_AI_API_KEY',
+    groq: 'GROQ_API_KEY',
+    openrouter: 'OPENROUTER_API_KEY',
+    ollama: 'OLLAMA_BASE_URL',
+    stability: 'STABILITY_API_KEY',
+    replicate: 'REPLICATE_API_TOKEN',
+  }
+
   const getProviderStatus = (providerName: string) => {
     const provider = providers.find((p) => p.name === providerName)
     return {
@@ -1676,7 +1689,10 @@ export const Dashboard: React.FC<any> = () => {
                         />
                         <span className="dashboard__provider-name">{provider.name}</span>
                       </label>
-                      <span className={`dashboard__provider-key ${provider.hasApiKey ? 'dashboard__provider-key--ok' : 'dashboard__provider-key--missing'}`}>
+                      <span
+                        className={`dashboard__provider-key ${provider.hasApiKey ? 'dashboard__provider-key--ok' : 'dashboard__provider-key--missing'}`}
+                        title={provider.hasApiKey ? 'API ключ встановлено' : `Додайте ${PROVIDER_ENV_VARS[provider.name] || '?'} у .env`}
+                      >
                         {provider.hasApiKey ? '🔑' : '⚠️'}
                       </span>
                     </div>
@@ -1715,7 +1731,10 @@ export const Dashboard: React.FC<any> = () => {
                         />
                         <span className="dashboard__provider-name">{provider.name}</span>
                       </label>
-                      <span className={`dashboard__provider-key ${provider.hasApiKey ? 'dashboard__provider-key--ok' : 'dashboard__provider-key--missing'}`}>
+                      <span
+                        className={`dashboard__provider-key ${provider.hasApiKey ? 'dashboard__provider-key--ok' : 'dashboard__provider-key--missing'}`}
+                        title={provider.hasApiKey ? 'API ключ встановлено' : `Додайте ${PROVIDER_ENV_VARS[provider.name] || '?'} у .env`}
+                      >
                         {provider.hasApiKey ? '🔑' : '⚠️'}
                       </span>
                     </div>
@@ -1736,6 +1755,27 @@ export const Dashboard: React.FC<any> = () => {
                 ))}
               </div>
             </div>
+
+            {providers.some((p) => !p.hasApiKey) && (
+              <div className="dashboard__providers-hint">
+                <strong>Налаштування ключів:</strong> додайте змінні середовища у файл{' '}
+                <code>/home/cloud/site_bridg/.env</code> на сервері та перезапустіть контейнер.
+                <table className="dashboard__providers-hint-table">
+                  <thead>
+                    <tr><th>Провайдер</th><th>Змінна</th><th>Статус</th></tr>
+                  </thead>
+                  <tbody>
+                    {providers.filter((p) => !p.hasApiKey).map((p) => (
+                      <tr key={p.name}>
+                        <td>{p.name}</td>
+                        <td><code>{PROVIDER_ENV_VARS[p.name] || '—'}</code></td>
+                        <td style={{ color: '#ea580c' }}>не встановлено</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {taskRouting.length > 0 && (
               <div className="dashboard__task-routing">
@@ -2568,6 +2608,44 @@ export const Dashboard: React.FC<any> = () => {
           margin: 0;
           color: var(--theme-elevation-600);
           font-size: 0.875rem;
+        }
+
+        .dashboard__providers-hint {
+          margin-top: 0.75rem;
+          padding: 0.75rem 1rem;
+          background: #fffbeb;
+          border: 1px solid #fde68a;
+          border-radius: 6px;
+          font-size: 0.8125rem;
+          color: #92400e;
+        }
+
+        .dashboard__providers-hint code {
+          background: #fef3c7;
+          padding: 0.125rem 0.375rem;
+          border-radius: 3px;
+          font-family: monospace;
+          font-size: 0.75rem;
+        }
+
+        .dashboard__providers-hint-table {
+          width: 100%;
+          margin-top: 0.5rem;
+          border-collapse: collapse;
+          font-size: 0.75rem;
+        }
+
+        .dashboard__providers-hint-table th {
+          text-align: left;
+          padding: 0.25rem 0.5rem;
+          border-bottom: 1px solid #fde68a;
+          color: #78350f;
+          font-weight: 600;
+        }
+
+        .dashboard__providers-hint-table td {
+          padding: 0.25rem 0.5rem;
+          border-bottom: 1px solid #fef3c7;
         }
 
         /* Vehicles import section */

@@ -6,7 +6,7 @@ import { ModelSelectorField as ModelSelectorField_6a378160dafcd64104e6f109828154
 import { ApiKeyStatusField as ApiKeyStatusField_49c6febc2a6e035c758d55c180eb8521 } from '../../../../src/components/ApiKeyStatus'
 import { default as default_e1aaac9d73a3992d50b4a18beefc4f4e } from '../../../../src/components/Dashboard'
 import { DashboardNavLink as DashboardNavLink_490d0eba6bde45092f6e27444083f8a2 } from '../../../../src/components/DashboardNavLink'
-import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
+import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
   "/src/components/RegenerateImageSection#default": default_59ded13a97b4cf5d40342fe416596b08,
@@ -17,5 +17,5 @@ export const importMap = {
   "/src/components/ApiKeyStatus#ApiKeyStatusField": ApiKeyStatusField_49c6febc2a6e035c758d55c180eb8521,
   "/src/components/Dashboard#default": default_e1aaac9d73a3992d50b4a18beefc4f4e,
   "/src/components/DashboardNavLink#DashboardNavLink": DashboardNavLink_490d0eba6bde45092f6e27444083f8a2,
-  "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
