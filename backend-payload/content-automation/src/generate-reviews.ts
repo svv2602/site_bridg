@@ -17,6 +17,8 @@
 import { fallbackLlm } from "./providers/fallback-llm.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { createLogger } from "./utils/logger.js";
+import { selectDiversityParams, type DiversityParams } from "./reviews/review-diversity.js";
+import { postProcessReview } from "./reviews/review-post-processor.js";
 
 const logger = createLogger("GenerateReviews");
 
@@ -183,9 +185,9 @@ export interface GeneratedReview {
 }
 
 /**
- * Build prompt for single review generation
+ * Build prompt for single review generation with diversity injection.
  */
-function buildSingleReviewPrompt(tyre: TyreInfo, reviewIndex: number): string {
+function buildSingleReviewPrompt(tyre: TyreInfo, reviewIndex: number, diversity: DiversityParams): string {
   const seasonUkr = {
     summer: "літня",
     winter: "зимова",
@@ -200,6 +202,41 @@ function buildSingleReviewPrompt(tyre: TyreInfo, reviewIndex: number): string {
                           reviewIndex === 1 ? "4 або 5" :
                           "3, 4 або 5 (з реалістичними зауваженнями)";
 
+  // Season enforcement block
+  const seasonBlock = tyre.season === "summer"
+    ? `\n⛔ ЗАБОРОНЕНО для літньої шини: НЕ згадуй сніг, лід, мороз, ожеледицю, шипи, зимові умови. Це ЛІТНЯ шина — пиши тільки про літній/міжсезонний досвід.`
+    : tyre.season === "winter"
+    ? `\n❄️ Це ЗИМОВА шина — можеш описувати досвід у снігу, на льоду, в мороз.`
+    : `\n🔄 Це ВСЕСЕЗОННА шина — пиши про досвід у різних умовах, але без екстремальних зимових описів.`;
+
+  // Persona + style block
+  const personaBlock = `
+АВТОР ВІДГУКУ:
+- Тип: ${diversity.persona.type}
+- Контекст: ${diversity.persona.context}
+- Стиль написання: ${diversity.writingStyle.instruction}
+- Стать: ${diversity.gender === "female" ? "жіноча (використовуй жіночий рід дієслів: купила, поставила, обрала, задоволена)" : "чоловіча"}`;
+
+  // Opening context
+  const openingBlock = `
+НАТХНЕННЯ ДЛЯ ПОЧАТКУ (не копіюй дослівно, використай як ідею):
+"${diversity.openingContext}"`;
+
+  // Property accent
+  const accentBlock = diversity.propertyAccent
+    ? `\nАКЦЕНТ ВІДГУКУ — обов'язково згадай ${diversity.accentProperty}:
+"${diversity.propertyAccent}"`
+    : "";
+
+  // Banned phrases
+  const bannedList = [
+    "фантастичний", "неймовірний", "бездоганний", "ідеальний",
+    "рекомендую всім", "однозначно рекомендую", "беріть не роздумуючи",
+    "ставлю п'ятірку", "підводячи підсумки", "шини мрії",
+  ];
+  const bannedBlock = `\n⛔ ЗАБОРОНЕНІ ФРАЗИ (ніколи не використовуй):
+${bannedList.map(p => `- "${p}"`).join("\n")}`;
+
   return `Ти - експерт з написання відгуків про автомобільні шини українською мовою.
 
 Згенеруй ОДИН реалістичний відгук від українського покупця про шину "${tyre.name}" від ${tyre.brand === "bridgestone" ? "Bridgestone" : "Firestone"}.
@@ -210,9 +247,14 @@ function buildSingleReviewPrompt(tyre: TyreInfo, reviewIndex: number): string {
 - Сезон: ${seasonUkr}
 - Тип авто: ${tyre.vehicleTypes.join(", ")}
 ${tyre.shortDescription ? `- Опис: ${tyre.shortDescription}` : ""}
+${seasonBlock}
+${personaBlock}
+${openingBlock}
+${accentBlock}
+${bannedBlock}
 
 Вимоги:
-1. Унікальний відгук з особистим досвідом
+1. Унікальний відгук з особистим досвідом від імені вказаного типу автора
 2. Ім'я: обери випадкове з (${UKRAINIAN_NAMES.slice(reviewIndex * 4, reviewIndex * 4 + 4).join(", ")})
 3. Місто: обери випадкове з (${UKRAINIAN_CITIES.slice(reviewIndex * 3, reviewIndex * 3 + 3).join(", ")})
 4. Автомобіль: обери з (${vehicleExamples.slice(reviewIndex * 2, reviewIndex * 2 + 3).join(", ")})
@@ -238,6 +280,7 @@ ${tyre.shortDescription ? `- Опис: ${tyre.shortDescription}` : ""}
 
 /**
  * Generate reviews using LLM (one at a time for reliability)
+ * with multi-layer diversity system.
  */
 export async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Promise<GeneratedReview[]> {
   logger.info(`Generating ${count} reviews for ${tyre.name}...`);
@@ -245,7 +288,11 @@ export async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Pro
   const reviews: GeneratedReview[] = [];
 
   for (let i = 0; i < count; i++) {
-    const prompt = buildSingleReviewPrompt(tyre, i);
+    // Select unique diversity parameters for this review
+    const diversity = selectDiversityParams(tyre.season, i, count);
+    logger.info(`  Review ${i + 1}: persona=${diversity.persona.type}, style=${diversity.writingStyle.name}, accent=${diversity.accentProperty}`);
+
+    const prompt = buildSingleReviewPrompt(tyre, i, diversity);
 
     try {
       const result = await fallbackLlm.generateJSON<GeneratedReview>(prompt, {
@@ -262,6 +309,13 @@ export async function generateReviewsWithLLM(tyre: TyreInfo, count: number): Pro
       }
 
       if (review && review.authorName && review.content) {
+        // Apply 6-step post-processing pipeline
+        review.content = postProcessReview(review.content, diversity.gender, tyre.season);
+
+        // Post-process pros/cons too
+        review.pros = review.pros.map(p => postProcessReview(p, diversity.gender, tyre.season));
+        review.cons = review.cons.map(c => postProcessReview(c, diversity.gender, tyre.season));
+
         reviews.push(review);
         logger.info(`  Generated review ${i + 1}/${count}: ${review.title} by ${review.authorName}`);
       }
