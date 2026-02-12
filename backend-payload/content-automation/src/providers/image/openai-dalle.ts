@@ -90,7 +90,7 @@ export class OpenAIDalleProvider extends BaseImageProvider {
         return client.images.generate(params);
       });
 
-      const image = response.data[0];
+      const image = response.data?.[0];
       if (!image?.url) {
         throw new Error("No image URL in DALL-E response");
       }
@@ -147,7 +147,7 @@ export class OpenAIDalleProvider extends BaseImageProvider {
 
       const dimensions = this.parseSize(size);
 
-      return response.data.map((img) =>
+      return (response.data ?? []).map((img) =>
         this.createResult({
           url: img.url!,
           model,

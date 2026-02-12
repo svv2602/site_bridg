@@ -172,9 +172,9 @@ export class AnthropicProvider extends BaseLLMProvider {
       // Use a lightweight API call that doesn't consume tokens.
       // Anthropic SDK doesn't have a models.list(), so we validate the API key
       // by making a request that will fail fast with a clear auth error if invalid.
-      // We use count_tokens which is free and doesn't generate output.
+      // We use countTokens which is free and doesn't generate output.
       const client = this.getClient();
-      await client.messages.count_tokens({
+      await client.messages.countTokens({
         model: "claude-3-5-haiku-20241022",
         messages: [{ role: "user", content: "test" }],
       });

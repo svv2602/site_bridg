@@ -11,13 +11,15 @@ import { apiResponse, apiError } from './api-response';
 import { requireRoleForEndpoint } from '../lib/rbac';
 
 // Dynamic imports for content-automation modules (ESM)
+// webpackIgnore prevents Next.js build from tracing into content-automation's
+// .js imports which only resolve at runtime via tsx
 async function getArticleImages() {
-  const mod = await import('../../content-automation/src/processors/content/article-images');
+  const mod = await import(/* webpackIgnore: true */ '../../content-automation/src/processors/content/article-images');
   return mod;
 }
 
 async function getPayloadClientModule() {
-  const mod = await import('../../content-automation/src/publishers/payload-client');
+  const mod = await import(/* webpackIgnore: true */ '../../content-automation/src/publishers/payload-client');
   return mod;
 }
 
