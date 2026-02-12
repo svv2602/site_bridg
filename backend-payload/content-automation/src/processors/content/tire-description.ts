@@ -93,7 +93,7 @@ ${input.relatedItems?.length ? `\nПОСИЛАННЯ ДЛЯ ПЕРЕЛІНКОВ
 
 ФОРМАТ ВІДПОВІДІ (JSON):
 {
-  "shortDescription": "Короткий опис 150-200 символів для картки товару. Головна перевага + для кого підійде.",
+  "shortDescription": "Короткий опис 150-250 символів для картки товару. Формат: одне речення про шину, потім 2-3 ключові особливості через •. Приклад: 'Преміальна літня шина для седанів та кросоверів. Зчеплення на мокрій дорозі класу A • технологія ENLITEN • низький опір коченню.' Використовуй конкретні дані з вхідних даних.",
   "fullDescription": "Повний HTML опис 300-500 слів. Структура: <h2>Вступ</h2><p>...</p><h2>Переваги</h2><ul><li>...</li></ul><h2>Для кого підійде</h2><p>...</p>. Використовуй теги: h2, h3, p, ul, li, strong, a.",
   "keyBenefits": ["Перевага 1", "Перевага 2", "Перевага 3", "Перевага 4", "Перевага 5"]
 }
@@ -152,7 +152,7 @@ ${input.relatedItems?.length ? `\nINTERLINKING URLs (use 2-3 organically in the 
 
 RESPONSE FORMAT (JSON):
 {
-  "shortDescription": "Short description 150-200 characters for product card. Main advantage + who it's for.",
+  "shortDescription": "Short description 150-250 characters for product card. Format: one sentence about the tire, then list 2-3 key features separated by •. Example: 'Premium summer tire for sedans and SUVs. Wet grip class A • ENLITEN lightweight technology • low rolling resistance.' Use specific features from the input data.",
   "fullDescription": "Full HTML description 300-500 words. Structure: <h2>Introduction</h2><p>...</p><h2>Advantages</h2><ul><li>...</li></ul><h2>Who it's for</h2><p>...</p>. Use tags: h2, h3, p, ul, li, strong, a.",
   "keyBenefits": ["Benefit 1", "Benefit 2", "Benefit 3", "Benefit 4", "Benefit 5"]
 }
@@ -447,6 +447,86 @@ export async function generateTireDescriptionFromStorage(
     metadata: {
       ...result.metadata,
       sources: rawContent.map((r) => r.sourceUrl),
+    },
+  };
+}
+
+/**
+ * Generate only shortDescription + keyBenefits (lightweight, no fullDescription)
+ * Used for regenerating shortDescriptions for existing tyres
+ */
+export async function generateShortDescriptionOnly(
+  input: TireDescriptionInput,
+): Promise<{
+  shortDescription: string;
+  keyBenefits: string[];
+  metadata: {
+    provider: string;
+    model: string;
+    cost: number;
+    latencyMs: number;
+  };
+}> {
+  const brand = input.brand || "bridgestone";
+  const brandName = BRAND_NAMES[brand];
+  const season = { summer: "summer", winter: "winter", allseason: "all-season" }[input.season];
+
+  const prompt = `Generate a short product card description and key benefits for the ${brandName} ${input.modelName} tire.
+
+INPUT DATA:
+- Model: ${brandName} ${input.modelName}
+- Season: ${season}
+${input.vehicleTypes?.length ? `- Vehicle types: ${input.vehicleTypes.join(", ")}` : ""}
+${input.technologies?.length ? `- Technologies: ${input.technologies.join(", ")}` : ""}
+${input.euLabel ? `- EU Label: Wet grip ${input.euLabel.wetGrip || "-"}, Fuel efficiency ${input.euLabel.fuelEfficiency || "-"}, Noise ${input.euLabel.noiseDb || "-"}dB` : ""}
+${input.testResults ? `- Test results: ${input.testResults}` : ""}
+
+RESPONSE FORMAT (JSON):
+{
+  "shortDescription": "150-250 characters for product card. Format: one sentence about the tire, then list 2-3 key features separated by •. Example: 'Premium summer tire for sedans and SUVs. Wet grip class A • ENLITEN lightweight technology • low rolling resistance.' Use specific features from the input data.",
+  "keyBenefits": ["Benefit 1", "Benefit 2", "Benefit 3", "Benefit 4", "Benefit 5"]
+}
+
+IMPORTANT:
+- Response ONLY in JSON format
+- Use specific facts from input data (EU label classes, technologies, etc.)
+- Do NOT mention prices or number of sizes
+- keyBenefits: 4-5 specific short items highlighting unique advantages
+- Write in ENGLISH (will be translated to Ukrainian later)`;
+
+  const generator = fallbackLlm.forTask("content-generation");
+
+  const { data: englishData, response: genResponse } = await generator.generateJSON<{
+    shortDescription: string;
+    keyBenefits: string[];
+  }>(prompt, {
+    systemPrompt: `You are a professional tire copywriter for the ${brandName} website. Write concise, factual product descriptions.`,
+    maxTokens: 1000,
+    temperature: 0.7,
+  });
+
+  // Translate to Ukrainian
+  const { data: ukrainianData, translationMeta } = await translateToUkrainian(
+    englishData,
+    { brand, contentType: "tire-description" }
+  );
+
+  const totalCost = genResponse.cost + translationMeta.cost;
+
+  logger.info(`Short description generated (EN→UA) for ${input.modelName}`, {
+    shortDescLength: ukrainianData.shortDescription.length,
+    keyBenefits: ukrainianData.keyBenefits.length,
+    totalCost: totalCost.toFixed(4),
+  });
+
+  return {
+    shortDescription: ukrainianData.shortDescription,
+    keyBenefits: ukrainianData.keyBenefits,
+    metadata: {
+      provider: genResponse.provider,
+      model: genResponse.model,
+      cost: totalCost,
+      latencyMs: genResponse.latencyMs + translationMeta.latencyMs,
     },
   };
 }

@@ -12,7 +12,7 @@
 
 import { ENV } from "./config/env.js";
 import { scrapeProkoleso, scrapeProkolesoBrand, mergeAndSaveResults } from "./scrapers/prokoleso.js";
-import { generateTireDescription } from "./processors/content/tire-description.js";
+import { generateTireDescription, generateShortDescriptionOnly } from "./processors/content/tire-description.js";
 import { generateTireSEO } from "./processors/content/tire-seo.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { notifyWeeklySummary, notifyError, notifyNewContent } from "./publishers/telegram-bot.js";
@@ -500,6 +500,78 @@ function parseArgs(args: string[]): { brand?: Brand; limit?: number } {
   return result;
 }
 
+/**
+ * Regenerate shortDescription for existing tyres in DB
+ * Uses keyBenefits + tire data to create feature-rich short descriptions
+ */
+async function regenerateShortDescriptions(brand?: Brand, limit?: number) {
+  const client = getPayloadClient();
+  await client.authenticate();
+
+  const tyres = await client.getAllTyres(200, brand);
+  console.log(`Found ${tyres.length} tyres in DB`);
+
+  // Load scraped data for additional context
+  const fs = await import("fs/promises");
+  let scrapedMap = new Map<string, any>();
+  try {
+    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+    const data = await fs.readFile(dataPath, "utf-8");
+    const scraped = JSON.parse(data);
+    for (const t of scraped) {
+      const slug = t.canonicalSlug || t.sourceSlug;
+      if (slug) scrapedMap.set(slug, t);
+    }
+  } catch {
+    console.log("No scraped data found, using DB data only");
+  }
+
+  const batchSize = limit || tyres.length;
+  let updated = 0;
+  let errors = 0;
+
+  for (let i = 0; i < Math.min(batchSize, tyres.length); i++) {
+    const tyre = tyres[i];
+    const scraped = scrapedMap.get(tyre.slug);
+    console.log(`\n[${i + 1}/${Math.min(batchSize, tyres.length)}] ${tyre.name} (${tyre.slug})`);
+
+    try {
+      // Use lightweight generator (only shortDescription + keyBenefits)
+      const result = await generateShortDescriptionOnly({
+        modelSlug: tyre.slug,
+        modelName: tyre.name,
+        brand: (tyre.brand as Brand) || brand || "bridgestone",
+        season: tyre.season || "summer",
+        euLabel: tyre.euLabel,
+        technologies: scraped?.technologies,
+      });
+
+      console.log(`  Old: ${(tyre.shortDescription || "(empty)").substring(0, 80)}...`);
+      console.log(`  New: ${result.shortDescription.substring(0, 80)}...`);
+      console.log(`  Cost: $${result.metadata.cost.toFixed(4)}`);
+
+      // Update shortDescription and keyBenefits in DB
+      const updateData: Record<string, unknown> = {
+        shortDescription: result.shortDescription,
+      };
+
+      if (result.keyBenefits?.length > 0) {
+        updateData.keyBenefits = result.keyBenefits.map((b: string) => ({ benefit: b }));
+      }
+
+      await client.updateTyre(tyre.id, updateData as any);
+      console.log(`  ✓ Updated`);
+      updated++;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`  ✗ Failed: ${errorMessage}`);
+      errors++;
+    }
+  }
+
+  console.log(`\nDone: ${updated} updated, ${errors} errors`);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0] || "help";
@@ -529,6 +601,11 @@ async function main() {
       await runPublishPipeline(brand);
       break;
 
+    case "regenerate-short":
+      console.log(`Regenerating shortDescriptions${brand ? ` for ${brand}` : ""}${limit ? ` (limit: ${limit})` : ""}...`);
+      await regenerateShortDescriptions(brand, limit);
+      break;
+
     case "test-telegram":
       console.log("Testing Telegram notification...");
       await notifyWeeklySummary({
@@ -550,12 +627,13 @@ Usage:
   npx tsx src/scheduler.ts <command> [options]
 
 Commands:
-  run-full       Run complete weekly automation
-  scrape         Only run scrapers
-  generate       Only generate content
-  publish        Only publish to Payload CMS
-  test-telegram  Send test Telegram notification
-  help           Show this help
+  run-full            Run complete weekly automation
+  scrape              Only run scrapers
+  generate            Only generate content
+  publish             Only publish to Payload CMS
+  regenerate-short    Regenerate shortDescriptions for existing tyres
+  test-telegram       Send test Telegram notification
+  help                Show this help
 
 Options:
   --brand <brand>   Filter by brand (bridgestone or firestone)
@@ -565,6 +643,7 @@ Examples:
   npx tsx src/scheduler.ts scrape --brand firestone
   npx tsx src/scheduler.ts generate --brand firestone --limit 5
   npx tsx src/scheduler.ts scrape --brand bridgestone
+  npx tsx src/scheduler.ts regenerate-short --limit 3
 
 Environment:
   ANTHROPIC_API_KEY   Required for content generation
