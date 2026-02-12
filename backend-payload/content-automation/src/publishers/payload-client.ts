@@ -304,6 +304,17 @@ class PayloadClient {
   // ============ ARTICLES ============
 
   /**
+   * Get article by ID
+   */
+  async getArticleById(id: number | string): Promise<ArticleDoc | null> {
+    try {
+      return await this.fetch<ArticleDoc>(`/articles/${id}?depth=1`);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Find article by slug
    */
   async findArticleBySlug(slug: string): Promise<ArticleDoc | null> {
