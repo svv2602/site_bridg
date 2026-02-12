@@ -146,7 +146,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   min_rating_to_feature: "2.0",
   interlinking_enabled: "true",
   image_generation_enabled: "true",
-  preferred_types: JSON.stringify(["test-summary", "seasonal-guide", "comparison", "news-digest"]),
+  preferred_types: JSON.stringify(["test-summary", "seasonal-guide", "comparison", "news-digest", "model-review", "technology", "tips-evergreen"]),
 };
 
 // ============ DATABASE ============

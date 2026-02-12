@@ -21,6 +21,7 @@ import {
 } from "./db/test-results.js";
 import { getNewsItemsSince } from "./db/news-items.js";
 import { normalizeRating } from "./scrapers/parsers.js";
+import { getPayloadClient } from "./publishers/payload-client.js";
 
 // Bridgestone, Firestone & Dayton brand names to detect in test results
 const OUR_BRANDS = ["bridgestone", "firestone", "dayton"];
@@ -86,6 +87,36 @@ export async function planArticles(sinceDate?: string): Promise<PlanResult> {
   if (preferredTypes.includes("news-digest") && result.planned < maxPerWeek) {
     const newsArticles = planNewsArticles(since);
     for (const item of newsArticles) {
+      if (result.planned >= maxPerWeek) break;
+      if (addPlanned(item, result)) result.planned++;
+      else result.skippedDuplicate++;
+    }
+  }
+
+  // 5. Plan model review articles from CMS tyre data
+  if (preferredTypes.includes("model-review") && result.planned < maxPerWeek) {
+    const modelArticles = await planModelReviewArticles();
+    for (const item of modelArticles) {
+      if (result.planned >= maxPerWeek) break;
+      if (addPlanned(item, result)) result.planned++;
+      else result.skippedDuplicate++;
+    }
+  }
+
+  // 6. Plan technology explainer articles
+  if (preferredTypes.includes("technology") && result.planned < maxPerWeek) {
+    const techArticles = planTechnologyArticles();
+    for (const item of techArticles) {
+      if (result.planned >= maxPerWeek) break;
+      if (addPlanned(item, result)) result.planned++;
+      else result.skippedDuplicate++;
+    }
+  }
+
+  // 7. Plan evergreen tips articles
+  if (preferredTypes.includes("tips-evergreen") && result.planned < maxPerWeek) {
+    const tipsArticles = planEvergreenTipsArticles();
+    for (const item of tipsArticles) {
       if (result.planned >= maxPerWeek) break;
       if (addPlanned(item, result)) result.planned++;
       else result.skippedDuplicate++;
@@ -334,6 +365,176 @@ function planNewsArticles(since: string): PlannedArticle[] {
     reason: `${recentNews.length} Bridgestone press releases this period`,
     dedupeKey: `news-digest-${year}-W${weekNum}`,
   });
+
+  return planned;
+}
+
+// ============ MODEL REVIEW ARTICLES ============
+
+async function planModelReviewArticles(): Promise<PlannedArticle[]> {
+  const planned: PlannedArticle[] = [];
+  const year = new Date().getFullYear();
+
+  try {
+    const client = getPayloadClient();
+    const tyres = await client.getAllTyres(100);
+
+    if (tyres.length === 0) {
+      console.log("[Planner] No tyres in CMS for model reviews");
+      return planned;
+    }
+
+    // Filter: only tyres with enough data for a quality article
+    const candidates = tyres.filter(
+      (t) => (t.badges && t.badges.length > 0) || t.keyBenefits?.length || t.faqs?.length
+    );
+
+    if (candidates.length === 0) {
+      console.log("[Planner] No tyres with sufficient data for model reviews");
+      return planned;
+    }
+
+    // Sort by priority: isNew > isPopular > has badges > others
+    candidates.sort((a, b) => {
+      const scoreA = (a.isNew ? 4 : 0) + (a.isPopular ? 2 : 0) + (a.badges?.length ? 1 : 0);
+      const scoreB = (b.isNew ? 4 : 0) + (b.isPopular ? 2 : 0) + (b.badges?.length ? 1 : 0);
+      return scoreB - scoreA;
+    });
+
+    // Pick top 2 candidates
+    for (const tyre of candidates.slice(0, 2)) {
+      const brandName = tyre.brand
+        ? tyre.brand.charAt(0).toUpperCase() + tyre.brand.slice(1)
+        : "Bridgestone";
+      const dedupeKey = `model-review-${tyre.slug}-${year}`;
+      const priority = tyre.isNew || tyre.isPopular ? 5 : 6;
+
+      planned.push({
+        topic: `Огляд ${brandName} ${tyre.name}: характеристики, тести та поради`,
+        articleType: "model-review",
+        triggerType: "seasonal",
+        triggerData: {
+          dedupeKey,
+          tyreSlug: tyre.slug,
+          brand: tyre.brand || "bridgestone",
+          season: tyre.season,
+          hasBadges: (tyre.badges?.length || 0) > 0,
+          isNew: !!tyre.isNew,
+          isPopular: !!tyre.isPopular,
+        },
+        priority,
+        relatedTyres: [tyre.slug],
+        reason: `Model review for ${tyre.name} (${tyre.isNew ? "new" : tyre.isPopular ? "popular" : "has data"})`,
+        dedupeKey,
+      });
+    }
+
+    console.log(`[Planner] ${planned.length} model review candidates from ${candidates.length} eligible tyres`);
+  } catch (error) {
+    console.warn("[Planner] Failed to fetch tyres for model reviews:", error);
+  }
+
+  return planned;
+}
+
+// ============ TECHNOLOGY ARTICLES ============
+
+const TECHNOLOGY_TOPICS = [
+  { slug: "run-flat", topic: "Технологія Run-Flat: як працюють шини, що їдуть без повітря" },
+  { slug: "enliten", topic: "ENLITEN: легші шини — менше палива та викидів" },
+  { slug: "nanopro-tech", topic: "NanoPro-Tech: як молекулярна технологія покращує зчеплення" },
+  { slug: "potenza-sport", topic: "Bridgestone Potenza: технології для спортивного водіння" },
+  { slug: "ecopia-fuel", topic: "Ecopia: як шини допомагають економити паливо" },
+  { slug: "driveguard", topic: "DriveGuard: безпечна їзда навіть після проколу" },
+  { slug: "weather-control", topic: "Weather Control: одні шини на всі сезони — чи це реально?" },
+  { slug: "eu-label-explained", topic: "EU Label для шин: як читати етикетку та обирати найкращі" },
+];
+
+function planTechnologyArticles(): PlannedArticle[] {
+  const planned: PlannedArticle[] = [];
+  const year = new Date().getFullYear();
+
+  // Shuffle pool for variety
+  const shuffled = [...TECHNOLOGY_TOPICS].sort(() => Math.random() - 0.5);
+
+  for (const item of shuffled) {
+    const dedupeKey = `technology-${item.slug}-${year}`;
+
+    if (queueHasSimilarTopic("technology", "seasonal", dedupeKey)) {
+      continue;
+    }
+
+    planned.push({
+      topic: item.topic,
+      articleType: "technology",
+      triggerType: "seasonal",
+      triggerData: {
+        dedupeKey,
+        technologySlug: item.slug,
+      },
+      priority: 6,
+      reason: `Technology explainer: ${item.slug}`,
+      dedupeKey,
+    });
+
+    // Take only first available
+    break;
+  }
+
+  return planned;
+}
+
+// ============ EVERGREEN TIPS ARTICLES ============
+
+const EVERGREEN_TIPS_TOPICS = [
+  { slug: "zberihannya-shyn", topic: "Як правильно зберігати шини: поради на літо та зиму" },
+  { slug: "hlybyna-protektora", topic: "Глибина протектора: коли час міняти шини" },
+  { slug: "tysk-u-shynakh", topic: "Тиск у шинах: чому це важливо та як перевіряти" },
+  { slug: "vik-shyn", topic: "Вік шин: як визначити та коли замінити" },
+  { slug: "zymove-vodinnya", topic: "Зимове водіння: 10 порад для безпеки на дорозі" },
+  { slug: "shyny-i-palyvo", topic: "Як шини впливають на витрату палива" },
+  { slug: "rotatsiya-shyn", topic: "Ротація шин: навіщо і як часто робити" },
+  { slug: "akvaplanuvannya", topic: "Що таке аквапланування та як його уникнути" },
+  { slug: "indeks-navantazhennya", topic: "Індекс навантаження та швидкості: що означають цифри на шинах" },
+  { slug: "shyny-dlya-suv", topic: "Як обрати шини для SUV: відмінності від легкових" },
+  { slug: "shyny-elektromobili", topic: "Шини для електромобілів: чим відрізняються та що обрати" },
+  { slug: "perehid-na-zymovi", topic: "Коли переходити на зимові шини: температурне правило +7°C" },
+  { slug: "shynomontazh", topic: "Шиномонтаж: як обрати сервіс та на що звернути увагу" },
+  { slug: "vidnovleni-shyny", topic: "Відновлені шини: переваги, ризики та коли це варто" },
+  { slug: "yizda-z-prychepom", topic: "Як їздити з причепом: вплив на шини та безпеку" },
+  { slug: "podorozh-na-avto", topic: "Подорож на авто: підготовка шин до далекої поїздки" },
+];
+
+function planEvergreenTipsArticles(): PlannedArticle[] {
+  const planned: PlannedArticle[] = [];
+  const year = new Date().getFullYear();
+
+  // Shuffle pool for variety
+  const shuffled = [...EVERGREEN_TIPS_TOPICS].sort(() => Math.random() - 0.5);
+
+  for (const item of shuffled) {
+    const dedupeKey = `tips-${item.slug}-${year}`;
+
+    if (queueHasSimilarTopic("tips", "seasonal", dedupeKey)) {
+      continue;
+    }
+
+    planned.push({
+      topic: item.topic,
+      articleType: "tips",
+      triggerType: "seasonal",
+      triggerData: {
+        dedupeKey,
+        topicSlug: item.slug,
+      },
+      priority: 7,
+      reason: `Evergreen tips: ${item.slug}`,
+      dedupeKey,
+    });
+
+    // Take only first available
+    break;
+  }
 
   return planned;
 }
