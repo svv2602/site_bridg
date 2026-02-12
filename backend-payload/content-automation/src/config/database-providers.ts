@@ -16,8 +16,9 @@ import {
 
 const logger = createLogger("DatabaseProviders");
 
-// Payload API base URL
-const PAYLOAD_API_URL = process.env.PAYLOAD_PUBLIC_SERVER_URL || "http://localhost:3001";
+// Payload API base URL — prefer internal URL for container-to-container communication
+// PAYLOAD_PUBLIC_SERVER_URL may point to external HTTPS domain unreachable from inside Docker
+const PAYLOAD_API_URL = process.env.PAYLOAD_INTERNAL_URL || "http://localhost:3001";
 
 // Cache for loaded config
 let cachedProviders: ProviderConfig[] | null = null;

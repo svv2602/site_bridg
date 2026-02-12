@@ -7,16 +7,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
-
-const BASE_URL = "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/";
-
-const TEST_TYPE_MAP: Record<string, TestResult["testType"]> = {
-  sommerreifen: "summer",
-  winterreifen: "winter",
-  ganzjahresreifen: "allseason",
-  sommer: "summer",
-  winter: "winter",
-};
+import { extractPlausibleYear, isPlausibleTestYear } from "./parsers.js";
 
 export interface TCSScraperResult {
   success: boolean;
@@ -26,41 +17,10 @@ export interface TCSScraperResult {
 }
 
 /**
- * Parse test type from URL or title text.
- * Handles both German keywords and Dimaster URL params (what=S/W/A).
- */
-function parseTestType(text: string): TestResult["testType"] {
-  const lower = text.toLowerCase();
-  // Check Dimaster URL params first
-  if (lower.includes("what=w")) return "winter";
-  if (lower.includes("what=a")) return "allseason";
-  if (lower.includes("what=s")) return "summer";
-  for (const [key, value] of Object.entries(TEST_TYPE_MAP)) {
-    if (lower.includes(key)) return value;
-  }
-  return "summer";
-}
-
-/**
  * Extract year from text/URL
  */
 function extractYear(text: string): number {
-  const match = text.match(/(\d{4})/);
-  return match ? parseInt(match[1], 10) : new Date().getFullYear();
-}
-
-/**
- * Extract size from text
- */
-function extractSize(text: string): string {
-  const match = text.match(/(\d{3})\/(\d{2,3})\s*R\s*(\d{2})/);
-  if (match) return `${match[1]}/${match[2]} R${match[3]}`;
-
-  // Try URL-style: 205-55-r16
-  const urlMatch = text.match(/(\d{3})-(\d{2,3})-r(\d{2})/i);
-  if (urlMatch) return `${urlMatch[1]}/${urlMatch[2]} R${urlMatch[3]}`;
-
-  return "Unknown";
+  return extractPlausibleYear(text) || new Date().getFullYear();
 }
 
 /**
@@ -117,16 +77,33 @@ async function discoverTestUrls(page: Page): Promise<string[]> {
 }
 
 // Type keywords used to split brand+model from the concatenated article text
-const TYPE_KEYWORDS = ["Winterreifen", "Sommerreifen", "Ganzjahresreifen"];
+const TYPE_KEYWORDS: Array<{ keyword: string; type: TestResult["testType"] }> = [
+  { keyword: "Winterreifen", type: "winter" },
+  { keyword: "Sommerreifen", type: "summer" },
+  { keyword: "Ganzjahresreifen", type: "allseason" },
+];
+
+interface ParsedArticle {
+  tireName: string;
+  size: string;
+  year: number;
+  pct: number;
+  /** Test type detected from article content keyword (Winterreifen/Sommerreifen/etc.) */
+  contentType: TestResult["testType"];
+}
 
 /**
  * Parse a single article.popup text into structured data.
  * Text format: "{BRAND} {Model}{TypeKeyword}{Year}{Dimension}{LoadIdx}{SpeedIdx}{Pct}%"
  * Example: "GOODYEAR UltraGrip Performance 3Winterreifen2025225/40 R1892V70%"
+ *
+ * Returns contentType derived from the keyword found in the article text,
+ * which is more reliable than the URL `what=` parameter (Dimaster may return
+ * mixed-type results on a single URL).
  */
-function parseArticleText(text: string): { tireName: string; size: string; year: number; pct: number } | null {
+function parseArticleText(text: string): ParsedArticle | null {
   // Split on type keyword to get brand+model
-  for (const kw of TYPE_KEYWORDS) {
+  for (const { keyword: kw, type: contentType } of TYPE_KEYWORDS) {
     const idx = text.indexOf(kw);
     if (idx < 0) continue;
     const tireName = text.slice(0, idx).trim();
@@ -134,7 +111,8 @@ function parseArticleText(text: string): { tireName: string; size: string; year:
 
     const rest = text.slice(idx + kw.length);
     const yearMatch = rest.match(/^(\d{4})/);
-    const year = yearMatch ? parseInt(yearMatch[1], 10) : 0;
+    const rawYear = yearMatch ? parseInt(yearMatch[1], 10) : 0;
+    const year = isPlausibleTestYear(rawYear) ? rawYear : 0;
 
     const sizeMatch = rest.match(/(\d{3}\/\d{2,3}\s*R\s*\d{2})/);
     const size = sizeMatch ? sizeMatch[1].replace(/\s+/g, " ") : "Unknown";
@@ -142,7 +120,7 @@ function parseArticleText(text: string): { tireName: string; size: string; year:
     const pctMatch = rest.match(/(\d{1,3})%/);
     const pct = pctMatch ? parseInt(pctMatch[1], 10) : 0;
 
-    return { tireName, size, year, pct };
+    return { tireName, size, year, pct, contentType };
   }
   return null;
 }
@@ -175,7 +153,9 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
       return null;
     }
 
-    const testType = parseTestType(url);
+    // Use content-derived type (from keyword in article text) — more reliable than URL param.
+    // Dimaster may return e.g. winter tyres on a ?what=S (summer) URL.
+    const testType = firstParsed.contentType;
     const year = firstParsed.year || extractYear(url);
     const size = firstParsed.size;
     const testUid = generateTestUid(testType, year, size);
