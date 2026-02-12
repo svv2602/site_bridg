@@ -106,7 +106,7 @@ Rules:
 
   const { data, response } = await translator.generateJSON<T>(prompt, {
     systemPrompt,
-    maxTokens: 4000,
+    maxTokens: 8000,
     temperature: 0.3,
   });
 
