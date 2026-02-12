@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "img-src 'self' data: blob: http://localhost:3001 https://*.googleapis.com https://*.gstatic.com https://s7d1.scene7.com https://prokoleso.ua https://images.simpletire.com https://www.facebook.com",
+              "img-src 'self' data: blob: http://localhost:3001 https://bridgestone.org.ua https://*.googleapis.com https://*.gstatic.com https://s7d1.scene7.com https://prokoleso.ua https://images.simpletire.com https://www.facebook.com",
               "font-src 'self' https://fonts.gstatic.com",
               "connect-src 'self' http://localhost:3001 https://maps.googleapis.com https://www.google-analytics.com https://www.facebook.com https://*.sentry.io",
               "frame-src 'self' https://www.google.com https://www.facebook.com",
@@ -173,6 +173,11 @@ const nextConfig: NextConfig = {
     // Enable AVIF (best compression) + WebP as fallback
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bridgestone.org.ua',
+        pathname: '/api/media/**',
+      },
       {
         protocol: 'http',
         hostname: 'localhost',
