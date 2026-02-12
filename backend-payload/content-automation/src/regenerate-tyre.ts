@@ -5,7 +5,7 @@
  *
  * This script:
  * 1. Fetches the tyre from Payload CMS by slug
- * 2. Generates new AI content using the multi-provider LLM system
+ * 2. Generates new AI content (EN → UA two-stage)
  * 3. Updates the tyre in Payload CMS with the new content
  */
 
@@ -28,6 +28,7 @@ async function main() {
   console.log("=".repeat(50));
 
   const client = getPayloadClient();
+  await client.authenticate();
 
   // 1. Find the tyre in Payload CMS
   console.log("\n[1/3] Fetching tyre from Payload CMS...");
@@ -42,51 +43,61 @@ async function main() {
   console.log(`Season: ${tyre.season}`);
   console.log(`Vehicle types: ${tyre.vehicleTypes?.join(", ") || "N/A"}`);
 
-  // 2. Generate new AI content
-  console.log("\n[2/3] Generating AI content...");
-
   const tireBrand = (tyre as { brand?: Brand }).brand || "bridgestone";
   const tireSeason = tyre.season as "summer" | "winter" | "allseason";
 
-  // Generate description
+  // Load scraped data for additional context
+  let scrapedTire: any = null;
+  try {
+    const fs = await import("fs/promises");
+    const dataPath = new URL("../data/prokoleso-tires.json", import.meta.url);
+    const data = await fs.readFile(dataPath, "utf-8");
+    const tires = JSON.parse(data);
+    scrapedTire = tires.find((t: any) =>
+      (t.canonicalSlug || t.sourceSlug) === slug
+    );
+  } catch {
+    // No scraped data — use DB data only
+  }
+
+  // 2. Generate new AI content (EN → UA two-stage)
+  console.log("\n[2/3] Generating AI content...");
+
   const descResult = await generateTireDescription({
     modelSlug: tyre.slug,
     modelName: tyre.name,
     brand: tireBrand,
     season: tireSeason,
     vehicleTypes: tyre.vehicleTypes,
-    euLabel: tyre.euLabel,
-  });
+    euLabel: tyre.euLabel || scrapedTire?.euLabel,
+    technologies: scrapedTire?.technologies,
+  }, { skipValidation: true, twoStage: true });
 
-  // Generate SEO (skip strict validation, will truncate on save)
+  // Generate SEO
   const seoResult = await generateTireSEO({
     modelSlug: tyre.slug,
     modelName: tyre.name,
     brand: tireBrand,
     season: tireSeason,
     shortDescription: descResult.content.shortDescription,
-    keyBenefits: descResult.content.highlights,
+    keyBenefits: descResult.content.keyBenefits,
   }, { skipValidation: true });
 
   console.log("Content generated successfully!");
-  console.log(`  Short description: ${descResult.content.shortDescription.substring(0, 60)}...`);
-  console.log(`  Full description: ${descResult.content.fullDescription.substring(0, 60)}...`);
-  console.log(`  Key benefits: ${descResult.content.highlights.length} items`);
+  console.log(`  Short description: ${descResult.content.shortDescription.substring(0, 80)}...`);
+  console.log(`  Full description: ${descResult.content.fullDescription.length} chars`);
+  console.log(`  Key benefits: ${descResult.content.keyBenefits.length} items`);
   console.log(`  SEO title: ${seoResult.seo.seoTitle}`);
   console.log(`  Cost: $${(descResult.metadata.cost + seoResult.metadata.cost).toFixed(4)}`);
 
   // 3. Update tyre in Payload CMS
   console.log("\n[3/3] Updating tyre in Payload CMS...");
 
-  // Convert markdown to HTML (CKEditor stores HTML directly)
   const fullDescriptionHtml = markdownToHtml(descResult.content.fullDescription);
-
-  // Truncate SEO fields to meet limits
   const seoTitle = (seoResult.seo.seoTitle || "").substring(0, 70);
   const seoDescription = (seoResult.seo.seoDescription || "").substring(0, 170);
 
-  // Convert highlights to Payload keyBenefits format
-  const keyBenefits = descResult.content.highlights.map((b: string) => ({
+  const keyBenefits = descResult.content.keyBenefits.map((b: string) => ({
     benefit: b,
   }));
 
@@ -98,7 +109,7 @@ async function main() {
     seoDescription,
   });
 
-  console.log(`\nDone! Tyre "${tyre.name}" updated successfully.`);
+  console.log(`\n✓ Tyre "${tyre.name}" updated successfully.`);
   console.log("=".repeat(50));
 }
 
