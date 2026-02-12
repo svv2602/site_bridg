@@ -43,6 +43,9 @@ services:
       # Telegram notifications (optional)
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      # Frontend revalidation (ISR cache busting)
+      FRONTEND_URL: http://frontend:3010
+      REVALIDATION_SECRET: ${REVALIDATION_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,6 +80,8 @@ services:
       NEXT_PUBLIC_META_PIXEL_ID: ${NEXT_PUBLIC_META_PIXEL_ID:-}
       # Google Maps for dealers page (optional)
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
+      # ISR revalidation secret (must match backend)
+      REVALIDATION_SECRET: ${REVALIDATION_SECRET:-}
     depends_on:
       backend:
         condition: service_healthy
