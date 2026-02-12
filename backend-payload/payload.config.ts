@@ -55,6 +55,10 @@ import {
   generatePromptEndpoint,
 } from './src/endpoints/imageRegeneration';
 import {
+  batchHeroesEndpoint,
+  batchHeroesListEndpoint,
+} from './src/endpoints/heroImageRegeneration';
+import {
   generateReviewsEndpoint,
   generateReviewsStatusEndpoint,
   reviewStatsEndpoint,
@@ -162,6 +166,8 @@ export default buildConfig({
     generatePromptEndpoint,
     regenerateImageStatusEndpoint,
     regenerateImageEndpoint,
+    batchHeroesEndpoint,
+    batchHeroesListEndpoint,
     generateReviewsBatchEndpoint,
     generateReviewsBatchStatusEndpoint,
     reviewBulkStatsEndpoint,
