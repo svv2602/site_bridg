@@ -502,9 +502,11 @@ export const automationQueueUpdateEndpoint: Endpoint = {
         db.prepare('UPDATE article_queue SET status = ? WHERE id = ?').run('generating', id);
 
         // Spawn background process to generate the article
-        const scriptPath = path.join(process.cwd(), 'content-automation', 'src', 'article-pipeline.ts');
+        // cwd must be content-automation/ so SQLite paths resolve correctly
+        const automationDir = path.join(process.cwd(), 'content-automation');
+        const scriptPath = path.join(automationDir, 'src', 'article-pipeline.ts');
         const child = spawn('npx', ['tsx', scriptPath, `--process-item=${id}`], {
-          cwd: process.cwd(),
+          cwd: automationDir,
           stdio: 'ignore',
           detached: true,
         });
