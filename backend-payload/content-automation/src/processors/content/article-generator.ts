@@ -39,6 +39,9 @@ export interface ArticleInput {
     year: number;
     results: string;
   };
+  newsData?: {
+    items: Array<{ title: string; summary: string; url: string; category?: string }>;
+  };
   keywords?: string[];
   targetWordCount?: number;
   relatedItems?: RelatedItem[];
@@ -122,6 +125,9 @@ TEST DATA:
 - Source: ${input.testData.source}
 - Year: ${input.testData.year}
 - Results: ${input.testData.results}
+` : ""}${input.newsData ? `
+NEWS ITEMS TO COVER:
+${input.newsData.items.map((n, i) => `${i + 1}. ${n.title}${n.category ? ` [${n.category}]` : ""}\n   ${n.summary || "(no summary)"}\n   Source: ${n.url}`).join("\n")}
 ` : ""}
 ${input.keywords?.length ? `KEYWORDS: ${input.keywords.join(", ")}` : ""}
 ${relatedItemsSection}
@@ -177,6 +183,9 @@ ${input.testData ? `
 - Джерело: ${input.testData.source}
 - Рік: ${input.testData.year}
 - Результати: ${input.testData.results}
+` : ""}${input.newsData ? `
+НОВИНИ ДЛЯ ОГЛЯДУ:
+${input.newsData.items.map((n, i) => `${i + 1}. ${n.title}${n.category ? ` [${n.category}]` : ""}\n   ${n.summary || "(без опису)"}\n   Джерело: ${n.url}`).join("\n")}
 ` : ""}
 ${input.keywords?.length ? `КЛЮЧОВІ СЛОВА: ${input.keywords.join(", ")}` : ""}
 ${relatedItemsSection}

@@ -46,6 +46,7 @@ export interface ArticleQueueItem {
   status: QueueStatus;
   relatedTyres: string[] | null;
   generatedPayloadId: string | null;
+  retryCount: number;
   createdAt: string;
   processedAt: string | null;
   error: string | null;
@@ -193,6 +194,21 @@ function initSchema(database: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_article_queue_status ON article_queue(status);
     CREATE INDEX IF NOT EXISTS idx_article_queue_priority ON article_queue(priority);
+
+    -- Add retry_count column if not exists (safe migration)
+    -- SQLite doesn't support IF NOT EXISTS for ALTER TABLE, so use pragma check
+  `);
+
+  // Safe column migration: add retry_count if missing
+  const columns = database
+    .prepare("PRAGMA table_info(article_queue)")
+    .all() as Array<{ name: string }>;
+  const hasRetryCount = columns.some((c) => c.name === "retry_count");
+  if (!hasRetryCount) {
+    database.exec("ALTER TABLE article_queue ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0");
+  }
+
+  database.exec(`
 
     CREATE TABLE IF NOT EXISTS article_settings (
       key TEXT PRIMARY KEY,
@@ -396,7 +412,7 @@ export function getRecentQueue(limit = 20): ArticleQueueItem[] {
 
 export function updateQueueItem(
   id: number,
-  update: Partial<Pick<ArticleQueueItem, "status" | "generatedPayloadId" | "processedAt" | "error" | "relatedTyres">>
+  update: Partial<Pick<ArticleQueueItem, "status" | "generatedPayloadId" | "processedAt" | "error" | "relatedTyres" | "retryCount">>
 ): boolean {
   const database = getDatabase();
   const fields: string[] = [];
@@ -422,6 +438,10 @@ export function updateQueueItem(
     fields.push("related_tyres = ?");
     values.push(update.relatedTyres ? JSON.stringify(update.relatedTyres) : null);
   }
+  if (update.retryCount !== undefined) {
+    fields.push("retry_count = ?");
+    values.push(update.retryCount);
+  }
 
   if (fields.length === 0) return false;
 
@@ -439,6 +459,20 @@ export function deleteQueueItem(id: number): boolean {
     .prepare("DELETE FROM article_queue WHERE id = ?")
     .run(id);
   return result.changes > 0;
+}
+
+/**
+ * Get failed items eligible for retry (retry_count < maxRetries)
+ */
+export function getRetryableItems(maxRetries = 3): ArticleQueueItem[] {
+  const database = getDatabase();
+  const rows = database
+    .prepare(
+      "SELECT * FROM article_queue WHERE status = 'failed' AND retry_count < ? ORDER BY priority ASC, created_at ASC"
+    )
+    .all(maxRetries) as Array<Record<string, unknown>>;
+
+  return rows.map(mapQueueItem);
 }
 
 /**
@@ -501,6 +535,7 @@ function mapQueueItem(row: Record<string, unknown>): ArticleQueueItem {
     status: row.status as QueueStatus,
     relatedTyres: row.related_tyres ? JSON.parse(row.related_tyres as string) : null,
     generatedPayloadId: (row.generated_payload_id as string) || null,
+    retryCount: (row.retry_count as number) || 0,
     createdAt: row.created_at as string,
     processedAt: (row.processed_at as string) || null,
     error: (row.error as string) || null,

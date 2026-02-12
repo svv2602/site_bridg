@@ -17,6 +17,7 @@ import {
   getDueSources,
   updateSource,
   getPendingQueue,
+  getRetryableItems,
   getQueueItem,
   updateQueueItem,
   deleteQueueItem,
@@ -30,7 +31,7 @@ import { planArticles } from "./article-planner.js";
 import { generateArticle, type ArticleInput } from "./processors/content/article-generator.js";
 import { generateHeroImage } from "./processors/content/article-images.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
-import { getArticlePrompt, type RelatedItem } from "./prompts/index.js";
+import { type RelatedItem } from "./prompts/index.js";
 import { getTestResult } from "./db/test-results.js";
 import type { GeneratedArticle } from "./types/content.js";
 import { notify } from "./publishers/telegram-bot.js";
@@ -130,51 +131,86 @@ async function scanSources(): Promise<{ scanned: number; newResults: number }> {
 
   console.log(`[Scan] ${dueSources.length} source(s) due for checking`);
 
+  // Split into HTTP-only scrapers (no browser needed) and Playwright scrapers
+  const HTTP_SCRAPERS: ScraperKey[] = ["bridgestone-news"];
+  const httpSources = dueSources.filter((s) => HTTP_SCRAPERS.includes(s.scraper));
+  const browserSources = dueSources.filter((s) => !HTTP_SCRAPERS.includes(s.scraper));
+
   let totalNew = 0;
-  let browser;
 
-  try {
-    browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage();
+  // Process HTTP scrapers first (no browser overhead)
+  for (const source of httpSources) {
+    try {
+      console.log(`[Scan] Checking ${source.name} (HTTP)...`);
+      const result = await runScraper(null, source);
 
-    for (const source of dueSources) {
-      try {
-        console.log(`[Scan] Checking ${source.name}...`);
-        const result = await runScraper(page, source);
+      updateSource(source.id, {
+        lastCheckedAt: new Date().toISOString(),
+        lastFoundNew: result.newResults,
+      });
 
-        updateSource(source.id, {
-          lastCheckedAt: new Date().toISOString(),
-          lastFoundNew: result.newResults,
-        });
+      totalNew += result.newResults;
+      console.log(`[Scan] ${source.name}: ${result.newResults} new results`);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(`[Scan] Error scanning ${source.name}: ${msg}`);
 
-        totalNew += result.newResults;
-        console.log(`[Scan] ${source.name}: ${result.newResults} new test results`);
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        console.error(`[Scan] Error scanning ${source.name}: ${msg}`);
-
-        // Still update last_checked_at so we don't retry immediately
-        updateSource(source.id, {
-          lastCheckedAt: new Date().toISOString(),
-          lastFoundNew: 0,
-        });
-      }
+      updateSource(source.id, {
+        lastCheckedAt: new Date().toISOString(),
+        lastFoundNew: 0,
+      });
     }
-  } finally {
-    if (browser) await browser.close();
+  }
+
+  // Launch browser only if there are Playwright-based sources
+  if (browserSources.length > 0) {
+    let browser;
+    try {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage();
+
+      for (const source of browserSources) {
+        try {
+          console.log(`[Scan] Checking ${source.name}...`);
+          const result = await runScraper(page, source);
+
+          updateSource(source.id, {
+            lastCheckedAt: new Date().toISOString(),
+            lastFoundNew: result.newResults,
+          });
+
+          totalNew += result.newResults;
+          console.log(`[Scan] ${source.name}: ${result.newResults} new test results`);
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          console.error(`[Scan] Error scanning ${source.name}: ${msg}`);
+
+          updateSource(source.id, {
+            lastCheckedAt: new Date().toISOString(),
+            lastFoundNew: 0,
+          });
+        }
+      }
+    } finally {
+      if (browser) await browser.close();
+    }
   }
 
   return { scanned: dueSources.length, newResults: totalNew };
 }
 
 async function runScraper(
-  page: import("playwright").Page,
+  page: import("playwright").Page | null,
   source: ContentSource
 ): Promise<{ newResults: number }> {
-  // Bridgestone news uses HTTP fetch, no Playwright page needed
+  // HTTP-only scrapers (no Playwright page needed)
   if (source.scraper === "bridgestone-news") {
     const newsResult = await scrapeBridgestoneNews();
     return { newResults: newsResult.newsNew };
+  }
+
+  if (!page) {
+    throw new Error(`Scraper "${source.scraper}" requires a browser page`);
   }
 
   const scraperMap: Record<string, (p: import("playwright").Page) => Promise<{ testsNew: number }>> = {
@@ -311,20 +347,25 @@ export async function processSingleQueueItem(
     };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
+    const currentRetries = item.retryCount || 0;
     updateQueueItem(item.id, {
       status: "failed",
       error: msg,
+      retryCount: currentRetries + 1,
       processedAt: new Date().toISOString(),
     });
-    console.error(`[Generate] Failed: "${item.topic}": ${msg}`);
+    console.error(`[Generate] Failed (attempt ${currentRetries + 1}): "${item.topic}": ${msg}`);
     return { success: false, error: msg };
   }
 }
+
+const MAX_RETRIES = 3;
 
 async function processQueue(): Promise<{
   generated: number;
   published: number;
   forReview: number;
+  retried: number;
   errors: string[];
 }> {
   const maxPerWeek = getSettingNumber("max_articles_per_week") || 3;
@@ -333,17 +374,38 @@ async function processQueue(): Promise<{
   const generateImages = getSettingBool("image_generation_enabled");
   const errors: string[] = [];
 
+  // Retry previously failed items first (up to MAX_RETRIES attempts)
+  const retryable = getRetryableItems(MAX_RETRIES);
+  let retried = 0;
+
+  if (retryable.length > 0) {
+    console.log(`[Generate] Retrying ${retryable.length} previously failed article(s)...`);
+    for (const item of retryable) {
+      // Reset status to pending so processSingleQueueItem accepts it
+      updateQueueItem(item.id, { status: "pending" });
+      console.log(`[Generate] Retry #${item.retryCount + 1} for: "${item.topic}"`);
+      const result = await processSingleQueueItem(item.id, {
+        autoPublish,
+        generateImages,
+        interlink,
+      });
+      if (result.success) retried++;
+    }
+  }
+
   // Fetch more than needed since we'll filter out manual items
   const allPending = getPendingQueue(maxPerWeek + 10);
   // Scheduled pipeline skips manual items — they are only processed on demand
   const pending = allPending.filter((item) => item.triggerType !== "manual").slice(0, maxPerWeek);
 
-  if (pending.length === 0) {
+  if (pending.length === 0 && retried === 0) {
     console.log("[Generate] No pending articles in queue");
-    return { generated: 0, published: 0, forReview: 0, errors };
+    return { generated: 0, published: 0, forReview: 0, retried: 0, errors };
   }
 
-  console.log(`[Generate] Processing ${pending.length} article(s) from queue`);
+  if (pending.length > 0) {
+    console.log(`[Generate] Processing ${pending.length} article(s) from queue`);
+  }
 
   let generated = 0;
   let published = 0;
@@ -370,7 +432,7 @@ async function processQueue(): Promise<{
     }
   }
 
-  return { generated, published, forReview, errors };
+  return { generated, published, forReview, retried, errors };
 }
 
 // ============ CONTEXT BUILDING ============
@@ -407,6 +469,25 @@ async function buildGenerationContext(
     }
   }
 
+  // Build news data if available
+  let newsData: ArticleInput["newsData"] | undefined;
+  if (item.triggerType === "news" && item.triggerData?.newsItems) {
+    const rawItems = item.triggerData.newsItems as Array<{
+      title: string;
+      summary?: string;
+      url: string;
+      category?: string;
+    }>;
+    newsData = {
+      items: rawItems.map((n) => ({
+        title: n.title,
+        summary: n.summary || "",
+        url: n.url,
+        category: n.category,
+      })),
+    };
+  }
+
   // Build related items for interlinking
   if (interlink) {
     const client = getPayloadClient();
@@ -423,9 +504,11 @@ async function buildGenerationContext(
               type: "tyre",
             });
             relatedTyreIds.push(tyre.id);
+          } else {
+            console.warn(`[Context] Tyre slug "${slug}" not found in CMS — skipping interlink`);
           }
         } catch {
-          // Tyre not in CMS, skip
+          console.warn(`[Context] Failed to look up tyre slug "${slug}" in CMS`);
         }
       }
     }
@@ -487,6 +570,7 @@ async function buildGenerationContext(
       brand,
       tireModels: tireModels.length > 0 ? tireModels : undefined,
       testData,
+      newsData,
       keywords,
     },
     relatedItems,
