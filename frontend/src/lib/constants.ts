@@ -3,7 +3,7 @@
 
 import { getSiteSettings, type SiteSettings } from '@/lib/api/payload';
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.ua';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.org.ua';
 export const SITE_NAME = 'Bridgestone Україна';
 export const SITE_NAME_EN = 'Bridgestone Ukraine';
 export const SITE_DESCRIPTION = 'Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.';
@@ -12,9 +12,9 @@ export const SITE_DESCRIPTION = 'Офіційний представник Bridg
 export const PHONE_DISPLAY = '0 800 123 456';
 export const PHONE_HREF = 'tel:+380800123456';
 export const PHONE_SCHEMA = '+380-800-123-456';
-export const EMAIL_SUPPORT = 'support@bridgestone.ua';
-export const EMAIL_PRIVACY = 'privacy@bridgestone.ua';
-export const EMAIL_INFO = 'info@bridgestone.ua';
+export const EMAIL_SUPPORT = 'support@bridgestone.org.ua';
+export const EMAIL_PRIVACY = 'privacy@bridgestone.org.ua';
+export const EMAIL_INFO = 'info@bridgestone.org.ua';
 
 // Address
 export const ADDRESS_CITY = 'Київ';

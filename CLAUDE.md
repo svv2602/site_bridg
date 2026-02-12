@@ -94,8 +94,8 @@ Core collections in Payload CMS:
 ### Admin Panel
 
 - URL: http://localhost:3001/admin
-- Admin: admin@bridgestone.ua / Admin123!
-- Editor: editor@bridgestone.ua / Editor123!
+- Admin: admin@bridgestone.org.ua / Admin123!
+- Editor: editor@bridgestone.org.ua / Editor123!
 
 ### API Endpoints
 

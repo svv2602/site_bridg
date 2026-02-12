@@ -5,7 +5,7 @@ import { existsSync } from 'fs';
 import { join, basename, extname } from 'path';
 
 const PAYLOAD_URL = process.env.PAYLOAD_URL || 'http://localhost:3001';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@bridgestone.ua';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@bridgestone.org.ua';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 const MEDIA_DIR = join(process.cwd(), 'media');

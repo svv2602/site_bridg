@@ -150,7 +150,7 @@ export function DealersMap({
   // SECURITY: This is a public API key (NEXT_PUBLIC_*) which is expected for the
   // Google Maps JavaScript API — it is embedded in client-side bundles. However,
   // it MUST be restricted in the Google Cloud Console:
-  //   1. Application restrictions → HTTP referrers: bridgestone.ua/*, localhost:3010/*
+  //   1. Application restrictions → HTTP referrers: bridgestone.org.ua/*, localhost:3010/*
   //   2. API restrictions → Maps JavaScript API only
   // Without these restrictions, the key could be abused for unauthorized usage.
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;

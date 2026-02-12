@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
   await page.waitForLoadState('networkidle');
   
   console.log('Logging in...');
-  await page.fill('input[name="email"]', 'admin@bridgestone.ua');
+  await page.fill('input[name="email"]', 'admin@bridgestone.org.ua');
   await page.fill('input[name="password"]', 'admin123');
   await page.click('button[type="submit"]');
   

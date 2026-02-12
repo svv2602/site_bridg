@@ -2166,7 +2166,7 @@ export function TechnologyIcon({ tech }: { tech: string }) {
 │                            │                                     │
 │                            ▼                                     │
 │                      ┌──────────┐                                │
-│                      │  Strapi  │ ──► bridgestone.ua             │
+│                      │  Strapi  │ ──► bridgestone.org.ua             │
 │                      │   CMS    │                                │
 │                      └──────────┘                                │
 │                            │                                     │

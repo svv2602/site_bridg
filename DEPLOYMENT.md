@@ -123,7 +123,7 @@ docker compose down -v     # !! DANGER: Also deletes PostgreSQL volume
 
 ```bash
 # Install SSL certificate via Let's Encrypt
-./scripts/setup-ssl.sh bridgestone.org.ua admin@bridgestone.ua
+./scripts/setup-ssl.sh bridgestone.org.ua admin@bridgestone.org.ua
 ```
 
 Requires:
@@ -299,8 +299,8 @@ docker compose restart backend
 URL: `https://your-domain.com/admin`
 
 Default credentials (after seed):
-- **Admin**: admin@bridgestone.ua / Admin123!
-- **Editor**: editor@bridgestone.ua / Editor123!
+- **Admin**: admin@bridgestone.org.ua / Admin123!
+- **Editor**: editor@bridgestone.org.ua / Editor123!
 
 ### Key sections
 

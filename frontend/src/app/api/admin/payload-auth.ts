@@ -15,7 +15,7 @@ export async function getPayloadToken(): Promise<string> {
     return cachedToken.token;
   }
 
-  const email = process.env.PAYLOAD_ADMIN_EMAIL || 'admin@bridgestone.ua';
+  const email = process.env.PAYLOAD_ADMIN_EMAIL || 'admin@bridgestone.org.ua';
   const password = process.env.PAYLOAD_ADMIN_PASSWORD || 'Admin123!';
 
   const response = await fetch(`${PAYLOAD_URL}/api/users/login`, {

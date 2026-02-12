@@ -26,7 +26,7 @@ const SMTP_HOST = process.env.SMTP_HOST;
 const SMTP_PORT = process.env.SMTP_PORT;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'info@bridgestone.ua';
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'info@bridgestone.org.ua';
 
 const SUBJECT_LABELS: Record<string, string> = {
   'tyre-selection': 'Підбір шин',
@@ -177,7 +177,7 @@ async function sendEmailNotification(data: ContactFormData): Promise<boolean> {
           ${escapeHtml(data.message).replace(/\n/g, '<br>')}
         </div>
         <p style="color: #666; font-size: 12px; margin-top: 20px;">
-          Відправлено з сайту bridgestone.ua
+          Відправлено з сайту bridgestone.org.ua
         </p>
       `,
     });

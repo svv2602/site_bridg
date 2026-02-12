@@ -130,8 +130,8 @@ const MOCK_DEALERS = [
     latitude: 50.4301,
     longitude: 30.5134,
     phone: '+380 44 123 45 67',
-    email: 'kyiv.center@bridgestone.ua',
-    website: 'https://kyiv.bridgestone.ua',
+    email: 'kyiv.center@bridgestone.org.ua',
+    website: 'https://kyiv.bridgestone.org.ua',
     workingHours: 'Пн–Сб: 9:00–19:00, Нд: 10:00–16:00',
     services: ['tire-fitting', 'balancing', 'storage', 'alignment'],
   },
@@ -557,24 +557,24 @@ async function seed() {
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@bridgestone.ua',
+        email: 'admin@bridgestone.org.ua',
         password: 'Admin123!',
         name: 'Адміністратор',
         role: 'admin',
       },
     });
-    console.log('   ✅ Admin: admin@bridgestone.ua / Admin123!');
+    console.log('   ✅ Admin: admin@bridgestone.org.ua / Admin123!');
 
     await payload.create({
       collection: 'users',
       data: {
-        email: 'editor@bridgestone.ua',
+        email: 'editor@bridgestone.org.ua',
         password: 'Editor123!',
         name: 'Контент-менеджер',
         role: 'editor',
       },
     });
-    console.log('   ✅ Editor: editor@bridgestone.ua / Editor123!');
+    console.log('   ✅ Editor: editor@bridgestone.org.ua / Editor123!');
     console.log('');
   } else {
     console.log('   ℹ️  Users already exist\n');
@@ -667,9 +667,9 @@ async function seed() {
     data: {
       phoneDisplay: '0 800 123 456',
       phoneHref: 'tel:+380800123456',
-      emailSupport: 'support@bridgestone.ua',
-      emailPrivacy: 'privacy@bridgestone.ua',
-      emailInfo: 'info@bridgestone.ua',
+      emailSupport: 'support@bridgestone.org.ua',
+      emailPrivacy: 'privacy@bridgestone.org.ua',
+      emailInfo: 'info@bridgestone.org.ua',
       city: 'Київ',
       addressFull: 'м. Київ, вул. Прикладна, 10',
       country: 'UA',
@@ -694,8 +694,8 @@ async function seed() {
   console.log(`   - 1 site settings global\n`);
   console.log('Admin panel:');
   console.log('   URL:    http://localhost:3001/admin');
-  console.log('   Admin:  admin@bridgestone.ua / Admin123!');
-  console.log('   Editor: editor@bridgestone.ua / Editor123!\n');
+  console.log('   Admin:  admin@bridgestone.org.ua / Admin123!');
+  console.log('   Editor: editor@bridgestone.org.ua / Editor123!\n');
 
   process.exit(0);
 }

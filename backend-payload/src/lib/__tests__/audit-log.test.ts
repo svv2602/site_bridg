@@ -11,7 +11,7 @@ describe('auditLog', () => {
 
     await auditLog(mockPayload as any, {
       action: 'config_change',
-      actor: 'admin@bridgestone.ua',
+      actor: 'admin@bridgestone.org.ua',
       target: 'scheduler',
       details: { enabled: true },
     });
@@ -21,7 +21,7 @@ describe('auditLog', () => {
       collection: 'audit-log',
       data: {
         action: 'config_change',
-        actor: 'admin@bridgestone.ua',
+        actor: 'admin@bridgestone.org.ua',
         target: 'scheduler',
         targetId: undefined,
         details: { enabled: true },

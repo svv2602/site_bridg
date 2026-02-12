@@ -70,10 +70,10 @@ TELEGRAM_TOPIC_REPORTS=789    # Тема "Звіти" — еженедельны
 ```env
 SMTP_HOST=smtp.gmail.com       # SMTP-сервер
 SMTP_PORT=587                   # Порт (587 для STARTTLS, 465 для SSL)
-SMTP_USER=alerts@bridgestone.ua # Логин
+SMTP_USER=alerts@bridgestone.org.ua # Логин
 SMTP_PASS=app-password          # Пароль (для Gmail — App Password)
-SMTP_FROM=Bridgestone UA <alerts@bridgestone.ua>  # Опционально, по умолчанию = SMTP_USER
-NOTIFY_EMAILS=admin@bridgestone.ua,manager@bridgestone.ua  # Получатели через запятую
+SMTP_FROM=Bridgestone UA <alerts@bridgestone.org.ua>  # Опционально, по умолчанию = SMTP_USER
+NOTIFY_EMAILS=admin@bridgestone.org.ua,manager@bridgestone.org.ua  # Получатели через запятую
 ```
 
 **Канал активен**, когда заданы `SMTP_HOST`, `SMTP_USER` и `NOTIFY_EMAILS`.
@@ -147,9 +147,9 @@ TELEGRAM_TOPIC_REPORTS=789
 # Email
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=alerts@bridgestone.ua
+SMTP_USER=alerts@bridgestone.org.ua
 SMTP_PASS=your-app-password
-NOTIFY_EMAILS=admin@bridgestone.ua
+NOTIFY_EMAILS=admin@bridgestone.org.ua
 
 # Payload (включён по умолчанию, API-ключ опционален)
 PAYLOAD_API_KEY=your-api-key

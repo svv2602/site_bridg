@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getTyreModels } from '@/lib/api/tyres';
 import { getArticles } from '@/lib/api/articles';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.ua';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://bridgestone.org.ua';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages

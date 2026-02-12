@@ -12,7 +12,7 @@ export interface ReviewStats {
 }
 
 // Product schema for tyre models
-export function generateProductSchema(tyre: TyreModel, baseUrl: string = "https://bridgestone.ua") {
+export function generateProductSchema(tyre: TyreModel, baseUrl: string = "https://bridgestone.org.ua") {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -47,7 +47,7 @@ export function generateProductSchema(tyre: TyreModel, baseUrl: string = "https:
 }
 
 // LocalBusiness schema for dealers
-export function generateLocalBusinessSchema(dealer: Dealer, baseUrl: string = "https://bridgestone.ua") {
+export function generateLocalBusinessSchema(dealer: Dealer, baseUrl: string = "https://bridgestone.org.ua") {
   return {
     "@context": "https://schema.org",
     "@type": "AutoPartsStore",
@@ -77,7 +77,7 @@ export function generateLocalBusinessSchema(dealer: Dealer, baseUrl: string = "h
 }
 
 // Article schema for blog posts
-export function generateArticleSchema(article: Article, baseUrl: string = "https://bridgestone.ua") {
+export function generateArticleSchema(article: Article, baseUrl: string = "https://bridgestone.org.ua") {
   const imageUrl = article.featuredImage || article.imageUrl;
   return {
     "@context": "https://schema.org",
@@ -146,7 +146,7 @@ export function generateFAQSchema(faqs: FAQ[]) {
 }
 
 // Organization schema for the main site
-export function generateOrganizationSchema(baseUrl: string = "https://bridgestone.ua", settings?: MergedSiteSettings) {
+export function generateOrganizationSchema(baseUrl: string = "https://bridgestone.org.ua", settings?: MergedSiteSettings) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -192,7 +192,7 @@ export function generateAggregateRatingSchema(stats: ReviewStats) {
 }
 
 // Individual Review schema
-export function generateReviewSchema(review: Review, baseUrl: string = "https://bridgestone.ua") {
+export function generateReviewSchema(review: Review, baseUrl: string = "https://bridgestone.org.ua") {
   return {
     "@type": "Review",
     reviewRating: {
@@ -221,7 +221,7 @@ export function generateProductSchemaWithReviews(
   tyre: TyreModel,
   reviews: Review[],
   stats: ReviewStats,
-  baseUrl: string = "https://bridgestone.ua"
+  baseUrl: string = "https://bridgestone.org.ua"
 ) {
   const aggregateRating = generateAggregateRatingSchema(stats);
 

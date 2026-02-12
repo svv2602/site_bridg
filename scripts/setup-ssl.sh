@@ -2,7 +2,7 @@
 # Setup SSL certificates using Let's Encrypt (certbot) via Docker.
 #
 # Usage:
-#   ./scripts/setup-ssl.sh bridgestone.ua [email@example.com]
+#   ./scripts/setup-ssl.sh bridgestone.org.ua [email@example.com]
 #
 # Prerequisites:
 #   - Docker and docker compose installed

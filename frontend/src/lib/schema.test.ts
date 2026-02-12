@@ -67,7 +67,7 @@ describe("generateProductSchema", () => {
     expect(schema.name).toBe("Turanza T005");
     expect(schema.description).toBe("Premium touring tyre");
     expect(schema.brand.name).toBe("Bridgestone");
-    expect(schema.url).toBe("https://bridgestone.ua/shyny/turanza-t005");
+    expect(schema.url).toBe("https://bridgestone.org.ua/shyny/turanza-t005");
   });
 
   it("uses custom baseUrl", () => {
@@ -162,7 +162,7 @@ describe("generateArticleSchema", () => {
     expect(schema["@type"]).toBe("Article");
     expect(schema.headline).toBe("Winter Driving Tips");
     expect(schema.description).toBe("How to drive safely in winter");
-    expect(schema.url).toBe("https://bridgestone.ua/blog/winter-tips");
+    expect(schema.url).toBe("https://bridgestone.org.ua/blog/winter-tips");
   });
 
   it("includes datePublished when available", () => {
@@ -189,9 +189,9 @@ describe("generateArticleSchema", () => {
 describe("generateBreadcrumbSchema", () => {
   it("generates breadcrumb list with correct positions", () => {
     const items = [
-      { name: "Home", url: "https://bridgestone.ua" },
-      { name: "Tyres", url: "https://bridgestone.ua/shyny" },
-      { name: "Turanza T005", url: "https://bridgestone.ua/shyny/turanza-t005" },
+      { name: "Home", url: "https://bridgestone.org.ua" },
+      { name: "Tyres", url: "https://bridgestone.org.ua/shyny" },
+      { name: "Turanza T005", url: "https://bridgestone.org.ua/shyny/turanza-t005" },
     ];
     const schema = generateBreadcrumbSchema(items);
 
@@ -241,7 +241,7 @@ describe("generateOrganizationSchema", () => {
 
     expect(schema["@type"]).toBe("Organization");
     expect(schema.name).toBe("Bridgestone Україна");
-    expect(schema.url).toBe("https://bridgestone.ua");
+    expect(schema.url).toBe("https://bridgestone.org.ua");
     expect(schema.sameAs).toContain("https://www.facebook.com/BridgestoneUkraine");
     expect(schema.contactPoint.contactType).toBe("customer service");
   });
@@ -348,7 +348,7 @@ describe("generateProductSchemaWithReviews", () => {
   it("includes image when imageUrl is present", () => {
     const tyreWithImage = { ...baseTyre, imageUrl: "/images/turanza.jpg" };
     const schema = generateProductSchemaWithReviews(tyreWithImage, [], stats);
-    expect(schema.image).toBe("https://bridgestone.ua/images/turanza.jpg");
+    expect(schema.image).toBe("https://bridgestone.org.ua/images/turanza.jpg");
   });
 
   it("handles absolute image URLs", () => {

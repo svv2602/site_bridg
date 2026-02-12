@@ -54,7 +54,7 @@ export class OpenRouterProvider extends BaseLLMProvider {
         apiKey: this.apiKey,
         baseURL: this.baseUrl || OPENROUTER_BASE_URL,
         defaultHeaders: {
-          "HTTP-Referer": "https://bridgestone.ua",
+          "HTTP-Referer": "https://bridgestone.org.ua",
           "X-Title": "Bridgestone Ukraine CMS",
         },
       });

@@ -58,7 +58,7 @@ interface PayloadTyre {
 }
 
 const PAYLOAD_URL = process.env.PAYLOAD_URL || "http://localhost:3001";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@bridgestone.ua";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@bridgestone.org.ua";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin123!";
 
 let authToken: string | null = null;
