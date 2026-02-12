@@ -86,7 +86,7 @@ export class GoogleProvider extends BaseLLMProvider {
         const body: Record<string, unknown> = {
           contents,
           generationConfig: {
-            maxOutputTokens: options?.maxTokens ?? 4096,
+            maxOutputTokens: options?.maxTokens ?? 8192,
             temperature: options?.temperature ?? 0.7,
             topP: options?.topP,
             stopSequences: options?.stopSequences,
@@ -157,7 +157,7 @@ export class GoogleProvider extends BaseLLMProvider {
     const body = {
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
-        maxOutputTokens: options?.maxTokens ?? 4096,
+        maxOutputTokens: options?.maxTokens ?? 8192,
         temperature: options?.temperature ?? 0.7,
       },
       ...(options?.systemPrompt && {
