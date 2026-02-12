@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { BulkReviewsSection } from './BulkReviewsSection'
+import { GenerateArticleSection } from './GenerateArticleSection'
+import { BatchHeroRegenSection } from './BatchHeroRegenSection'
 import { DashboardNotifications } from './DashboardNotifications'
 
 interface Stats {
@@ -1961,6 +1963,8 @@ export const Dashboard: React.FC<any> = () => {
         )}
       </div>
 
+      <GenerateArticleSection />
+      <BatchHeroRegenSection />
       <BulkReviewsSection />
 
       <style>{`
