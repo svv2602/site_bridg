@@ -122,6 +122,45 @@ export function mapTierToRating(tierText: string): { rating: string; ratingNumer
 }
 
 /**
+ * Check if an extracted year value is plausible for a tyre test.
+ * Returns true if the year is between 2021 and currentYear + 1 (tests can be published ahead).
+ */
+export function isPlausibleTestYear(year: number): boolean {
+  const currentYear = new Date().getFullYear();
+  return Number.isInteger(year) && year >= 2021 && year <= currentYear + 1;
+}
+
+/**
+ * Extract a plausible year from text, trying context-aware patterns first.
+ * Returns null if no plausible year is found.
+ */
+export function extractPlausibleYear(text: string): number | null {
+  // 1. Try context-aware patterns first (e.g. "Test 2025", "Reifentest 2024")
+  const contextPatterns = [
+    /(?:test|reifentest|sommerreifentest|winterreifentest|ganzjahresreifentest)\s*(\d{4})/i,
+    /(\d{4})\s*(?:test|reifentest)/i,
+    /(?:year|jahr|année|рік|год)\s*:?\s*(\d{4})/i,
+  ];
+
+  for (const pattern of contextPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      if (isPlausibleTestYear(year)) return year;
+    }
+  }
+
+  // 2. Fallback: find all 4-digit sequences, pick the most plausible one
+  const allFourDigit = [...text.matchAll(/\b(20[1-3]\d)\b/g)];
+  for (const match of allFourDigit) {
+    const year = parseInt(match[1], 10);
+    if (isPlausibleTestYear(year)) return year;
+  }
+
+  return null;
+}
+
+/**
  * Normalize ratings from different test sources to a unified 1.0-5.0 scale.
  * Lower is better (consistent with ADAC where 1.0 = best).
  *
