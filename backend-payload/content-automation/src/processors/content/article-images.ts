@@ -29,6 +29,7 @@ export interface ArticleImageInput {
   season?: "summer" | "winter" | "allseason";
   tireModel?: string;
   context?: string;
+  articleType?: string;
 }
 
 /**
@@ -77,6 +78,7 @@ export async function generateArticleImage(
   const prompt = generatePromptByType(input.type, input.tireModel ? `Bridgestone ${input.tireModel}` : input.topic, {
     season: input.season,
     context: input.context,
+    articleType: input.articleType,
   });
   const size = IMAGE_SIZES[input.type];
 
@@ -130,6 +132,7 @@ export async function generateHeroImage(
   options?: {
     provider?: string;
     model?: string;
+    articleType?: string;
   }
 ): Promise<GeneratedImage> {
   return generateArticleImage(
@@ -137,6 +140,7 @@ export async function generateHeroImage(
       type: "hero",
       topic,
       season,
+      articleType: options?.articleType,
     },
     { ...options, quality: "hd" }
   );
