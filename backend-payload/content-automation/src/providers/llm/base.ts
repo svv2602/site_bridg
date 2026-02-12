@@ -125,7 +125,12 @@ Respond with valid JSON only. No explanations or markdown.`;
 
     try {
       // Try to extract JSON from response
-      const content = response.content.trim();
+      // Strip markdown code blocks (```json ... ```) that some LLMs wrap around JSON
+      let content = response.content.trim();
+      const mdMatch = content.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/);
+      if (mdMatch) {
+        content = mdMatch[1].trim();
+      }
 
       // First, try to parse the entire content as JSON
       try {
