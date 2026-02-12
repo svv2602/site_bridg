@@ -8,6 +8,10 @@
  * Access: public read, auth-required write.
  */
 import type { CollectionConfig } from 'payload';
+import { createRevalidateHook } from '../hooks/revalidateFrontend';
+
+const { afterChange: revalidateAfterChange, afterDelete: revalidateAfterDelete } =
+  createRevalidateHook('articles');
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -125,5 +129,7 @@ export const Articles: CollectionConfig = {
         return data;
       },
     ],
+    afterChange: [revalidateAfterChange],
+    afterDelete: [revalidateAfterDelete],
   },
 };

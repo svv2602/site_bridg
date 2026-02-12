@@ -12,6 +12,10 @@ import { euLabelField } from '../fields/euLabel';
 import { tyreSizeFields } from '../fields/tyreSize';
 import { usageField } from '../fields/usage';
 import { badgeFields } from '../fields/badge';
+import { createRevalidateHook } from '../hooks/revalidateFrontend';
+
+const { afterChange: revalidateAfterChange, afterDelete: revalidateAfterDelete } =
+  createRevalidateHook('tyres');
 
 export const Tyres: CollectionConfig = {
   slug: 'tyres',
@@ -310,5 +314,7 @@ export const Tyres: CollectionConfig = {
         return data;
       },
     ],
+    afterChange: [revalidateAfterChange],
+    afterDelete: [revalidateAfterDelete],
   },
 };
