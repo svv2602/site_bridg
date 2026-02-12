@@ -97,7 +97,14 @@ async function discoverTestUrls(page: Page): Promise<string[]> {
       if (!link) continue;
       // Match patterns: sommerreifentest-2024, winterreifentest-2025, etc.
       if (/reifentest.*\d{4}/i.test(link)) {
-        const fullUrl = link.startsWith("http") ? link : `https://www.oeamtc.at${link}`;
+        let fullUrl: string;
+        if (link.startsWith("http")) {
+          fullUrl = link;
+        } else {
+          // Normalize: strip leading domain if href contains it (e.g. "/www.oeamtc.at/...")
+          const path = link.replace(/^\/?(www\.)?oeamtc\.at/, "");
+          fullUrl = `https://www.oeamtc.at${path.startsWith("/") ? path : "/" + path}`;
+        }
         if (!urls.includes(fullUrl)) urls.push(fullUrl);
       }
     }
