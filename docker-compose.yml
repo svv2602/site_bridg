@@ -43,6 +43,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - backend_media:/app/media
+      - backend_automation_data:/app/content-automation/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/health/live"]
       interval: 10s
@@ -77,3 +80,5 @@ services:
 
 volumes:
   postgres_data:
+  backend_media:
+  backend_automation_data:
