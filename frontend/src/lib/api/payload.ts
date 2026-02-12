@@ -452,6 +452,7 @@ export async function getPayloadArticlesPaginated(params?: {
     searchParams.set('page', String(page));
     searchParams.set('sort', '-createdAt');
     searchParams.set('depth', '1');
+    searchParams.set('where[_status][equals]', 'published');
 
     const query = searchParams.toString();
     const data = await fetchPayload<PayloadArticle>(`articles?${query}`);
@@ -471,6 +472,7 @@ export async function getPayloadArticlesPaginated(params?: {
   searchParams.set('limit', '500');
   searchParams.set('sort', '-createdAt');
   searchParams.set('depth', '1');
+  searchParams.set('where[_status][equals]', 'published');
 
   const query = searchParams.toString();
   const data = await fetchPayload<PayloadArticle>(`articles?${query}`);
@@ -518,6 +520,7 @@ export async function getPayloadArticleTags(): Promise<string[]> {
   searchParams.set('depth', '0');
   // Only select the tags field to minimize response payload
   searchParams.set('select[tags]', 'true');
+  searchParams.set('where[_status][equals]', 'published');
 
   const query = searchParams.toString();
   const data = await fetchPayload<Pick<PayloadArticle, 'tags'>>(`articles?${query}`);
@@ -532,7 +535,7 @@ export async function getPayloadArticleTags(): Promise<string[]> {
 
 export async function getPayloadArticleBySlug(slug: string): Promise<PayloadArticle | null> {
   const data = await fetchPayload<PayloadArticle>(
-    `articles?where[slug][equals]=${encodeURIComponent(slug)}&depth=2`
+    `articles?where[slug][equals]=${encodeURIComponent(slug)}&where[_status][equals]=published&depth=2`
   );
   return data.docs[0] || null;
 }

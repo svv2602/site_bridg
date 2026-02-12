@@ -95,7 +95,7 @@ const DEFAULT_SOURCES: ContentSource[] = [
 
 const DEFAULT_SETTINGS: Record<string, string> = {
   max_articles_per_week: "3",
-  auto_publish: "false",
+  auto_publish: "true",
   seasonal_lead_weeks: "6",
   min_rating_to_feature: "2.0",
   interlinking_enabled: "true",

@@ -237,14 +237,14 @@ export const TASK_ROUTING: TaskRouting[] = [
     timeoutMs: 60000,
     maxCost: 0.3,
   },
-  // Translation
+  // Translation (articles are long, need generous timeout)
   {
     task: "content-translation",
     preferredProvider: "google",
     preferredModel: "gemini-2.5-flash",
     fallbackProviders: ["anthropic", "deepseek"],
     maxRetries: 2,
-    timeoutMs: 30000,
+    timeoutMs: 90000,
     maxCost: 0.1,
   },
   // Code generation

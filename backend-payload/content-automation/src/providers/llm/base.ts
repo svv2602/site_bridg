@@ -127,9 +127,16 @@ Respond with valid JSON only. No explanations or markdown.`;
       // Try to extract JSON from response
       // Strip markdown code blocks (```json ... ```) that some LLMs wrap around JSON
       let content = response.content.trim();
-      const mdMatch = content.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/);
-      if (mdMatch) {
-        content = mdMatch[1].trim();
+      // Try strict match first (entire content is a code block)
+      const mdMatchStrict = content.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```\s*$/);
+      if (mdMatchStrict) {
+        content = mdMatchStrict[1].trim();
+      } else {
+        // Flexible match: find first code block anywhere in the response
+        const mdMatchFlex = content.match(/```(?:json)?\s*\n([\s\S]*?)\n\s*```/);
+        if (mdMatchFlex) {
+          content = mdMatchFlex[1].trim();
+        }
       }
 
       // First, try to parse the entire content as JSON

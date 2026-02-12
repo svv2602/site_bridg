@@ -73,6 +73,7 @@ interface ArticleData {
   seoTitle?: string;
   seoDescription?: string;
   readingTimeMinutes?: number;
+  _status?: "draft" | "published";
 }
 
 type TyreDoc = TyreData & PayloadDoc;
@@ -349,13 +350,15 @@ class PayloadClient {
    * Publish article - creates new or updates existing
    */
   async publishArticle(data: ArticleData): Promise<{ action: "create" | "update"; id: string }> {
+    // Always set _status to "published" so article is visible on frontend
+    const dataWithStatus = { ...data, _status: "published" as const };
     const existing = await this.findArticleBySlug(data.slug);
 
     if (existing) {
-      await this.updateArticle(existing.id, data);
+      await this.updateArticle(existing.id, dataWithStatus);
       return { action: "update", id: existing.id };
     } else {
-      const created = await this.createArticle(data);
+      const created = await this.createArticle(dataWithStatus);
       return { action: "create", id: created.id };
     }
   }
