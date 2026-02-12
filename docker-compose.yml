@@ -37,6 +37,9 @@ services:
       GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # Payload CMS auth for content automation
+      PAYLOAD_ADMIN_EMAIL: ${PAYLOAD_ADMIN_EMAIL:-admin@bridgestone.ua}
+      PAYLOAD_ADMIN_PASSWORD: ${PAYLOAD_ADMIN_PASSWORD:-Admin123!}
       # Telegram notifications (optional)
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}

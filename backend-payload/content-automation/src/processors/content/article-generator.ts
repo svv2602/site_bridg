@@ -241,8 +241,8 @@ function validateArticle(article: ArticleOutput, type: ArticleType): void {
     errors.push(`title too short: ${article.title?.length || 0} chars`);
   }
 
-  if (article.title && article.title.length > 100) {
-    errors.push(`title too long: ${article.title.length} chars (max 100)`);
+  if (article.title && article.title.length > 160) {
+    errors.push(`title too long: ${article.title.length} chars (max 160)`);
   }
 
   if (!article.excerpt || article.excerpt.length < 50) {

@@ -40,6 +40,7 @@ const FALLBACK_ERROR_TYPES = [
   "ENOTFOUND",
   "EAI_AGAIN",         // DNS lookup failure
   "ECONNREFUSED",
+  "Failed to parse JSON", // LLM returned invalid/truncated JSON
   "404",               // Model not found / endpoint removed
   "429",
   "500",
