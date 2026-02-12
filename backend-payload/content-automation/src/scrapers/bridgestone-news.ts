@@ -2,24 +2,28 @@
  * Bridgestone EMEA News Scraper
  *
  * Fetches press releases from press.bridgestone-emea.com
- * Uses HTTP API — no Playwright needed.
+ * Strategy: parse sitemap.xml for URLs + dates, then fetch meta tags from new pages.
+ * Uses plain HTTP — no Playwright needed.
  * Saves to news_items table (not test_results).
  */
 
 import { saveNewsItem, newsItemExists } from "../db/news-items.js";
 
-const API_URL = "https://press.bridgestone-emea.com/services/getheadlines.php";
+const SITEMAP_URL = "https://press.bridgestone-emea.com/sitemap.xml";
+const BASE_URL = "https://press.bridgestone-emea.com";
+const USER_AGENT = "Mozilla/5.0 (compatible; BridgestoneUA/1.0)";
 
-interface HeadlineItem {
-  id?: string;
-  title?: string;
-  summary?: string;
-  url?: string;
-  link?: string;
-  date?: string;
-  published?: string;
-  category?: string;
-  type?: string;
+// Language prefixes to exclude (we only want English articles)
+const LANG_PREFIXES = [
+  "/de/", "/fr/", "/it/", "/es/", "/pl-pl/", "/pt-pt/",
+  "/cs-cz/", "/hu-hu/", "/da-dk/", "/fi-fi/", "/el-gr/",
+  "/en-in/", "/en-za/", "/en-ie/",
+  "/en/", // UK English variant — root URLs already have the same content
+];
+
+interface SitemapEntry {
+  url: string;
+  lastmod: string | null;
 }
 
 export interface BridgestoneNewsScraperResult {
@@ -30,61 +34,87 @@ export interface BridgestoneNewsScraperResult {
 }
 
 /**
- * Fetch headlines from Bridgestone EMEA press API
+ * Fetch and parse sitemap.xml for English press release URLs
  */
-async function fetchHeadlines(): Promise<HeadlineItem[]> {
-  const response = await fetch(API_URL, {
-    headers: {
-      "Accept": "application/json",
-      "User-Agent": "Mozilla/5.0 (compatible; BridgestoneUA/1.0)",
-    },
+async function fetchSitemapEntries(): Promise<SitemapEntry[]> {
+  const response = await fetch(SITEMAP_URL, {
+    headers: { "User-Agent": USER_AGENT },
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    throw new Error(`Sitemap HTTP ${response.status}: ${response.statusText}`);
   }
 
-  const data = await response.json() as Record<string, unknown>;
+  const xml = await response.text();
+  const entries: SitemapEntry[] = [];
 
-  // API may return array directly or nested in a property
-  if (Array.isArray(data)) return data as HeadlineItem[];
-  if (data.headlines && Array.isArray(data.headlines)) return data.headlines as HeadlineItem[];
-  if (data.items && Array.isArray(data.items)) return data.items as HeadlineItem[];
-  if (data.data && Array.isArray(data.data)) return data.data as HeadlineItem[];
+  const urlBlocks = xml.match(/<url>[\s\S]*?<\/url>/g) || [];
 
-  // Try to extract array from first object property
-  for (const key of Object.keys(data)) {
-    if (Array.isArray(data[key])) return data[key] as HeadlineItem[];
+  for (const block of urlBlocks) {
+    const locMatch = block.match(/<loc>(.*?)<\/loc>/);
+    if (!locMatch) continue;
+
+    const url = locMatch[1];
+
+    // Skip non-English pages
+    const path = url.replace(BASE_URL, "");
+    if (LANG_PREFIXES.some((prefix) => path.startsWith(prefix))) continue;
+
+    // Skip homepage, about, contact, media-library pages
+    if (path === "/" || path === "/en/" ||
+        path.includes("/about-") || path.includes("/contact") ||
+        path.includes("/media-library")) continue;
+
+    const modMatch = block.match(/<lastmod>(.*?)<\/lastmod>/);
+    entries.push({
+      url,
+      lastmod: modMatch ? modMatch[1] : null,
+    });
   }
 
-  console.warn("[BridgestoneNews] Unexpected API response format");
-  return [];
+  return entries;
 }
 
 /**
- * Normalize a headline item to a consistent shape
+ * Extract title, description and keywords from a page's meta tags (static HTML)
  */
-function normalizeItem(item: HeadlineItem): {
+async function fetchPageMeta(url: string): Promise<{
   title: string;
   summary: string;
-  url: string;
-  publishedDate: string | null;
   category: string | null;
-} | null {
-  const title = item.title?.trim();
-  const url = (item.url || item.link)?.trim();
+} | null> {
+  const response = await fetch(url, {
+    headers: { "User-Agent": USER_AGENT },
+  });
 
-  if (!title || !url) return null;
+  if (!response.ok) return null;
 
-  const fullUrl = url.startsWith("http") ? url : `https://press.bridgestone-emea.com${url}`;
+  const html = await response.text();
 
-  return {
-    title,
-    summary: (item.summary || "").trim(),
-    url: fullUrl,
-    publishedDate: item.date || item.published || null,
-    category: item.category || item.type || null,
-  };
+  // Try OG title first, then <title>
+  const ogTitle = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["'](.*?)["']/);
+  const titleTag = html.match(/<title>(.*?)<\/title>/);
+  const title = (ogTitle?.[1] || titleTag?.[1] || "").trim();
+
+  if (!title) return null;
+
+  // Description from meta or OG
+  const metaDesc = html.match(/<meta[^>]*name=["']description["'][^>]*content=["'](.*?)["']/);
+  const ogDesc = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["'](.*?)["']/);
+  const summary = (metaDesc?.[1] || ogDesc?.[1] || "").trim();
+
+  // Keywords as category
+  const keywords = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["'](.*?)["']/);
+  const category = keywords?.[1]?.trim() || null;
+
+  return { title, summary, category };
+}
+
+/**
+ * Rate-limit helper
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -100,35 +130,47 @@ export async function scrapeBridgestoneNews(): Promise<BridgestoneNewsScraperRes
   };
 
   try {
-    console.log("[BridgestoneNews] Fetching headlines...");
+    console.log("[BridgestoneNews] Fetching sitemap...");
 
-    const headlines = await fetchHeadlines();
-    result.newsFound = headlines.length;
+    const entries = await fetchSitemapEntries();
+    result.newsFound = entries.length;
 
-    console.log(`[BridgestoneNews] Found ${headlines.length} headlines`);
+    console.log(`[BridgestoneNews] Found ${entries.length} English press releases in sitemap`);
 
-    for (const item of headlines) {
+    // Only process entries from the last 90 days to avoid fetching the entire archive
+    const cutoffDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const recentEntries = entries.filter(
+      (e) => e.lastmod && e.lastmod >= cutoffDate
+    );
+
+    console.log(`[BridgestoneNews] ${recentEntries.length} entries in last 90 days`);
+
+    for (const entry of recentEntries) {
       try {
-        const normalized = normalizeItem(item);
-        if (!normalized) continue;
-
         // Skip if already scraped
-        if (newsItemExists(normalized.url)) continue;
+        if (newsItemExists(entry.url)) continue;
+
+        // Fetch page meta tags
+        const meta = await fetchPageMeta(entry.url);
+        if (!meta) continue;
 
         const saved = saveNewsItem({
           source: "bridgestone-emea",
-          title: normalized.title,
-          summary: normalized.summary,
-          url: normalized.url,
-          publishedDate: normalized.publishedDate,
-          category: normalized.category,
+          title: meta.title,
+          summary: meta.summary,
+          url: entry.url,
+          publishedDate: entry.lastmod,
+          category: meta.category,
           scrapedAt: new Date().toISOString(),
         });
 
         if (saved) {
           result.newsNew++;
-          console.log(`[BridgestoneNews] New: ${normalized.title}`);
+          console.log(`[BridgestoneNews] New: ${meta.title}`);
         }
+
+        // Rate limit: 500ms between page fetches
+        await delay(500);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         result.errors.push(errorMsg);
