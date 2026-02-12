@@ -5,21 +5,24 @@
  * GET  /api/image-regeneration/batch-heroes/list — list articles for selection
  */
 
+import path from 'path';
 import type { Endpoint, PayloadRequest } from 'payload';
 import { createBackgroundJobHandler } from './createBackgroundJob';
 import { apiResponse, apiError } from './api-response';
 import { requireRoleForEndpoint } from '../lib/rbac';
 
 // Dynamic imports for content-automation modules (ESM)
-// webpackIgnore prevents Next.js build from tracing into content-automation's
-// .js imports which only resolve at runtime via tsx
+// webpackIgnore prevents Next.js build from bundling these imports.
+// Absolute paths via process.cwd() ensure correct resolution from .next/server/chunks/
 async function getArticleImages() {
-  const mod = await import(/* webpackIgnore: true */ '../../content-automation/src/processors/content/article-images');
+  const modPath = path.join(process.cwd(), 'content-automation', 'src', 'processors', 'content', 'article-images');
+  const mod = await import(/* webpackIgnore: true */ modPath);
   return mod;
 }
 
 async function getPayloadClientModule() {
-  const mod = await import(/* webpackIgnore: true */ '../../content-automation/src/publishers/payload-client');
+  const modPath = path.join(process.cwd(), 'content-automation', 'src', 'publishers', 'payload-client');
+  const mod = await import(/* webpackIgnore: true */ modPath);
   return mod;
 }
 
