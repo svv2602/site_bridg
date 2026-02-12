@@ -1434,7 +1434,7 @@ export const Dashboard: React.FC<any> = () => {
             disabled={bgProcessing || !bgStatus?.rembgAvailable || bgStatus?.pending === 0}
             className="dashboard__action dashboard__action--primary"
           >
-            {bgProcessing ? 'Обробка...' : 'Видалити фон з усіх фото'}
+            {bgProcessing ? 'Обробка...' : 'Видалити фон (шини)'}
           </button>
         </div>
       </div>

@@ -176,8 +176,9 @@ export const removeBackgroundsEndpoint: Endpoint = {
           where: { id: { equals: parseInt(singleId, 10) } },
           limit: 1,
         };
-      } else if (!processAll) {
+      } else {
         // Only process items that have removeBackground checked but not yet processed
+        // This ensures article images and other non-tyre media are never touched
         query.where.removeBackground = { equals: true };
       }
 
@@ -302,10 +303,13 @@ export const removeBackgroundsBatchEndpoint: Endpoint = {
           limit: input.mediaIds.length,
         };
       } else {
+        // Only process images that have removeBackground explicitly enabled
+        // This ensures article images and other non-tyre media are never touched
         query = {
           where: {
             mimeType: { contains: 'image' },
             backgroundRemoved: { not_equals: true },
+            removeBackground: { equals: true },
           },
           limit: 500,
         };
@@ -415,12 +419,12 @@ export const removeBackgroundsStatusEndpoint: Endpoint = {
 
     try {
       const [total, processed, pending] = await Promise.all([
-        payload.count({ collection: 'media', where: { mimeType: { contains: 'image' } } }),
-        payload.count({ collection: 'media', where: { backgroundRemoved: { equals: true } } }),
+        payload.count({ collection: 'media', where: { removeBackground: { equals: true } } }),
+        payload.count({ collection: 'media', where: { removeBackground: { equals: true }, backgroundRemoved: { equals: true } } }),
         payload.count({
           collection: 'media',
           where: {
-            mimeType: { contains: 'image' },
+            removeBackground: { equals: true },
             backgroundRemoved: { not_equals: true },
           },
         }),
