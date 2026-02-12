@@ -164,10 +164,11 @@ export default buildConfig({
     providersUpdateModelEndpoint,
     taskRoutingUpdateEndpoint,
     generatePromptEndpoint,
-    regenerateImageStatusEndpoint,
-    regenerateImageEndpoint,
+    // batch-heroes must be before :id route to avoid /image-regeneration/:id capturing "batch-heroes"
     batchHeroesEndpoint,
     batchHeroesListEndpoint,
+    regenerateImageStatusEndpoint,
+    regenerateImageEndpoint,
     generateReviewsBatchEndpoint,
     generateReviewsBatchStatusEndpoint,
     reviewBulkStatsEndpoint,
