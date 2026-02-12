@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { BulkReviewsSection } from './BulkReviewsSection'
+import { DashboardNotifications } from './DashboardNotifications'
 
 interface Stats {
   tyres: number
@@ -908,6 +909,8 @@ export const Dashboard: React.FC<any> = () => {
           </a>
         ))}
       </div>
+
+      <DashboardNotifications />
 
       <div className="dashboard__section">
         <h2>Швидкі дії</h2>

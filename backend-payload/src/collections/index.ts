@@ -12,3 +12,4 @@ export { ProviderSettings } from './ProviderSettings';
 export { TaskRouting } from './TaskRouting';
 export { Reviews } from './Reviews';
 export { CategoryPages } from './CategoryPages';
+export { default as Notifications } from './Notifications';

@@ -41,6 +41,21 @@ export const ENV = {
   // === Telegram notifications ===
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
   TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID || "",
+  TELEGRAM_TOPIC_CONTENT: process.env.TELEGRAM_TOPIC_CONTENT || "",
+  TELEGRAM_TOPIC_ERRORS: process.env.TELEGRAM_TOPIC_ERRORS || "",
+  TELEGRAM_TOPIC_REPORTS: process.env.TELEGRAM_TOPIC_REPORTS || "",
+
+  // === Email (SMTP) notifications ===
+  SMTP_HOST: process.env.SMTP_HOST || "",
+  SMTP_PORT: process.env.SMTP_PORT || "587",
+  SMTP_USER: process.env.SMTP_USER || "",
+  SMTP_PASS: process.env.SMTP_PASS || "",
+  SMTP_FROM: process.env.SMTP_FROM || "",
+  NOTIFY_EMAILS: process.env.NOTIFY_EMAILS || "",
+
+  // === Payload notifications ===
+  NOTIFY_PAYLOAD_ENABLED: process.env.NOTIFY_PAYLOAD_ENABLED !== "false",
+  PAYLOAD_API_KEY: process.env.PAYLOAD_API_KEY || "",
 
   // === Scraping ===
   SCRAPE_DELAY_MS: parseInt(process.env.SCRAPE_DELAY_MS || "2000", 10),

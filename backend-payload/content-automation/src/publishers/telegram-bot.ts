@@ -6,16 +6,9 @@
  */
 
 import { ENV } from "../config/env.js";
-import { withRetry } from "../utils/retry.js";
+import { dispatch, initNotificationService } from "./notification-service.js";
 
-// Constants
-const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
-const TELEGRAM_MIN_INTERVAL_MS = 5000; // 5 seconds between messages (Telegram API rate limit protection)
-
-// Rate limiter state
-let lastNotifyTimestamp = 0;
-
-// Types
+// Types (re-exported for all callsites)
 export type NotificationType = "new_content" | "error" | "weekly_summary" | "info";
 
 export interface NotificationButton {
@@ -31,14 +24,6 @@ export interface NotificationPayload {
   data?: Record<string, unknown>;
 }
 
-// Emoji mapping
-const TYPE_EMOJI: Record<NotificationType, string> = {
-  new_content: "🆕",
-  error: "❌",
-  weekly_summary: "📊",
-  info: "ℹ️",
-};
-
 /**
  * Escape special HTML characters to prevent parse errors in Telegram
  */
@@ -50,96 +35,19 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Format message with HTML for Telegram
- */
-function formatMessage(payload: NotificationPayload): string {
-  const emoji = TYPE_EMOJI[payload.type];
-  let message = `${emoji} <b>${escapeHtml(payload.title)}</b>\n\n`;
-  message += payload.body;
-
-  return message;
-}
-
-/**
- * Truncate message to fit Telegram API limit (4096 chars)
- */
-function truncateMessage(message: string): string {
-  if (message.length <= TELEGRAM_MAX_MESSAGE_LENGTH) return message;
-
-  const truncationSuffix = "\n\n...[truncated]";
-  return message.slice(0, TELEGRAM_MAX_MESSAGE_LENGTH - truncationSuffix.length) + truncationSuffix;
-}
-
-/**
- * Create inline keyboard from buttons
- */
-function createInlineKeyboard(buttons?: NotificationButton[]): object | undefined {
-  if (!buttons || buttons.length === 0) return undefined;
-
-  return {
-    inline_keyboard: [
-      buttons.map((btn) => ({
-        text: btn.text,
-        url: btn.url,
-      })),
-    ],
-  };
-}
-
-/**
- * Send notification to Telegram with retry logic
+ * Send notification to all configured channels (Telegram, Email, Payload DB).
+ * Returns success:true if ANY channel succeeds (backward compatible).
  */
 export async function notify(payload: NotificationPayload): Promise<{ success: boolean; error?: string }> {
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = ENV;
-
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.warn("Telegram credentials not set. Skipping notification.");
-    return { success: false, error: "Telegram credentials not configured" };
-  }
-
-  // Rate limiting: ensure minimum interval between messages
-  const now = Date.now();
-  const elapsed = now - lastNotifyTimestamp;
-  if (elapsed < TELEGRAM_MIN_INTERVAL_MS && lastNotifyTimestamp > 0) {
-    await new Promise((resolve) =>
-      setTimeout(resolve, TELEGRAM_MIN_INTERVAL_MS - elapsed)
-    );
-  }
-  lastNotifyTimestamp = Date.now();
-
-  const message = truncateMessage(formatMessage(payload));
-  const replyMarkup = createInlineKeyboard(payload.buttons);
-
-  const result = await withRetry(
-    async () => {
-      const response = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: "HTML",
-            reply_markup: replyMarkup,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Telegram API error: ${response.status} ${errorText}`);
-      }
-
-      return true;
-    },
-    { maxRetries: 2, initialDelayMs: 1000, maxDelayMs: 5000 }
-  );
+  await initNotificationService();
+  const result = await dispatch(payload);
 
   if (!result.success) {
-    const errorMessage = result.error?.message || "Unknown error";
-    console.error("Telegram notification failed after retries:", errorMessage);
-    return { success: false, error: errorMessage };
+    const errors = result.channels
+      .filter((ch) => !ch.success)
+      .map((ch) => `${ch.name}: ${ch.error}`)
+      .join("; ");
+    return { success: false, error: errors || "No channels available" };
   }
 
   return { success: true };

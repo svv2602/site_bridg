@@ -20,6 +20,7 @@ import {
   TaskRouting,
   Reviews,
   CategoryPages,
+  Notifications,
 } from './src/collections';
 import AuditLog from './src/collections/AuditLog';
 import { SiteSettings } from './src/globals';
@@ -77,6 +78,11 @@ import {
   readinessEndpoint,
   livenessEndpoint,
 } from './src/endpoints/health';
+import {
+  notificationCountEndpoint,
+  notificationMarkReadEndpoint,
+  notificationMarkAllReadEndpoint,
+} from './src/endpoints/notifications';
 import { initScheduler } from './src/scheduler';
 import { initSentry } from './src/lib/sentry';
 
@@ -107,6 +113,7 @@ export default buildConfig({
     components: {
       beforeDashboard: ['/src/components/Dashboard'],
       beforeNavLinks: ['/src/components/DashboardNavLink#DashboardNavLink'],
+      actions: ['/src/components/NotificationBell#NotificationBell'],
     },
     theme: 'dark',
     avatar: 'gravatar',
@@ -129,6 +136,7 @@ export default buildConfig({
     Reviews,
     CategoryPages,
     AuditLog,
+    Notifications,
   ],
   globals: [SiteSettings],
   endpoints: [
@@ -171,6 +179,10 @@ export default buildConfig({
     automationQueueUpdateEndpoint,
     automationArticleSettingsEndpoint,
     automationArticleSettingsUpdateEndpoint,
+    // Notifications
+    notificationCountEndpoint,
+    notificationMarkReadEndpoint,
+    notificationMarkAllReadEndpoint,
     // Health checks
     healthEndpoint,
     readinessEndpoint,
