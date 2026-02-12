@@ -23,6 +23,10 @@ export { type ScrapedTire, type ScrapedTireSize } from "./types.js";
 export { scrapeADAC, type ADACScraperResult } from "./adac.js";
 export { scrapeAutoBild, type AutoBildScraperResult } from "./autobild.js";
 export { scrapeTyreReviews, type TyreReviewsScraperResult, searchTyreTests } from "./tyrereviews.js";
+export { scrapeOEAMTC, type OEAMTCScraperResult } from "./oeamtc.js";
+export { scrapeTCS, type TCSScraperResult } from "./tcs.js";
+export { scrapeGTUE, type GTUEScraperResult } from "./gtue.js";
+export { scrapeBridgestoneNews, type BridgestoneNewsScraperResult } from "./bridgestone-news.js";
 
 // Test results database
 export {
@@ -42,19 +46,25 @@ import type { Page } from "playwright";
 import { scrapeADAC, type ADACScraperResult } from "./adac.js";
 import { scrapeAutoBild, type AutoBildScraperResult } from "./autobild.js";
 import { scrapeTyreReviews, type TyreReviewsScraperResult } from "./tyrereviews.js";
+import { scrapeOEAMTC, type OEAMTCScraperResult } from "./oeamtc.js";
+import { scrapeTCS, type TCSScraperResult } from "./tcs.js";
+import { scrapeGTUE, type GTUEScraperResult } from "./gtue.js";
 import type { TestResult } from "../db/test-results.js";
 
 export interface AllScrapersResult {
   adac: ADACScraperResult | null;
   autobild: AutoBildScraperResult | null;
   tyrereviews: TyreReviewsScraperResult | null;
+  oeamtc: OEAMTCScraperResult | null;
+  tcs: TCSScraperResult | null;
+  gtue: GTUEScraperResult | null;
   totalTestsFound: number;
   totalTestsNew: number;
   totalErrors: number;
   duration: number;
 }
 
-export type ScraperSource = "adac" | "autobild" | "tyrereviews";
+export type ScraperSource = "adac" | "autobild" | "tyrereviews" | "oeamtc" | "tcs" | "gtue";
 
 /**
  * Run all test scrapers
@@ -68,30 +78,39 @@ export async function scrapeAllTestSources(
     adac: null,
     autobild: null,
     tyrereviews: null,
+    oeamtc: null,
+    tcs: null,
+    gtue: null,
     totalTestsFound: 0,
     totalTestsNew: 0,
     totalErrors: 0,
     duration: 0,
   };
 
-  const sourcesToScrape = sources || ["adac", "autobild", "tyrereviews"];
+  const sourcesToScrape = sources || ["adac", "autobild", "tyrereviews", "oeamtc", "tcs", "gtue"];
+  const total = sourcesToScrape.length;
 
   console.log("=".repeat(50));
   console.log("Starting test results scrapers...");
   console.log(`Sources: ${sourcesToScrape.join(", ")}`);
   console.log("=".repeat(50));
 
-  // ADAC
-  if (sourcesToScrape.includes("adac")) {
-    console.log("\n[1/3] Scraping ADAC...");
+  // Helper to run a single scraper
+  async function runSource(
+    key: ScraperSource,
+    index: number,
+    fn: () => Promise<{ success: boolean; testsFound: number; testsNew: number; errors: string[] }>
+  ) {
+    console.log(`\n[${index + 1}/${total}] Scraping ${key}...`);
     try {
-      result.adac = await scrapeADAC(page);
-      result.totalTestsFound += result.adac.testsFound;
-      result.totalTestsNew += result.adac.testsNew;
-      result.totalErrors += result.adac.errors.length;
+      const r = await fn();
+      (result as Record<string, unknown>)[key] = r;
+      result.totalTestsFound += r.testsFound;
+      result.totalTestsNew += r.testsNew;
+      result.totalErrors += r.errors.length;
     } catch (error) {
-      console.error("ADAC scraper failed:", error);
-      result.adac = {
+      console.error(`${key} scraper failed:`, error);
+      (result as Record<string, unknown>)[key] = {
         success: false,
         testsFound: 0,
         testsNew: 0,
@@ -101,44 +120,21 @@ export async function scrapeAllTestSources(
     }
   }
 
-  // Auto Bild
-  if (sourcesToScrape.includes("autobild")) {
-    console.log("\n[2/3] Scraping Auto Bild...");
-    try {
-      result.autobild = await scrapeAutoBild(page);
-      result.totalTestsFound += result.autobild.testsFound;
-      result.totalTestsNew += result.autobild.testsNew;
-      result.totalErrors += result.autobild.errors.length;
-    } catch (error) {
-      console.error("Auto Bild scraper failed:", error);
-      result.autobild = {
-        success: false,
-        testsFound: 0,
-        testsNew: 0,
-        errors: [error instanceof Error ? error.message : String(error)],
-      };
-      result.totalErrors++;
-    }
-  }
+  const scraperFns: Record<ScraperSource, () => Promise<{ success: boolean; testsFound: number; testsNew: number; errors: string[] }>> = {
+    adac: () => scrapeADAC(page),
+    autobild: () => scrapeAutoBild(page),
+    tyrereviews: () => scrapeTyreReviews(page),
+    oeamtc: () => scrapeOEAMTC(page),
+    tcs: () => scrapeTCS(page),
+    gtue: () => scrapeGTUE(page),
+  };
 
-  // TyreReviews
-  if (sourcesToScrape.includes("tyrereviews")) {
-    console.log("\n[3/3] Scraping TyreReviews...");
-    try {
-      result.tyrereviews = await scrapeTyreReviews(page);
-      result.totalTestsFound += result.tyrereviews.testsFound;
-      result.totalTestsNew += result.tyrereviews.testsNew;
-      result.totalErrors += result.tyrereviews.errors.length;
-    } catch (error) {
-      console.error("TyreReviews scraper failed:", error);
-      result.tyrereviews = {
-        success: false,
-        testsFound: 0,
-        testsNew: 0,
-        errors: [error instanceof Error ? error.message : String(error)],
-      };
-      result.totalErrors++;
+  let idx = 0;
+  for (const source of sourcesToScrape) {
+    if (scraperFns[source]) {
+      await runSource(source, idx, scraperFns[source]);
     }
+    idx++;
   }
 
   result.duration = Math.round((Date.now() - startTime) / 1000);

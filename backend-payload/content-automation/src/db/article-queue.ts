@@ -11,7 +11,7 @@ import path from "path";
 // ============ TYPES ============
 
 export type SourceType = "test-results" | "news" | "rss";
-export type ScraperKey = "adac" | "autobild" | "tyrereviews";
+export type ScraperKey = "adac" | "autobild" | "tyrereviews" | "oeamtc" | "tcs" | "gtue" | "bridgestone-news";
 
 export interface ContentSource {
   id: string;
@@ -25,14 +25,15 @@ export interface ContentSource {
   lastFoundNew: number;
 }
 
-export type ArticleTriggerType = "test-result" | "seasonal" | "new-product" | "manual";
+export type ArticleTriggerType = "test-result" | "seasonal" | "new-product" | "news" | "manual";
 export type ArticleType =
   | "test-summary"
   | "comparison"
   | "seasonal-guide"
   | "model-review"
   | "technology"
-  | "tips";
+  | "tips"
+  | "news-digest";
 export type QueueStatus = "pending" | "generating" | "review" | "published" | "failed" | "rejected";
 
 export interface ArticleQueueItem {
@@ -91,6 +92,50 @@ const DEFAULT_SOURCES: ContentSource[] = [
     lastCheckedAt: null,
     lastFoundNew: 0,
   },
+  {
+    id: "oeamtc",
+    name: "ÖAMTC Reifentests",
+    sourceType: "test-results",
+    scraper: "oeamtc",
+    baseUrl: "https://www.oeamtc.at/tests/reifentest/",
+    enabled: true,
+    checkIntervalHours: 168, // weekly
+    lastCheckedAt: null,
+    lastFoundNew: 0,
+  },
+  {
+    id: "tcs",
+    name: "TCS Reifentests",
+    sourceType: "test-results",
+    scraper: "tcs",
+    baseUrl: "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/",
+    enabled: true,
+    checkIntervalHours: 168, // weekly
+    lastCheckedAt: null,
+    lastFoundNew: 0,
+  },
+  {
+    id: "gtue",
+    name: "GTÜ Reifentests",
+    sourceType: "test-results",
+    scraper: "gtue",
+    baseUrl: "https://www.gtue.news/technik/",
+    enabled: true,
+    checkIntervalHours: 336, // bi-weekly
+    lastCheckedAt: null,
+    lastFoundNew: 0,
+  },
+  {
+    id: "bridgestone-news",
+    name: "Bridgestone EMEA News",
+    sourceType: "news",
+    scraper: "bridgestone-news",
+    baseUrl: "https://press.bridgestone-emea.com",
+    enabled: true,
+    checkIntervalHours: 24, // daily
+    lastCheckedAt: null,
+    lastFoundNew: 0,
+  },
 ];
 
 const DEFAULT_SETTINGS: Record<string, string> = {
@@ -100,7 +145,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   min_rating_to_feature: "2.0",
   interlinking_enabled: "true",
   image_generation_enabled: "true",
-  preferred_types: JSON.stringify(["test-summary", "seasonal-guide", "comparison"]),
+  preferred_types: JSON.stringify(["test-summary", "seasonal-guide", "comparison", "news-digest"]),
 };
 
 // ============ DATABASE ============

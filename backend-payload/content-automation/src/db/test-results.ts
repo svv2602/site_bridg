@@ -19,7 +19,7 @@ export interface TestResultEntry {
 
 export interface TestResult {
   testUid: string;
-  source: "adac" | "autobild" | "tyrereviews";
+  source: "adac" | "autobild" | "tyrereviews" | "oeamtc" | "tcs" | "gtue";
   testType: "summer" | "winter" | "allseason";
   year: number;
   testedSize: string;

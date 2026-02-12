@@ -23,7 +23,8 @@ export type ArticleType =
   | "test-summary"
   | "comparison"
   | "technology"
-  | "tips";
+  | "tips"
+  | "news-digest";
 
 /**
  * Input for article generation
@@ -68,6 +69,7 @@ const WORD_COUNT_RANGES: Record<ArticleType, { min: number; max: number }> = {
   comparison: { min: 1000, max: 1500 },
   technology: { min: 600, max: 800 },
   tips: { min: 500, max: 700 },
+  "news-digest": { min: 600, max: 900 },
 };
 
 /**
@@ -80,6 +82,7 @@ const TYPE_DESCRIPTIONS: Record<ArticleType, string> = {
   comparison: "Порівняння кількох моделей шин",
   technology: "Пояснення технології Bridgestone",
   tips: "Практичні поради для водіїв",
+  "news-digest": "Дайджест новин та анонсів Bridgestone",
 };
 
 /**
@@ -92,6 +95,7 @@ const TYPE_DESCRIPTIONS_EN: Record<ArticleType, string> = {
   comparison: "Comparison of multiple tire models",
   technology: "Explanation of Bridgestone technology",
   tips: "Practical tips for drivers",
+  "news-digest": "Digest of Bridgestone news and product announcements",
 };
 
 /**

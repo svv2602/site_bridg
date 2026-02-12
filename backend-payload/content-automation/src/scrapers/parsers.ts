@@ -92,6 +92,36 @@ export function parseLoadIndex(text: string): string | undefined {
 }
 
 /**
+ * Map German recommendation tier text to a numeric rating (1.0-5.0 scale).
+ * Used by TCS and GTÜ scrapers which use tier-based ratings instead of numeric.
+ */
+export function mapTierToRating(tierText: string): { rating: string; ratingNumeric: number } {
+  const lower = tierText.toLowerCase().trim();
+
+  if (lower.includes("sehr empfehlenswert") || lower.includes("sehr gut")) {
+    return { rating: "sehr empfehlenswert", ratingNumeric: 1.0 };
+  }
+  if (lower.includes("empfehlenswert") || lower.includes("gut")) {
+    return { rating: "empfehlenswert", ratingNumeric: 2.0 };
+  }
+  if (lower.includes("bedingt empfehlenswert") || lower.includes("befriedigend") || lower.includes("bedingt")) {
+    return { rating: "bedingt empfehlenswert", ratingNumeric: 3.5 };
+  }
+  if (lower.includes("nicht empfohlen") || lower.includes("nicht empfehlenswert") || lower.includes("mangelhaft")) {
+    return { rating: "nicht empfohlen", ratingNumeric: 5.0 };
+  }
+
+  // Fallback: try to extract numeric
+  const numericMatch = tierText.match(/(\d+[.,]\d+)/);
+  if (numericMatch) {
+    const numeric = parseFloat(numericMatch[1].replace(",", "."));
+    return { rating: tierText, ratingNumeric: numeric };
+  }
+
+  return { rating: tierText, ratingNumeric: 3.0 };
+}
+
+/**
  * Normalize ratings from different test sources to a unified 1.0-5.0 scale.
  * Lower is better (consistent with ADAC where 1.0 = best).
  *
@@ -115,11 +145,24 @@ export function normalizeRating(rating: number, source: string): number {
       // 1.0 -> 1.0, 4.0 -> 5.0
       return Math.max(1.0, Math.min(5.0, 1.0 + ((rating - 1.0) / 3.0) * 4.0));
 
-    case "tyrereviews":
+    case "tyrereviews": {
       // Percentage (0-100) where higher is better
       // Invert: 100% -> 1.0, 0% -> 5.0
       const clampedPct = Math.max(0, Math.min(100, rating));
       return 5.0 - (clampedPct / 100) * 4.0;
+    }
+
+    case "oeamtc":
+      // Scale 0.5-5.5, same direction as ADAC (lower = better)
+      // Clamp to 1.0-5.0
+      return Math.max(1.0, Math.min(5.0, rating));
+
+    case "tcs":
+    case "gtue":
+      // Tier-based: already converted to numeric by scraper
+      // "sehr empfehlenswert" → 1.0, "empfehlenswert" → 2.0,
+      // "bedingt empfehlenswert" → 3.5, "nicht empfohlen" → 5.0
+      return Math.max(1.0, Math.min(5.0, rating));
 
     default:
       // Unknown source: return as-is, clamped to valid range

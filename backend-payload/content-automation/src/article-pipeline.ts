@@ -9,6 +9,10 @@ import { chromium } from "playwright";
 import { scrapeADAC } from "./scrapers/adac.js";
 import { scrapeAutoBild } from "./scrapers/autobild.js";
 import { scrapeTyreReviews } from "./scrapers/tyrereviews.js";
+import { scrapeOEAMTC } from "./scrapers/oeamtc.js";
+import { scrapeTCS } from "./scrapers/tcs.js";
+import { scrapeGTUE } from "./scrapers/gtue.js";
+import { scrapeBridgestoneNews } from "./scrapers/bridgestone-news.js";
 import {
   getDueSources,
   updateSource,
@@ -167,10 +171,19 @@ async function runScraper(
   page: import("playwright").Page,
   source: ContentSource
 ): Promise<{ newResults: number }> {
-  const scraperMap: Record<ScraperKey, (p: import("playwright").Page) => Promise<{ testsNew: number }>> = {
+  // Bridgestone news uses HTTP fetch, no Playwright page needed
+  if (source.scraper === "bridgestone-news") {
+    const newsResult = await scrapeBridgestoneNews();
+    return { newResults: newsResult.newsNew };
+  }
+
+  const scraperMap: Record<string, (p: import("playwright").Page) => Promise<{ testsNew: number }>> = {
     adac: scrapeADAC,
     autobild: scrapeAutoBild,
     tyrereviews: (p) => scrapeTyreReviews(p),
+    oeamtc: scrapeOEAMTC,
+    tcs: scrapeTCS,
+    gtue: scrapeGTUE,
   };
 
   const scraperFn = scraperMap[source.scraper];
@@ -249,7 +262,7 @@ export async function processSingleQueueItem(
       try {
         console.log(`[Generate] Generating hero image for: "${result.article.title}"`);
         const season = (item.triggerData?.season as "summer" | "winter" | "allseason") || undefined;
-        const heroImage = await generateHeroImage(item.topic, season);
+        const heroImage = await generateHeroImage(item.topic, season, { articleType: item.articleType });
         if (heroImage.url) {
           const client = getPayloadClient();
           const media = await client.uploadImageFromUrl(heroImage.url, {
@@ -461,6 +474,10 @@ async function buildGenerationContext(
     const season = item.triggerData?.season as string;
     if (season === "winter") keywords.push("зимові шини", "безпека взимку");
     if (season === "summer") keywords.push("літні шини", "безпека на дорозі");
+    if (season === "allseason") keywords.push("всесезонні шини", "цілорічні шини");
+  }
+  if (item.articleType === "news-digest") {
+    keywords.push("новини Bridgestone", "інновації", "нові продукти");
   }
 
   return {
@@ -517,6 +534,14 @@ function getSourceLabel(source: string): string {
       return "Auto Bild";
     case "tyrereviews":
       return "TyreReviews";
+    case "oeamtc":
+      return "ÖAMTC";
+    case "tcs":
+      return "TCS";
+    case "gtue":
+      return "GTÜ";
+    case "bridgestone-news":
+      return "Bridgestone";
     default:
       return source;
   }

@@ -1,7 +1,7 @@
 /**
  * Smart Article Planner
  *
- * Analyzes available data (test results, seasonal timing, new products)
+ * Analyzes available data (test results, seasonal timing, new products, news)
  * and decides which articles to generate. Creates entries in article_queue.
  */
 
@@ -11,6 +11,7 @@ import {
   getSettingNumber,
   getSettingJSON,
   type ArticleType,
+  type ArticleTriggerType,
 } from "./db/article-queue.js";
 import {
   getTestResultsSince,
@@ -18,10 +19,11 @@ import {
   type TestResult,
   type TestResultEntry,
 } from "./db/test-results.js";
+import { getNewsItemsSince } from "./db/news-items.js";
 import { normalizeRating } from "./scrapers/parsers.js";
 
-// Bridgestone & Firestone brand names to detect in test results
-const OUR_BRANDS = ["bridgestone", "firestone"];
+// Bridgestone, Firestone & Dayton brand names to detect in test results
+const OUR_BRANDS = ["bridgestone", "firestone", "dayton"];
 
 interface PlanResult {
   planned: number;
@@ -40,6 +42,7 @@ export async function planArticles(sinceDate?: string): Promise<PlanResult> {
     "test-summary",
     "seasonal-guide",
     "comparison",
+    "news-digest",
   ];
   const minRating = getSettingNumber("min_rating_to_feature") || 2.0;
 
@@ -79,6 +82,16 @@ export async function planArticles(sinceDate?: string): Promise<PlanResult> {
     }
   }
 
+  // 4. Plan news digest articles from recent Bridgestone press releases
+  if (preferredTypes.includes("news-digest") && result.planned < maxPerWeek) {
+    const newsArticles = planNewsArticles(since);
+    for (const item of newsArticles) {
+      if (result.planned >= maxPerWeek) break;
+      if (addPlanned(item, result)) result.planned++;
+      else result.skippedDuplicate++;
+    }
+  }
+
   console.log(
     `[Planner] Done: ${result.planned} planned, ${result.skippedDuplicate} skipped (duplicate)`
   );
@@ -90,7 +103,7 @@ export async function planArticles(sinceDate?: string): Promise<PlanResult> {
 interface PlannedArticle {
   topic: string;
   articleType: ArticleType;
-  triggerType: "test-result" | "seasonal" | "new-product" | "manual";
+  triggerType: ArticleTriggerType;
   triggerData: Record<string, unknown>;
   priority: number;
   relatedTyres?: string[];
@@ -176,11 +189,13 @@ function planComparisonArticles(since: string): PlannedArticle[] {
   }
 
   for (const [testType, tests] of Object.entries(byType)) {
-    // Need 3+ tests of same type for a comparison article
-    if (tests.length < 3) continue;
+    // Require tests from 3+ different sources (not just 3+ tests)
+    const uniqueSources = new Set(tests.map((t) => t.source));
+    if (uniqueSources.size < 3) continue;
 
     const seasonLabel = getSeasonLabelUk(testType as TestResult["testType"]);
     const year = tests[0].year;
+    const sourcesList = Array.from(uniqueSources).map(getSourceLabel).join(", ");
     const topic = `Порівняння ${seasonLabel} шин ${year}: результати незалежних тестів`;
 
     // Collect all our brand tyres mentioned across tests
@@ -201,11 +216,13 @@ function planComparisonArticles(since: string): PlannedArticle[] {
         testType,
         year,
         testUids: tests.map((t) => t.testUid),
-        sourceCount: tests.length,
+        sourceCount: uniqueSources.size,
+        sources: Array.from(uniqueSources),
+        sourceLabels: sourcesList,
       },
-      priority: 4,
+      priority: 3, // More valuable with cross-source data
       relatedTyres: allOurTyres,
-      reason: `${tests.length} ${testType} tests found for comparison`,
+      reason: `${uniqueSources.size} sources (${sourcesList}) for ${testType} comparison`,
       dedupeKey: `comparison-${testType}-${year}`,
     });
   }
@@ -248,6 +265,19 @@ function planSeasonalArticles(): PlannedArticle[] {
     });
   }
 
+  // All-season guide: August-September (months 8-9)
+  if (futureMonth >= 8 && futureMonth <= 9) {
+    planned.push({
+      topic: `Всесезонні шини ${futureDate.getFullYear()}: чи варто обирати?`,
+      articleType: "seasonal-guide",
+      triggerType: "seasonal",
+      triggerData: { season: "allseason", year: futureDate.getFullYear() },
+      priority: 3,
+      reason: `All-season guide for fall transition (lead ${leadWeeks} weeks)`,
+      dedupeKey: `seasonal-allseason-${futureDate.getFullYear()}`,
+    });
+  }
+
   // Care article: generate every 3 months (quarters)
   const quarter = Math.ceil((now.getMonth() + 1) / 3);
   planned.push({
@@ -258,6 +288,51 @@ function planSeasonalArticles(): PlannedArticle[] {
     priority: 7,
     reason: `Quarterly care article Q${quarter}`,
     dedupeKey: `seasonal-care-${now.getFullYear()}-Q${quarter}`,
+  });
+
+  return planned;
+}
+
+// ============ NEWS DIGEST ARTICLES ============
+
+function planNewsArticles(since: string): PlannedArticle[] {
+  const planned: PlannedArticle[] = [];
+
+  const recentNews = getNewsItemsSince(since);
+
+  if (recentNews.length < 2) {
+    console.log(`[Planner] Only ${recentNews.length} news items — need 2+ for digest`);
+    return planned;
+  }
+
+  console.log(`[Planner] Found ${recentNews.length} recent news items for digest`);
+
+  const now = new Date();
+  const weekNum = getISOWeekNumber(now);
+  const year = now.getFullYear();
+
+  // Create a news digest article
+  const titles = recentNews.slice(0, 5).map((n) => n.title);
+  const topic = `Новини Bridgestone: ${titles[0]}${recentNews.length > 1 ? ` та інше` : ""}`;
+
+  planned.push({
+    topic,
+    articleType: "news-digest",
+    triggerType: "news",
+    triggerData: {
+      newsCount: recentNews.length,
+      newsItems: recentNews.slice(0, 5).map((n) => ({
+        title: n.title,
+        summary: n.summary,
+        url: n.url,
+        category: n.category,
+      })),
+      weekNum,
+      year,
+    },
+    priority: 4,
+    reason: `${recentNews.length} Bridgestone press releases this period`,
+    dedupeKey: `news-digest-${year}-W${weekNum}`,
   });
 
   return planned;
@@ -336,7 +411,23 @@ function getSourceLabel(source: string): string {
       return "Auto Bild";
     case "tyrereviews":
       return "TyreReviews";
+    case "oeamtc":
+      return "ÖAMTC";
+    case "tcs":
+      return "TCS";
+    case "gtue":
+      return "GTÜ";
+    case "bridgestone-news":
+      return "Bridgestone";
     default:
       return source;
   }
+}
+
+function getISOWeekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
