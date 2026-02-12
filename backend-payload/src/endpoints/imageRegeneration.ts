@@ -196,6 +196,11 @@ export const regenerateImageEndpoint: Endpoint = {
           req.payload.logger.error(`Failed to update generation metadata: ${err}`);
         }
 
+        // Update back-references: old media was deleted, point to new media ID
+        if (job.newMediaId && job.newMediaId !== mediaId) {
+          await updateMediaBackReferences(req.payload, mediaId, job.newMediaId);
+        }
+
         req.payload.logger.info(`Image regeneration completed: ${jobId}`);
       })
       .catch((error) => {
@@ -275,4 +280,95 @@ export const generatePromptEndpoint: Endpoint = {
  */
 function generateDefaultPrompt(type: string, topic: string, season?: string): string {
   return generatePromptByType(type as ImageType, topic, { season });
+}
+
+/**
+ * Update all collection documents that reference the old media ID
+ * to point to the new media ID after image regeneration.
+ *
+ * Collections with `upload` fields referencing 'media':
+ *   - articles.image
+ *   - tyres.image
+ *   - category-pages.heroImage
+ *   - holiday-banners.slides[].bannerImage, slides[].bannerImageMobile
+ */
+async function updateMediaBackReferences(
+  payload: any,
+  oldMediaId: number,
+  newMediaId: number,
+): Promise<void> {
+  const refs: Array<{ collection: string; field: string }> = [
+    { collection: 'articles', field: 'image' },
+    { collection: 'tyres', field: 'image' },
+    { collection: 'category-pages', field: 'heroImage' },
+  ];
+
+  for (const { collection, field } of refs) {
+    try {
+      const found = await payload.find({
+        collection,
+        where: { [field]: { equals: oldMediaId } },
+        limit: 50,
+      });
+
+      for (const doc of found.docs) {
+        await payload.update({
+          collection,
+          id: doc.id,
+          data: { [field]: newMediaId },
+        });
+        payload.logger.info(
+          `Updated ${collection}/${doc.id}: ${field} ${oldMediaId} → ${newMediaId}`,
+        );
+      }
+    } catch (err) {
+      payload.logger.error(
+        `Failed to update back-references in ${collection}.${field}: ${err}`,
+      );
+    }
+  }
+
+  // Holiday banners: slides[].bannerImage and slides[].bannerImageMobile (array field)
+  try {
+    const banners = await payload.find({
+      collection: 'holiday-banners',
+      limit: 50,
+    });
+
+    for (const banner of banners.docs) {
+      if (!Array.isArray(banner.slides)) continue;
+
+      let changed = false;
+      const updatedSlides = banner.slides.map((slide: any) => {
+        const s = { ...slide };
+        const imgId = typeof s.bannerImage === 'object' ? s.bannerImage?.id : s.bannerImage;
+        const mobId = typeof s.bannerImageMobile === 'object' ? s.bannerImageMobile?.id : s.bannerImageMobile;
+
+        if (imgId === oldMediaId || imgId === String(oldMediaId)) {
+          s.bannerImage = newMediaId;
+          changed = true;
+        }
+        if (mobId === oldMediaId || mobId === String(oldMediaId)) {
+          s.bannerImageMobile = newMediaId;
+          changed = true;
+        }
+        return s;
+      });
+
+      if (changed) {
+        await payload.update({
+          collection: 'holiday-banners',
+          id: banner.id,
+          data: { slides: updatedSlides },
+        });
+        payload.logger.info(
+          `Updated holiday-banners/${banner.id}: slides media ${oldMediaId} → ${newMediaId}`,
+        );
+      }
+    }
+  } catch (err) {
+    payload.logger.error(
+      `Failed to update back-references in holiday-banners.slides: ${err}`,
+    );
+  }
 }
