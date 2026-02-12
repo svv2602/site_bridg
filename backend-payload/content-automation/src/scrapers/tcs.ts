@@ -68,52 +68,111 @@ function generateTestUid(testType: string, year: number, size: string): string {
 }
 
 /**
- * Discover test page URLs from TCS
+ * Known TCS test sub-pages.
+ * TCS test data is behind an external Dimaster iframe — standard link discovery
+ * doesn't find year-based URLs. These known pages embed the Dimaster widget
+ * with type and year parameters.
+ */
+const TCS_TEST_PAGES = [
+  { url: "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/sommerreifentest.php", type: "summer" as const },
+  { url: "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/winterreifen-getestet.php", type: "winter" as const },
+  { url: "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/ganzjahresreifen.php", type: "allseason" as const },
+];
+
+/**
+ * Dimaster iframe base URL. TCS embeds Dimaster with query params:
+ *   lang=de, tests=1, year=YYYY, what=S|W|A
+ */
+const DIMASTER_BASE = "https://tcstire.live.dimaster.ch/";
+
+const DIMASTER_TYPE_MAP: Record<string, string> = {
+  summer: "S",
+  winter: "W",
+  allseason: "A",
+};
+
+/**
+ * Discover test configurations from TCS.
+ * Returns iframe URLs for each type+year combination.
  */
 async function discoverTestUrls(page: Page): Promise<string[]> {
   const urls: string[] = [];
+  const currentYear = new Date().getFullYear();
 
-  try {
-    await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForTimeout(2000);
-
-    const links = await page.$$eval(
-      'a[href*="reifentest"]',
-      (elements) => elements.map((e) => e.getAttribute("href")).filter(Boolean)
-    );
-
-    for (const link of links) {
-      if (!link) continue;
-      // Match test pages with year
-      if (/reifentest.*\d{4}/i.test(link) || /\d{4}.*reifen/i.test(link)) {
-        const fullUrl = link.startsWith("http") ? link : `https://www.tcs.ch${link}`;
-        if (!urls.includes(fullUrl)) urls.push(fullUrl);
-      }
+  // Generate Dimaster iframe URLs for recent years
+  for (const { type } of TCS_TEST_PAGES) {
+    const what = DIMASTER_TYPE_MAP[type] || "S";
+    for (let year = currentYear; year >= currentYear - 2; year--) {
+      urls.push(`${DIMASTER_BASE}?lang=de&tests=1&year=${year}&what=${what}`);
     }
-
-    console.log(`[TCS] Discovered ${urls.length} test URLs`);
-  } catch (error) {
-    console.error("[TCS] Discovery failed:", error);
   }
 
+  console.log(`[TCS] Generated ${urls.length} Dimaster URLs to check`);
   return urls;
 }
 
+// Type keywords used to split brand+model from the concatenated article text
+const TYPE_KEYWORDS = ["Winterreifen", "Sommerreifen", "Ganzjahresreifen"];
+
 /**
- * Scrape a single TCS test page
+ * Parse a single article.popup text into structured data.
+ * Text format: "{BRAND} {Model}{TypeKeyword}{Year}{Dimension}{LoadIdx}{SpeedIdx}{Pct}%"
+ * Example: "GOODYEAR UltraGrip Performance 3Winterreifen2025225/40 R1892V70%"
+ */
+function parseArticleText(text: string): { tireName: string; size: string; year: number; pct: number } | null {
+  // Split on type keyword to get brand+model
+  for (const kw of TYPE_KEYWORDS) {
+    const idx = text.indexOf(kw);
+    if (idx < 0) continue;
+    const tireName = text.slice(0, idx).trim();
+    if (!tireName) continue;
+
+    const rest = text.slice(idx + kw.length);
+    const yearMatch = rest.match(/^(\d{4})/);
+    const year = yearMatch ? parseInt(yearMatch[1], 10) : 0;
+
+    const sizeMatch = rest.match(/(\d{3}\/\d{2,3}\s*R\s*\d{2})/);
+    const size = sizeMatch ? sizeMatch[1].replace(/\s+/g, " ") : "Unknown";
+
+    const pctMatch = rest.match(/(\d{1,3})%/);
+    const pct = pctMatch ? parseInt(pctMatch[1], 10) : 0;
+
+    return { tireName, size, year, pct };
+  }
+  return null;
+}
+
+/**
+ * Scrape TCS test results from Dimaster iframe page.
+ *
+ * The Dimaster SPA renders article.popup elements with concatenated test data.
+ * Each URL loads results for one type+year (default size).
  */
 async function scrapeTestPage(page: Page, url: string): Promise<TestResult | null> {
   try {
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForTimeout(2000);
+    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    await page.waitForTimeout(5000);
 
-    const pageText = await page.textContent("body") || "";
-    const title = await page.title();
-    const combinedText = `${url} ${title} ${pageText.slice(0, 500)}`;
+    // Extract article.popup text content
+    const articleTexts = await page.$$eval("article.popup", (els: Element[]) =>
+      els.map((e) => (e.textContent || "").replace(/\s+/g, " ").trim())
+    );
 
-    const testType = parseTestType(combinedText);
-    const year = extractYear(combinedText);
-    const size = extractSize(combinedText);
+    if (articleTexts.length === 0) {
+      console.log(`[TCS] No article elements on ${url}`);
+      return null;
+    }
+
+    // Parse first article to get test metadata (type, year, size)
+    const firstParsed = parseArticleText(articleTexts[0]);
+    if (!firstParsed) {
+      console.log(`[TCS] Could not parse article text on ${url}`);
+      return null;
+    }
+
+    const testType = parseTestType(url);
+    const year = firstParsed.year || extractYear(url);
+    const size = firstParsed.size;
     const testUid = generateTestUid(testType, year, size);
 
     if (testResultExists(testUid)) {
@@ -123,41 +182,23 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
 
     const results: TestResultEntry[] = [];
 
-    // TCS uses result tables with recommendation tiers
-    const rows = await page.$$("table tbody tr, .result-row, .test-result");
+    for (let i = 0; i < articleTexts.length; i++) {
+      const parsed = parseArticleText(articleTexts[i]);
+      if (!parsed) continue;
 
-    let position = 0;
-    for (const row of rows) {
-      try {
-        const text = await row.textContent();
-        if (!text) continue;
+      // TCS percentage: higher is better (0-100%), convert to 1-5 scale (lower is better)
+      const ratingNumeric = parsed.pct > 0 ? Math.round((100 - parsed.pct) * 4 / 100 + 1) : 0;
 
-        // Look for tyre brand names
-        const tyreNameMatch = text.match(
-          /(Bridgestone|Continental|Michelin|Goodyear|Pirelli|Dunlop|Hankook|Nokian|Vredestein|Falken|Kumho|Toyo|Yokohama|BFGoodrich|Firestone|Dayton|Semperit|Uniroyal|Maxxis|Nexen)\s+[\w\s\-\.]+/i
-        );
-
-        if (!tyreNameMatch) continue;
-
-        position++;
-        const tireName = tyreNameMatch[0].trim();
-
-        // Extract tier rating
-        const { rating, ratingNumeric } = mapTierToRating(text);
-
-        results.push({
-          tireName,
-          position,
-          rating,
-          ratingNumeric,
-        });
-      } catch {
-        // Skip row on error
-      }
+      results.push({
+        tireName: parsed.tireName,
+        position: i + 1,
+        rating: parsed.pct > 0 ? `${parsed.pct}%` : "N/A",
+        ratingNumeric,
+      });
     }
 
     if (results.length === 0) {
-      console.log(`[TCS] No results found on ${url}`);
+      console.log(`[TCS] No results parsed from ${url}`);
       return null;
     }
 

@@ -10,7 +10,7 @@ import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
 import { mapTierToRating } from "./parsers.js";
 
-const BASE_URL = "https://www.gtue.news/technik/";
+const BASE_URL = "https://www.gtue.news/";
 
 const TEST_TYPE_MAP: Record<string, TestResult["testType"]> = {
   sommerreifen: "summer",
@@ -78,28 +78,32 @@ function generateTestUid(testType: string, year: number, size: string): string {
 }
 
 /**
- * Discover GTÜ test article URLs
+ * Discover GTÜ test article URLs via site search
+ *
+ * The /technik/ page only shows recent articles without filtering.
+ * Using `?s=reifentest` reliably returns tyre test articles.
  */
 async function discoverTestUrls(page: Page): Promise<string[]> {
   const urls: string[] = [];
 
   try {
-    await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
+    // Use search to find all tyre test articles
+    await page.goto(`${BASE_URL}?s=reifentest`, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.waitForTimeout(2000);
 
+    // GTÜ search results use article links with h2/h3 headings
     const links = await page.$$eval(
-      "a[href]",
+      "article a[href], h2 a[href], h3 a[href]",
       (elements) => elements.map((e) => e.getAttribute("href")).filter(Boolean)
     );
 
     for (const link of links) {
       if (!link) continue;
       const lower = link.toLowerCase();
-      // Match articles about tyre tests
+      // Match articles about tyre tests (exclude general advice articles)
       if (
         lower.includes("reifentest") ||
-        lower.includes("winterreifen") ||
-        lower.includes("sommerreifen") ||
+        lower.includes("sommerreifen-im-h") ||
         lower.includes("ganzjahresreifen")
       ) {
         const fullUrl = link.startsWith("http") ? link : `https://www.gtue.news${link}`;

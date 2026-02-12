@@ -100,10 +100,12 @@ async function discoverTestUrls(page: Page): Promise<string[]> {
         let fullUrl: string;
         if (link.startsWith("http")) {
           fullUrl = link;
+        } else if (link.startsWith("//")) {
+          // Protocol-relative URL: //www.oeamtc.at/tests/...
+          fullUrl = `https:${link}`;
         } else {
-          // Normalize: strip leading domain if href contains it (e.g. "/www.oeamtc.at/...")
-          const path = link.replace(/^\/?(www\.)?oeamtc\.at/, "");
-          fullUrl = `https://www.oeamtc.at${path.startsWith("/") ? path : "/" + path}`;
+          // Relative path: /tests/reifentest/...
+          fullUrl = `https://www.oeamtc.at${link.startsWith("/") ? link : "/" + link}`;
         }
         if (!urls.includes(fullUrl)) urls.push(fullUrl);
       }
@@ -119,6 +121,12 @@ async function discoverTestUrls(page: Page): Promise<string[]> {
 
 /**
  * Scrape a single ÖAMTC test page
+ *
+ * ÖAMTC tables use `data-sort` attributes on <td> elements:
+ *   col 0 (Produkt): data-sort = tyre name
+ *   col 1-3 (category scores): data-sort = numeric
+ *   col 4 (Gesamturteil): data-sort = overall numeric rating
+ *   col 5 (Empfehlung): data-sort = star rating, text = "gut" / "befriedigend" / etc.
  */
 async function scrapeTestPage(page: Page, url: string): Promise<TestResult | null> {
   try {
@@ -136,53 +144,43 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
       return null;
     }
 
+    // Extract structured data via data-sort attributes
+    const rowData = await page.$$eval("table.table tbody tr", (rows) =>
+      rows.map((row) => {
+        const cells = Array.from(row.querySelectorAll("td"));
+        if (cells.length < 5) return null;
+        const name = cells[0]?.getAttribute("data-sort")?.trim();
+        if (!name) return null;
+        // Overall rating is the last numeric column before recommendation
+        const overallCell = cells[cells.length - 2]; // Gesamturteil
+        const recoCell = cells[cells.length - 1]; // Empfehlung
+        const overall = overallCell?.getAttribute("data-sort");
+        const recoText = recoCell?.textContent?.replace(/\s+/g, " ").trim().split(" ")[0] || "";
+        return { name, overall, recoText };
+      }).filter(Boolean)
+    );
+
     const results: TestResultEntry[] = [];
-
-    // ÖAMTC uses sortable result tables
-    const rows = await page.$$("table tbody tr, .test-result-row, .result-item");
-
     let position = 0;
-    for (const row of rows) {
-      try {
-        const text = await row.textContent();
-        if (!text) continue;
 
-        // Look for tyre brand names
-        const tyreNameMatch = text.match(
-          /(Bridgestone|Continental|Michelin|Goodyear|Pirelli|Dunlop|Hankook|Nokian|Vredestein|Falken|Kumho|Toyo|Yokohama|BFGoodrich|Firestone|Dayton|Semperit|Uniroyal|Maxxis|Nexen)\s+[\w\s\-\.]+/i
-        );
+    for (const data of rowData) {
+      if (!data) continue;
+      position++;
 
-        if (!tyreNameMatch) continue;
+      const ratingNumeric = data.overall ? parseFloat(data.overall) : 0;
+      const rating = ratingNumeric ? String(ratingNumeric) : "N/A";
 
-        position++;
-        const tireName = tyreNameMatch[0].trim();
+      const categoryWins: string[] = [];
+      if (data.recoText.toLowerCase().includes("sehr")) categoryWins.push("sehr gut");
+      if (data.recoText.toLowerCase() === "gut") categoryWins.push("gut");
 
-        // Extract numeric rating (ÖAMTC uses 0.5-5.5 scale)
-        const ratingMatch = text.match(/(\d+[.,]\d+)/);
-        let ratingNumeric = 0;
-        let rating = "N/A";
-
-        if (ratingMatch) {
-          ratingNumeric = parseFloat(ratingMatch[1].replace(",", "."));
-          rating = ratingMatch[1].replace(",", ".");
-        }
-
-        // Look for category wins
-        const categoryWins: string[] = [];
-        if (text.toLowerCase().includes("testsieger")) categoryWins.push("Testsieger");
-        if (text.toLowerCase().includes("empfehlung")) categoryWins.push("Empfehlung");
-        if (text.toLowerCase().includes("eco")) categoryWins.push("Eco");
-
-        results.push({
-          tireName,
-          position,
-          rating,
-          ratingNumeric,
-          categoryWins: categoryWins.length > 0 ? categoryWins : undefined,
-        });
-      } catch {
-        // Skip row on error
-      }
+      results.push({
+        tireName: data.name,
+        position,
+        rating,
+        ratingNumeric,
+        categoryWins: categoryWins.length > 0 ? categoryWins : undefined,
+      });
     }
 
     if (results.length === 0) {
