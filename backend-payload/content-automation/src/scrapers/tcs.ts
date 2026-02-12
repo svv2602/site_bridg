@@ -7,7 +7,6 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
-import { mapTierToRating } from "./parsers.js";
 
 const BASE_URL = "https://www.tcs.ch/de/testberichte-ratgeber/tests/reifentests/";
 
@@ -27,10 +26,15 @@ export interface TCSScraperResult {
 }
 
 /**
- * Parse test type from URL or title text
+ * Parse test type from URL or title text.
+ * Handles both German keywords and Dimaster URL params (what=S/W/A).
  */
 function parseTestType(text: string): TestResult["testType"] {
   const lower = text.toLowerCase();
+  // Check Dimaster URL params first
+  if (lower.includes("what=w")) return "winter";
+  if (lower.includes("what=a")) return "allseason";
+  if (lower.includes("what=s")) return "summer";
   for (const [key, value] of Object.entries(TEST_TYPE_MAP)) {
     if (lower.includes(key)) return value;
   }
@@ -63,7 +67,8 @@ function extractSize(text: string): string {
  * Generate unique test ID
  */
 function generateTestUid(testType: string, year: number, size: string): string {
-  const sizeNormalized = size.toLowerCase().replace(/[\/\s]/g, "-").replace("r", "");
+  // Normalize: "225/40 R 18" or "225/40 R18" → "225-40-18"
+  const sizeNormalized = size.toLowerCase().replace(/\s*r\s*/g, "-").replace(/[\/\s]/g, "-").replace(/-+/g, "-");
   return `tcs-${testType}-${year}-${sizeNormalized}`;
 }
 
