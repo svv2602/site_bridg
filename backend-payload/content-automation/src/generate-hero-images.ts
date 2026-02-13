@@ -7,6 +7,7 @@
  */
 
 import { image } from "./providers/index.js";
+import { NEGATIVE_PROMPT, generatePromptByType } from "./config/image-prompts.js";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,89 +17,22 @@ const __dirname = path.dirname(__filename);
 
 const FRONTEND_HERO_DIR = path.resolve(__dirname, "../../../frontend/public/images/hero");
 
-const NEGATIVE_PROMPT = `blurry, low quality, distorted, deformed, text, logo, watermark,
-signature, cropped, worst quality, low resolution, cartoon, anime, illustration, 3d render,
-cgi, artificial looking, brand names, license plates readable`;
-
 interface HeroImageConfig {
   filename: string;
-  prompt: string;
+  topic: string;
+  season?: string;
   size: "1792x1024" | "1024x1024";
 }
 
 const heroImages: HeroImageConfig[] = [
-  // Season pages - square format for hero cards
-  {
-    filename: "hero-summer.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of a modern silver sedan driving on a European highway in summer.
-Bright sunny day, blue sky with white clouds, lush green trees along the road.
-The car is captured from a 3/4 front angle, showing the full vehicle profile.
-Dry asphalt road, professional automotive photography lighting.
-Shot with Canon EOS R5, 85mm f/1.4 lens, natural daylight.
-Hyperrealistic, 8K quality, no distortion, correct car proportions.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
-  {
-    filename: "hero-winter.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of a dark gray SUV driving on a snowy mountain road in winter.
-Fresh snow covering the road and pine trees, overcast sky, cold winter atmosphere.
-The SUV is captured from the side-front angle, showing confident winter driving.
-Visible tire tracks in fresh snow, demonstrating grip and control.
-Shot with Sony A7R IV, 70-200mm lens, natural winter light.
-Hyperrealistic, 8K quality, correct vehicle proportions, no distortion.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
-  {
-    filename: "hero-allseason.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of a modern crossover on a wet autumn road.
-Rainy weather just stopped, wet reflective asphalt, fallen orange and yellow leaves.
-Moody autumn sky with dramatic clouds, trees with colorful foliage.
-The car is captured from 3/4 angle, showing stability on wet surface.
-Shot with Nikon Z9, 50mm lens, natural overcast lighting.
-Hyperrealistic, 8K quality, correct proportions, photojournalistic style.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
-
-  // Vehicle type pages - square format
-  {
-    filename: "hero-passenger.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of an elegant silver sedan on a clean city street.
-Modern executive car similar to Audi A6 or BMW 5 series styling.
-Daytime urban setting, modern architecture in background, clean sidewalks.
-The sedan captured from 3/4 front angle showing sleek design.
-Professional automotive photography, soft shadows, balanced exposure.
-Shot with Phase One XF camera, 80mm lens, studio-quality natural light.
-Hyperrealistic, 8K quality, perfect proportions, showroom finish.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
-  {
-    filename: "hero-suv.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of a premium black SUV on a scenic mountain viewpoint.
-Large luxury SUV similar to BMW X5 or Volvo XC90 styling.
-Dramatic mountain landscape background, golden hour sunlight.
-The SUV captured from 3/4 angle showing robust stance and ground clearance.
-Adventure spirit with professional automotive photography quality.
-Shot with Canon EOS R5, 35mm wide angle, warm golden light.
-Hyperrealistic, 8K quality, correct proportions, magazine cover quality.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
-  {
-    filename: "hero-lcv.jpg",
-    size: "1024x1024",
-    prompt: `Ultra-realistic photograph of a white delivery van in an urban business district.
-Modern commercial van similar to Mercedes Sprinter or Ford Transit styling.
-Clean city environment, modern office buildings, professional business context.
-The van captured from 3/4 front angle, showing practical design.
-Bright daylight, professional commercial photography style.
-Shot with Sony A7R IV, 50mm lens, clean natural lighting.
-Hyperrealistic, 8K quality, correct proportions, fleet advertising quality.
-CRITICAL: No text, no logos, no watermarks, no brand emblems visible.`,
-  },
+  // Season pages
+  { filename: "hero-summer.jpg",    topic: "summer tires on European highway, sunny day",          season: "summer",    size: "1024x1024" },
+  { filename: "hero-winter.jpg",    topic: "winter SUV tires on snowy mountain road",              season: "winter",    size: "1024x1024" },
+  { filename: "hero-allseason.jpg", topic: "allseason tires on wet autumn road",                   season: "allseason", size: "1024x1024" },
+  // Vehicle type pages
+  { filename: "hero-passenger.jpg", topic: "elegant sedan passenger car tires, city street",       size: "1024x1024" },
+  { filename: "hero-suv.jpg",       topic: "premium SUV tires on scenic mountain viewpoint",       size: "1024x1024" },
+  { filename: "hero-lcv.jpg",       topic: "delivery van LCV tires in urban business district",    size: "1024x1024" },
 ];
 
 async function ensureDirectory(dir: string) {
@@ -127,17 +61,20 @@ async function generateHeroImages(dryRun: boolean = false) {
   let totalCost = 0;
 
   for (const config of heroImages) {
+    const prompt = generatePromptByType("hero", config.topic, { season: config.season });
+
     console.log(`\n📷 ${config.filename}`);
     console.log(`   Size: ${config.size}`);
+    console.log(`   Topic: ${config.topic}`);
 
     if (dryRun) {
       console.log("   [DRY RUN] Would generate with prompt:");
-      console.log(`   ${config.prompt.substring(0, 100)}...`);
+      console.log(`   ${prompt.substring(0, 150)}...`);
       continue;
     }
 
     try {
-      const result = await image.generate(config.prompt, {
+      const result = await image.generate(prompt, {
         size: config.size,
         quality: "hd",
         negativePrompt: NEGATIVE_PROMPT,
