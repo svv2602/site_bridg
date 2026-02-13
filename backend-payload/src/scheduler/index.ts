@@ -450,11 +450,10 @@ function startTelegramBotPolling(): void {
   }
 
   const automationDir = path.join(process.cwd(), 'content-automation');
-  const script = 'import{startPolling}from"./src/publishers/telegram-commands.js";startPolling()';
 
   schedulerLogger.info('Starting Telegram bot polling...');
 
-  telegramBotProcess = exec(`npx tsx -e '${script}'`, {
+  telegramBotProcess = exec('npx tsx src/start-bot.ts', {
     cwd: automationDir,
     env: { ...process.env },
   });
