@@ -147,43 +147,64 @@ async function reUploadMedia(
   };
 }
 
-// ---- Update references ----
+// ---- Reference tracking ----
 
-async function updateReferences(
-  oldId: number,
-  newId: number,
+// Collections that reference media
+const MEDIA_REFS = [
+  { slug: "tyres", field: "image" },
+  { slug: "articles", field: "image" },
+  { slug: "category-pages", field: "heroImage" },
+  { slug: "technologies", field: "icon" },
+];
+
+interface RefEntry {
+  collection: string;
+  field: string;
+  docId: number;
+}
+
+/** Find all documents referencing a media ID (must be called BEFORE delete) */
+async function findReferences(
+  mediaId: number,
   token: string
-): Promise<string[]> {
-  const updated: string[] = [];
+): Promise<RefEntry[]> {
+  const refs: RefEntry[] = [];
 
-  // Collections that reference media
-  const collections = [
-    { slug: "tyres", field: "image" },
-    { slug: "articles", field: "image" },
-    { slug: "category-pages", field: "heroImage" },
-    { slug: "technologies", field: "icon" },
-  ];
-
-  for (const { slug, field } of collections) {
+  for (const { slug, field } of MEDIA_REFS) {
     const searchRes = await fetch(
-      `${PAYLOAD_URL}/api/${slug}?where[${field}][equals]=${oldId}&limit=100`,
+      `${PAYLOAD_URL}/api/${slug}?where[${field}][equals]=${mediaId}&limit=100`,
       { headers: { Authorization: `JWT ${token}` } }
     );
     if (!searchRes.ok) continue;
 
     const data = await searchRes.json();
     for (const doc of data.docs || []) {
-      const patchRes = await fetch(`${PAYLOAD_URL}/api/${slug}/${doc.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
-        },
-        body: JSON.stringify({ [field]: newId }),
-      });
-      if (patchRes.ok) {
-        updated.push(`${slug}/${doc.id}`);
-      }
+      refs.push({ collection: slug, field, docId: doc.id });
+    }
+  }
+
+  return refs;
+}
+
+/** Update previously-found references to point to a new media ID */
+async function updateReferences(
+  refs: RefEntry[],
+  newId: number,
+  token: string
+): Promise<string[]> {
+  const updated: string[] = [];
+
+  for (const { collection, field, docId } of refs) {
+    const patchRes = await fetch(`${PAYLOAD_URL}/api/${collection}/${docId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `JWT ${token}`,
+      },
+      body: JSON.stringify({ [field]: newId }),
+    });
+    if (patchRes.ok) {
+      updated.push(`${collection}/${docId}`);
     }
   }
 
@@ -274,17 +295,20 @@ Options:
         `${progress} Converting ${doc.filename} (${originalSize})...`
       );
 
+      // Collect references BEFORE delete (delete cascades nullify them)
+      const refs = await findReferences(doc.id, token);
+
       const result = await reUploadMedia(doc, token);
       const newSize = formatBytes(result.newFilesize);
       const saved = (doc.filesize || 0) - result.newFilesize;
       if (saved > 0) totalSavedBytes += saved;
 
-      // Update references if ID changed
+      // Restore references with new media ID
       let refInfo = "";
-      if (result.newId !== doc.id) {
-        const refs = await updateReferences(doc.id, result.newId, token);
-        if (refs.length > 0) {
-          refInfo = ` | refs updated: ${refs.join(", ")}`;
+      if (refs.length > 0) {
+        const updated = await updateReferences(refs, result.newId, token);
+        if (updated.length > 0) {
+          refInfo = ` | refs updated: ${updated.join(", ")}`;
         }
       }
 
