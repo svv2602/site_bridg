@@ -14,6 +14,28 @@ import { requireRoleForEndpoint } from '../lib/rbac';
 
 const execAsync = promisify(exec);
 
+/** Trigger frontend ISR revalidation for a category page */
+async function revalidateCategoryPage(slug: string, logger: any) {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://frontend:3010';
+  const secret = process.env.REVALIDATION_SECRET;
+  if (!secret) {
+    logger.warn('REVALIDATION_SECRET not set, skipping frontend cache revalidation');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${frontendUrl}/api/revalidate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, collection: 'category-pages', slug }),
+    });
+    const data = await res.json();
+    logger.info(`Revalidated category page "${slug}": ${JSON.stringify(data.paths || [])}`);
+  } catch (err) {
+    logger.error(`Failed to revalidate category page "${slug}": ${err}`);
+  }
+}
+
 /**
  * POST /api/category-image/:pageId
  *
@@ -39,9 +61,11 @@ export const generateCategoryImageEndpoint: Endpoint = {
       return Response.json({ error: 'Page ID is required' }, { status: 400 });
     }
 
-    // Verify page exists
+    // Verify page exists and get slug for revalidation
+    let pageSlug: string;
     try {
-      await req.payload.findByID({ collection: 'category-pages', id: pageId });
+      const page = await req.payload.findByID({ collection: 'category-pages', id: pageId });
+      pageSlug = (page as any).slug;
     } catch {
       return Response.json({ error: 'Category page not found' }, { status: 404 });
     }
@@ -123,6 +147,9 @@ export const generateCategoryImageEndpoint: Endpoint = {
         job.output = (stderr + '\n' + stdout).slice(0, 2000);
         updateJob(job);
         req.payload.logger.info(`Category hero generation completed: ${jobId}`);
+
+        // Auto-revalidate frontend cache
+        revalidateCategoryPage(pageSlug, req.payload.logger);
       })
       .catch((error) => {
         job.status = 'failed';
