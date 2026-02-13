@@ -28,7 +28,7 @@ notification-service.ts: dispatch()
 
 **Переменные окружения** (в `backend-payload/.env`):
 
-```env
+```env (production сервере в /home/cloud/site_bridg/.env)
 # Обязательные (уже настроены)
 TELEGRAM_BOT_TOKEN=your-bot-token
 TELEGRAM_CHAT_ID=your-chat-id

@@ -7,6 +7,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
+import { extractPlausibleYear } from "./parsers.js";
 
 // ADAC rating mapping (German → numeric)
 const RATING_MAP: Record<string, number> = {
@@ -115,8 +116,7 @@ export async function scrapeADACTestPage(page: Page, url: string): Promise<TestR
     await page.waitForTimeout(2000);
 
     // Extract year from page or URL
-    const yearMatch = url.match(/(\d{4})/);
-    const year = yearMatch ? parseInt(yearMatch[1]) : new Date().getFullYear();
+    const year = extractPlausibleYear(url) || new Date().getFullYear();
 
     // Extract test type
     const testType = parseTestType(url);

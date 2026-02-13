@@ -7,6 +7,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
+import { extractPlausibleYear } from "./parsers.js";
 
 const BASE_URL = "https://www.oeamtc.at/tests/reifentest/";
 
@@ -39,14 +40,14 @@ function parseTestType(url: string): TestResult["testType"] {
  * Extract year from URL or text
  */
 function extractYear(url: string, pageText?: string): number {
-  // Try URL first
-  const urlMatch = url.match(/test-?(\d{4})/i) || url.match(/(\d{4})/);
-  if (urlMatch) return parseInt(urlMatch[1], 10);
+  // Try URL first with context-aware extraction
+  const urlYear = extractPlausibleYear(url);
+  if (urlYear) return urlYear;
 
   // Try page text
   if (pageText) {
-    const textMatch = pageText.match(/Reifentest\s+(\d{4})/i);
-    if (textMatch) return parseInt(textMatch[1], 10);
+    const textYear = extractPlausibleYear(pageText);
+    if (textYear) return textYear;
   }
 
   return new Date().getFullYear();

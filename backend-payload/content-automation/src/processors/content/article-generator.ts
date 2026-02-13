@@ -11,6 +11,7 @@ import { BRAND_NAMES } from "../../types/content.js";
 import type { GeneratedArticle } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
 import { translateToUkrainian } from "./translate.js";
+import { isPlausibleTestYear } from "../../scrapers/parsers.js";
 
 const logger = createLogger("ArticleGenerator");
 
@@ -115,7 +116,11 @@ function buildPromptEN(input: ArticleInput): string {
       }).join("\n")}`
     : "";
 
+  const currentYear = new Date().getFullYear();
+
   return `Write a blog article for Bridgestone Ukraine.
+
+CURRENT YEAR: ${currentYear}
 
 ARTICLE TYPE: ${TYPE_DESCRIPTIONS_EN[input.type]}
 TOPIC: ${input.topic}
@@ -156,7 +161,8 @@ REQUIREMENTS:
 - Keywords naturally integrated
 - CTA at the end: "Find a dealer" or "Learn more"
 - Do NOT fabricate data
-- Do NOT mention prices`;
+- Do NOT mention prices
+- YEARS: Only use years from the provided TEST DATA. Do NOT invent or hallucinate years. The current year is ${currentYear}. Any year in the title or content must be between 2021 and ${currentYear + 1}.`;
 }
 
 /**
@@ -173,7 +179,11 @@ function buildPrompt(input: ArticleInput): string {
       }).join("\n")}`
     : "";
 
+  const currentYear = new Date().getFullYear();
+
   return `Напиши статтю для блогу Bridgestone Україна.
+
+ПОТОЧНИЙ РІК: ${currentYear}
 
 ТИП СТАТТІ: ${TYPE_DESCRIPTIONS[input.type]}
 ТЕМА: ${input.topic}
@@ -215,7 +225,8 @@ ${relatedItemsSection}
 - Ключові слова природно інтегровані
 - CTA в кінці: "Знайдіть дилера" або "Дізнайтеся більше"
 - НЕ вигадуй дані
-- НЕ згадуй ціни`;
+- НЕ згадуй ціни
+- РОКИ: Використовуй ТІЛЬКИ роки з наданих ДАНИХ ТЕСТУ. НЕ вигадуй роки. Поточний рік: ${currentYear}. Будь-який рік у заголовку чи тексті має бути між 2021 та ${currentYear + 1}.`;
 }
 
 /**
@@ -241,6 +252,24 @@ function parseResponse(response: string): ArticleOutput {
     readingTime: parsed.readingTime || 5,
     relatedTyres: Array.isArray(parsed.relatedTyres) ? parsed.relatedTyres : undefined,
   };
+}
+
+/**
+ * Sanitize implausible years in text.
+ * Replaces any 4-digit number that looks like a year but is outside the plausible range
+ * with the current year. Only targets years in typical "test year" contexts.
+ */
+function sanitizeYears(text: string): string {
+  // Match 4-digit numbers that look like years (surrounded by word boundaries)
+  return text.replace(/\b(\d{4})\b/g, (match) => {
+    const num = parseInt(match, 10);
+    // Only sanitize numbers that look like years (2000+) but are implausible
+    if (num >= 2000 && !isPlausibleTestYear(num)) {
+      logger.warn(`Sanitizing implausible year ${num} → ${new Date().getFullYear()}`);
+      return String(new Date().getFullYear());
+    }
+    return match;
+  });
 }
 
 /**
@@ -270,6 +299,14 @@ function validateArticle(article: ArticleOutput, type: ArticleType): void {
   if (!article.tags || article.tags.length < 2) {
     errors.push(`need at least 2 tags, got ${article.tags?.length || 0}`);
   }
+
+  // Sanitize implausible years in title, excerpt, and content
+  article.title = sanitizeYears(article.title);
+  if (article.subtitle) article.subtitle = sanitizeYears(article.subtitle);
+  article.excerpt = sanitizeYears(article.excerpt);
+  article.content = sanitizeYears(article.content);
+  if (article.seoTitle) article.seoTitle = sanitizeYears(article.seoTitle);
+  if (article.seoDescription) article.seoDescription = sanitizeYears(article.seoDescription);
 
   if (errors.length > 0) {
     throw new Error(`Article validation failed: ${errors.join("; ")}`);

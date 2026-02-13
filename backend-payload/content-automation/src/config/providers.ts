@@ -240,9 +240,9 @@ export const TASK_ROUTING: TaskRouting[] = [
   // Translation (articles are long, need generous timeout)
   {
     task: "content-translation",
-    preferredProvider: "google",
-    preferredModel: "gemini-2.5-flash",
-    fallbackProviders: ["anthropic", "deepseek"],
+    preferredProvider: "deepseek",
+    preferredModel: "deepseek-chat",
+    fallbackProviders: ["google", "anthropic"],
     maxRetries: 2,
     timeoutMs: 90000,
     maxCost: 0.1,

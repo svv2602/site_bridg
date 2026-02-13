@@ -7,6 +7,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
+import { extractPlausibleYear } from "./parsers.js";
 
 // Auto Bild rating mapping
 const RATING_MAP: Record<string, number> = {
@@ -98,19 +99,11 @@ export async function scrapeAutoBildTestPage(page: Page, url: string): Promise<T
     // Wait for content to load
     await page.waitForTimeout(2000);
 
-    // Extract year from URL or page content
-    let year = new Date().getFullYear();
-    const yearMatch = url.match(/(\d{4})/);
-    if (yearMatch) {
-      year = parseInt(yearMatch[1]);
-    } else {
-      // Try to find year in page title
-      const title = await page.title();
-      const titleYearMatch = title.match(/(\d{4})/);
-      if (titleYearMatch) {
-        year = parseInt(titleYearMatch[1]);
-      }
-    }
+    // Extract year from URL or page content with validation
+    const title = await page.title();
+    const yearFromUrl = extractPlausibleYear(url);
+    const yearFromTitle = extractPlausibleYear(title);
+    const year = yearFromUrl || yearFromTitle || new Date().getFullYear();
 
     // Extract test type
     const testType = parseTestType(url);

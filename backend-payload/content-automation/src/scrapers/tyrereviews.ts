@@ -8,6 +8,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
+import { extractPlausibleYear } from "./parsers.js";
 
 // Base URL
 const TYREREVIEWS_BASE_URL = "https://www.tyrereviews.com";
@@ -77,11 +78,7 @@ export async function scrapeTyreReviewsTestPage(page: Page, url: string): Promis
     const title = await page.title();
 
     // Try to extract year
-    let year = new Date().getFullYear();
-    const yearMatch = title.match(/(\d{4})/);
-    if (yearMatch) {
-      year = parseInt(yearMatch[1]);
-    }
+    const year = extractPlausibleYear(title) || new Date().getFullYear();
 
     // Extract test type
     const testType = parseTestType(url);

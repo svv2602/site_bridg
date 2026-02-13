@@ -8,7 +8,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
-import { mapTierToRating } from "./parsers.js";
+import { mapTierToRating, extractPlausibleYear } from "./parsers.js";
 
 const BASE_URL = "https://www.gtue.news/";
 
@@ -56,8 +56,7 @@ function parseTestType(text: string): TestResult["testType"] {
  * Extract year from text
  */
 function extractYear(text: string): number {
-  const match = text.match(/(\d{4})/);
-  return match ? parseInt(match[1], 10) : new Date().getFullYear();
+  return extractPlausibleYear(text) || new Date().getFullYear();
 }
 
 /**
