@@ -24,6 +24,7 @@ const GenerateCategoryHeroButton: React.FC = () => {
   const [customPrompt, setCustomPrompt] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPrompt, setIsLoadingPrompt] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -69,6 +70,27 @@ const GenerateCategoryHeroButton: React.FC = () => {
   }, [pageTypeField.value, seasonField.value, vehicleTypeField.value, titleField.value]);
 
   const hasHeroImage = !!heroImageField.value;
+
+  // Load auto-generated prompt into the textarea for review/editing
+  const handleLoadPrompt = useCallback(async () => {
+    setIsLoadingPrompt(true);
+    try {
+      const params = new URLSearchParams({ type: 'hero', topic: topic || 'automotive tires' });
+      if (season) params.set('season', season);
+
+      const response = await fetch(`/api/image-regeneration/prompt?${params}`);
+      const data = await response.json();
+
+      if (data.prompt) {
+        setCustomPrompt(data.prompt);
+        setShowAdvanced(true);
+      }
+    } catch (error) {
+      console.error('Failed to load prompt:', error);
+    } finally {
+      setIsLoadingPrompt(false);
+    }
+  }, [topic, season]);
 
   const handleGenerate = useCallback(async () => {
     if (!id) {
@@ -214,14 +236,24 @@ const GenerateCategoryHeroButton: React.FC = () => {
               </select>
             </div>
           </div>
-          <div>
-            <label className="admin-label">Власний промпт (необовʼязково, замінить тему/сезон)</label>
+          <div className="admin-field-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <label className="admin-label" style={{ marginBottom: 0 }}>Промпт для генерації</label>
+              <button
+                type="button"
+                onClick={handleLoadPrompt}
+                disabled={isLoading || isLoadingPrompt}
+                className="admin-btn--outline"
+              >
+                {isLoadingPrompt ? 'Завантаження...' : 'Завантажити промпт'}
+              </button>
+            </div>
             <textarea
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               disabled={isLoading}
-              placeholder="Залиште порожнім для автоматичної генерації промпта"
-              rows={4}
+              placeholder="Натисніть «Завантажити промпт» щоб побачити та відредагувати промпт перед генерацією"
+              rows={10}
               className="admin-textarea"
             />
           </div>
