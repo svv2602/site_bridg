@@ -44,13 +44,15 @@ export function OnlineStores() {
               className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
             >
               <div className="mb-4 flex items-center justify-between">
-                <Image
-                  src={store.logo}
-                  alt={store.name}
-                  width={140}
-                  height={32}
-                  className="h-8 w-auto text-foreground"
-                />
+                <span className="inline-flex items-center rounded-lg bg-white px-3 py-1.5 dark:bg-stone-200">
+                  <Image
+                    src={store.logo}
+                    alt={store.name}
+                    width={140}
+                    height={32}
+                    className="h-7 w-auto"
+                  />
+                </span>
                 <span className="rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                   Онлайн-магазин
                 </span>
