@@ -104,6 +104,9 @@ export const primaryNav = [
 
 // Full nav for mobile/burger menu
 export const fullNav = [
+  { href: '/passenger-tyres/summer', label: 'Літні шини' },
+  { href: '/passenger-tyres/winter', label: 'Зимові шини' },
+  { href: '/passenger-tyres/all-season', label: 'Всесезонні шини' },
   { href: '/passenger-tyres', label: 'Легкові шини' },
   { href: '/suv-4x4-tyres', label: 'Шини для SUV' },
   { href: '/lcv-tyres', label: 'Комерційні шини' },

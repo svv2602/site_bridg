@@ -113,13 +113,13 @@ export function MainHeader() {
             <span className="hidden md:inline">Пошук шин</span>
           </Link>
 
-          {/* Burger menu (mobile + additional items on desktop) */}
-          <div ref={menuRef}>
+          {/* Burger menu (mobile only) */}
+          <div ref={menuRef} className="lg:hidden">
             <button
               ref={burgerRef}
               type="button"
               onClick={() => setOpen((prev) => !prev)}
-              className="flex items-center justify-center rounded-full border border-stone-700 p-2 min-w-11 min-h-11 transition-colors hover:bg-stone-800 lg:border-transparent"
+              className="flex items-center justify-center rounded-full border border-stone-700 p-2 min-w-11 min-h-11 transition-colors hover:bg-stone-800"
               aria-expanded={open}
               aria-label={open ? "Закрити меню" : "Відкрити меню"}
             >
