@@ -149,6 +149,20 @@ function formatKyivDate(isoDate: string): string {
   });
 }
 
+// ============ TOPIC HELPERS ============
+
+function getTopicId(type: "reports" | "errors" | "content"): number | undefined {
+  const envMap = {
+    reports: ENV.TELEGRAM_TOPIC_REPORTS,
+    errors: ENV.TELEGRAM_TOPIC_ERRORS,
+    content: ENV.TELEGRAM_TOPIC_CONTENT,
+  };
+  const raw = envMap[type];
+  if (!raw) return undefined;
+  const id = parseInt(raw, 10);
+  return isNaN(id) ? undefined : id;
+}
+
 // ============ TELEGRAM API HELPERS ============
 
 /**
@@ -296,10 +310,10 @@ function isAuthorized(chatId: number): boolean {
 
 // ============ COMMAND HANDLERS ============
 
-type CommandHandler = (chatId: number, args: string) => Promise<string>;
+type CommandHandler = (chatId: number, args: string, threadId?: number) => Promise<string>;
 
 const commands: Record<string, CommandHandler> = {
-  "/start": async (chatId) => {
+  "/start": async (chatId, _args, threadId) => {
     // Send with keyboard
     const text = `
 <b>Bridgestone Content Automation Bot</b>
@@ -319,11 +333,11 @@ const commands: Record<string, CommandHandler> = {
 <i>Бот працює тільки з авторизованого чату.</i>
     `.trim();
 
-    await sendMessage(chatId, text, { reply_markup: MAIN_KEYBOARD });
+    await sendMessage(chatId, text, { reply_markup: MAIN_KEYBOARD, message_thread_id: threadId });
     return ""; // Already sent with keyboard
   },
 
-  "/help": async (chatId) => {
+  "/help": async (chatId, _args, threadId) => {
     const text = `
 <b>Довідка</b>
 
@@ -344,11 +358,11 @@ const commands: Record<string, CommandHandler> = {
 <i>Автоматичний запуск: щонеділі о 03:00, статті — щосереди о 05:00</i>
     `.trim();
 
-    await sendMessage(chatId, text, { reply_markup: MAIN_KEYBOARD });
+    await sendMessage(chatId, text, { reply_markup: MAIN_KEYBOARD, message_thread_id: threadId });
     return "";
   },
 
-  "/run": async (chatId) => {
+  "/run": async (chatId, _args, threadId) => {
     if (runStatus.isRunning) {
       return "Автоматизація вже запущена. Зачекайте завершення.";
     }
@@ -356,7 +370,7 @@ const commands: Record<string, CommandHandler> = {
     runStatus.isRunning = true;
     runStatus.lastRunAt = new Date().toISOString();
 
-    await sendMessage(chatId, "Запускаю повний цикл автоматизації...");
+    await sendMessage(chatId, "Запускаю повний цикл автоматизації...", { message_thread_id: threadId });
 
     const startTime = Date.now();
 
@@ -389,7 +403,7 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
     }
   },
 
-  "/scrape": async (chatId, args) => {
+  "/scrape": async (chatId, args, threadId) => {
     if (runStatus.isRunning) {
       return "Автоматизація вже запущена. Зачекайте завершення.";
     }
@@ -405,7 +419,7 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
         return `Невідоме джерело: <code>${escapeHtml(sourceId)}</code>\n\nДоступні: ${validIds}`;
       }
 
-      await sendMessage(chatId, `Запускаю скрапінг: ${escapeHtml(source.name)}...`);
+      await sendMessage(chatId, `Запускаю скрапінг: ${escapeHtml(source.name)}...`, { message_thread_id: threadId });
 
       try {
         const { runSmartArticlePipeline } = await import("../article-pipeline.js");
@@ -461,7 +475,7 @@ ${result.errors.length > 0 ? `Помилок: ${result.errors.length}` : "Пом
     }
 
     // Default: ProKoleso scrape
-    await sendMessage(chatId, "Запускаю скрапінг ProKoleso...");
+    await sendMessage(chatId, "Запускаю скрапінг ProKoleso...", { message_thread_id: threadId });
 
     try {
       const { scrapeProkoleso, mergeAndSaveResults } = await import("../scrapers/prokoleso.js");
@@ -604,12 +618,12 @@ ${runStatus.lastRunError ? `Помилка: ${escapeHtml(runStatus.lastRunError)
     }
   },
 
-  "/articles": async (chatId) => {
+  "/articles": async (chatId, _args, threadId) => {
     if (runStatus.isRunning) {
       return "Автоматизація вже запущена. Зачекайте завершення.";
     }
 
-    await sendMessage(chatId, "Запускаю генерацію статей (smart pipeline)...");
+    await sendMessage(chatId, "Запускаю генерацію статей (smart pipeline)...", { message_thread_id: threadId });
 
     try {
       const { runSmartArticlePipeline } = await import("../article-pipeline.js");
@@ -664,7 +678,7 @@ ${hasErrors ? `⚠️ Помилок: ${result.errors.length}` : ""}
     }
   },
 
-  "/retry": async (chatId, args) => {
+  "/retry": async (chatId, args, threadId) => {
     if (!args) {
       return "Вкажіть ID статті: /retry &lt;id&gt;";
     }
@@ -683,7 +697,7 @@ ${hasErrors ? `⚠️ Помилок: ${result.errors.length}` : ""}
       return `Статтю #${itemId} не можна повторити — статус: "${item.status}" (потрібен "failed").`;
     }
 
-    await sendMessage(chatId, `Повторюю генерацію #${itemId}: "${escapeHtml(item.topic)}"...`);
+    await sendMessage(chatId, `Повторюю генерацію #${itemId}: "${escapeHtml(item.topic)}"...`, { message_thread_id: threadId });
 
     try {
       updateQueueItem(item.id, { status: "pending" });
@@ -929,8 +943,6 @@ export async function sendArticleForReview(
 ${escapeHtml(excerpt.slice(0, 300))}${excerpt.length > 300 ? "..." : ""}
   `.trim();
 
-  const threadId = ENV.TELEGRAM_TOPIC_CONTENT ? parseInt(ENV.TELEGRAM_TOPIC_CONTENT, 10) : undefined;
-
   await sendMessage(chatId, text, {
     reply_markup: {
       inline_keyboard: [
@@ -940,7 +952,7 @@ ${escapeHtml(excerpt.slice(0, 300))}${excerpt.length > 300 ? "..." : ""}
         ],
       ],
     },
-    message_thread_id: threadId && !isNaN(threadId) ? threadId : undefined,
+    message_thread_id: getTopicId("content"),
   });
 }
 
@@ -965,15 +977,13 @@ export async function sendArticleError(
 <b>Помилка:</b> ${escapeHtml(error.slice(0, 500))}
   `.trim();
 
-  const threadId = ENV.TELEGRAM_TOPIC_ERRORS ? parseInt(ENV.TELEGRAM_TOPIC_ERRORS, 10) : undefined;
-
   await sendMessage(chatId, text, {
     reply_markup: {
       inline_keyboard: [
         [{ text: "🔄 Повторити", callback_data: `retry:${queueId}` }],
       ],
     },
-    message_thread_id: threadId && !isNaN(threadId) ? threadId : undefined,
+    message_thread_id: getTopicId("errors"),
   });
 }
 
@@ -999,10 +1009,9 @@ export async function sendArticlePublished(params: {
     ],
   };
 
-  const threadId = ENV.TELEGRAM_TOPIC_CONTENT ? parseInt(ENV.TELEGRAM_TOPIC_CONTENT, 10) : undefined;
   const messageOptions = {
     reply_markup: viewButton,
-    message_thread_id: threadId && !isNaN(threadId) ? threadId : undefined,
+    message_thread_id: getTopicId("content"),
   };
 
   // Try sending with cover image
@@ -1082,10 +1091,8 @@ export async function sendDailyDigest(): Promise<void> {
     text += `  Сьогодні: $${todayMetrics.totals.costUsd.toFixed(2)}\n`;
     text += `  Тиждень: $${weekMetrics.totals.costUsd.toFixed(2)}\n`;
 
-    const threadId = ENV.TELEGRAM_TOPIC_REPORTS ? parseInt(ENV.TELEGRAM_TOPIC_REPORTS, 10) : undefined;
-
     await sendMessage(chatId, text.trim(), {
-      message_thread_id: threadId && !isNaN(threadId) ? threadId : undefined,
+      message_thread_id: getTopicId("reports"),
     });
 
     logger.info("Daily digest sent");
@@ -1128,18 +1135,19 @@ async function processUpdate(update: TelegramUpdate): Promise<void> {
 
   // Find and execute command
   const commandKey = Object.keys(commands).find((cmd) => text.startsWith(cmd));
+  const reportsThreadId = getTopicId("reports");
 
   if (commandKey) {
     logger.info(`Executing command: ${commandKey}`);
     const handler = commands[commandKey];
     const args = text.slice(commandKey.length).trim();
-    const response = await handler(chatId, args);
+    const response = await handler(chatId, args, reportsThreadId);
     // Some commands send their own messages (return empty string)
     if (response) {
-      await sendMessage(chatId, response);
+      await sendMessage(chatId, response, { message_thread_id: reportsThreadId });
     }
   } else if (text.startsWith("/")) {
-    await sendMessage(chatId, "Невідома команда. Використовуйте /help для довідки.");
+    await sendMessage(chatId, "Невідома команда. Використовуйте /help для довідки.", { message_thread_id: reportsThreadId });
   }
 }
 

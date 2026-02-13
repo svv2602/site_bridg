@@ -64,11 +64,15 @@ Copy `.env.example` to `.env` and configure:
 | `GOOGLE_AI_API_KEY` | - | For translation (EN→UA) |
 | `TELEGRAM_BOT_TOKEN` | - | Telegram notifications |
 | `TELEGRAM_CHAT_ID` | - | Telegram chat for notifications |
+| `TELEGRAM_TOPIC_CONTENT` | - | Forum topic ID for content notifications |
+| `TELEGRAM_TOPIC_ERRORS` | - | Forum topic ID for error notifications |
+| `TELEGRAM_TOPIC_REPORTS` | - | Forum topic ID for reports & bot commands |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID` | - | Google Analytics 4 |
 | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | - | Google Maps (dealers page) |
 
 At least one AI provider key is required for content automation.
 
+Внимание - если ты сменишь пароль админа в Payload CMS, нужно будет также обновить .env на сервере (`PAYLOAD_ADMIN_EMAI` и `PAYLOAD_ADMIN_PASSWORD` ), иначе автоматизация не  сможет аутентифицироваться
 ---
 
 ## Deployment Commands
