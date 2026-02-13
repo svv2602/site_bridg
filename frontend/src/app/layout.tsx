@@ -110,11 +110,17 @@ export default async function RootLayout({
   ]);
   const organizationSchema = generateOrganizationSchema(SITE_URL, settings);
   return (
-    <html lang="uk" className="scroll-smooth">
+    <html lang="uk" className="scroll-smooth" data-theme="dark">
       <head>
         {/* Preconnect to external resources for faster loading */}
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="dns-prefetch" href="https://maps.googleapis.com" />
+        {/* Inline theme script: read localStorage before paint to prevent FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})()`,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
