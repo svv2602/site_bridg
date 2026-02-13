@@ -150,6 +150,15 @@ export const CategoryPages: CollectionConfig = {
           relationTo: 'media',
         },
         {
+          name: 'generateHeroImage',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '/src/components/GenerateCategoryHeroButton',
+            },
+          },
+        },
+        {
           name: 'heroImageAlt',
           label: 'Alt тексту зображення',
           type: 'text',

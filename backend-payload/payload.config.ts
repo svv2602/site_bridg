@@ -67,6 +67,10 @@ import {
   reviewBulkStatsEndpoint,
 } from './src/endpoints/reviewGeneration';
 import {
+  categoryImageStatusEndpoint,
+  generateCategoryImageEndpoint,
+} from './src/endpoints/categoryImageGeneration';
+import {
   automationStatsEndpoint,
   automationStatusEndpoint,
   automationSchedulerEndpoint,
@@ -175,6 +179,9 @@ export default buildConfig({
     generateReviewsEndpoint,
     generateReviewsStatusEndpoint,
     reviewStatsEndpoint,
+    // Category hero image generation
+    categoryImageStatusEndpoint,      // GET /api/category-image/status/:jobId (before :pageId)
+    generateCategoryImageEndpoint,    // POST /api/category-image/:pageId
     // Automation metrics & scheduler
     automationStatsEndpoint,
     automationStatusEndpoint,
