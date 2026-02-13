@@ -2,7 +2,7 @@
  * English → Ukrainian Translation Utility
  *
  * Translates LLM-generated content from English to Ukrainian
- * using the content-translation task routing (google/gemini-2.0-flash).
+ * using the content-translation task routing (google/gemini-2.5-flash).
  *
  * Used by tire-description and article generators for two-stage
  * generation: generate in English (better quality/length) → translate.
