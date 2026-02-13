@@ -136,7 +136,7 @@ export async function notifyWeeklySummary(params: {
     title: "Тижневий звіт автоматизації",
     body,
     buttons: [
-      { text: "Payload Admin", url: `${ENV.PAYLOAD_URL}/admin` },
+      { text: "Payload Admin", url: `${ENV.PAYLOAD_PUBLIC_URL}/admin` },
     ],
   });
 }
@@ -159,7 +159,7 @@ async function main() {
     tireName: "Bridgestone Turanza 6",
     descriptionLength: 487,
     badges: ["Winner ADAC 2025"],
-    payloadUrl: `${ENV.PAYLOAD_URL}/admin`,
+    payloadUrl: `${ENV.PAYLOAD_PUBLIC_URL}/admin`,
   });
 
   if (result.success) {

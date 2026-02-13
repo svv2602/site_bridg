@@ -1002,7 +1002,7 @@ export async function sendArticlePublished(params: {
   const chatId = parseInt(ENV.TELEGRAM_CHAT_ID, 10);
   if (isNaN(chatId)) return;
 
-  const payloadUrl = `${ENV.PAYLOAD_URL}/admin/collections/articles/${params.payloadId}`;
+  const payloadUrl = `${ENV.PAYLOAD_PUBLIC_URL}/admin/collections/articles/${params.payloadId}`;
   const viewButton = {
     inline_keyboard: [
       [{ text: "📝 Переглянути в Payload", url: payloadUrl }],
@@ -1017,7 +1017,7 @@ export async function sendArticlePublished(params: {
   // Try sending with cover image
   if (params.imageMediaId) {
     try {
-      const imageUrl = `${ENV.PAYLOAD_URL}/api/media/${params.imageMediaId}/file`;
+      const imageUrl = `${ENV.PAYLOAD_PUBLIC_URL}/api/media/${params.imageMediaId}/file`;
       const caption = `📤 <b>Статтю опубліковано</b>\n\n${escapeHtml(params.title)}`;
 
       const sent = await sendPhoto(chatId, imageUrl, caption, messageOptions);

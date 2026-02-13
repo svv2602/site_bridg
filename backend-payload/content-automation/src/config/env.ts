@@ -37,6 +37,7 @@ export const ENV = {
 
   // === Payload CMS ===
   PAYLOAD_URL: process.env.PAYLOAD_URL || "http://localhost:3001",
+  PAYLOAD_PUBLIC_URL: process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.PAYLOAD_URL || "http://localhost:3001",
 
   // === Telegram notifications ===
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",

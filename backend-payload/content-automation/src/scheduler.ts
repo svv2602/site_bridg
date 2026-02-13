@@ -226,8 +226,8 @@ async function runContentGeneration(brand?: Brand, limit?: number) {
       return;
     }
 
-    // Process tires (default limit 3 for safety)
-    const batchSize = limit || Math.min(tiresNeedingGeneration.length, 3);
+    // Process tires (default limit 3 for safety, never exceed array length)
+    const batchSize = Math.min(limit || 3, tiresNeedingGeneration.length);
     console.log(`Processing ${batchSize} tires...`);
 
     for (let i = 0; i < batchSize; i++) {
@@ -448,7 +448,7 @@ async function runPublishPipeline(brand?: Brand) {
           tireName: tire.name,
           descriptionLength: content.shortDescription?.split(/\s+/).length || 0,
           badges: [],
-          payloadUrl: `${ENV.PAYLOAD_URL}/admin/collections/tyres/${slug}`,
+          payloadUrl: `${ENV.PAYLOAD_PUBLIC_URL}/admin/collections/tyres/${slug}`,
         });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
