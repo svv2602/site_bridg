@@ -431,9 +431,62 @@ export function initScheduler(): void {
     if (cleaned > 0) {
       schedulerLogger.info(`Cleaned up ${cleaned} old job records`);
     }
+
+    // Start Telegram bot polling in a child process
+    startTelegramBotPolling();
   } catch (error) {
     schedulerLogger.error('Failed to initialize', { error: error instanceof Error ? error.message : String(error) });
   }
+}
+
+// ---- Telegram Bot Polling ----
+
+let telegramBotProcess: ReturnType<typeof exec> | null = null;
+
+function startTelegramBotPolling(): void {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+    schedulerLogger.warn('Telegram bot not configured — polling disabled');
+    return;
+  }
+
+  const automationDir = path.join(process.cwd(), 'content-automation');
+  const script = 'import{startPolling}from"./src/publishers/telegram-commands.js";startPolling()';
+
+  schedulerLogger.info('Starting Telegram bot polling...');
+
+  telegramBotProcess = exec(`npx tsx -e '${script}'`, {
+    cwd: automationDir,
+    env: { ...process.env },
+  });
+
+  telegramBotProcess.stdout?.on('data', (data: string) => {
+    for (const line of data.trim().split('\n')) {
+      if (line) schedulerLogger.info(`[TelegramBot] ${line}`);
+    }
+  });
+
+  telegramBotProcess.stderr?.on('data', (data: string) => {
+    for (const line of data.trim().split('\n')) {
+      if (line && !line.includes('ExperimentalWarning')) {
+        schedulerLogger.error(`[TelegramBot] ${line}`);
+      }
+    }
+  });
+
+  telegramBotProcess.on('exit', (code) => {
+    schedulerLogger.warn(`Telegram bot process exited with code ${code}`);
+    telegramBotProcess = null;
+
+    // Auto-restart after 10 seconds
+    setTimeout(() => {
+      if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+        schedulerLogger.info('Restarting Telegram bot polling...');
+        startTelegramBotPolling();
+      }
+    }, 10000);
+  });
+
+  schedulerLogger.info('Telegram bot polling started');
 }
 
 export function getSchedulerStatus(): TaskSchedule[] {
