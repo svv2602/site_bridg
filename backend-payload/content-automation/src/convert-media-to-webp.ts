@@ -87,10 +87,14 @@ async function reUploadMedia(
   doc: MediaDoc,
   token: string
 ): Promise<{ newId: number; newFilename: string; newFilesize: number }> {
-  // 1. Download original file
-  const imageUrl = doc.url.startsWith("http")
-    ? doc.url
-    : `${PAYLOAD_URL}${doc.url}`;
+  // 1. Download original file — rewrite public URLs to local Payload URL
+  let imageUrl: string;
+  if (doc.url.startsWith("http")) {
+    const parsed = new URL(doc.url);
+    imageUrl = `${PAYLOAD_URL}${parsed.pathname}`;
+  } else {
+    imageUrl = `${PAYLOAD_URL}${doc.url}`;
+  }
 
   const downloadRes = await fetch(imageUrl);
   if (!downloadRes.ok) {
