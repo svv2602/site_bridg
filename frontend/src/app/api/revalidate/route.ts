@@ -3,6 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET;
 
+/** Map CMS category-page slug to frontend route path(s) */
+const CATEGORY_SLUG_PATHS: Record<string, string[]> = {
+  'passenger-tyres': ['/passenger-tyres'],
+  'suv-4x4-tyres': ['/suv-4x4-tyres'],
+  'lcv-tyres': ['/lcv-tyres'],
+  summer: ['/passenger-tyres/summer'],
+  winter: ['/passenger-tyres/winter'],
+  allseason: ['/passenger-tyres/all-season'],
+};
+
 const COLLECTION_PATHS: Record<string, { listing: string; detail: (slug: string) => string }> = {
   articles: {
     listing: '/blog',
@@ -32,6 +42,27 @@ export async function POST(request: NextRequest) {
 
   const { collection, slug } = body;
 
+  const revalidatedPaths: string[] = [];
+
+  // Category pages: revalidate mapped frontend routes by CMS slug
+  if (collection === 'category-pages') {
+    if (slug && CATEGORY_SLUG_PATHS[slug]) {
+      for (const p of CATEGORY_SLUG_PATHS[slug]) {
+        revalidatePath(p);
+        revalidatedPaths.push(p);
+      }
+    } else {
+      // Revalidate all category routes
+      for (const paths of Object.values(CATEGORY_SLUG_PATHS)) {
+        for (const p of paths) {
+          revalidatePath(p);
+          revalidatedPaths.push(p);
+        }
+      }
+    }
+    return NextResponse.json({ revalidated: true, paths: revalidatedPaths });
+  }
+
   if (!collection || !COLLECTION_PATHS[collection]) {
     return NextResponse.json(
       { error: `Unknown collection: ${collection}` },
@@ -40,7 +71,6 @@ export async function POST(request: NextRequest) {
   }
 
   const config = COLLECTION_PATHS[collection];
-  const revalidatedPaths: string[] = [];
 
   // Always revalidate the listing page
   revalidatePath(config.listing);
