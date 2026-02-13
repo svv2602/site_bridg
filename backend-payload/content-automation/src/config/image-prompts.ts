@@ -40,10 +40,10 @@ type CompositionFocus =
  */
 export const NEGATIVE_PROMPT = `blurry, low quality, distorted, deformed, disfigured, bad anatomy,
 watermark, text, logo, signature, cropped, out of frame, worst quality, low resolution,
-jpeg artifacts, pixelated, noise, grain, overexposed, underexposed, oversaturated,
+jpeg artifacts, pixelated, noise, overexposed, underexposed, oversaturated,
 cartoon, anime, illustration, 3d render, cgi, artificial looking, plastic looking,
 duplicate, clone, extra limbs, missing parts, floating objects, unnatural proportions,
-HDR, oversharpened, neon colors, lens flare, chromatic aberration`;
+HDR, oversharpened, neon colors, lens flare, chromatic aberration, vibrant colors, 8k ultra detailed`;
 
 /**
  * Season context descriptions for hero images — soft, natural tones
@@ -94,6 +94,78 @@ function hashString(str: string): number {
 /** Pick an item from a pool using a hash seed */
 function pickFromPool<T>(pool: T[], seed: number, offset: number = 0): T {
   return pool[(seed + offset) % pool.length];
+}
+
+// ============ PHOTOGRAPHY STYLE PRESETS ============
+
+/**
+ * Realistic photography style presets.
+ *
+ * Each preset simulates a different "photographer's eye" — film stock,
+ * camera body, lens character, and color grading approach.
+ * Randomly selected per image to add natural variety and push DALL-E
+ * towards photorealistic output instead of digital/poster look.
+ */
+interface PhotographyStyle {
+  /** Identifier for logging */
+  name: string;
+  /** Camera + lens + settings */
+  technical: string;
+  /** Color grading / film stock */
+  colorScience: string;
+  /** Texture and finish */
+  texture: string;
+}
+
+const PHOTOGRAPHY_STYLES: PhotographyStyle[] = [
+  {
+    name: 'kodak-portra-400',
+    technical: 'Shot on Canon EOS R5, 85mm f/1.8 lens, f/2.8 aperture, ISO 400, shallow depth of field',
+    colorScience: 'Color science similar to Kodak Portra 400 — warm skin tones, slightly desaturated, soft pastel highlights, muted shadows',
+    texture: 'Subtle film grain, matte finish, true-to-life colors, low contrast',
+  },
+  {
+    name: 'fuji-pro-400h',
+    technical: 'Shot on Nikon Z8, 35mm f/1.4 lens, f/4 aperture, ISO 200, natural depth of field',
+    colorScience: 'Color science similar to Fuji Pro 400H — cool-neutral tones, clean pastel highlights, slightly green-shifted shadows, refined palette',
+    texture: 'Fine film grain, soft tonal transitions, slightly desaturated, natural dynamic range',
+  },
+  {
+    name: 'kodak-ektar-100',
+    technical: 'Shot on Sony A7IV, 24-70mm f/2.8 lens, f/5.6 aperture, ISO 100, medium depth of field',
+    colorScience: 'Color science similar to Kodak Ektar 100 — rich but natural colors, fine detail, slightly warm midtones, deep but not crushed blacks',
+    texture: 'Ultra-fine grain, sharp detail, natural saturation, true-to-life tones',
+  },
+  {
+    name: 'digital-documentary',
+    technical: 'Shot on Canon EOS R6, 50mm f/1.2 lens, f/2.8 aperture, ISO 800, natural light only',
+    colorScience: 'Natural white balance, documentary color grading — no color casts, accurate scene colors, neutral shadows and highlights',
+    texture: 'No filters, real-world imperfections, natural skin tones, low saturation, slightly desaturated highlights',
+  },
+  {
+    name: 'cinematic-natural',
+    technical: 'Shot on Sony A7III, 85mm f/1.4 lens, f/2 aperture, ISO 400, cinematic shallow depth of field',
+    colorScience: 'Cinematic but realistic color grading — slightly teal shadows, warm highlights, restrained color palette, subtle color contrast',
+    texture: 'Matte finish, soft shadows, low contrast, subtle vignette, filmic quality without being stylised',
+  },
+  {
+    name: 'leica-reportage',
+    technical: 'Shot on Leica Q3, 28mm f/1.7 lens, f/4 aperture, ISO 320, wide environmental perspective',
+    colorScience: 'Classic Leica color rendering — slightly desaturated, honest tones, no artificial enhancement, neutral but warm',
+    texture: 'Subtle film grain, matte finish, real-world imperfections, unedited documentary feel, no post-processing glow',
+  },
+];
+
+/** Pick a photography style based on topic hash */
+function pickPhotographyStyle(seed: number, offset: number = 10): PhotographyStyle {
+  return pickFromPool(PHOTOGRAPHY_STYLES, seed, offset);
+}
+
+/** Format style preset into a prompt block */
+function formatStyleBlock(style: PhotographyStyle): string {
+  return `Technical: ${style.technical}.
+${style.colorScience}.
+${style.texture}.`;
 }
 
 // ============ COMPOSITION ELEMENTS ============
@@ -266,6 +338,9 @@ export function generateHeroPrompt(
   // Pick composition focus — this determines the overall type of image
   const focus = pickFromPool(COMPOSITION_FOCUSES, seed, 0);
 
+  // Pick photography style — varies film stock/camera per image
+  const style = pickPhotographyStyle(seed, 10);
+
   // Build scene based on focus
   const scene = buildScene(focus, seed, weather, articleType);
 
@@ -273,14 +348,14 @@ export function generateHeroPrompt(
 
 Scene: ${scene}.
 
-Technical: Shot on a full-frame camera, 35-85mm lens range, natural depth of field.
+${formatStyleBlock(style)}
 Balanced exposure, accurate white balance, gentle post-processing.
 Rule of thirds composition, widescreen framing.
 
 Style: Authentic editorial magazine photography. Looks like a real photograph
 taken by a professional photographer for an automotive publication.
-Muted, natural colour palette — no oversaturation, no HDR look.
-Soft tonal transitions, film-like quality, subtle colour grading.
+Not oversaturated, not hyper-detailed, not HDR.
+Soft tonal transitions, film-like quality.
 
 Lighting: Natural ambient light, soft shadows, no harsh contrasts.
 No lens flare, no neon, no artificial colour casts.
@@ -380,18 +455,21 @@ export function generateContentPrompt(topic: string, context?: string): string {
       sceneHint = 'A vehicle in an everyday real-world setting.';
   }
 
+  const style = pickPhotographyStyle(seed, 11);
+
   return `Editorial photography for an automotive article about ${topic}.
 
 Context: ${context || 'tyre and automotive safety'}.
 Scene: ${sceneHint}
 
 Composition: Clean frame with a clear focal point. Real-world setting.
-Technical: Full-frame camera, 24-70mm lens, balanced exposure, natural white balance.
-Style: Documentary editorial feel, authentic and relatable, muted natural colours.
+${formatStyleBlock(style)}
+Style: Documentary editorial feel, authentic and relatable.
+Not oversaturated, not hyper-detailed, not HDR.
 Lighting: Natural daylight, soft shadows, even illumination.
 
 Requirements: Photorealistic, like a real photograph. No text, no watermarks.
-Natural colour palette, no oversaturation. Publication-ready quality.`;
+Publication-ready quality.`;
 }
 
 // ============ PRODUCT PROMPT ============
@@ -400,6 +478,15 @@ Natural colour palette, no oversaturation. Publication-ready quality.`;
  * Generate a product image prompt — clean studio photography
  */
 export function generateProductPrompt(topic: string): string {
+  const seed = hashString(topic);
+  // Product images use a subset of styles — only digital/neutral ones suit studio work
+  const PRODUCT_STYLES = [
+    'Shot on Canon EOS R5, 100mm f/2.8 macro lens, f/8 aperture, ISO 100. True-to-life color reproduction, neutral tones, no color cast.',
+    'Shot on Nikon Z8, 105mm f/2.8 lens, f/11 aperture, ISO 64. Accurate color rendition, clean neutral palette, precise white balance.',
+    'Shot on Sony A7RV, 90mm f/2.8 macro lens, f/8 aperture, ISO 100. Natural color science, subtle tonal gradations, matte finish.',
+  ];
+  const techStyle = pickFromPool(PRODUCT_STYLES, seed, 10);
+
   return `Product photography of ${topic} automotive tyre.
 
 Setup: Professional studio, seamless dark grey backdrop.
@@ -411,10 +498,12 @@ strip softbox behind for subtle edge definition. Soft, controlled, no hot spots.
 Focus: Sharp detail on tread grooves, sipes, and shoulder blocks.
 Sidewall markings visible but not overly emphasised.
 
-Technical: 100mm lens, f/8 for full depth of field. Clean, precise framing.
+Technical: ${techStyle}
+Clean, precise framing.
 
 Style: Clean commercial product photography with understated premium feel.
-Realistic representation of black rubber — true-to-life tones, not overly contrasty.
+Realistic representation of black rubber — true-to-life tones, not oversaturated, not hyper-detailed.
+Low contrast, matte finish.
 
 Requirements: Photorealistic studio shot, no text, no watermarks.
 Accurate colour, subtle shadows, professional but not flashy.`;
@@ -430,6 +519,9 @@ export function generateLifestylePrompt(topic: string, season?: string): string 
     ? LIFESTYLE_SEASON_CONTEXTS[season]
     : 'everyday driving, relatable daily situations';
 
+  const seed = hashString(topic + (season || ''));
+  const style = pickPhotographyStyle(seed, 12);
+
   return `Lifestyle photography capturing ${scene}.
 
 Story: Authentic moments of everyday driving — families, couples, or individuals
@@ -438,13 +530,14 @@ Tyre and vehicle reliability is implied, not highlighted.
 
 Subjects: Relatable people (30-50 years old) in natural poses,
 genuine expressions, candid documentary approach.
+Natural skin tones, real-world imperfections.
 
 Vehicle: Everyday family car or crossover, lived-in but well-kept condition.
 
 Environment: ${scene}. Real locations, natural backgrounds.
 
-Technical: 35-50mm lens, natural depth of field, candid framing.
-Balanced exposure, accurate skin tones, gentle post-processing.
+${formatStyleBlock(style)}
+Candid framing, balanced exposure, accurate skin tones.
 
 Lighting: Natural available light, soft and flattering.
 No artificial colour casts, no dramatic lighting effects.
@@ -452,7 +545,8 @@ No artificial colour casts, no dramatic lighting effects.
 Mood: Warm but restrained, positive, relatable, trustworthy.
 
 Requirements: Must look like a real candid photograph, not AI-generated.
-No text, no watermarks. Muted natural colours, editorial magazine quality.`;
+No text, no watermarks. Not oversaturated, not hyper-detailed.
+Editorial magazine quality.`;
 }
 
 // ============ UNIFIED ENTRY POINT ============
