@@ -5,6 +5,7 @@ import { SITE_URL, getSiteSettingsWithDefaults } from "@/lib/constants";
 import { Breadcrumb } from "@/components/ui";
 import { TrackDealerSearch } from "@/components/AnalyticsEvents";
 import { DealersClient } from "./DealersClient";
+import { OnlineStores } from "./components/OnlineStores";
 
 export const metadata: Metadata = {
   title: "Де купити | Дилери Bridgestone в Україні",
@@ -86,6 +87,9 @@ export default async function DealersPage() {
           </div>
         </section>
       </noscript>
+
+      {/* Online stores section */}
+      <OnlineStores />
 
       {/* Interactive client parts (filters, map, geolocation, dealer list) */}
       <DealersClient initialDealers={allDealers} phoneHref={settings.phoneHref} />
