@@ -1,15 +1,18 @@
+import Image from "next/image";
 import { ExternalLink, ShoppingCart } from "lucide-react";
 
 const onlineStores = [
   {
     name: "ProKoleso",
     url: "https://prokoleso.ua",
+    logo: "/images/logos/prokoleso.svg",
     description:
       "Широкий асортимент шин Bridgestone з доставкою по всій Україні. Зручний підбір за параметрами та сезоном.",
   },
   {
     name: "Tvoya Shina",
     url: "https://tshina.ua",
+    logo: "/images/logos/tshina.svg",
     description:
       "Офіційний інтернет-магазин мережі «Твоя Шина» — шини Bridgestone з можливістю самовивозу або доставки.",
   },
@@ -41,9 +44,13 @@ export function OnlineStores() {
               className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-xl font-medium text-foreground group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                  {store.name}
-                </h3>
+                <Image
+                  src={store.logo}
+                  alt={store.name}
+                  width={140}
+                  height={32}
+                  className="h-8 w-auto text-foreground"
+                />
                 <span className="rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                   Онлайн-магазин
                 </span>
