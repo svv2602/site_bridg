@@ -22,12 +22,14 @@ import { postProcessReview } from "./reviews/review-post-processor.js";
 
 const logger = createLogger("GenerateReviews");
 
-// Ukrainian first names (male and female)
-const UKRAINIAN_NAMES = [
+// Ukrainian first names by gender
+const UKRAINIAN_NAMES_MALE = [
   "Олександр", "Андрій", "Сергій", "Володимир", "Максим", "Дмитро", "Іван", "Михайло",
   "Олексій", "Юрій", "Віктор", "Ігор", "Тарас", "Богдан", "Петро", "Роман",
+];
+const UKRAINIAN_NAMES_FEMALE = [
   "Олена", "Наталія", "Оксана", "Ірина", "Марія", "Тетяна", "Катерина", "Анна",
-  "Юлія", "Людмила", "Світлана", "Вікторія", "Ольга", "Галина", "Надія", "Лариса"
+  "Юлія", "Людмила", "Світлана", "Вікторія", "Ольга", "Галина", "Надія", "Лариса",
 ];
 
 // Ukrainian cities
@@ -143,7 +145,7 @@ ${tyre.shortDescription ? `- Опис: ${tyre.shortDescription}` : ""}
 
 Вимоги до відгуків:
 1. Кожен відгук має бути унікальним і відображати особистий досвід
-2. Використовуй різні імена з цього списку: ${UKRAINIAN_NAMES.slice(0, 10).join(", ")}...
+2. Використовуй різні імена з цього списку: ${[...UKRAINIAN_NAMES_MALE.slice(0, 5), ...UKRAINIAN_NAMES_FEMALE.slice(0, 5)].join(", ")}...
 3. Використовуй різні міста з цього списку: ${UKRAINIAN_CITIES.slice(0, 10).join(", ")}...
 4. Використовуй реалістичні автомобілі: ${vehicleExamples.slice(0, 5).join(", ")}...
 5. Оцінки: переважно 4-5 зірок, рідко 3
@@ -215,7 +217,7 @@ function buildSingleReviewPrompt(tyre: TyreInfo, reviewIndex: number, diversity:
 - Тип: ${diversity.persona.type}
 - Контекст: ${diversity.persona.context}
 - Стиль написання: ${diversity.writingStyle.instruction}
-- Стать: ${diversity.gender === "female" ? "жіноча (використовуй жіночий рід дієслів: купила, поставила, обрала, задоволена)" : "чоловіча"}`;
+- Стать: ${diversity.gender === "female" ? "ЖІНОЧА — обов'язково використовуй жіночий рід дієслів та прикметників: купила, поставила, обрала, задоволена, вражена, їздила. Ім'я має бути ЖІНОЧИМ." : "ЧОЛОВІЧА — використовуй чоловічий рід: купив, поставив, обрав, задоволений. Ім'я має бути ЧОЛОВІЧИМ."}`;
 
   // Opening context
   const openingBlock = `
@@ -255,7 +257,7 @@ ${bannedBlock}
 
 Вимоги:
 1. Унікальний відгук з особистим досвідом від імені вказаного типу автора
-2. Ім'я: обери випадкове з (${UKRAINIAN_NAMES.slice(reviewIndex * 4, reviewIndex * 4 + 4).join(", ")})
+2. Ім'я: обери випадкове ${diversity.gender === "female" ? "ЖІНОЧЕ" : "ЧОЛОВІЧЕ"} ім'я з (${(diversity.gender === "female" ? UKRAINIAN_NAMES_FEMALE : UKRAINIAN_NAMES_MALE).sort(() => Math.random() - 0.5).slice(0, 4).join(", ")})
 3. Місто: обери випадкове з (${UKRAINIAN_CITIES.slice(reviewIndex * 3, reviewIndex * 3 + 3).join(", ")})
 4. Автомобіль: обери з (${vehicleExamples.slice(reviewIndex * 2, reviewIndex * 2 + 3).join(", ")})
 5. Оцінка: ${suggestedRating}
