@@ -295,12 +295,23 @@
   color: #ffffff;
 }
 
-/* Tables */
+/* Tables — overflow wrapper for mobile */
+.prose .table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+}
+
+.prose .table-wrapper table {
+  margin: 0;
+}
+
 .prose table {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
   font-size: 0.95rem;
+  min-width: 480px;
 }
 
 .prose thead {

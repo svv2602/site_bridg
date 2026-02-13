@@ -48,9 +48,9 @@ function getTransform(direction: AnimationDirection, isVisible: boolean): string
     case 'up':
       return 'translateY(20px)';
     case 'left':
-      return 'translateX(-20px)';
+      return 'translateX(-12px)';
     case 'right':
-      return 'translateX(20px)';
+      return 'translateX(12px)';
   }
 }
 

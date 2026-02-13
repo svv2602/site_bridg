@@ -56,7 +56,7 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
             className="space-y-5"
             style={{
               opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateX(0)' : 'translateX(-18px)',
+              transform: isVisible ? 'translateX(0)' : 'translateX(-12px)',
               transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
             }}
           >
@@ -132,7 +132,7 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
             className="space-y-6"
             style={{
               opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateX(0)' : 'translateX(20px)',
+              transform: isVisible ? 'translateX(0)' : 'translateX(12px)',
               transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
             }}
           >

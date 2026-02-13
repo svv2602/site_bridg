@@ -291,10 +291,20 @@ export function LexicalRenderer({
     );
 
     // Add lazy loading and decoding attributes to img tags in HTML content
-    const optimizedContent = iframeFiltered.replace(
-      /<img\b(?![^>]*\bloading=)/gi,
-      '<img loading="lazy" decoding="async"'
-    );
+    const optimizedContent = iframeFiltered
+      .replace(
+        /<img\b(?![^>]*\bloading=)/gi,
+        '<img loading="lazy" decoding="async"'
+      )
+      // Wrap tables in overflow container for mobile
+      .replace(
+        /<table\b/gi,
+        '<div class="table-wrapper"><table'
+      )
+      .replace(
+        /<\/table>/gi,
+        '</table></div>'
+      );
     return (
       <div
         className={`${proseClasses} ${className}`}

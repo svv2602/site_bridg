@@ -134,7 +134,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col overflow-x-hidden">
           {/* Top bar */}
           <div className="border-b border-border bg-card text-xs">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 md:px-8">
