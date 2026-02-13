@@ -15,10 +15,13 @@ import { createLogger } from "./utils/logger.js";
 const logger = createLogger("Cron");
 import { notify } from "./publishers/telegram-bot.js";
 import { runWeeklyAutomation } from "./scheduler.js";
-import { setRunStatus } from "./publishers/telegram-commands.js";
+import { setRunStatus, sendDailyDigest } from "./publishers/telegram-commands.js";
 
 // Weekly automation: Sunday at 03:00 Kyiv time
 const WEEKLY_SCHEDULE = "0 3 * * 0";
+
+// Daily digest: every day at 09:00 Kyiv time
+const DAILY_DIGEST_SCHEDULE = "0 9 * * *";
 
 /**
  * Run the weekly automation job
@@ -121,15 +124,35 @@ export function startCronJobs(): void {
   logger.info(`Weekly automation scheduled: ${WEEKLY_SCHEDULE} (Europe/Kyiv)`);
   logger.info("Next run: Sunday at 03:00 Kyiv time");
 
+  // Schedule daily digest
+  let digestJob: ReturnType<typeof cron.schedule> | undefined;
+  if (cron.validate(DAILY_DIGEST_SCHEDULE)) {
+    digestJob = cron.schedule(
+      DAILY_DIGEST_SCHEDULE,
+      () => {
+        sendDailyDigest().catch((error) => {
+          logger.error("Failed to send daily digest:", error);
+        });
+      },
+      {
+        timezone: "Europe/Kyiv",
+        scheduled: true,
+      }
+    );
+    logger.info(`Daily digest scheduled: ${DAILY_DIGEST_SCHEDULE} (Europe/Kyiv)`);
+  }
+
   // Handle graceful shutdown
   process.on("SIGINT", () => {
     logger.info("Stopping cron jobs...");
     job.stop();
+    digestJob?.stop();
   });
 
   process.on("SIGTERM", () => {
     logger.info("Stopping cron jobs...");
     job.stop();
+    digestJob?.stop();
   });
 }
 

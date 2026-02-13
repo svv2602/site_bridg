@@ -33,6 +33,7 @@ import { generateHeroImage } from "./processors/content/article-images.js";
 import { getPayloadClient } from "./publishers/payload-client.js";
 import { type RelatedItem } from "./prompts/index.js";
 import { getTestResult } from "./db/test-results.js";
+import { isPlausibleTestYear } from "./scrapers/parsers.js";
 import type { GeneratedArticle } from "./types/content.js";
 import { notify } from "./publishers/telegram-bot.js";
 
@@ -330,6 +331,17 @@ export async function processSingleQueueItem(
         processedAt: new Date().toISOString(),
       });
       console.log(`[Generate] Published: "${result.article.title}" (ID: ${payloadId})`);
+
+      // Notify via Telegram with cover image
+      try {
+        const { sendArticlePublished } = await import("./publishers/telegram-commands.js");
+        await sendArticlePublished({
+          title: result.article.title,
+          slug: result.article.slug || "",
+          payloadId,
+          imageMediaId,
+        });
+      } catch { /* non-blocking */ }
     } else {
       updateQueueItem(item.id, {
         status: "review",
@@ -337,6 +349,16 @@ export async function processSingleQueueItem(
         processedAt: new Date().toISOString(),
       });
       console.log(`[Generate] For review: "${result.article.title}" (ID: ${payloadId})`);
+
+      // Send for review via Telegram with approve/reject buttons
+      try {
+        const { sendArticleForReview } = await import("./publishers/telegram-commands.js");
+        await sendArticleForReview(
+          item.id,
+          result.article.title,
+          result.article.excerpt || item.topic
+        );
+      } catch { /* non-blocking */ }
     }
 
     return {
@@ -355,6 +377,13 @@ export async function processSingleQueueItem(
       processedAt: new Date().toISOString(),
     });
     console.error(`[Generate] Failed (attempt ${currentRetries + 1}): "${item.topic}": ${msg}`);
+
+    // Send error notification with retry button
+    try {
+      const { sendArticleError } = await import("./publishers/telegram-commands.js");
+      await sendArticleError(item.id, item.topic, msg);
+    } catch { /* non-blocking */ }
+
     return { success: false, error: msg };
   }
 }
@@ -461,9 +490,15 @@ async function buildGenerationContext(
         .map((r) => `${r.position}. ${r.tireName} (${r.rating})`)
         .join("; ");
 
+      // Validate year before passing to LLM — fall back to current year if implausible
+      const safeYear = isPlausibleTestYear(test.year) ? test.year : new Date().getFullYear();
+      if (safeYear !== test.year) {
+        console.warn(`[Context] Implausible test year ${test.year} for ${test.testUid}, using ${safeYear}`);
+      }
+
       testData = {
         source: getSourceLabel(test.source),
-        year: test.year,
+        year: safeYear,
         results: resultsStr,
       };
     }

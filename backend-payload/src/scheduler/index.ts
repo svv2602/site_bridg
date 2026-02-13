@@ -57,6 +57,14 @@ const DEFAULT_TASKS: TaskConfig[] = [
     cronExpression: '0 5 * * 3',
     timezone: 'Europe/Kyiv',
   },
+  {
+    taskId: 'daily-digest',
+    label: 'Ранковий дайджест',
+    command: 'daily-digest',
+    enabled: false,
+    cronExpression: '0 9 * * *',
+    timezone: 'Europe/Kyiv',
+  },
 ];
 
 function readAllConfigs(): TaskConfig[] {
@@ -222,6 +230,8 @@ function getTaskCallback(taskId: string): () => Promise<void> {
       return runScheduledPipeline;
     case 'smart-articles':
       return runScheduledSmartArticles;
+    case 'daily-digest':
+      return runScheduledDailyDigest;
     default:
       return async () => {
         schedulerLogger.warn(`No callback defined for task "${taskId}"`);
@@ -333,6 +343,48 @@ async function runScheduledSmartArticles(): Promise<void> {
     job.output = err.stdout || '';
     updateJob(job);
     schedulerLogger.error(`Smart articles failed: ${err.message}`);
+  }
+}
+
+// ---- Daily Digest runner ----
+
+async function runScheduledDailyDigest(): Promise<void> {
+  const automationDir = path.join(process.cwd(), 'content-automation');
+  const command = 'npx tsx -e "import{sendDailyDigest}from\'./src/publishers/telegram-commands.js\';sendDailyDigest()"';
+
+  const jobId = `cron-daily-digest-${Date.now()}`;
+  const job: JobStatus = {
+    id: jobId,
+    status: 'running',
+    startedAt: new Date().toISOString(),
+    command,
+    currentStep: 1,
+    totalSteps: 1,
+    stepLabel: 'Дайджест',
+  };
+  saveJob(job);
+
+  schedulerLogger.info(`Cron triggered daily-digest job ${jobId}`);
+
+  try {
+    const { stdout, stderr } = await execAsync(command, {
+      cwd: automationDir,
+      timeout: 60000, // 1 minute
+      env: { ...process.env },
+    });
+    job.status = 'completed';
+    job.completedAt = new Date().toISOString();
+    job.output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
+    updateJob(job);
+    schedulerLogger.info(`Daily digest completed: ${jobId}`);
+  } catch (error: unknown) {
+    const err = error as { message: string; stdout?: string };
+    job.status = 'failed';
+    job.completedAt = new Date().toISOString();
+    job.error = err.message;
+    job.output = err.stdout || '';
+    updateJob(job);
+    schedulerLogger.error(`Daily digest failed: ${err.message}`);
   }
 }
 
