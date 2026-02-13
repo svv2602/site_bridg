@@ -19,7 +19,7 @@ interface ContactFormPayload extends ContactFormData {
 const MIN_SUBMIT_TIME_MS = 3_000;     // 3 seconds
 const MAX_SUBMIT_TIME_MS = 30 * 60_000; // 30 minutes
 
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
+const PAYLOAD_URL = process.env.PAYLOAD_API_URL || process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const SMTP_HOST = process.env.SMTP_HOST;
@@ -53,7 +53,8 @@ async function saveToPayload(data: ContactFormData): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.error('Failed to save to Payload CMS:', response.status);
+      const errorBody = await response.text().catch(() => '');
+      console.error('Failed to save to Payload CMS:', response.status, errorBody);
       return false;
     }
 

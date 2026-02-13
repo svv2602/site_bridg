@@ -69,9 +69,9 @@ export const ContactSubmissions: CollectionConfig = {
           required: true,
           validate: (value: string | null | undefined) => {
             if (!value) return true; // required check handled separately
-            // Ukrainian phone format: +380XXXXXXXXX or 0XXXXXXXXX or with spaces/dashes
-            const phoneRegex = /^(\+?38)?[\s-]?0[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
-            if (!phoneRegex.test(value.replace(/[() ]/g, ''))) {
+            // Accept digits, +, spaces, dashes, parentheses (10-20 chars)
+            const phoneRegex = /^[+]?[\d\s()-]{10,20}$/;
+            if (!phoneRegex.test(value)) {
               return 'Невірний формат телефону. Приклад: +380671234567';
             }
             return true;
