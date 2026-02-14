@@ -8,7 +8,7 @@
 
 import type { Page } from "playwright";
 import { type TestResult, type TestResultEntry, saveTestResult, testResultExists } from "../db/test-results.js";
-import { mapTierToRating, extractPlausibleYear } from "./parsers.js";
+import { mapTierToRating, extractPlausibleYear, isPlausibleTestYear } from "./parsers.js";
 
 const BASE_URL = "https://www.gtue.news/";
 
@@ -53,10 +53,55 @@ function parseTestType(text: string): TestResult["testType"] {
 }
 
 /**
- * Extract year from text
+ * Extract year from text. Returns null if no plausible year found — never falls back to current year.
  */
-function extractYear(text: string): number {
-  return extractPlausibleYear(text) || new Date().getFullYear();
+function extractYear(text: string): number | null {
+  return extractPlausibleYear(text);
+}
+
+/**
+ * Extract publication date from page using structured data.
+ * Tries: 1) JSON-LD datePublished, 2) meta article:published_time, 3) <time datetime>
+ */
+async function extractPublicationDate(page: Page): Promise<string | null> {
+  return page.evaluate(() => {
+    // 1. JSON-LD datePublished (most reliable — GTÜ always has this)
+    const ldScripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const script of ldScripts) {
+      try {
+        const data = JSON.parse(script.textContent || "");
+        // Handle both single objects and arrays
+        const items = Array.isArray(data) ? data : [data];
+        for (const item of items) {
+          if (item.datePublished) return item.datePublished as string;
+          // Check @graph array (WordPress pattern)
+          if (item["@graph"] && Array.isArray(item["@graph"])) {
+            for (const node of item["@graph"]) {
+              if (node.datePublished) return node.datePublished as string;
+            }
+          }
+        }
+      } catch {
+        // Invalid JSON-LD, continue
+      }
+    }
+
+    // 2. Meta tag article:published_time
+    const metaPublished = document.querySelector('meta[property="article:published_time"]');
+    if (metaPublished) {
+      const content = metaPublished.getAttribute("content");
+      if (content) return content;
+    }
+
+    // 3. <time datetime> element
+    const timeEl = document.querySelector("time[datetime]");
+    if (timeEl) {
+      const dt = timeEl.getAttribute("datetime");
+      if (dt) return dt;
+    }
+
+    return null;
+  });
 }
 
 /**
@@ -180,8 +225,34 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
     const combinedMeta = `${url} ${title}`;
 
     const testType = parseTestType(combinedMeta);
-    const year = extractYear(combinedMeta);
     const size = extractSize(bodyText || combinedMeta);
+
+    // Determine year: prefer page's structured date, fallback to URL/title text
+    let year: number | null = null;
+    let publishedDate: string | null = null;
+
+    const pubDateStr = await extractPublicationDate(page);
+    if (pubDateStr) {
+      const parsed = new Date(pubDateStr);
+      if (!isNaN(parsed.getTime())) {
+        const pubYear = parsed.getFullYear();
+        if (isPlausibleTestYear(pubYear)) {
+          year = pubYear;
+          publishedDate = parsed.toISOString();
+        }
+      }
+    }
+
+    // Secondary: try extracting year from URL + title text
+    if (year === null) {
+      year = extractYear(combinedMeta);
+    }
+
+    if (year === null) {
+      console.warn(`[GTÜ] Skipping article — cannot determine year: ${url}`);
+      return null;
+    }
+
     const testUid = generateTestUid(testType, year, size);
 
     if (testResultExists(testUid)) {
@@ -204,6 +275,7 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
       year,
       testedSize: size,
       sourceUrl: url,
+      publishedDate: publishedDate || undefined,
       results,
       scrapedAt: new Date().toISOString(),
     };

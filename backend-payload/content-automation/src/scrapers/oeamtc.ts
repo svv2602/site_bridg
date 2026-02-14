@@ -37,9 +37,9 @@ function parseTestType(url: string): TestResult["testType"] {
 }
 
 /**
- * Extract year from URL or text
+ * Extract year from URL or text. Returns null if no plausible year found.
  */
-function extractYear(url: string, pageText?: string): number {
+function extractYear(url: string, pageText?: string): number | null {
   // Try URL first with context-aware extraction
   const urlYear = extractPlausibleYear(url);
   if (urlYear) return urlYear;
@@ -50,7 +50,7 @@ function extractYear(url: string, pageText?: string): number {
     if (textYear) return textYear;
   }
 
-  return new Date().getFullYear();
+  return null;
 }
 
 /**
@@ -137,6 +137,10 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
     const pageText = await page.textContent("body") || "";
     const testType = parseTestType(url);
     const year = extractYear(url, pageText);
+    if (!year) {
+      console.warn(`[ÖAMTC] Skipping — cannot determine year: ${url}`);
+      return null;
+    }
     const size = extractSize(url, pageText);
     const testUid = generateTestUid(testType, year, size);
 

@@ -17,10 +17,10 @@ export interface TCSScraperResult {
 }
 
 /**
- * Extract year from text/URL
+ * Extract year from text/URL. Returns null if no plausible year found.
  */
-function extractYear(text: string): number {
-  return extractPlausibleYear(text) || new Date().getFullYear();
+function extractYear(text: string): number | null {
+  return extractPlausibleYear(text);
 }
 
 /**
@@ -157,6 +157,10 @@ async function scrapeTestPage(page: Page, url: string): Promise<TestResult | nul
     // Dimaster may return e.g. winter tyres on a ?what=S (summer) URL.
     const testType = firstParsed.contentType;
     const year = firstParsed.year || extractYear(url);
+    if (!year) {
+      console.warn(`[TCS] Skipping — cannot determine year: ${url}`);
+      return null;
+    }
     const size = firstParsed.size;
     const testUid = generateTestUid(testType, year, size);
 

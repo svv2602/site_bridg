@@ -78,7 +78,11 @@ export async function scrapeTyreReviewsTestPage(page: Page, url: string): Promis
     const title = await page.title();
 
     // Try to extract year
-    const year = extractPlausibleYear(title) || new Date().getFullYear();
+    const year = extractPlausibleYear(title) || extractPlausibleYear(url);
+    if (!year) {
+      console.warn(`[TyreReviews] Skipping — cannot determine year: ${url}`);
+      return null;
+    }
 
     // Extract test type
     const testType = parseTestType(url);

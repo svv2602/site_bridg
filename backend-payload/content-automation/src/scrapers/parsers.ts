@@ -127,7 +127,7 @@ export function mapTierToRating(tierText: string): { rating: string; ratingNumer
  */
 export function isPlausibleTestYear(year: number): boolean {
   const currentYear = new Date().getFullYear();
-  return Number.isInteger(year) && year >= 2021 && year <= currentYear + 1;
+  return Number.isInteger(year) && year >= 2023 && year <= currentYear + 1;
 }
 
 /**

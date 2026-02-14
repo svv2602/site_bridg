@@ -80,7 +80,7 @@ export function saveTestResult(result: TestResult): boolean {
   // Validate year before saving to prevent garbage data propagation
   if (!isPlausibleTestYear(result.year)) {
     console.warn(
-      `[TestResults] Rejecting test ${result.testUid}: implausible year ${result.year} (expected 2021-${new Date().getFullYear() + 1})`
+      `[TestResults] Rejecting test ${result.testUid}: implausible year ${result.year} (expected 2023-${new Date().getFullYear() + 1})`
     );
     return false;
   }

@@ -103,7 +103,11 @@ export async function scrapeAutoBildTestPage(page: Page, url: string): Promise<T
     const title = await page.title();
     const yearFromUrl = extractPlausibleYear(url);
     const yearFromTitle = extractPlausibleYear(title);
-    const year = yearFromUrl || yearFromTitle || new Date().getFullYear();
+    const year = yearFromUrl || yearFromTitle;
+    if (!year) {
+      console.warn(`[AutoBild] Skipping — cannot determine year: ${url}`);
+      return null;
+    }
 
     // Extract test type
     const testType = parseTestType(url);

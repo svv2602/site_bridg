@@ -116,7 +116,12 @@ export async function scrapeADACTestPage(page: Page, url: string): Promise<TestR
     await page.waitForTimeout(2000);
 
     // Extract year from page or URL
-    const year = extractPlausibleYear(url) || new Date().getFullYear();
+    const title = await page.title();
+    const year = extractPlausibleYear(url) || extractPlausibleYear(title);
+    if (!year) {
+      console.warn(`[ADAC] Skipping — cannot determine year: ${url}`);
+      return null;
+    }
 
     // Extract test type
     const testType = parseTestType(url);
