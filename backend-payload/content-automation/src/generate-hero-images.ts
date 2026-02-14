@@ -26,13 +26,13 @@ interface HeroImageConfig {
 
 const heroImages: HeroImageConfig[] = [
   // Season pages
-  { filename: "hero-summer.jpg",    topic: "summer tires on European highway, sunny day",          season: "summer",    size: "1024x1024" },
-  { filename: "hero-winter.jpg",    topic: "winter SUV tires on snowy mountain road",              season: "winter",    size: "1024x1024" },
-  { filename: "hero-allseason.jpg", topic: "allseason tires on wet autumn road",                   season: "allseason", size: "1024x1024" },
+  { filename: "hero-summer.jpg",    topic: "summer tires on European highway, sunny day",          season: "summer",    size: "1792x1024" },
+  { filename: "hero-winter.jpg",    topic: "winter SUV tires on snowy mountain road",              season: "winter",    size: "1792x1024" },
+  { filename: "hero-allseason.jpg", topic: "allseason tires on wet autumn road",                   season: "allseason", size: "1792x1024" },
   // Vehicle type pages
-  { filename: "hero-passenger.jpg", topic: "elegant sedan passenger car tires, city street",       size: "1024x1024" },
-  { filename: "hero-suv.jpg",       topic: "premium SUV tires on scenic mountain viewpoint",       size: "1024x1024" },
-  { filename: "hero-lcv.jpg",       topic: "delivery van LCV tires in urban business district",    size: "1024x1024" },
+  { filename: "hero-passenger.jpg", topic: "elegant sedan passenger car tires, city street",       size: "1792x1024" },
+  { filename: "hero-suv.jpg",       topic: "premium SUV tires on scenic mountain viewpoint",       size: "1792x1024" },
+  { filename: "hero-lcv.jpg",       topic: "delivery van LCV tires in urban business district",    size: "1792x1024" },
 ];
 
 async function ensureDirectory(dir: string) {
@@ -61,7 +61,7 @@ async function generateHeroImages(dryRun: boolean = false) {
   let totalCost = 0;
 
   for (const config of heroImages) {
-    const prompt = generatePromptByType("hero", config.topic, { season: config.season });
+    const prompt = generatePromptByType("hero", config.topic, { season: config.season, entropy: Date.now() % 100_000 });
 
     console.log(`\n📷 ${config.filename}`);
     console.log(`   Size: ${config.size}`);

@@ -277,9 +277,10 @@ export const generatePromptEndpoint: Endpoint = {
 /**
  * Generate default prompt based on type and season.
  * Delegates to shared image-prompts module.
+ * Uses time-based entropy so each request produces a unique composition.
  */
 function generateDefaultPrompt(type: string, topic: string, season?: string): string {
-  return generatePromptByType(type as ImageType, topic, { season });
+  return generatePromptByType(type as ImageType, topic, { season, entropy: Date.now() % 100_000 });
 }
 
 /**

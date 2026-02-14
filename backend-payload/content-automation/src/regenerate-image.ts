@@ -62,10 +62,10 @@ async function listRecentMedia() {
 async function regenerateImage(options: RegenerateOptions) {
   const { mediaId, type = "content", season, topic = "automotive tires", dryRun } = options;
 
-  // Build prompt
+  // Build prompt — use entropy for variety on each regeneration attempt
   let prompt = options.prompt;
   if (!prompt) {
-    prompt = generatePromptByType(type, topic, { season });
+    prompt = generatePromptByType(type, topic, { season, entropy: Date.now() % 100_000 });
   }
 
   // Determine size: use explicit size, or default based on type

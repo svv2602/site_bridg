@@ -109,7 +109,7 @@ async function generateCategoryHero(options: Options) {
   const season = options.season || autoDetectSeason(page);
 
   // 3. Build prompt
-  const prompt = options.prompt || generatePromptByType("hero", topic, { season });
+  const prompt = options.prompt || generatePromptByType("hero", topic, { season, entropy: Date.now() % 100_000 });
 
   console.error(`\nCategory Page: ${page.title} (ID: ${pageId})`);
   console.error(`  Slug: ${page.slug}`);
@@ -132,7 +132,7 @@ async function generateCategoryHero(options: Options) {
   // 5. Generate image
   console.error("\nGenerating image...");
   const result = await image.generate(prompt, {
-    size: "1024x1024",
+    size: "1792x1024",
     quality: "hd",
     negativePrompt: NEGATIVE_PROMPT,
     taskType: "image-hero",

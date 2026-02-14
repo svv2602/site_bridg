@@ -73,12 +73,15 @@ export async function generateArticleImage(
     model?: string;
     quality?: "standard" | "hd";
     fallbackModels?: string[];
+    /** Pass non-zero entropy for variety on regeneration (0 = deterministic) */
+    entropy?: number;
   }
 ): Promise<GeneratedImage> {
   const prompt = generatePromptByType(input.type, input.tireModel ? `Bridgestone ${input.tireModel}` : input.topic, {
     season: input.season,
     context: input.context,
     articleType: input.articleType,
+    entropy: options?.entropy,
   });
   const size = IMAGE_SIZES[input.type];
 
@@ -133,6 +136,8 @@ export async function generateHeroImage(
     provider?: string;
     model?: string;
     articleType?: string;
+    /** Pass non-zero entropy for variety on regeneration */
+    entropy?: number;
   }
 ): Promise<GeneratedImage> {
   return generateArticleImage(
@@ -142,7 +147,7 @@ export async function generateHeroImage(
       season,
       articleType: options?.articleType,
     },
-    { ...options, quality: "hd" }
+    { ...options, quality: "hd", entropy: options?.entropy }
   );
 }
 

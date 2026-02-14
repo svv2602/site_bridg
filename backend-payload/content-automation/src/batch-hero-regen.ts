@@ -82,8 +82,11 @@ async function main() {
       console.error(`  Title: ${title.slice(0, 60)}...`);
       console.error(`  Type: ${articleType}, Season: ${season}`);
 
-      // Generate new hero image
-      const heroImage = await generateHeroImage(title, season, { articleType });
+      // Generate new hero image — use entropy for variety on each batch run
+      const heroImage = await generateHeroImage(title, season, {
+        articleType,
+        entropy: Date.now() % 100_000 + i,
+      });
 
       if (!heroImage.url) {
         results.push({ articleId, success: false, error: "Image generation returned no URL" });

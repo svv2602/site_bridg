@@ -10,6 +10,7 @@
  * - Photorealistic, natural look (not HDR/oversaturated)
  * - Diverse compositions: vehicles, tires, people, workshops, atmospheric
  * - Muted, editorial magazine aesthetic
+ * - Variety on regeneration via entropy seed
  */
 
 export type ImageType = 'hero' | 'content' | 'product' | 'lifestyle';
@@ -36,7 +37,9 @@ type CompositionFocus =
   | 'detail-macro';
 
 /**
- * Negative prompt to avoid common AI image artifacts
+ * Negative prompt for providers that support it (Replicate/Flux).
+ * DALL-E 3 ignores this parameter — key avoidance instructions are
+ * embedded directly into prompt text via INLINE_AVOID.
  */
 export const NEGATIVE_PROMPT = `blurry, low quality, distorted, deformed, disfigured, bad anatomy,
 watermark, text, logo, signature, cropped, out of frame, worst quality, low resolution,
@@ -46,27 +49,36 @@ duplicate, clone, extra limbs, missing parts, floating objects, unnatural propor
 HDR, oversharpened, neon colors, lens flare, chromatic aberration, vibrant colors, 8k ultra detailed`;
 
 /**
+ * Compact avoidance block embedded directly into prompt text.
+ * Works with DALL-E 3 which ignores the negativePrompt parameter.
+ */
+const INLINE_AVOID = `AVOID: text, watermarks, logos, neon colors, HDR, oversaturation, plastic texture, illustration style, 3D render.`;
+
+/**
  * Season context descriptions for hero images — soft, natural tones
  */
 export const HERO_SEASON_CONTEXTS: Record<string, string> = {
-  summer: `warm afternoon light, dry asphalt road, clear sky with gentle clouds,
-green trees in soft focus background, natural warm tones, gentle shadows`,
-  winter: `light snow on road shoulders, cool morning atmosphere, muted blue-grey tones,
-bare trees with frost, overcast sky with soft even light, tire tracks in thin snow`,
-  allseason: `changeable weather, partly cloudy sky, damp road with subtle reflections,
-mild natural light, neutral colour palette, transitional season atmosphere`,
+  summer: `warm afternoon light, dry asphalt, clear sky with gentle clouds, green foliage in soft focus, warm tones`,
+  winter: `light snow on road shoulders, cool morning, muted blue-grey tones, bare frosted trees, soft even light`,
+  allseason: `changeable weather, partly cloudy, damp road with subtle reflections, neutral palette, transitional season`,
+};
+
+/**
+ * Season color mood — explicit color temperature guidance
+ */
+const SEASON_COLOR_MOODS: Record<string, string> = {
+  summer: 'Warm color temperature (5500-6500K), golden undertones, high key lighting',
+  winter: 'Cool color temperature (7000-8000K), blue-silver undertones, low key lighting',
+  allseason: 'Neutral color temperature (5000-5500K), balanced tones, medium key lighting',
 };
 
 /**
  * Season context descriptions for lifestyle images
  */
 export const LIFESTYLE_SEASON_CONTEXTS: Record<string, string> = {
-  summer: `family road trip, scenic highway, pleasant sunny day,
-relaxed atmosphere, natural warm tones, luggage on roof rack`,
-  winter: `winter family journey, snow-dusted landscape,
-confident driving in cold conditions, cozy feeling, holiday travel`,
-  allseason: `everyday driving, suburban neighbourhood,
-mixed weather showing adaptability, daily routine, practical life`,
+  summer: `family road trip, scenic highway, pleasant sunny day, relaxed atmosphere, warm tones`,
+  winter: `winter family journey, snow-dusted landscape, confident cold-weather driving, cozy feeling`,
+  allseason: `everyday driving, suburban neighbourhood, mixed weather, daily routine`,
 };
 
 /**
@@ -81,14 +93,18 @@ export const IMAGE_SIZES: Record<ImageType, { width: number; height: number; asp
 
 // ============ DIVERSITY SYSTEM ============
 
-/** Simple string hash for deterministic selection */
-function hashString(str: string): number {
+/**
+ * String hash with optional entropy for variety on regeneration.
+ * Without entropy: deterministic (same topic → same selections across a batch).
+ * With entropy: different results each time (for manual regeneration).
+ */
+function hashString(str: string, entropy: number = 0): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const ch = str.charCodeAt(i);
     hash = ((hash << 5) - hash + ch) | 0;
   }
-  return Math.abs(hash);
+  return Math.abs(hash + entropy);
 }
 
 /** Pick an item from a pool using a hash seed */
@@ -96,76 +112,107 @@ function pickFromPool<T>(pool: T[], seed: number, offset: number = 0): T {
   return pool[(seed + offset) % pool.length];
 }
 
+// ============ TIRE LINE AWARENESS ============
+
+/**
+ * Bridgestone tire line hints — adds context-aware mood and setting
+ * when the topic mentions a specific product line.
+ */
+const TIRE_LINE_HINTS: Record<string, { mood: string; setting: string }> = {
+  turanza: {
+    mood: 'premium comfort, refined quiet ride, luxury touring',
+    setting: 'smooth highway, elegant urban boulevard, long-distance travel',
+  },
+  blizzak: {
+    mood: 'winter confidence, ice and snow mastery, safety in harsh conditions',
+    setting: 'snow-covered mountain pass, icy morning road, frost-coated landscape',
+  },
+  potenza: {
+    mood: 'sport performance, dynamic handling, high-speed precision',
+    setting: 'winding mountain road, racing circuit, aggressive cornering',
+  },
+  dueler: {
+    mood: 'SUV adventure, off-road capability, rugged reliability',
+    setting: 'unpaved trail, forest path, scenic mountain viewpoint',
+  },
+  ecopia: {
+    mood: 'eco-friendly efficiency, low rolling resistance, green driving',
+    setting: 'quiet suburban street, city commute, tree-lined avenue',
+  },
+  duravis: {
+    mood: 'commercial durability, heavy-load endurance, fleet reliability',
+    setting: 'urban delivery route, warehouse district, industrial road',
+  },
+  alenza: {
+    mood: 'premium SUV luxury, refined on-road comfort, all-terrain elegance',
+    setting: 'scenic coastal road, upscale suburban area, premium resort driveway',
+  },
+  weather: {
+    mood: 'all-weather adaptability, year-round confidence, versatile grip',
+    setting: 'road transitioning from wet to dry, mixed conditions, changeable sky',
+  },
+};
+
+/** Extract tire line hint from topic if mentioned */
+function getTireLineHint(topic: string): { mood: string; setting: string } | null {
+  const lowerTopic = topic.toLowerCase();
+  for (const [line, hint] of Object.entries(TIRE_LINE_HINTS)) {
+    if (lowerTopic.includes(line)) {
+      return hint;
+    }
+  }
+  return null;
+}
+
 // ============ PHOTOGRAPHY STYLE PRESETS ============
 
 /**
- * Realistic photography style presets.
- *
- * Each preset simulates a different "photographer's eye" — film stock,
- * camera body, lens character, and color grading approach.
- * Randomly selected per image to add natural variety and push DALL-E
- * towards photorealistic output instead of digital/poster look.
+ * Compact photography style presets.
+ * Each preset simulates a different "photographer's eye".
  */
 interface PhotographyStyle {
-  /** Identifier for logging */
   name: string;
-  /** Camera + lens + settings */
-  technical: string;
-  /** Color grading / film stock */
-  colorScience: string;
-  /** Texture and finish */
-  texture: string;
+  prompt: string;
 }
 
 const PHOTOGRAPHY_STYLES: PhotographyStyle[] = [
   {
     name: 'kodak-portra-400',
-    technical: 'Shot on Canon EOS R5, 85mm f/1.8 lens, f/2.8 aperture, ISO 400, shallow depth of field',
-    colorScience: 'Color science similar to Kodak Portra 400 — warm skin tones, slightly desaturated, soft pastel highlights, muted shadows',
-    texture: 'Subtle film grain, matte finish, true-to-life colors, low contrast',
+    prompt: 'Canon EOS R5, 85mm f/1.8, f/2.8, ISO 400. Kodak Portra 400 colors — warm skin tones, desaturated, soft pastels. Subtle film grain, matte finish.',
   },
   {
     name: 'fuji-pro-400h',
-    technical: 'Shot on Nikon Z8, 35mm f/1.4 lens, f/4 aperture, ISO 200, natural depth of field',
-    colorScience: 'Color science similar to Fuji Pro 400H — cool-neutral tones, clean pastel highlights, slightly green-shifted shadows, refined palette',
-    texture: 'Fine film grain, soft tonal transitions, slightly desaturated, natural dynamic range',
+    prompt: 'Nikon Z8, 35mm f/1.4, f/4, ISO 200. Fuji Pro 400H colors — cool-neutral, clean highlights, green-shifted shadows. Fine grain, soft transitions.',
   },
   {
     name: 'kodak-ektar-100',
-    technical: 'Shot on Sony A7IV, 24-70mm f/2.8 lens, f/5.6 aperture, ISO 100, medium depth of field',
-    colorScience: 'Color science similar to Kodak Ektar 100 — rich but natural colors, fine detail, slightly warm midtones, deep but not crushed blacks',
-    texture: 'Ultra-fine grain, sharp detail, natural saturation, true-to-life tones',
+    prompt: 'Sony A7IV, 24-70mm f/2.8, f/5.6, ISO 100. Kodak Ektar 100 colors — rich but natural, warm midtones, deep blacks. Ultra-fine grain, sharp.',
   },
   {
     name: 'digital-documentary',
-    technical: 'Shot on Canon EOS R6, 50mm f/1.2 lens, f/2.8 aperture, ISO 800, natural light only',
-    colorScience: 'Natural white balance, documentary color grading — no color casts, accurate scene colors, neutral shadows and highlights',
-    texture: 'No filters, real-world imperfections, natural skin tones, low saturation, slightly desaturated highlights',
+    prompt: 'Canon EOS R6, 50mm f/1.2, f/2.8, ISO 800, natural light only. Documentary grading — no color casts, accurate colors. No filters, low saturation.',
   },
   {
     name: 'cinematic-natural',
-    technical: 'Shot on Sony A7III, 85mm f/1.4 lens, f/2 aperture, ISO 400, cinematic shallow depth of field',
-    colorScience: 'Cinematic but realistic color grading — slightly teal shadows, warm highlights, restrained color palette, subtle color contrast',
-    texture: 'Matte finish, soft shadows, low contrast, subtle vignette, filmic quality without being stylised',
+    prompt: 'Sony A7III, 85mm f/1.4, f/2, ISO 400. Cinematic grading — teal shadows, warm highlights, restrained palette. Matte, subtle vignette.',
   },
   {
     name: 'leica-reportage',
-    technical: 'Shot on Leica Q3, 28mm f/1.7 lens, f/4 aperture, ISO 320, wide environmental perspective',
-    colorScience: 'Classic Leica color rendering — slightly desaturated, honest tones, no artificial enhancement, neutral but warm',
-    texture: 'Subtle film grain, matte finish, real-world imperfections, unedited documentary feel, no post-processing glow',
+    prompt: 'Leica Q3, 28mm f/1.7, f/4, ISO 320, wide perspective. Classic Leica rendering — desaturated, honest tones. Subtle grain, documentary feel.',
+  },
+  {
+    name: 'hasselblad-medium-format',
+    prompt: 'Hasselblad X2D, 80mm f/1.9, f/4, ISO 100. Medium format look — exceptional detail, creamy bokeh, natural colors. Smooth tonal rolloff.',
+  },
+  {
+    name: 'fuji-x-pro',
+    prompt: 'Fujifilm X-Pro3, 56mm f/1.2, f/2, ISO 400. Classic Chrome simulation — muted colors, strong highlights, subdued shadows. Rangefinder aesthetic.',
   },
 ];
 
-/** Pick a photography style based on topic hash */
+/** Pick a photography style based on seed */
 function pickPhotographyStyle(seed: number, offset: number = 10): PhotographyStyle {
   return pickFromPool(PHOTOGRAPHY_STYLES, seed, offset);
-}
-
-/** Format style preset into a prompt block */
-function formatStyleBlock(style: PhotographyStyle): string {
-  return `Technical: ${style.technical}.
-${style.colorScience}.
-${style.texture}.`;
 }
 
 // ============ COMPOSITION ELEMENTS ============
@@ -186,6 +233,12 @@ const VEHICLES = [
   'estate car (Volvo V60 style)',
   'city hatchback (Volkswagen Golf style)',
   'family minivan (Volkswagen Multivan style)',
+  'compact crossover (Hyundai Tucson style)',
+  'family SUV (Kia Sportage style)',
+  'practical liftback (Skoda Octavia style)',
+  'rugged pickup truck (Toyota Hilux style)',
+  'sporty sedan (BMW 3 Series style)',
+  'premium SUV (Mercedes GLC style)',
 ];
 
 const CAMERA_ANGLES = [
@@ -194,6 +247,8 @@ const CAMERA_ANGLES = [
   'side profile with softly blurred background',
   'rear 3/4 angle with road visible ahead',
   'eye-level straight-on perspective',
+  'high angle looking down at front wheel area',
+  'dynamic tracking shot with slight motion blur in background',
 ];
 
 const TIMES_OF_DAY = [
@@ -202,6 +257,7 @@ const TIMES_OF_DAY = [
   'early morning with gentle mist',
   'midday with soft cloud cover',
   'blue hour with quiet twilight tones',
+  'golden hour with warm directional light',
 ];
 
 const LOCATIONS = [
@@ -211,6 +267,12 @@ const LOCATIONS = [
   'tree-lined country road',
   'clean suburban road with houses',
   'rural highway through open fields',
+  'Ukrainian countryside road through sunflower fields',
+  'modern Kyiv boulevard with chestnut trees',
+  'Carpathian mountain road with pine forests',
+  'Black Sea coastal highway near Odesa',
+  'scenic road through autumn birch forest',
+  'alpine pass road with panoramic views',
 ];
 
 // ============ PEOPLE & SETTING ELEMENTS ============
@@ -222,6 +284,10 @@ const PEOPLE_SCENES = [
   'a father with a child (8-10) walking towards their parked car in a residential area',
   'a professional mechanic (40s) in clean overalls explaining something to a customer near a lifted car',
   'a young woman (25-35) getting into her car in a parking garage, keys in hand',
+  'a man (30-40) inspecting tyre tread depth with a coin, crouched by the front wheel',
+  'a mother securing a child seat in the back, car parked in a suburban driveway',
+  'a young couple arriving at a scenic overlook, stepping out of their crossover',
+  'an experienced driver (50s) wiping headlights before a winter journey, practical preparation',
 ];
 
 const WORKSHOP_SCENES = [
@@ -231,6 +297,8 @@ const WORKSHOP_SCENES = [
   'seasonal tyre changeover scene: winter and summer tyres laid out side by side on clean workshop floor',
   'tyre fitting bay with pneumatic tools, a freshly mounted wheel being lowered onto the hub',
   'customer reception area of a tyre centre, display rack with tyres, clean and modern interior',
+  'mechanic performing wheel alignment with laser equipment, technical precision',
+  'tyre storage rack in a seasonal depot, labelled sets waiting for changeover',
 ];
 
 const TIRE_CLOSEUP_SCENES = [
@@ -240,6 +308,8 @@ const TIRE_CLOSEUP_SCENES = [
   'tyre and alloy wheel detail on a parked car, focused on the sidewall and rim junction',
   'two different tyre treads placed side by side on a clean surface, showing pattern differences',
   'close-up of tyre contact patch on damp road, showing how tread displaces water',
+  'rubber compound texture in warm raking light, showing material quality and engineering',
+  'winter tyre sipes opening under load on icy surface, close-range technical detail',
 ];
 
 const ATMOSPHERIC_SCENES = [
@@ -249,6 +319,8 @@ const ATMOSPHERIC_SCENES = [
   'aerial view of a road cutting through autumn countryside, warm muted earth tones',
   'close view of road surface texture with raindrops, a car approaching in soft background blur',
   'panoramic mountain road with a single car small in the frame, vast landscape dominating',
+  'Carpathian mountain road with low clouds, a car emerging through mist, epic scale',
+  'sunflower fields lining a straight Ukrainian road, a car disappearing into the distance',
 ];
 
 const DETAIL_MACRO_SCENES = [
@@ -258,6 +330,51 @@ const DETAIL_MACRO_SCENES = [
   'road surface texture meeting tyre edge, shallow depth of field, abstract automotive detail',
   'brake disc and calliper visible through alloy wheel spokes, with tyre sidewall in foreground',
   'puddle splash around a rolling tyre, frozen mid-motion, showing water displacement',
+  'tyre valve cap and sidewall detail in warm directional light, minimalist composition',
+  'fresh tyre marks on wet asphalt seen from above, geometric tread pattern imprint',
+];
+
+// ============ LIFESTYLE SCENES ============
+
+const LIFESTYLE_SCENES = [
+  'young family loading stroller and bags into SUV trunk for a weekend getaway',
+  'woman checking her phone for directions, leaning on car door in a scenic area',
+  'man washing his car on a Saturday morning in suburban driveway',
+  'couple arriving at a trailhead, hiking boots visible, car parked at a forest edge',
+  'parent picking up child from school, warm greeting near the car',
+  'friends loading camping gear into a crossover, morning departure excitement',
+  'a driver refuelling at a modern petrol station, relaxed long-distance journey',
+  'couple admiring a mountain view from beside their parked car, travel mood',
+];
+
+// ============ PRODUCT SETUP VARIETY ============
+
+const PRODUCT_SETUPS = [
+  {
+    backdrop: 'seamless dark grey backdrop',
+    pose: 'single tyre at 15-20° angle showing tread and sidewall',
+    lighting: 'three-point setup — large softbox key, reflector fill, strip softbox rim',
+  },
+  {
+    backdrop: 'gradient white-to-light-grey backdrop',
+    pose: 'tyre standing upright, front-facing tread view with slight tilt',
+    lighting: 'large overhead softbox, two side reflectors for even fill',
+  },
+  {
+    backdrop: 'dark matte surface with subtle reflection',
+    pose: 'tyre laid at 45° showing tread pattern and shoulder blocks',
+    lighting: 'single large window light from left, dark flag on right for contrast',
+  },
+  {
+    backdrop: 'industrial concrete backdrop with subtle texture',
+    pose: 'tyre mounted on stylish alloy wheel, 3/4 front view',
+    lighting: 'beauty dish key light slightly above, strip softbox edge accent',
+  },
+  {
+    backdrop: 'clean black sweep with controlled spill',
+    pose: 'tyre at dramatic low angle, emphasising sidewall and tread depth',
+    lighting: 'backlit rim light for edge definition, soft frontal fill',
+  },
 ];
 
 // ============ VEHICLE SCENE TEMPLATES (per article type) ============
@@ -309,17 +426,14 @@ const VEHICLE_SCENE_TEMPLATES: Record<HeroArticleType, string[]> = {
  * The system cycles through 6 composition focuses:
  *   vehicle-scene, tire-closeup, people-auto, workshop, atmospheric, detail-macro
  *
- * This ensures that across a batch of articles, hero images vary significantly
- * in subject matter — not just cars on roads.
- *
  * Overloads:
  *   generateHeroPrompt(topic)
  *   generateHeroPrompt(topic, season)
- *   generateHeroPrompt(topic, { season, articleType })
+ *   generateHeroPrompt(topic, { season, articleType, entropy })
  */
 export function generateHeroPrompt(
   topic: string,
-  seasonOrOptions?: string | { season?: string; articleType?: string },
+  seasonOrOptions?: string | { season?: string; articleType?: string; entropy?: number },
 ): string {
   const season = typeof seasonOrOptions === 'string'
     ? seasonOrOptions
@@ -327,41 +441,35 @@ export function generateHeroPrompt(
   const articleType = (
     typeof seasonOrOptions === 'object' ? seasonOrOptions?.articleType : undefined
   ) as HeroArticleType | undefined;
+  const entropy = typeof seasonOrOptions === 'object' ? seasonOrOptions?.entropy ?? 0 : 0;
 
   const weather = season && HERO_SEASON_CONTEXTS[season]
     ? HERO_SEASON_CONTEXTS[season]
     : 'soft natural daylight, neutral tones';
 
-  // Deterministic seed from topic
-  const seed = hashString(topic);
+  const colorMood = season && SEASON_COLOR_MOODS[season]
+    ? SEASON_COLOR_MOODS[season]
+    : 'Neutral color temperature, balanced tones';
 
-  // Pick composition focus — this determines the overall type of image
+  const seed = hashString(topic, entropy);
+
   const focus = pickFromPool(COMPOSITION_FOCUSES, seed, 0);
-
-  // Pick photography style — varies film stock/camera per image
   const style = pickPhotographyStyle(seed, 10);
-
-  // Build scene based on focus
   const scene = buildScene(focus, seed, weather, articleType);
+  const tireHint = getTireLineHint(topic);
 
-  return `Editorial automotive photography, ${topic}.
+  let prompt = `Editorial automotive photography, ${topic}.
 
-Scene: ${scene}.
+Scene: ${scene}.${tireHint ? `\nMood: ${tireHint.mood}.` : ''}
 
-${formatStyleBlock(style)}
-Balanced exposure, accurate white balance, gentle post-processing.
-Rule of thirds composition, widescreen framing.
+${style.prompt}
+${colorMood}. Rule of thirds, widescreen framing.
 
-Style: Authentic editorial magazine photography. Looks like a real photograph
-taken by a professional photographer for an automotive publication.
-Not oversaturated, not hyper-detailed, not HDR.
-Soft tonal transitions, film-like quality.
+Real editorial magazine photograph by a professional automotive photographer.
+Natural ambient light, soft shadows, film-like tonal transitions.
+${INLINE_AVOID}`;
 
-Lighting: Natural ambient light, soft shadows, no harsh contrasts.
-No lens flare, no neon, no artificial colour casts.
-
-Requirements: Must look like a real photograph, not AI-generated.
-No text, no logos, no watermarks. Clean composition, understated elegance.`;
+  return prompt;
 }
 
 /**
@@ -429,11 +537,15 @@ function buildScene(
 /**
  * Generate a content image prompt — softer editorial style
  */
-export function generateContentPrompt(topic: string, context?: string): string {
-  const seed = hashString(topic + (context || ''));
+export function generateContentPrompt(
+  topic: string,
+  context?: string,
+  options?: { entropy?: number },
+): string {
+  const entropy = options?.entropy ?? 0;
+  const seed = hashString(topic + (context || ''), entropy);
   const focus = pickFromPool(COMPOSITION_FOCUSES, seed, 7);
 
-  // For content images, build a mini-scene based on focus too
   let sceneHint: string;
   switch (focus) {
     case 'tire-closeup':
@@ -456,57 +568,51 @@ export function generateContentPrompt(topic: string, context?: string): string {
   }
 
   const style = pickPhotographyStyle(seed, 11);
+  const tireHint = getTireLineHint(topic);
 
   return `Editorial photography for an automotive article about ${topic}.
 
 Context: ${context || 'tyre and automotive safety'}.
-Scene: ${sceneHint}
+Scene: ${sceneHint}${tireHint ? ` Setting: ${tireHint.setting}.` : ''}
 
-Composition: Clean frame with a clear focal point. Real-world setting.
-${formatStyleBlock(style)}
-Style: Documentary editorial feel, authentic and relatable.
-Not oversaturated, not hyper-detailed, not HDR.
-Lighting: Natural daylight, soft shadows, even illumination.
-
-Requirements: Photorealistic, like a real photograph. No text, no watermarks.
-Publication-ready quality.`;
+${style.prompt}
+Documentary editorial feel, authentic and relatable.
+Natural daylight, soft shadows, even illumination.
+${INLINE_AVOID}`;
 }
 
 // ============ PRODUCT PROMPT ============
 
 /**
- * Generate a product image prompt — clean studio photography
+ * Generate a product image prompt — clean studio photography with varied setups
  */
-export function generateProductPrompt(topic: string): string {
-  const seed = hashString(topic);
-  // Product images use a subset of styles — only digital/neutral ones suit studio work
+export function generateProductPrompt(
+  topic: string,
+  options?: { entropy?: number },
+): string {
+  const entropy = options?.entropy ?? 0;
+  const seed = hashString(topic, entropy);
+
   const PRODUCT_STYLES = [
-    'Shot on Canon EOS R5, 100mm f/2.8 macro lens, f/8 aperture, ISO 100. True-to-life color reproduction, neutral tones, no color cast.',
-    'Shot on Nikon Z8, 105mm f/2.8 lens, f/11 aperture, ISO 64. Accurate color rendition, clean neutral palette, precise white balance.',
-    'Shot on Sony A7RV, 90mm f/2.8 macro lens, f/8 aperture, ISO 100. Natural color science, subtle tonal gradations, matte finish.',
+    'Canon EOS R5, 100mm f/2.8 macro, f/8, ISO 100. True-to-life colors, neutral tones.',
+    'Nikon Z8, 105mm f/2.8, f/11, ISO 64. Accurate rendition, clean neutral palette.',
+    'Sony A7RV, 90mm f/2.8 macro, f/8, ISO 100. Natural color science, matte finish.',
+    'Hasselblad X2D, 120mm f/3.5 macro, f/8, ISO 64. Medium format detail, creamy tones.',
   ];
   const techStyle = pickFromPool(PRODUCT_STYLES, seed, 10);
+  const setup = pickFromPool(PRODUCT_SETUPS, seed, 3);
+  const tireHint = getTireLineHint(topic);
 
-  return `Product photography of ${topic} automotive tyre.
+  return `Product photography of ${topic} automotive tyre.${tireHint ? ` ${tireHint.mood}.` : ''}
 
-Setup: Professional studio, seamless dark grey backdrop.
-Single tyre at a slight angle (15-20 degrees) showing tread and sidewall.
-
-Lighting: Three-point setup — large softbox as key light, reflector fill,
-strip softbox behind for subtle edge definition. Soft, controlled, no hot spots.
-
+Setup: Professional studio, ${setup.backdrop}. ${setup.pose}.
+Lighting: ${setup.lighting}. Soft, controlled, no hot spots.
 Focus: Sharp detail on tread grooves, sipes, and shoulder blocks.
-Sidewall markings visible but not overly emphasised.
 
-Technical: ${techStyle}
-Clean, precise framing.
-
-Style: Clean commercial product photography with understated premium feel.
-Realistic representation of black rubber — true-to-life tones, not oversaturated, not hyper-detailed.
-Low contrast, matte finish.
-
-Requirements: Photorealistic studio shot, no text, no watermarks.
-Accurate colour, subtle shadows, professional but not flashy.`;
+${techStyle}
+Clean commercial product photography, understated premium feel.
+Realistic black rubber — true-to-life tones, low contrast, matte.
+${INLINE_AVOID}`;
 }
 
 // ============ LIFESTYLE PROMPT ============
@@ -514,61 +620,61 @@ Accurate colour, subtle shadows, professional but not flashy.`;
 /**
  * Generate a lifestyle image prompt — authentic documentary style
  */
-export function generateLifestylePrompt(topic: string, season?: string): string {
-  const scene = season && LIFESTYLE_SEASON_CONTEXTS[season]
+export function generateLifestylePrompt(
+  topic: string,
+  season?: string,
+  options?: { entropy?: number },
+): string {
+  const seasonContext = season && LIFESTYLE_SEASON_CONTEXTS[season]
     ? LIFESTYLE_SEASON_CONTEXTS[season]
     : 'everyday driving, relatable daily situations';
 
-  const seed = hashString(topic + (season || ''));
+  const colorMood = season && SEASON_COLOR_MOODS[season]
+    ? SEASON_COLOR_MOODS[season]
+    : 'Neutral color temperature, balanced tones';
+
+  const entropy = options?.entropy ?? 0;
+  const seed = hashString(topic + (season || ''), entropy);
   const style = pickPhotographyStyle(seed, 12);
+  const lifestyleScene = pickFromPool(LIFESTYLE_SCENES, seed, 5);
 
-  return `Lifestyle photography capturing ${scene}.
+  return `Lifestyle photography: ${lifestyleScene}. ${seasonContext}.
 
-Story: Authentic moments of everyday driving — families, couples, or individuals
-in genuine situations with their vehicles. Not posed or promotional.
-Tyre and vehicle reliability is implied, not highlighted.
+Authentic candid moment, not posed or promotional.
+People (30-50 years old) in natural poses, genuine expressions.
+Everyday family car or crossover, well-kept condition.
 
-Subjects: Relatable people (30-50 years old) in natural poses,
-genuine expressions, candid documentary approach.
-Natural skin tones, real-world imperfections.
-
-Vehicle: Everyday family car or crossover, lived-in but well-kept condition.
-
-Environment: ${scene}. Real locations, natural backgrounds.
-
-${formatStyleBlock(style)}
-Candid framing, balanced exposure, accurate skin tones.
-
-Lighting: Natural available light, soft and flattering.
-No artificial colour casts, no dramatic lighting effects.
-
-Mood: Warm but restrained, positive, relatable, trustworthy.
-
-Requirements: Must look like a real candid photograph, not AI-generated.
-No text, no watermarks. Not oversaturated, not hyper-detailed.
-Editorial magazine quality.`;
+${style.prompt}
+${colorMood}. Natural available light, soft and flattering.
+Warm but restrained mood, positive, relatable.
+${INLINE_AVOID}`;
 }
 
 // ============ UNIFIED ENTRY POINT ============
 
 /**
- * Generate prompt by image type
+ * Generate prompt by image type.
+ *
+ * Pass `entropy` in options to get variety on regeneration.
+ * When entropy is 0 (default), results are deterministic per topic.
+ * Use `entropy: Date.now() % 100000` for fresh results each time.
  */
 export function generatePromptByType(
   type: ImageType,
   topic: string,
-  options?: { season?: string; context?: string; articleType?: string }
+  options?: { season?: string; context?: string; articleType?: string; entropy?: number }
 ): string {
+  const entropy = options?.entropy;
   switch (type) {
     case 'hero':
-      return generateHeroPrompt(topic, { season: options?.season, articleType: options?.articleType });
+      return generateHeroPrompt(topic, { season: options?.season, articleType: options?.articleType, entropy });
     case 'content':
-      return generateContentPrompt(topic, options?.context);
+      return generateContentPrompt(topic, options?.context, { entropy });
     case 'product':
-      return generateProductPrompt(topic);
+      return generateProductPrompt(topic, { entropy });
     case 'lifestyle':
-      return generateLifestylePrompt(topic, options?.season);
+      return generateLifestylePrompt(topic, options?.season, { entropy });
     default:
-      return generateContentPrompt(topic, options?.context);
+      return generateContentPrompt(topic, options?.context, { entropy });
   }
 }
