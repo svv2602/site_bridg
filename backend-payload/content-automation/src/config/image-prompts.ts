@@ -115,46 +115,77 @@ function pickFromPool<T>(pool: T[], seed: number, offset: number = 0): T {
 // ============ TIRE LINE AWARENESS ============
 
 /**
- * Bridgestone tire line hints — adds context-aware mood and setting
- * when the topic mentions a specific product line.
+ * Bridgestone brand tone — subtle brand DNA injected into every line's visuals.
+ * Picked per-topic via hash for variety, but all options share the same philosophy.
  */
-const TIRE_LINE_HINTS: Record<string, { mood: string; setting: string }> = {
+const BRAND_TONES = [
+  'understated Japanese precision',
+  'engineered confidence',
+  'quiet performance philosophy',
+  'meticulous craftsmanship ethos',
+  'refined technical excellence',
+];
+
+/** Global realism suffix applied to every tire line hint */
+const TIRE_LINE_GLOBAL_SUFFIX = ', realistic automotive photography, natural light, soft dynamic range, slightly desaturated tones, true-to-life materials, realistic tyre deformation, natural lens rendering, no HDR, no cinematic glow, no CGI look';
+
+/**
+ * Bridgestone tire line hints — adds context-aware mood, setting and
+ * visual style when the topic mentions a specific product line.
+ *
+ * Each line has a distinct character but shares the global realism baseline.
+ */
+interface TireLineHint {
+  mood: string;
+  setting: string;
+  visualStyle: string;
+}
+
+const TIRE_LINE_HINTS: Record<string, TireLineHint> = {
   turanza: {
     mood: 'premium comfort, refined quiet ride, luxury touring',
     setting: 'smooth highway, elegant urban boulevard, long-distance travel',
+    visualStyle: 'understated luxury, soft daylight, neutral tones, smooth motion, minimal contrast, natural reflections, documentary premium feel, no showroom gloss, smooth asphalt texture, calm driver presence, elegant composition',
   },
   blizzak: {
     mood: 'winter confidence, ice and snow mastery, safety in harsh conditions',
     setting: 'snow-covered mountain pass, icy morning road, frost-coated landscape',
+    visualStyle: 'cold diffused light, muted winter palette, realistic snow texture, subtle tyre deformation, no dramatic blizzard, natural exposure, compacted snow texture, controlled motion',
   },
   potenza: {
     mood: 'sport performance, dynamic handling, high-speed precision',
     setting: 'winding mountain road, racing circuit, aggressive cornering',
+    visualStyle: 'controlled performance environment, natural daylight, slightly desaturated tones, subtle motion blur, no racing drama, documentary motorsport feel, track day realism, slight body roll',
   },
   dueler: {
     mood: 'SUV adventure, off-road capability, rugged reliability',
     setting: 'unpaved trail, forest path, scenic mountain viewpoint',
+    visualStyle: 'realistic terrain interaction, natural dust texture, soft outdoor light, no extreme mud splash, authentic SUV capability',
   },
   ecopia: {
     mood: 'eco-friendly efficiency, low rolling resistance, green driving',
     setting: 'quiet suburban street, city commute, tree-lined avenue',
+    visualStyle: 'bright but soft daylight, clean neutral tones, quiet urban atmosphere, subtle greenery, natural color balance, no over-saturated greens',
   },
   duravis: {
     mood: 'commercial durability, heavy-load endurance, fleet reliability',
     setting: 'urban delivery route, warehouse district, industrial road',
+    visualStyle: 'industrial realism, muted urban tones, practical environment, natural overcast light, subtle wear details, documentary commercial atmosphere',
   },
   alenza: {
     mood: 'premium SUV luxury, refined on-road comfort, all-terrain elegance',
     setting: 'scenic coastal road, upscale suburban area, premium resort driveway',
+    visualStyle: 'refined outdoor setting, soft coastal light, understated elegance, smooth ride feel, natural premium aesthetic, no luxury advertisement gloss',
   },
   weather: {
     mood: 'all-weather adaptability, year-round confidence, versatile grip',
     setting: 'road transitioning from wet to dry, mixed conditions, changeable sky',
+    visualStyle: 'transitional surface detail, subtle wet reflections, natural sky gradient, soft dynamic range, realistic road texture, no dramatic storm lighting',
   },
 };
 
 /** Extract tire line hint from topic if mentioned */
-function getTireLineHint(topic: string): { mood: string; setting: string } | null {
+function getTireLineHint(topic: string): TireLineHint | null {
   const lowerTopic = topic.toLowerCase();
   for (const [line, hint] of Object.entries(TIRE_LINE_HINTS)) {
     if (lowerTopic.includes(line)) {
@@ -162,6 +193,11 @@ function getTireLineHint(topic: string): { mood: string; setting: string } | nul
     }
   }
   return null;
+}
+
+/** Pick a brand tone from pool based on seed */
+function pickBrandTone(seed: number): string {
+  return pickFromPool(BRAND_TONES, seed, 15);
 }
 
 // ============ PHOTOGRAPHY STYLE PRESETS ============
@@ -258,7 +294,15 @@ const TIMES_OF_DAY = [
   'midday with soft cloud cover',
   'blue hour with quiet twilight tones',
   'golden hour with warm directional light',
+  'after rain, soft diffused light, subtle reflections on the ground, slightly muted colors, realistic atmosphere',
+  'light fog, low contrast, soft background fade, natural muted tones, atmospheric depth',
+  'natural window side light, soft shadows, realistic interior lighting, no artificial glow',
+  'cool daylight tones, neutral color balance, soft dynamic range',
+  'flat diffused light, low contrast, natural exposure, documentary realism',
+  'practical lighting, single warm light source, natural shadows, realistic exposure, no dramatic contrast',
 ];
+
+const LOCATIONS_SUFFIX = ', realistic photo, natural lighting, slightly desaturated colors, soft dynamic range, no HDR, subtle film grain, documentary photography style, true-to-life atmosphere';
 
 const LOCATIONS = [
   'winding mountain road with valley views',
@@ -273,9 +317,26 @@ const LOCATIONS = [
   'Black Sea coastal highway near Odesa',
   'scenic road through autumn birch forest',
   'alpine pass road with panoramic views',
-];
+  'urban residential courtyard with parked cars',
+  'multi-level parking garage with natural light from above',
+  'bridge crossing over a wide river',
+  'small roadside gas station in countryside',
+  'rainy city street with wet asphalt reflections',
+  'snow-covered suburban road in winter',
+  'industrial outskirts road with warehouses',
+  'forest road with light morning mist',
+  'large supermarket parking lot on a weekday morning',
+  'city boulevard during blue hour with light traffic',
+  'professional race track during a quiet practice session, overcast sky, no dramatic lighting, documentary photography',
+  'track day at a local circuit with amateur drivers, casual atmosphere, everyday cars, slightly desaturated',
+  'pit lane area before a session starts, equipment and tools visible, calm working atmosphere',
+  'empty race track early morning with light mist, low contrast, serene pre-session calm',
+  'rainy circuit with wet asphalt reflections, spray from tyres, moody overcast conditions',
+].map(s => s + LOCATIONS_SUFFIX);
 
 // ============ PEOPLE & SETTING ELEMENTS ============
+
+const PEOPLE_SCENES_SUFFIX = ', candid moment, natural body language, no posing, documentary photography style, subtle expressions, realistic proportions, natural light, low contrast';
 
 const PEOPLE_SCENES = [
   'a man (35-45) checking tyre pressure with a gauge, kneeling beside the car',
@@ -288,7 +349,19 @@ const PEOPLE_SCENES = [
   'a mother securing a child seat in the back, car parked in a suburban driveway',
   'a young couple arriving at a scenic overlook, stepping out of their crossover',
   'an experienced driver (50s) wiping headlights before a winter journey, practical preparation',
-];
+  'a driver adjusting side mirrors before departure, calm preparation moment',
+  'a woman refueling her car at a quiet gas station, unhurried everyday routine',
+  'a man brushing snow off the windshield early in the morning, cold breath visible',
+  'a parent handing snacks to children in the back seat during a road trip, lively family moment',
+  'a driver checking navigation on the dashboard screen before driving, focused and ready',
+  'a couple sharing coffee beside their parked car during a short stop, relaxed travel pause',
+  'a driver waiting in light traffic, relaxed hands on the steering wheel, calm urban moment',
+  'a mechanic checking brake pads while the customer observes attentively, professional trust',
+  'a woman closing the trunk after grocery shopping, everyday practical task',
+  'a driver placing emergency triangle on the roadside, calm safety precaution without drama',
+].map(s => s + PEOPLE_SCENES_SUFFIX);
+
+const WORKSHOP_SCENES_SUFFIX = ', realistic auto service environment, soft industrial lighting, neutral color temperature, slightly desaturated tones, natural exposure, subtle shadows, documentary photography style, no HDR, no dramatic spotlight';
 
 const WORKSHOP_SCENES = [
   'modern tyre service centre, a mechanic mounting a tyre on a balancing machine, clean well-lit workshop',
@@ -299,7 +372,17 @@ const WORKSHOP_SCENES = [
   'customer reception area of a tyre centre, display rack with tyres, clean and modern interior',
   'mechanic performing wheel alignment with laser equipment, technical precision',
   'tyre storage rack in a seasonal depot, labelled sets waiting for changeover',
-];
+  'mechanic checking tyre pressure before handing the car back to the customer, final inspection moment',
+  'close-up of hands inspecting tyre tread wear under workshop light, detail-focused micro scene',
+  'mechanic cleaning wheel hub before mounting a tyre, careful preparation step',
+  'service advisor discussing tyre options with a customer beside a sample display, human interaction',
+  'mechanic using compressed air to clean brake components, soft diffused overhead light',
+  'stacked used tyres waiting for recycling in a designated area, lived-in workshop corner',
+  'early morning workshop opening, lights just turned on, calm before the workday begins',
+  'mechanic making notes on a clipboard near the lifted car, methodical documentation process',
+].map(s => s + WORKSHOP_SCENES_SUFFIX);
+
+const TIRE_CLOSEUP_SUFFIX = ', realistic macro photography, soft directional light, subtle shadows, natural rubber texture, slightly desaturated colors, shallow depth of field, natural lens rendering, no HDR, no CGI look, documentary product photography';
 
 const TIRE_CLOSEUP_SCENES = [
   'close-up of a tyre tread on wet asphalt, water droplets in the grooves, shallow depth of field',
@@ -310,7 +393,17 @@ const TIRE_CLOSEUP_SCENES = [
   'close-up of tyre contact patch on damp road, showing how tread displaces water',
   'rubber compound texture in warm raking light, showing material quality and engineering',
   'winter tyre sipes opening under load on icy surface, close-range technical detail',
-];
+  'slightly worn tread with natural road dust, lived-in texture, real-world usage visible',
+  'tyre rolling slowly through shallow puddle, subtle splash, no action-poster drama',
+  'close-up of tyre valve being checked with a pressure gauge, service and product connection',
+  'edge wear comparison between properly inflated and underinflated tyre, technical detail',
+  'tyre on gravel road, small stones embedded naturally in tread, tactile realism',
+  'sidewall flex under vehicle weight, subtle deformation visible, physical authenticity',
+  'close-up of brake disc visible through alloy wheel spokes, safety context with tyre in foreground',
+  'early morning dew on tyre surface in soft light, delicate moisture droplets, low contrast',
+].map(s => s + TIRE_CLOSEUP_SUFFIX);
+
+const ATMOSPHERIC_SCENES_SUFFIX = ', realistic landscape photography, natural light conditions, muted tones, soft dynamic range, subtle contrast, no HDR, no cinematic glow, documentary style, true-to-life atmosphere';
 
 const ATMOSPHERIC_SCENES = [
   'empty winding road disappearing into morning fog, tyre marks faintly visible on damp asphalt',
@@ -321,7 +414,17 @@ const ATMOSPHERIC_SCENES = [
   'panoramic mountain road with a single car small in the frame, vast landscape dominating',
   'Carpathian mountain road with low clouds, a car emerging through mist, epic scale',
   'sunflower fields lining a straight Ukrainian road, a car disappearing into the distance',
-];
+  'overcast highway with soft horizon fade, natural Scandinavian light, pale sky',
+  'early blue hour city road with minimal traffic, no neon glow, quiet urban dusk',
+  'rural road after light rain, soft reflections but no glare, gentle depth',
+  'empty service road in industrial outskirts under flat grey sky, everyday realism',
+  'straight highway vanishing into heat haze, natural atmospheric distortion',
+  'forest road covered in fallen leaves, soft autumn light, no golden instagram saturation',
+  'light snowfall in the evening, road softly illuminated by street lamps, no bright glare',
+  'quiet dawn highway rest area with pale sky tones, calm pre-sunrise stillness',
+].map(s => s + ATMOSPHERIC_SCENES_SUFFIX);
+
+const DETAIL_MACRO_SUFFIX = ', realistic macro photography, natural lens rendering, soft directional light, subtle shadows, slightly desaturated tones, realistic material texture, documentary product detail, no HDR, no CGI look';
 
 const DETAIL_MACRO_SCENES = [
   'macro shot of rubber compound texture on a tyre surface, showing the fine grain and material quality',
@@ -332,9 +435,19 @@ const DETAIL_MACRO_SCENES = [
   'puddle splash around a rolling tyre, frozen mid-motion, showing water displacement',
   'tyre valve cap and sidewall detail in warm directional light, minimalist composition',
   'fresh tyre marks on wet asphalt seen from above, geometric tread pattern imprint',
-];
+  'micro cracks and natural wear in tyre rubber under soft light, lived-in texture',
+  'fine dust particles settled in tyre grooves, real-world usage evidence',
+  'subtle sidewall flex under vehicle weight captured close-up, physical deformation visible',
+  'fine siping detail of winter tyre under cool diffused light, no gloss, matte rubber',
+  'metal rim edge with subtle brake dust accumulation, authentic everyday detail',
+  'tyre shoulder detail transitioning into road texture, abstract boundary composition',
+  'condensation forming on cool rubber surface at dawn, soft morning light, low contrast',
+  'slight motion blur on rotating tyre tread in low light, subtle movement, not a speed poster',
+].map(s => s + DETAIL_MACRO_SUFFIX);
 
 // ============ LIFESTYLE SCENES ============
+
+const LIFESTYLE_SCENES_SUFFIX = ', realistic lifestyle photography, candid moment, natural body language, soft daylight, slightly desaturated tones, subtle shadows, documentary style, true-to-life atmosphere, no HDR, no cinematic glow';
 
 const LIFESTYLE_SCENES = [
   'young family loading stroller and bags into SUV trunk for a weekend getaway',
@@ -345,77 +458,128 @@ const LIFESTYLE_SCENES = [
   'friends loading camping gear into a crossover, morning departure excitement',
   'a driver refuelling at a modern petrol station, relaxed long-distance journey',
   'couple admiring a mountain view from beside their parked car, travel mood',
-];
+  'parent helping child buckle seatbelt before departure, quiet caring moment',
+  'early morning coffee stop beside a parked car, calm travel pause, no rush',
+  'driver adjusting roof box before a long trip, practical preparation',
+  'friends laughing while unloading sports equipment, natural body language, not posed',
+  'quiet evening return home, car headlights softly illuminating driveway, end of day calm',
+  'weekend grocery run, trunk open in supermarket parking lot, everyday routine',
+  'driver checking tyre pressure before family trip, safety meets lifestyle',
+  'rainy day school drop-off, umbrellas and soft reflections, low contrast mood',
+].map(s => s + LIFESTYLE_SCENES_SUFFIX);
 
 // ============ PRODUCT SETUP VARIETY ============
+
+const PRODUCT_REALISM_SUFFIX = '. Realistic studio photography, soft controlled lighting, matte rubber finish, subtle surface imperfections, natural highlight rolloff, slightly desaturated tones, realistic lens rendering, no CGI look, no hyper-detailed 3D render, true-to-life materials';
 
 const PRODUCT_SETUPS = [
   {
     backdrop: 'seamless dark grey backdrop',
     pose: 'single tyre at 15-20° angle showing tread and sidewall',
-    lighting: 'three-point setup — large softbox key, reflector fill, strip softbox rim',
+    lighting: 'three-point setup — large softbox key, reflector fill, strip softbox rim. Soft controlled studio lighting, subtle shadows, natural rubber texture, matte finish, micro surface detail, natural tonal transitions, no glossy reflections',
   },
   {
     backdrop: 'gradient white-to-light-grey backdrop',
     pose: 'tyre standing upright, front-facing tread view with slight tilt',
-    lighting: 'large overhead softbox, two side reflectors for even fill',
+    lighting: 'large overhead softbox, two side reflectors for even fill. Soft shadow under tyre, realistic studio falloff, no pure white clipping, gentle contrast, natural exposure, subtle edge softness, real lens rendering, no 3D render look',
   },
   {
     backdrop: 'dark matte surface with subtle reflection',
     pose: 'tyre laid at 45° showing tread pattern and shoulder blocks',
-    lighting: 'single large window light from left, dark flag on right for contrast',
+    lighting: 'natural window light from the side, soft shadows, subtle reflection on matte surface, realistic material response, low contrast, no dramatic highlights, slight lens softness, documentary studio feel',
   },
   {
     backdrop: 'industrial concrete backdrop with subtle texture',
     pose: 'tyre mounted on stylish alloy wheel, 3/4 front view',
-    lighting: 'beauty dish key light slightly above, strip softbox edge accent',
+    lighting: 'beauty dish key light slightly above, strip softbox edge accent. Neutral color balance, natural industrial lighting, realistic brake dust detail, subtle texture in concrete, no showroom gloss, authentic metal texture, soft shadow transitions',
   },
   {
     backdrop: 'clean black sweep with controlled spill',
     pose: 'tyre at dramatic low angle, emphasising sidewall and tread depth',
-    lighting: 'backlit rim light for edge definition, soft frontal fill',
+    lighting: 'soft rim light, controlled highlights, no dramatic glow, realistic exposure, matte rubber texture, subtle depth, no cinematic lighting, soft frontal fill',
   },
+  {
+    backdrop: 'slightly textured studio floor, minimal setup',
+    pose: 'tyre standing naturally, simple straight-on view',
+    lighting: 'single large softbox from above-left, no fill, natural shadow falloff, minimal and honest',
+  },
+  {
+    backdrop: 'neutral grey seamless, half in shadow',
+    pose: 'tyre at 30° angle, soft side lighting for depth and volume',
+    lighting: 'single strip softbox from the side, no fill, deep soft shadow on opposite side, sculptural light without gloss',
+  },
+  {
+    backdrop: 'clean studio, shallow depth of field',
+    pose: 'close 3/4 angle product crop, focus on tread and shoulder, rear falling out of focus',
+    lighting: 'large diffused key light, subtle fill, shallow DOF at f/2.8, more photo less catalogue',
+  },
+];
+
+// ============ CAMERA STYLES (handheld / lens feel) ============
+
+const CAMERA_STYLES = [
+  'handheld documentary feel, natural slight imperfections',
+  '85mm lens, shallow depth of field, subject isolation',
+  '35mm wide angle, natural perspective, environmental context',
+  'low eye-level angle, grounded perspective, tyre emphasis',
+  'slight telephoto compression, flattened background, editorial look',
+  '50mm standard lens, honest neutral perspective, no distortion',
+  '24mm wide shot, expansive framing, environmental storytelling',
+  '70-200mm zoom, selective focus, background separation',
 ];
 
 // ============ VEHICLE SCENE TEMPLATES (per article type) ============
 
+/** Per-articleType realism suffixes — prevent common DALL-E failure modes */
+const ARTICLE_TYPE_SUFFIXES: Record<HeroArticleType, string> = {
+  'test-summary': ', controlled testing environment, realistic tire deformation, subtle motion blur, natural daylight, no racing drama, no dramatic smoke, no motorsport crowd, documentary automotive photography, slightly desaturated tones',
+  comparison: ', neutral editorial tone, calm composition, balanced framing, natural color grading, no dramatic rivalry mood, realistic spacing between vehicles, natural perspective, documentary comparison style',
+  'seasonal-guide': ', weather as main visual element, natural light diffusion, muted seasonal tones, soft contrast, realistic sky rendering, no cinematic glow, slight haze, subtle reflections, natural tire contact with surface',
+  'model-review': ', understated premium feel, natural outdoor lighting, realistic materials, soft highlight rolloff, no showroom gloss, subtle lens depth, no luxury advertisement look, no high contrast commercial lighting',
+  technology: ', clean modern realism, cool neutral tones, natural reflections, realistic road texture, subtle engineering atmosphere, no futuristic CGI effects, no neon glow, no sci-fi elements, no holographic overlays',
+  tips: ', relatable everyday setting, natural body language, documentary style, practical atmosphere, soft natural light, no commercial posing, no exaggerated smiles, no overly staged gestures',
+};
+
+/** Global realism suffix applied to ALL vehicle scene templates */
+const VEHICLE_SCENE_GLOBAL_SUFFIX = ', realistic automotive photography, natural lighting, soft dynamic range, slightly desaturated tones, subtle shadows, true-to-life materials, realistic lens rendering, no HDR, no cinematic glow, no CGI look';
+
 const VEHICLE_SCENE_TEMPLATES: Record<HeroArticleType, string[]> = {
   'test-summary': [
-    '{vehicle} cornering on a test track, {weather}, {angle}, {timeOfDay}, tyre marks on asphalt, testing equipment at trackside',
-    '{vehicle} braking on a wet test surface, {weather}, {angle}, {timeOfDay}, water mist from tyres, measurement cones in background',
-    '{vehicle} on a handling course, {weather}, {angle}, {timeOfDay}, orange cones visible, controlled testing environment',
-    '{vehicle} driving through a slalom on a closed circuit, {weather}, {angle}, {timeOfDay}, professional test setting',
-  ],
+    '{vehicle} cornering on a test track, {weather}, {cameraStyle}, {angle}, {timeOfDay}, tyre marks on asphalt, testing equipment at trackside',
+    '{vehicle} braking on a wet test surface, {weather}, {cameraStyle}, {angle}, {timeOfDay}, water mist from tyres, measurement cones in background',
+    '{vehicle} on a handling course, {weather}, {cameraStyle}, {angle}, {timeOfDay}, orange cones visible, controlled testing environment',
+    '{vehicle} driving through a slalom on a closed circuit, {weather}, {cameraStyle}, {angle}, {timeOfDay}, professional test setting',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['test-summary'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
   comparison: [
-    'two cars side by side on a road — {vehicle} and a different sedan — {weather}, {angle}, {timeOfDay}, editorial comparison composition',
-    '{vehicle} on a road that transitions from dry to damp surface, {weather}, {angle}, {timeOfDay}, showing versatility',
-    'close-up of two different tyre treads side by side on wet ground, {weather}, {timeOfDay}, detail comparison shot',
-    '{vehicle} and another car parked facing each other at {location}, {weather}, {angle}, {timeOfDay}, calm comparison scene',
-  ],
+    'two cars side by side on a road — {vehicle} and a different sedan — {weather}, {cameraStyle}, {angle}, {timeOfDay}, editorial comparison composition',
+    '{vehicle} on a road that transitions from dry to damp surface, {weather}, {cameraStyle}, {angle}, {timeOfDay}, showing versatility',
+    'close-up of two different tyre treads side by side on wet ground, {weather}, {cameraStyle}, {timeOfDay}, detail comparison shot',
+    '{vehicle} and another car parked facing each other at {location}, {weather}, {cameraStyle}, {angle}, {timeOfDay}, calm comparison scene',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['comparison'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
   'seasonal-guide': [
-    '{vehicle} driving through seasonal weather on {location}, {weather}, {angle}, {timeOfDay}, weather is the main element',
-    '{vehicle} with visible tyre tracks on a seasonal road, {weather}, {angle}, {timeOfDay}, {location}, atmospheric scene',
-    '{vehicle} parked with seasonal equipment nearby, {weather}, {angle}, {timeOfDay}, practical preparation mood',
-    'wide landscape with {vehicle} small in the frame on {location}, {weather}, {timeOfDay}, nature dominates the scene',
-  ],
+    '{vehicle} driving through seasonal weather on {location}, {weather}, {cameraStyle}, {angle}, {timeOfDay}, weather is the main element',
+    '{vehicle} with visible tyre tracks on a seasonal road, {weather}, {cameraStyle}, {angle}, {timeOfDay}, {location}, atmospheric scene',
+    '{vehicle} parked with seasonal equipment nearby, {weather}, {cameraStyle}, {angle}, {timeOfDay}, practical preparation mood',
+    'wide landscape with {vehicle} small in the frame on {location}, {weather}, {cameraStyle}, {timeOfDay}, nature dominates the scene',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['seasonal-guide'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
   'model-review': [
-    '{vehicle} with shallow depth of field on tyre and wheel detail, {weather}, {angle}, {timeOfDay}, {location}, product showcase',
-    'environmental portrait of {vehicle} emphasising sidewall and tread, {weather}, {angle}, {timeOfDay}, natural outdoor light',
-    '{vehicle} at {location}, {weather}, {angle}, {timeOfDay}, soft rim lighting on tyre profile, understated premium feel',
-    'detail shot of {vehicle} wheel and tyre with road texture, {weather}, {angle}, {timeOfDay}, close-range product photography',
-  ],
+    '{vehicle} with shallow depth of field on tyre and wheel detail, {weather}, {cameraStyle}, {angle}, {timeOfDay}, {location}, product showcase',
+    'environmental portrait of {vehicle} emphasising sidewall and tread, {weather}, {cameraStyle}, {angle}, {timeOfDay}, natural outdoor light',
+    '{vehicle} at {location}, {weather}, {cameraStyle}, {angle}, {timeOfDay}, soft rim lighting on tyre profile, understated premium feel',
+    'detail shot of {vehicle} wheel and tyre with road texture, {weather}, {cameraStyle}, {angle}, {timeOfDay}, close-range product photography',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['model-review'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
   technology: [
-    '{vehicle} on a modern road at {timeOfDay}, {weather}, {angle}, clean cool-toned colour palette, focus on wheels, innovation theme',
-    '{vehicle} driving through {location}, {weather}, {angle}, {timeOfDay}, sleek understated engineering atmosphere',
-    '{vehicle} on a damp highway with soft headlight reflections, {weather}, {angle}, {timeOfDay}, modern driving feel',
-    '{vehicle} on a rain-slicked road, {weather}, {angle}, {timeOfDay}, water spray from tyres, advanced grip demonstrated',
-  ],
+    '{vehicle} on a modern road at {timeOfDay}, {weather}, {cameraStyle}, {angle}, clean cool-toned colour palette, focus on wheels, innovation theme',
+    '{vehicle} driving through {location}, {weather}, {cameraStyle}, {angle}, {timeOfDay}, sleek understated engineering atmosphere',
+    '{vehicle} on a damp highway with soft headlight reflections, {weather}, {cameraStyle}, {angle}, {timeOfDay}, modern driving feel',
+    '{vehicle} on a rain-slicked road, {weather}, {cameraStyle}, {angle}, {timeOfDay}, water spray from tyres, advanced grip demonstrated',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['technology'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
   tips: [
-    '{vehicle} in an everyday parking area, {weather}, {angle}, {timeOfDay}, driver checking tyre condition, practical scene',
-    '{vehicle} parked in a driveway with tyre care tools nearby, {weather}, {angle}, {timeOfDay}, relatable maintenance scene',
-    '{vehicle} at a petrol station or tyre service, {weather}, {angle}, {timeOfDay}, practical automotive care setting',
-    '{vehicle} on a quiet residential street, {weather}, {angle}, {timeOfDay}, safe everyday driving context',
-  ],
+    '{vehicle} in an everyday parking area, {weather}, {cameraStyle}, {angle}, {timeOfDay}, driver checking tyre condition, practical scene',
+    '{vehicle} parked in a driveway with tyre care tools nearby, {weather}, {cameraStyle}, {angle}, {timeOfDay}, relatable maintenance scene',
+    '{vehicle} at a petrol station or tyre service, {weather}, {cameraStyle}, {angle}, {timeOfDay}, practical automotive care setting',
+    '{vehicle} on a quiet residential street, {weather}, {cameraStyle}, {angle}, {timeOfDay}, safe everyday driving context',
+  ].map(s => s + ARTICLE_TYPE_SUFFIXES['tips'] + VEHICLE_SCENE_GLOBAL_SUFFIX),
 };
 
 // ============ HERO PROMPT GENERATOR ============
@@ -457,10 +621,15 @@ export function generateHeroPrompt(
   const style = pickPhotographyStyle(seed, 10);
   const scene = buildScene(focus, seed, weather, articleType);
   const tireHint = getTireLineHint(topic);
+  const brandTone = pickBrandTone(seed);
 
-  let prompt = `Editorial automotive photography, ${topic}.
+  const tireHintBlock = tireHint
+    ? `\nMood: ${tireHint.mood}.\nVisual style: ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    : '';
 
-Scene: ${scene}.${tireHint ? `\nMood: ${tireHint.mood}.` : ''}
+  let prompt = `Editorial automotive photography, ${topic}. ${brandTone}.
+
+Scene: ${scene}.${tireHintBlock}
 
 ${style.prompt}
 ${colorMood}. Rule of thirds, widescreen framing.
@@ -487,6 +656,7 @@ function buildScene(
       const angle = pickFromPool(CAMERA_ANGLES, seed, 2);
       const timeOfDay = pickFromPool(TIMES_OF_DAY, seed, 3);
       const location = pickFromPool(LOCATIONS, seed, 4);
+      const cameraStyle = pickFromPool(CAMERA_STYLES, seed, 6);
 
       const type = articleType || 'seasonal-guide';
       const templates = VEHICLE_SCENE_TEMPLATES[type] || VEHICLE_SCENE_TEMPLATES['seasonal-guide'];
@@ -497,6 +667,7 @@ function buildScene(
         .replace(/\{angle\}/g, angle)
         .replace(/\{timeOfDay\}/g, timeOfDay)
         .replace(/\{location\}/g, location)
+        .replace(/\{cameraStyle\}/g, cameraStyle)
         .replace(/\{weather\}/g, weather);
     }
 
@@ -569,11 +740,16 @@ export function generateContentPrompt(
 
   const style = pickPhotographyStyle(seed, 11);
   const tireHint = getTireLineHint(topic);
+  const brandTone = pickBrandTone(seed);
 
-  return `Editorial photography for an automotive article about ${topic}.
+  const tireBlock = tireHint
+    ? ` Setting: ${tireHint.setting}. ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    : '';
+
+  return `Editorial photography for an automotive article about ${topic}. ${brandTone}.
 
 Context: ${context || 'tyre and automotive safety'}.
-Scene: ${sceneHint}${tireHint ? ` Setting: ${tireHint.setting}.` : ''}
+Scene: ${sceneHint}${tireBlock}
 
 ${style.prompt}
 Documentary editorial feel, authentic and relatable.
@@ -602,8 +778,13 @@ export function generateProductPrompt(
   const techStyle = pickFromPool(PRODUCT_STYLES, seed, 10);
   const setup = pickFromPool(PRODUCT_SETUPS, seed, 3);
   const tireHint = getTireLineHint(topic);
+  const brandTone = pickBrandTone(seed);
 
-  return `Product photography of ${topic} automotive tyre.${tireHint ? ` ${tireHint.mood}.` : ''}
+  const tireBlock = tireHint
+    ? ` ${tireHint.mood}. ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    : '';
+
+  return `Product photography of ${topic} automotive tyre. ${brandTone}.${tireBlock}
 
 Setup: Professional studio, ${setup.backdrop}. ${setup.pose}.
 Lighting: ${setup.lighting}. Soft, controlled, no hot spots.
@@ -612,6 +793,7 @@ Focus: Sharp detail on tread grooves, sipes, and shoulder blocks.
 ${techStyle}
 Clean commercial product photography, understated premium feel.
 Realistic black rubber — true-to-life tones, low contrast, matte.
+${PRODUCT_REALISM_SUFFIX}.
 ${INLINE_AVOID}`;
 }
 
@@ -637,8 +819,9 @@ export function generateLifestylePrompt(
   const seed = hashString(topic + (season || ''), entropy);
   const style = pickPhotographyStyle(seed, 12);
   const lifestyleScene = pickFromPool(LIFESTYLE_SCENES, seed, 5);
+  const brandTone = pickBrandTone(seed);
 
-  return `Lifestyle photography: ${lifestyleScene}. ${seasonContext}.
+  return `Lifestyle photography: ${lifestyleScene}. ${seasonContext}. ${brandTone}.
 
 Authentic candid moment, not posed or promotional.
 People (30-50 years old) in natural poses, genuine expressions.
