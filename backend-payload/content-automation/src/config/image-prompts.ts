@@ -393,7 +393,7 @@ const LOCATIONS = [
 
 // ============ PEOPLE & SETTING ELEMENTS ============
 
-const PEOPLE_SCENES_SUFFIX = ', candid moment, natural body language, no posing, documentary photography style, subtle expressions, realistic proportions, natural light, low contrast';
+const PEOPLE_SCENES_SUFFIX = ', European appearance, candid moment, natural body language, no posing, documentary photography style, subtle expressions, realistic proportions, natural light, low contrast';
 
 const PEOPLE_SCENES = [
   'a man (35-45) checking tyre pressure with a gauge, kneeling beside the car',
@@ -418,7 +418,7 @@ const PEOPLE_SCENES = [
   'a driver placing emergency triangle on the roadside, calm safety precaution without drama',
 ].map(s => s + PEOPLE_SCENES_SUFFIX);
 
-const WORKSHOP_SCENES_SUFFIX = ', realistic auto service environment, soft industrial lighting, neutral color temperature, slightly desaturated tones, natural exposure, subtle shadows, documentary photography style, no HDR, no dramatic spotlight';
+const WORKSHOP_SCENES_SUFFIX = ', European appearance, realistic auto service environment, soft industrial lighting, neutral color temperature, slightly desaturated tones, natural exposure, subtle shadows, documentary photography style, no HDR, no dramatic spotlight';
 
 const WORKSHOP_SCENES = [
   'modern tyre service centre, a mechanic mounting a tyre on a balancing machine, clean well-lit workshop',
@@ -504,7 +504,7 @@ const DETAIL_MACRO_SCENES = [
 
 // ============ LIFESTYLE SCENES ============
 
-const LIFESTYLE_SCENES_SUFFIX = ', realistic lifestyle photography, candid moment, natural body language, soft daylight, slightly desaturated tones, subtle shadows, documentary style, true-to-life atmosphere, no HDR, no cinematic glow';
+const LIFESTYLE_SCENES_SUFFIX = ', European appearance, realistic lifestyle photography, candid moment, natural body language, soft daylight, slightly desaturated tones, subtle shadows, documentary style, true-to-life atmosphere, no HDR, no cinematic glow';
 
 const LIFESTYLE_SCENES = [
   'young family loading stroller and bags into SUV trunk for a weekend getaway',
@@ -888,7 +888,7 @@ export function generateLifestylePrompt(
   return `Lifestyle photography: ${lifestyleScene}. ${seasonContext}. ${brandTone}.
 
 Authentic candid moment, not posed or promotional.
-People (30-50 years old) in natural poses, genuine expressions.
+European people (30-50 years old) in natural poses, genuine expressions.
 Everyday family car or crossover, well-kept condition.
 
 ${style.prompt}
