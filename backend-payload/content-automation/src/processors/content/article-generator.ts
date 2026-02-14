@@ -142,7 +142,7 @@ RESPONSE FORMAT (JSON):
   "title": "Article title (50-70 characters, engaging for readers)",
   "subtitle": "Article subtitle — 1 sentence, 60-100 characters. Complements the title, does not duplicate it.",
   "excerpt": "Short preview description (150-200 characters). NO HTML.",
-  "content": "Full HTML article text (${targetWords} words): <h2>Section</h2><p>Text...</p><ul><li>Item</li></ul>",
+  "content": "Full HTML article text (MINIMUM ${targetWords} words, aim for ${wordRange.max}): <h2>Section</h2><p>Text...</p><ul><li>Item</li></ul>",
   "seoTitle": "SEO-optimized title (40-55 characters, with keyword). Must NOT duplicate title.",
   "seoDescription": "SEO description for search engines (150-160 characters, with CTA). Must NOT duplicate excerpt.",
   "tags": ["tag1", "tag2", "tag3"],
@@ -151,7 +151,7 @@ RESPONSE FORMAT (JSON):
 }
 
 REQUIREMENTS:
-- ${wordRange.min}-${wordRange.max} words
+- CRITICAL: The content field MUST contain at least ${wordRange.min} words. Aim for ${wordRange.max} words. Articles shorter than ${wordRange.min} words will be rejected. Use 4-6 sections with <h2> headings, each with 2-3 detailed paragraphs.
 - content in HTML format (h2, h3, p, ul, li, strong, a)
 - seoTitle — do NOT include site name (suffix is added automatically), optimize for search
 - seoDescription — include keyword and motivation to click
@@ -205,7 +205,7 @@ ${relatedItemsSection}
   "title": "Заголовок статті (50-70 символів, привабливий для читача)",
   "subtitle": "Підзаголовок статті — 1 речення, 60-100 символів. Доповнює title, не дублює.",
   "excerpt": "Короткий опис для превʼю (150-200 символів). БЕЗ HTML.",
-  "content": "Повний HTML текст статті (${targetWords} слів): <h2>Секція</h2><p>Текст...</p><ul><li>Пункт</li></ul>",
+  "content": "Повний HTML текст статті (МІНІМУМ ${targetWords} слів, прагни до ${wordRange.max}): <h2>Секція</h2><p>Текст...</p><ul><li>Пункт</li></ul>",
   "seoTitle": "SEO-оптимізований заголовок (40-55 символів, з ключовим словом). НЕ дублюй title.",
   "seoDescription": "SEO-опис для пошуковиків (150-160 символів, з CTA). НЕ дублюй excerpt.",
   "tags": ["тег1", "тег2", "тег3"],
@@ -214,7 +214,7 @@ ${relatedItemsSection}
 }
 
 ВИМОГИ:
-- ${wordRange.min}-${wordRange.max} слів
+- КРИТИЧНО: поле content ПОВИННО містити мінімум ${wordRange.min} слів. Прагни до ${wordRange.max} слів. Статті коротші за ${wordRange.min} слів будуть відхилені. Використовуй 4-6 секцій з заголовками <h2>, кожна з 2-3 детальними абзацами.
 - content у форматі HTML (h2, h3, p, ul, li, strong, a)
 - seoTitle — НЕ включай назву сайту (суфікс додається автоматично), оптимізуй для пошуку
 - seoDescription — включи ключове слово та мотивацію до кліку
@@ -292,8 +292,8 @@ function validateArticle(article: ArticleOutput, type: ArticleType): void {
   }
 
   const wordCount = article.content?.split(/\s+/).length || 0;
-  if (wordCount < wordRange.min * 0.7) {
-    errors.push(`content too short: ${wordCount} words (min ${wordRange.min})`);
+  if (wordCount < wordRange.min * 0.55) {
+    errors.push(`content too short: ${wordCount} words (min ${Math.round(wordRange.min * 0.55)})`);
   }
 
   if (!article.tags || article.tags.length < 2) {
