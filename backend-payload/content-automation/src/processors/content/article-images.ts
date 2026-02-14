@@ -11,6 +11,7 @@ import {
   IMAGE_SIZES,
   generatePromptByType,
   type ImageType,
+  type Brand,
 } from "../../config/image-prompts.js";
 import type { GeneratedImage } from "../../types/content.js";
 import { createLogger } from "../../utils/logger.js";
@@ -30,6 +31,7 @@ export interface ArticleImageInput {
   tireModel?: string;
   context?: string;
   articleType?: string;
+  brand?: Brand;
 }
 
 /**
@@ -56,7 +58,8 @@ function generateAltText(input: ArticleImageInput): string {
   }
 
   if (input.tireModel) {
-    alt += ` - Bridgestone ${input.tireModel}`;
+    const brandName = input.brand === 'firestone' ? 'Firestone' : 'Bridgestone';
+    alt += ` - ${brandName} ${input.tireModel}`;
   }
 
   return alt;
@@ -77,11 +80,13 @@ export async function generateArticleImage(
     entropy?: number;
   }
 ): Promise<GeneratedImage> {
-  const prompt = generatePromptByType(input.type, input.tireModel ? `Bridgestone ${input.tireModel}` : input.topic, {
+  const brandName = input.brand === 'firestone' ? 'Firestone' : 'Bridgestone';
+  const prompt = generatePromptByType(input.type, input.tireModel ? `${brandName} ${input.tireModel}` : input.topic, {
     season: input.season,
     context: input.context,
     articleType: input.articleType,
     entropy: options?.entropy,
+    brand: input.brand,
   });
   const size = IMAGE_SIZES[input.type];
 

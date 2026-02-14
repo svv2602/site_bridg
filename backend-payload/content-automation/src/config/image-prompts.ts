@@ -15,6 +15,15 @@
 
 export type ImageType = 'hero' | 'content' | 'product' | 'lifestyle';
 
+export type Brand = 'bridgestone' | 'firestone';
+
+/** Detect brand from topic string based on known Firestone product lines */
+function detectBrand(topic: string): Brand {
+  const lower = topic.toLowerCase();
+  const firestoneKeywords = ['firestone', 'roadhawk', 'multihawk', 'winterhawk', 'multiseason gen'];
+  return firestoneKeywords.some(kw => lower.includes(kw)) ? 'firestone' : 'bridgestone';
+}
+
 /** Article type alias to avoid importing from db module */
 type HeroArticleType =
   | 'test-summary'
@@ -118,7 +127,7 @@ function pickFromPool<T>(pool: T[], seed: number, offset: number = 0): T {
  * Bridgestone brand tone — subtle brand DNA injected into every line's visuals.
  * Picked per-topic via hash for variety, but all options share the same philosophy.
  */
-const BRAND_TONES = [
+const BRIDGESTONE_BRAND_TONES = [
   'understated Japanese precision',
   'engineered confidence',
   'quiet performance philosophy',
@@ -126,8 +135,23 @@ const BRAND_TONES = [
   'refined technical excellence',
 ];
 
-/** Global realism suffix applied to every tire line hint */
-const TIRE_LINE_GLOBAL_SUFFIX = ', realistic automotive photography, natural light, soft dynamic range, slightly desaturated tones, true-to-life materials, realistic tyre deformation, natural lens rendering, no HDR, no cinematic glow, no CGI look';
+/**
+ * Firestone brand tone — bolder, warmer, more practical/rugged character.
+ * Distinct from Bridgestone's refined Japanese precision.
+ */
+const FIRESTONE_BRAND_TONES = [
+  'confident American road heritage',
+  'bold practical performance',
+  'dependable real-world durability',
+  'honest everyday confidence',
+  'straightforward driving character',
+];
+
+/** Global realism suffix applied to Bridgestone tire line hints */
+const BRIDGESTONE_GLOBAL_SUFFIX = ', realistic automotive photography, natural light, soft dynamic range, slightly desaturated tones, true-to-life materials, realistic tyre deformation, natural lens rendering, no HDR, no cinematic glow, no CGI look';
+
+/** Global realism suffix applied to Firestone tire line hints */
+const FIRESTONE_GLOBAL_SUFFIX = ', realistic automotive photography, confident bold framing, natural light with defined shadows, slightly warm tones, tactile rubber texture, subtle road grit, real-world atmosphere, no CGI look, no HDR, no cinematic gloss';
 
 /**
  * Bridgestone tire line hints — adds context-aware mood, setting and
@@ -182,6 +206,33 @@ const TIRE_LINE_HINTS: Record<string, TireLineHint> = {
     setting: 'road transitioning from wet to dry, mixed conditions, changeable sky',
     visualStyle: 'transitional surface detail, subtle wet reflections, natural sky gradient, soft dynamic range, realistic road texture, no dramatic storm lighting',
   },
+
+  // — Firestone lines —
+  roadhawk: {
+    mood: 'confident touring, dependable all-season grip',
+    setting: 'real highways, suburban roads, everyday commute',
+    visualStyle: 'slightly higher contrast, defined shadows, strong tyre profile, confident framing, natural grit',
+  },
+  'roadhawk 2': {
+    mood: 'evolved touring confidence, refined everyday grip',
+    setting: 'modern highways, urban boulevards',
+    visualStyle: 'bold but controlled, stronger shadow definition, practical road texture',
+  },
+  multihawk: {
+    mood: 'city summer confidence, nimble urban handling',
+    setting: 'city streets, parking areas, daily urban driving',
+    visualStyle: 'warm urban tones, practical atmosphere, natural city light',
+  },
+  winterhawk: {
+    mood: 'practical winter resilience, everyday cold-weather confidence',
+    setting: 'compact snow roads, frosty mornings, suburban winter',
+    visualStyle: 'compact snow texture, confident traction, everyday winter driving realism, warm practical tones',
+  },
+  'multiseason gen': {
+    mood: 'year-round adaptability, all-weather dependability',
+    setting: 'transitional weather roads, mixed conditions',
+    visualStyle: 'transitional surfaces, subtle wet reflections, warm practical tones, confident all-weather stance',
+  },
 };
 
 /** Extract tire line hint from topic if mentioned */
@@ -195,9 +246,15 @@ function getTireLineHint(topic: string): TireLineHint | null {
   return null;
 }
 
-/** Pick a brand tone from pool based on seed */
-function pickBrandTone(seed: number): string {
-  return pickFromPool(BRAND_TONES, seed, 15);
+/** Pick a brand tone from pool based on seed and brand */
+function pickBrandTone(seed: number, brand: Brand = 'bridgestone'): string {
+  const pool = brand === 'firestone' ? FIRESTONE_BRAND_TONES : BRIDGESTONE_BRAND_TONES;
+  return pickFromPool(pool, seed, 15);
+}
+
+/** Get the global realism suffix for a brand */
+function getGlobalSuffix(brand: Brand): string {
+  return brand === 'firestone' ? FIRESTONE_GLOBAL_SUFFIX : BRIDGESTONE_GLOBAL_SUFFIX;
 }
 
 // ============ PHOTOGRAPHY STYLE PRESETS ============
@@ -597,7 +654,7 @@ const VEHICLE_SCENE_TEMPLATES: Record<HeroArticleType, string[]> = {
  */
 export function generateHeroPrompt(
   topic: string,
-  seasonOrOptions?: string | { season?: string; articleType?: string; entropy?: number },
+  seasonOrOptions?: string | { season?: string; articleType?: string; entropy?: number; brand?: Brand },
 ): string {
   const season = typeof seasonOrOptions === 'string'
     ? seasonOrOptions
@@ -606,6 +663,7 @@ export function generateHeroPrompt(
     typeof seasonOrOptions === 'object' ? seasonOrOptions?.articleType : undefined
   ) as HeroArticleType | undefined;
   const entropy = typeof seasonOrOptions === 'object' ? seasonOrOptions?.entropy ?? 0 : 0;
+  const brand = (typeof seasonOrOptions === 'object' ? seasonOrOptions?.brand : undefined) || detectBrand(topic);
 
   const weather = season && HERO_SEASON_CONTEXTS[season]
     ? HERO_SEASON_CONTEXTS[season]
@@ -621,10 +679,11 @@ export function generateHeroPrompt(
   const style = pickPhotographyStyle(seed, 10);
   const scene = buildScene(focus, seed, weather, articleType);
   const tireHint = getTireLineHint(topic);
-  const brandTone = pickBrandTone(seed);
+  const brandTone = pickBrandTone(seed, brand);
+  const globalSuffix = getGlobalSuffix(brand);
 
   const tireHintBlock = tireHint
-    ? `\nMood: ${tireHint.mood}.\nVisual style: ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    ? `\nMood: ${tireHint.mood}.\nVisual style: ${tireHint.visualStyle}${globalSuffix}.`
     : '';
 
   let prompt = `Editorial automotive photography, ${topic}. ${brandTone}.
@@ -711,9 +770,10 @@ function buildScene(
 export function generateContentPrompt(
   topic: string,
   context?: string,
-  options?: { entropy?: number },
+  options?: { entropy?: number; brand?: Brand },
 ): string {
   const entropy = options?.entropy ?? 0;
+  const brand = options?.brand || detectBrand(topic);
   const seed = hashString(topic + (context || ''), entropy);
   const focus = pickFromPool(COMPOSITION_FOCUSES, seed, 7);
 
@@ -740,10 +800,11 @@ export function generateContentPrompt(
 
   const style = pickPhotographyStyle(seed, 11);
   const tireHint = getTireLineHint(topic);
-  const brandTone = pickBrandTone(seed);
+  const brandTone = pickBrandTone(seed, brand);
+  const globalSuffix = getGlobalSuffix(brand);
 
   const tireBlock = tireHint
-    ? ` Setting: ${tireHint.setting}. ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    ? ` Setting: ${tireHint.setting}. ${tireHint.visualStyle}${globalSuffix}.`
     : '';
 
   return `Editorial photography for an automotive article about ${topic}. ${brandTone}.
@@ -764,9 +825,10 @@ ${INLINE_AVOID}`;
  */
 export function generateProductPrompt(
   topic: string,
-  options?: { entropy?: number },
+  options?: { entropy?: number; brand?: Brand },
 ): string {
   const entropy = options?.entropy ?? 0;
+  const brand = options?.brand || detectBrand(topic);
   const seed = hashString(topic, entropy);
 
   const PRODUCT_STYLES = [
@@ -778,10 +840,11 @@ export function generateProductPrompt(
   const techStyle = pickFromPool(PRODUCT_STYLES, seed, 10);
   const setup = pickFromPool(PRODUCT_SETUPS, seed, 3);
   const tireHint = getTireLineHint(topic);
-  const brandTone = pickBrandTone(seed);
+  const brandTone = pickBrandTone(seed, brand);
+  const globalSuffix = getGlobalSuffix(brand);
 
   const tireBlock = tireHint
-    ? ` ${tireHint.mood}. ${tireHint.visualStyle}${TIRE_LINE_GLOBAL_SUFFIX}.`
+    ? ` ${tireHint.mood}. ${tireHint.visualStyle}${globalSuffix}.`
     : '';
 
   return `Product photography of ${topic} automotive tyre. ${brandTone}.${tireBlock}
@@ -805,7 +868,7 @@ ${INLINE_AVOID}`;
 export function generateLifestylePrompt(
   topic: string,
   season?: string,
-  options?: { entropy?: number },
+  options?: { entropy?: number; brand?: Brand },
 ): string {
   const seasonContext = season && LIFESTYLE_SEASON_CONTEXTS[season]
     ? LIFESTYLE_SEASON_CONTEXTS[season]
@@ -816,10 +879,11 @@ export function generateLifestylePrompt(
     : 'Neutral color temperature, balanced tones';
 
   const entropy = options?.entropy ?? 0;
+  const brand = options?.brand || detectBrand(topic);
   const seed = hashString(topic + (season || ''), entropy);
   const style = pickPhotographyStyle(seed, 12);
   const lifestyleScene = pickFromPool(LIFESTYLE_SCENES, seed, 5);
-  const brandTone = pickBrandTone(seed);
+  const brandTone = pickBrandTone(seed, brand);
 
   return `Lifestyle photography: ${lifestyleScene}. ${seasonContext}. ${brandTone}.
 
@@ -845,19 +909,20 @@ ${INLINE_AVOID}`;
 export function generatePromptByType(
   type: ImageType,
   topic: string,
-  options?: { season?: string; context?: string; articleType?: string; entropy?: number }
+  options?: { season?: string; context?: string; articleType?: string; entropy?: number; brand?: Brand }
 ): string {
   const entropy = options?.entropy;
+  const brand = options?.brand;
   switch (type) {
     case 'hero':
-      return generateHeroPrompt(topic, { season: options?.season, articleType: options?.articleType, entropy });
+      return generateHeroPrompt(topic, { season: options?.season, articleType: options?.articleType, entropy, brand });
     case 'content':
-      return generateContentPrompt(topic, options?.context, { entropy });
+      return generateContentPrompt(topic, options?.context, { entropy, brand });
     case 'product':
-      return generateProductPrompt(topic, { entropy });
+      return generateProductPrompt(topic, { entropy, brand });
     case 'lifestyle':
-      return generateLifestylePrompt(topic, options?.season, { entropy });
+      return generateLifestylePrompt(topic, options?.season, { entropy, brand });
     default:
-      return generateContentPrompt(topic, options?.context, { entropy });
+      return generateContentPrompt(topic, options?.context, { entropy, brand });
   }
 }
