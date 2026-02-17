@@ -20,7 +20,7 @@ export function TestResultsSection({ results, tireName }: TestResultsSectionProp
             <FlaskConical className="h-5 w-5 text-purple-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Результати незалежних тестів</h2>
+            <div className="heading-2 text-2xl font-bold">Результати незалежних тестів</div>
             <p className="text-sm text-muted-foreground">
               Оцінки {tireName} від провідних автомобільних організацій
             </p>

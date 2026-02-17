@@ -55,7 +55,7 @@ export function VehicleTypeCard({
         </div>
         {/* Title - fixed height container */}
         <div className="mb-2 h-[2rem]">
-          <h3 className="text-xl font-bold md:text-2xl line-clamp-1">{title}</h3>
+          <div className="heading-3 text-xl font-bold md:text-2xl line-clamp-1">{title}</div>
         </div>
         {/* Description - fixed height container */}
         <div className="mb-4 h-[2.5rem]">

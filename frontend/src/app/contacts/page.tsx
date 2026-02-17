@@ -120,7 +120,7 @@ export default async function ContactsPage() {
                 <div className={`mb-4 inline-flex rounded-full ${method.color.bg} p-3`}>
                   <method.icon className={`h-6 w-6 ${method.color.text}`} />
                 </div>
-                <h2 className="mb-2 text-lg font-semibold">{method.title}</h2>
+                <div className="heading-2 mb-2 text-lg font-semibold">{method.title}</div>
                 <p className="mb-1 break-all text-xl font-bold text-secondary md:text-2xl">
                   {method.details}
                 </p>
@@ -158,14 +158,14 @@ export default async function ContactsPage() {
               <div
                 className="rounded-2xl border border-border bg-gradient-to-br from-card to-secondary/5 p-8"
               >
-                <h2 className="mb-6 text-2xl font-bold">Часті запитання</h2>
+                <div className="heading-2 mb-6 text-2xl font-bold">Часті запитання</div>
                 <div className="space-y-4">
                   {faqs.map((faq, idx) => (
                     <div
                       key={idx}
                       className="rounded-xl border border-border bg-background p-4"
                     >
-                      <h3 className="font-semibold text-secondary">{faq.question}</h3>
+                      <div className="heading-3 font-semibold text-secondary">{faq.question}</div>
                       <p className="mt-2 text-sm text-muted-foreground">{faq.answer}</p>
                     </div>
                   ))}
@@ -181,7 +181,7 @@ export default async function ContactsPage() {
               <div
                 className="overflow-hidden rounded-2xl border border-border bg-gradient-to-tr from-primary/5 to-secondary/5 p-8"
               >
-                <h2 className="mb-4 text-2xl font-bold">Ми на карті</h2>
+                <div className="heading-2 mb-4 text-2xl font-bold">Ми на карті</div>
                 <div className="h-64 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="mx-auto h-12 w-12 text-primary" />
@@ -209,7 +209,7 @@ export default async function ContactsPage() {
           <div
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700"
           >
-            <h2 className="mb-4 text-3xl font-bold">Потрібна негайна допомога?</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Потрібна негайна допомога?</div>
             <p className="mb-8 text-lg">
               Зателефонуйте на гарячу лінію або напишіть у месенджер — ми відповімо протягом 15 хвилин.
             </p>

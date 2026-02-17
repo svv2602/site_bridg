@@ -36,7 +36,7 @@ export const SearchResults = forwardRef<HTMLDivElement, SearchResultsProps>(
         aria-atomic="true"
       >
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-xl font-bold text-stone-900 dark:text-stone-50 flex flex-wrap items-center gap-2">
+          <div className="heading-3 text-xl font-bold text-stone-900 dark:text-stone-50 flex flex-wrap items-center gap-2">
             <span>Результати пошуку {filteredResults.length > 0 && `(${filteredResults.length})`}</span>
             {searchedSize && (
               <span className="rounded-full bg-primary px-3 py-1 text-sm font-medium text-primary-text">
@@ -52,7 +52,7 @@ export const SearchResults = forwardRef<HTMLDivElement, SearchResultsProps>(
                 {searchedSeason === "summer" ? "Літні" : searchedSeason === "winter" ? "Зимові" : "Всесезонні"}
               </span>
             )}
-          </h3>
+          </div>
           {/* Brand filter */}
           {results.length > 0 && (
             <div className="flex items-center gap-2">

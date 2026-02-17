@@ -176,7 +176,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
                     <div className={`rounded-full ${seasonBgLight[season]} p-2`}>
                       <Icon className={`h-5 w-5 ${seasonTextColors[season]}`} />
                     </div>
-                    <h2 className="text-xl font-semibold text-white">{meta.h1}</h2>
+                    <div className="heading-2 text-xl font-semibold text-white">{meta.h1}</div>
                   </div>
                   <p className="text-sm text-white/80">
                     {pluralize(seasonTyres.length, "модель", "моделі", "моделей")} у каталозі
@@ -194,7 +194,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
           {popularTyres.length > 0 && (
             <>
               <div className="mb-8">
-                <h2 className="mb-2 text-2xl font-bold">Популярні моделі</h2>
+                <div className="heading-2 mb-2 text-2xl font-bold">Популярні моделі</div>
                 <p className="text-muted-foreground">
                   Найбільш затребувані {seasonLabels[season].toLowerCase()} серед наших клієнтів.
                 </p>
@@ -206,9 +206,9 @@ export default async function SeasonTyresPage({ params }: PageProps) {
           {otherTyres.length > 0 && (
             <div className={popularTyres.length > 0 ? "mt-16" : ""}>
               <div className="mb-8">
-                <h2 className="mb-2 text-2xl font-bold">
+                <div className="heading-2 mb-2 text-2xl font-bold">
                   {popularTyres.length > 0 ? "Інші моделі" : "Всі моделі"}
-                </h2>
+                </div>
                 <p className="text-muted-foreground">
                   {popularTyres.length > 0
                     ? `Додаткові ${seasonLabels[season].toLowerCase()} для різних потреб.`
@@ -222,7 +222,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
           {seasonTyres.length === 0 && (
             <div className="py-16 text-center">
               <Icon className="mx-auto mb-4 h-16 w-16 text-muted-foreground/30" />
-              <h2 className="mb-2 text-xl font-semibold">Моделі не знайдено</h2>
+              <div className="heading-2 mb-2 text-xl font-semibold">Моделі не знайдено</div>
               <p className="mb-6 text-muted-foreground">
                 На жаль, {seasonLabels[season].toLowerCase()} для легкових авто наразі відсутні в
                 каталозі.
@@ -249,7 +249,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       {/* Related Seasons */}
       <section aria-label="Інші сезони" className="border-t border-border bg-card py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-8 text-center text-2xl font-bold">Інші сезони</h2>
+          <div className="heading-2 mb-8 text-center text-2xl font-bold">Інші сезони</div>
           <div className="grid gap-4 md:grid-cols-2">
             {(["summer", "winter", "allseason"] as Season[])
               .filter((s) => s !== season)
@@ -265,7 +265,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
                       <SIcon className={`h-6 w-6 ${seasonTextColors[s]}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{seasonLabels[s]}</h3>
+                      <div className="heading-3 font-semibold">{seasonLabels[s]}</div>
                       <p className="text-sm text-muted-foreground">Переглянути каталог</p>
                     </div>
                   </Link>
@@ -279,7 +279,7 @@ export default async function SeasonTyresPage({ params }: PageProps) {
       <section aria-label="Допомога у виборі" className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h2 className="mb-4 text-3xl font-bold">{meta.ctaTitle}</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">{meta.ctaTitle}</div>
             <p className="mb-8 text-lg opacity-90">
               {meta.ctaDescription}
             </p>

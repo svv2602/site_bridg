@@ -309,7 +309,7 @@ export function QuickSearchForm() {
 
   return (
     <div className={cardClass}>
-      <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-50">Знайдіть ідеальні шини</h2>
+      <div className="heading-2 text-xl font-semibold text-stone-900 dark:text-stone-50">Знайдіть ідеальні шини</div>
       <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
         За розміром на боковині шини або за маркою вашого авто
       </p>

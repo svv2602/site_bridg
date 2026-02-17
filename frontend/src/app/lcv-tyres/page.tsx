@@ -45,7 +45,7 @@ export default async function LcvTyresPage() {
         <section className="py-16">
           <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
             <Truck className="mx-auto h-16 w-16 text-stone-500 dark:text-stone-400 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Шини LCV незабаром з&apos;являться</h3>
+            <div className="heading-3 text-xl font-semibold mb-2">Шини LCV незабаром з&apos;являться</div>
             <p className="text-stone-500 dark:text-stone-400 mb-6">
               Наразі каталог комерційних шин оновлюється. Зверніться до наших консультантів для підбору.
             </p>

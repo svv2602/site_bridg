@@ -144,7 +144,7 @@ export default async function TechnologyPage() {
                   <Cpu className="h-40 w-40 text-stone-300 dark:text-white/10" aria-hidden="true" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
-                  <h2 className="text-xl font-semibold text-stone-900 dark:text-white">Технології у дії</h2>
+                  <div className="heading-2 text-xl font-semibold text-stone-900 dark:text-white">Технології у дії</div>
                   <p className="text-sm text-stone-500 dark:text-stone-400">
                     {technologies.length} унікальних технологій для різних умов експлуатації.
                   </p>
@@ -158,7 +158,7 @@ export default async function TechnologyPage() {
       {/* Benefits */}
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-10 text-center text-3xl font-bold">Ключові переваги</h2>
+          <div className="heading-2 mb-10 text-center text-3xl font-bold">Ключові переваги</div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((benefit) => (
               <div
@@ -168,7 +168,7 @@ export default async function TechnologyPage() {
                 <div className={`mb-4 inline-flex rounded-full ${benefit.color.bg} p-3`}>
                   <benefit.icon className={`h-6 w-6 ${benefit.color.text}`} aria-hidden="true" />
                 </div>
-                <h3 className="mb-2 text-xl font-semibold">{benefit.title}</h3>
+                <div className="heading-3 mb-2 text-xl font-semibold">{benefit.title}</div>
                 <p className="text-sm text-muted-foreground">{benefit.description}</p>
               </div>
             ))}
@@ -179,7 +179,7 @@ export default async function TechnologyPage() {
       {/* Technologies List */}
       <section id="technologies" className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-10 text-3xl font-bold">Технології Bridgestone</h2>
+          <div className="heading-2 mb-10 text-3xl font-bold">Технології Bridgestone</div>
           {technologies.length === 0 ? (
             <div className="text-center py-12">
               <Cpu className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" aria-hidden="true" />
@@ -204,7 +204,7 @@ export default async function TechnologyPage() {
                             {techIcons[tech.slug] || techIcons.default}
                           </div>
                           <div>
-                            <h3 className="text-2xl font-bold">{tech.name}</h3>
+                            <div className="heading-3 text-2xl font-bold">{tech.name}</div>
                             <p className="text-sm uppercase tracking-wide text-primary">
                               Технологія Bridgestone
                             </p>
@@ -221,7 +221,7 @@ export default async function TechnologyPage() {
 
                       {tyres.length > 0 && (
                         <div className="rounded-xl border border-border bg-background p-6">
-                          <h4 className="mb-4 text-xl font-bold">Моделі з цією технологією</h4>
+                          <div className="heading-4 mb-4 text-xl font-bold">Моделі з цією технологією</div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {tyres.slice(0, 3).map((tyre) => (
                               <div
@@ -229,7 +229,7 @@ export default async function TechnologyPage() {
                                 className="rounded-xl border border-border bg-card p-4"
                               >
                                 <div className="mb-2 flex items-center justify-between">
-                                  <h3 className="font-bold">{tyre.name}</h3>
+                                  <div className="heading-3 font-bold">{tyre.name}</div>
                                   <span className="rounded-full bg-stone-200 px-2 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                                     {tyre.season === "summer"
                                       ? "Літо"
@@ -284,7 +284,7 @@ export default async function TechnologyPage() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div className="rounded-3xl bg-graphite p-6 text-white shadow-2xl md:p-10 dark:ring-1 dark:ring-stone-700">
-            <h2 className="mb-4 text-3xl font-bold">Зацікавили технології Bridgestone?</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Зацікавили технології Bridgestone?</div>
             <p className="mb-8 text-lg opacity-90">
               Отримайте детальну консультацію від наших експертів щодо технологій,
               які найкраще підходять для вашого авто та стилю водіння.

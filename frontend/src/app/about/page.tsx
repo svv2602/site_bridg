@@ -73,7 +73,7 @@ export default async function AboutPage() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="mb-6 text-3xl font-bold">Наша місія</h2>
+              <div className="heading-2 mb-6 text-3xl font-bold">Наша місія</div>
               <p className="mb-6 text-lg text-muted-foreground">
                 «Служити суспільству з максимальною якістю» — це не просто слова.
                 Це принцип, який лежить в основі кожної шини, кожного технологічного
@@ -85,7 +85,7 @@ export default async function AboutPage() {
                     <Target className="h-5 w-5 text-orange-500" aria-hidden="true" />
                   </div>
                   <div>
-                    <h4 className="font-semibold">Інновації для безпеки</h4>
+                    <div className="heading-4 font-semibold">Інновації для безпеки</div>
                     <p className="text-sm text-muted-foreground">
                       Ми постійно вдосконалюємо технології, щоб зробити рух безпечнішим
                       на будь‑якій дорозі та в будь‑яку погоду.
@@ -97,7 +97,7 @@ export default async function AboutPage() {
                     <Globe className="h-5 w-5 text-teal-500" aria-hidden="true" />
                   </div>
                   <div>
-                    <h4 className="font-semibold">Відповідальність перед планетою</h4>
+                    <div className="heading-4 font-semibold">Відповідальність перед планетою</div>
                     <p className="text-sm text-muted-foreground">
                       Розробляємо екологічні матеріали та процеси, щоб зменшити вплив
                       на довкілля протягом усього життєвого циклу продукції.
@@ -107,7 +107,7 @@ export default async function AboutPage() {
               </div>
             </div>
             <div>
-              <h2 className="mb-6 text-3xl font-bold">Наші цінності</h2>
+              <div className="heading-2 mb-6 text-3xl font-bold">Наші цінності</div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {values.map((value) => (
                   <div
@@ -117,7 +117,7 @@ export default async function AboutPage() {
                     <div className={`mb-3 inline-flex rounded-full ${value.color.bg} p-2`}>
                       <value.icon className={`h-5 w-5 ${value.color.text}`} aria-hidden="true" />
                     </div>
-                    <h4 className="mb-2 font-semibold">{value.title}</h4>
+                    <div className="heading-4 mb-2 font-semibold">{value.title}</div>
                     <p className="text-sm text-muted-foreground">{value.description}</p>
                   </div>
                 ))}
@@ -131,7 +131,7 @@ export default async function AboutPage() {
       <section className="py-16 bg-gradient-to-b from-card to-background">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mx-auto max-w-4xl text-center animate-fade-in">
-            <h2 className="mb-4 text-3xl font-bold">Історія, яка формує майбутнє</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Історія, яка формує майбутнє</div>
             <p className="mb-10 text-lg text-muted-foreground">
               За понад 90 років Bridgestone пройшов шлях від невеликої японської мануфактури
               до одного з найбільших виробників шин у світі. Кожен етап нашого розвитку
@@ -173,7 +173,7 @@ export default async function AboutPage() {
           <div
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700"
           >
-            <h3 className="mb-4 text-3xl font-bold">Готові дізнатися більше?</h3>
+            <div className="heading-3 mb-4 text-3xl font-bold">Готові дізнатися більше?</div>
             <p className="mb-8 text-lg opacity-90">
               Отримайте професійну консультацію щодо підбору шин або знайдіть найближчого
               офіційного дилера Bridgestone в Україні.

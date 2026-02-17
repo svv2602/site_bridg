@@ -130,9 +130,9 @@ export function TyreCard({ tyre, variant = "default", matchingSizes }: TyreCardP
           <span className={`inline-block text-xs font-semibold uppercase tracking-wide ${brandColors[tyre.brand].text}`}>
             {brandLabels[tyre.brand]}
           </span>
-          <h3 className="line-clamp-2 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+          <div className="heading-3 line-clamp-2 text-base font-medium leading-tight text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
             {tyre.name}
-          </h3>
+          </div>
         </div>
 
         {/* Description - fixed height container */}

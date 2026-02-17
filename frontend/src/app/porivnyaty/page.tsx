@@ -247,9 +247,9 @@ export default function ComparisonSelectionPage() {
                     </div>
 
                     {/* Info */}
-                    <h3 className="font-semibold text-sm mb-1 line-clamp-1">
+                    <div className="heading-3 font-semibold text-sm mb-1 line-clamp-1">
                       {tyre.name}
-                    </h3>
+                    </div>
                     <span
                       className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${seasonBadgeColors[tyre.season]}`}
                     >
@@ -266,7 +266,7 @@ export default function ComparisonSelectionPage() {
       {/* Popular Comparisons */}
       <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Популярні порівняння</h2>
+          <div className="heading-2 text-2xl font-bold mb-6">Популярні порівняння</div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
             {[
               {
@@ -290,9 +290,9 @@ export default function ComparisonSelectionPage() {
                 href={`/porivnyaty/${comparison.slug}`}
                 className="bg-card border border-border rounded-xl p-6 hover:border-silver/50 hover:shadow-md hover:-translate-y-1 transition-all group"
               >
-                <h3 className="font-medium mb-3 text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                <div className="heading-3 font-medium mb-3 text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                   {comparison.title}
-                </h3>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {comparison.description}
                 </p>

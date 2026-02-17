@@ -25,9 +25,9 @@ export function OnlineStores() {
         <div className="mb-8 flex items-center gap-3">
           <ShoppingCart className="h-6 w-6 text-primary" />
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <div className="heading-2 text-2xl font-semibold tracking-tight">
               Купити онлайн
-            </h2>
+            </div>
             <p className="mt-1 text-sm text-muted-foreground">
               Замовте шини Bridgestone в перевірених інтернет-магазинах
             </p>

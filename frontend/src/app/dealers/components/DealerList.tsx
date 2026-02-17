@@ -68,7 +68,7 @@ export function DealerList({
     return (
       <div className="rounded-2xl border border-border bg-card p-12 text-center">
         <Search className="mx-auto h-12 w-12 text-stone-500 dark:text-stone-400" />
-        <h3 className="mt-4 text-xl font-semibold">Дилерів не знайдено</h3>
+        <div className="heading-3 mt-4 text-xl font-semibold">Дилерів не знайдено</div>
         <p className="mt-2 text-muted-foreground">
           Спробуйте змінити параметри пошуку або обрати інше місто.
         </p>
@@ -102,9 +102,9 @@ export function DealerList({
                       ? "Партнер"
                       : "Сервісний центр"}
                 </span>
-                <h3 className="mt-3 mb-1 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                <div className="heading-3 mt-3 mb-1 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                   {dealer.name}
-                </h3>
+                </div>
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4 shrink-0" />
                   <span>{dealer.displayAddress}</span>

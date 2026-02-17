@@ -1,0 +1,9 @@
+/* Heading visual classes — replaces semantic h2-h6 for SEO */
+/* Actual sizing/weight via Tailwind classes on each element */
+.heading-2,
+.heading-3,
+.heading-4,
+.heading-5,
+.heading-6 {
+  display: block;
+}

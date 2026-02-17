@@ -86,7 +86,7 @@ export function ReviewsSectionWithMore({
               <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">{title}</h2>
+              <div className="heading-2 text-2xl font-bold">{title}</div>
               <p className="text-sm text-muted-foreground">
                 {totalCount} {totalCount === 1 ? 'відгук' : totalCount < 5 ? 'відгуки' : 'відгуків'}
               </p>

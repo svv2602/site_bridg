@@ -197,9 +197,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-2xl font-bold">
+            <div className="heading-2 text-2xl font-bold">
               {activeTag ? `Статті з тегом #${activeTag}` : searchQuery ? `Результати пошуку` : "Усі статті"}
-            </h2>
+            </div>
             <span className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground">
               {pluralize(totalDocs, "стаття", "статті", "статей")}
             </span>
@@ -269,11 +269,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           </span>
                         </span>
                       </div>
-                      <h3 className="mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                      <div className="heading-3 mb-3 text-xl font-medium text-foreground transition-all group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
                         <Link href={`/blog/${article.slug}`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded">
                           {article.title}
                         </Link>
-                      </h3>
+                      </div>
                       {article.subtitle && (
                         <p className="mb-4 text-sm text-muted-foreground">{article.subtitle}</p>
                       )}
@@ -321,7 +321,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібну інформацію?</h3>
+            <div className="heading-3 mb-4 text-3xl font-bold">Не знайшли потрібну інформацію?</div>
             <p className="mb-8 text-lg opacity-90">
               Задайте питання нашим експертам або знайдіть найближчого дилера.
             </p>

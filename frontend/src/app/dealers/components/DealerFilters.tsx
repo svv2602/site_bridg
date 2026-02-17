@@ -60,7 +60,7 @@ export function DealerFilters({
       </div>
       {/* Search form */}
       <div className="p-6">
-        <h2 className="mb-4 text-2xl font-semibold">Пошук дилерів</h2>
+        <div className="heading-2 mb-4 text-2xl font-semibold">Пошук дилерів</div>
         <div role="search" className="mb-6 flex flex-col gap-4 sm:flex-row">
           <div className="flex-1">
             <label htmlFor="city-search" className="mb-2 block text-sm font-medium text-foreground">

@@ -263,7 +263,7 @@ export default async function ComparisonPage({
                       className="object-contain p-4"
                     />
                   </div>
-                  <h2 className="text-xl font-bold mb-2">{tyre.name}</h2>
+                  <div className="heading-2 text-xl font-bold mb-2">{tyre.name}</div>
                   <p className="text-muted-foreground text-sm mb-4">
                     {seasonLabelsShort[tyre.season]}
                   </p>
@@ -283,7 +283,7 @@ export default async function ComparisonPage({
         {/* Comparison Table */}
         <section className="py-12">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-8">Порівняння характеристик</h2>
+            <div className="heading-2 text-2xl font-bold mb-8">Порівняння характеристик</div>
 
             <div className="overflow-x-auto">
               <table
@@ -356,7 +356,7 @@ export default async function ComparisonPage({
         {/* Verdict */}
         <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6">Висновок</h2>
+            <div className="heading-2 text-2xl font-bold mb-6">Висновок</div>
             <div className="bg-card border border-border rounded-xl p-6 md:p-8">
               <p className="text-lg leading-relaxed text-muted-foreground">
                 Обидві моделі є якісними шинами від Bridgestone. Вибір залежить
@@ -371,9 +371,9 @@ export default async function ComparisonPage({
         {/* CTA */}
         <section className="py-12">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold mb-4">
+            <div className="heading-2 text-2xl font-bold mb-4">
               Готові обрати?
-            </h2>
+            </div>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
               Знайдіть найближчого дилера Bridgestone та придбайте обрану модель
               шин.

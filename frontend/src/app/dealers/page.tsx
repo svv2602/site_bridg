@@ -68,11 +68,11 @@ export default async function DealersPage() {
       <noscript>
         <section className="pb-8">
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
-            <h2 className="mb-4 text-2xl font-bold">Усі дилери ({allDealers.length})</h2>
+            <div className="heading-2 mb-4 text-2xl font-bold">Усі дилери ({allDealers.length})</div>
             <ul className="space-y-4">
               {allDealers.map((dealer) => (
                 <li key={dealer.id} className="rounded-xl border border-border bg-card p-4">
-                  <h3 className="font-semibold">{dealer.name}</h3>
+                  <div className="heading-3 font-semibold">{dealer.name}</div>
                   <p className="text-sm text-muted-foreground">
                     {[dealer.city, dealer.address].filter(Boolean).join(", ")}
                   </p>

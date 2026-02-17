@@ -152,7 +152,7 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-6">
-                <h2 className="text-xl font-semibold text-stone-900 dark:text-white">
+                <div className="heading-2 text-xl font-semibold text-stone-900 dark:text-white">
                   {seasonalData.promoTitle || (
                     seasonalData.featuredSeason === 'summer'
                       ? t('hero.readyForSummer')
@@ -160,7 +160,7 @@ export function SeasonalHero({ children, seasonalData: serverData }: SeasonalHer
                       ? t('hero.readyForWinter')
                       : t('hero.readyForAny')
                   )}
-                </h2>
+                </div>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
                   {seasonalData.promoSubtitle || (
                     seasonalData.featuredSeason === 'summer'

@@ -204,7 +204,7 @@ export default async function TyreModelPage({
                 )}
                 {!model.imageUrl && (
                   <div className="absolute bottom-0 left-0 right-0 border-t border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm p-6">
-                    <h3 className="text-lg font-semibold text-stone-900 dark:text-white">Фото незабаром</h3>
+                    <div className="heading-3 text-lg font-semibold text-stone-900 dark:text-white">Фото незабаром</div>
                     <p className="text-sm text-stone-500 dark:text-stone-400">
                       Зображення моделі {model.name} буде додано найближчим часом.
                     </p>
@@ -220,7 +220,7 @@ export default async function TyreModelPage({
       {model.fullDescription ? (
         <section className="border-b border-border bg-stone-50 dark:bg-stone-900/50 py-12 md:py-16">
           <div className="container mx-auto max-w-4xl px-4 md:px-8">
-            <h2 className="mb-6 text-2xl font-bold md:text-3xl">Про модель {model.name}</h2>
+            <div className="heading-2 mb-6 text-2xl font-bold md:text-3xl">Про модель {model.name}</div>
             <div className="prose prose-lg max-w-none">
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <LexicalRenderer
@@ -248,13 +248,13 @@ export default async function TyreModelPage({
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-4 text-xl font-bold">Технічні характеристики</h2>
+                <div className="heading-2 mb-4 text-xl font-bold">Технічні характеристики</div>
                 <SizesByDiameter sizes={model.sizes} modelSlug={model.slug} />
               </div>
 
               {model.euLabel && (
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                  <h2 className="mb-4 text-xl font-bold">EU‑маркування</h2>
+                  <div className="heading-2 mb-4 text-xl font-bold">EU‑маркування</div>
                   <div className="grid gap-4 sm:grid-cols-3 text-sm">
                     <div className="rounded-xl border border-border bg-background p-4">
                       <p className="mb-2 text-xs text-muted-foreground">Зчеплення на мокрій дорозі</p>
@@ -302,7 +302,7 @@ export default async function TyreModelPage({
 
             <aside className="space-y-6">
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-3 text-lg font-bold">Для яких умов підходить</h2>
+                <div className="heading-2 mb-3 text-lg font-bold">Для яких умов підходить</div>
                 <p className="mb-4 text-sm text-muted-foreground">
                   Інформаційний блок на основі сценаріїв використання з технічного опису моделі.
                 </p>
@@ -341,7 +341,7 @@ export default async function TyreModelPage({
               </div>
 
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="mb-3 text-lg font-bold">Повернутися до каталогу</h2>
+                <div className="heading-2 mb-3 text-lg font-bold">Повернутися до каталогу</div>
                 <p className="mb-4 text-sm text-muted-foreground">
                   Ви можете перейти до загального каталогу шин або до пошуку за параметрами.
                 </p>
@@ -393,9 +393,9 @@ export default async function TyreModelPage({
       {recommended.length > 0 && (
         <section className="py-12 bg-gradient-to-b from-card to-background">
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
-            <h2 className="mb-8 text-2xl font-bold md:text-3xl">
+            <div className="heading-2 mb-8 text-2xl font-bold md:text-3xl">
               Рекомендовані моделі Bridgestone
-            </h2>
+            </div>
             <TyreCardGrid tyres={recommended} />
           </div>
         </section>

@@ -32,9 +32,9 @@ export function DataUnavailable({
       <div className="rounded-full bg-stone-100 p-4 dark:bg-stone-800">
         <AlertTriangle className="h-8 w-8 text-stone-500 dark:text-stone-400" />
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-stone-900 dark:text-stone-100">
+      <div className="heading-3 mt-4 text-lg font-semibold text-stone-900 dark:text-stone-100">
         {title}
-      </h3>
+      </div>
       <p className="mt-2 max-w-md text-center text-sm text-stone-600 dark:text-stone-400">
         {message}
       </p>

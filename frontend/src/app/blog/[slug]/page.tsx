@@ -209,7 +209,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {article.tags && article.tags.length > 0 && (
         <section className="border-t border-border py-8">
           <div className="container mx-auto max-w-6xl px-4 md:px-8">
-            <h3 className="mb-4 text-lg font-semibold">Схожі теми</h3>
+            <div className="heading-3 mb-4 text-lg font-semibold">Схожі теми</div>
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (
                 <Link

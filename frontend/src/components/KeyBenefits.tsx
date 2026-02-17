@@ -25,7 +25,7 @@ export function KeyBenefits({
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/15">
           <Star className="h-5 w-5 text-purple-500" />
         </div>
-        <h2 className="text-xl font-bold">{title}</h2>
+        <div className="heading-2 text-xl font-bold">{title}</div>
       </div>
 
       <ul className="grid gap-3 sm:grid-cols-2">

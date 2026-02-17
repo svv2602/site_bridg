@@ -99,7 +99,7 @@ export function FuelCalculator({ currentRating = "C", className = "" }: FuelCalc
         <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
           <Calculator className="h-5 w-5 text-green-600 dark:text-green-400" />
         </div>
-        <h3 className="font-semibold">Калькулятор економії палива</h3>
+        <div className="heading-3 font-semibold">Калькулятор економії палива</div>
       </div>
 
       {/* Annual mileage slider */}

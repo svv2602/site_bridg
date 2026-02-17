@@ -100,7 +100,7 @@ export default function TyreSearchPage() {
             <div className="lg:col-span-2">
               <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 text-foreground shadow-lg dark:border-stone-800 dark:bg-stone-900/95 dark:text-stone-50 dark:shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:p-8">
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-50">Оберіть спосіб пошуку</h2>
+                  <div className="heading-2 text-2xl font-bold text-stone-900 dark:text-stone-50">Оберіть спосіб пошуку</div>
                   <div
                     role="tablist"
                     aria-label="Спосіб пошуку шин"
@@ -195,10 +195,10 @@ export default function TyreSearchPage() {
             <div className="space-y-6">
               {mode === "car" ? (
                 <div className="rounded-2xl border border-border bg-card p-6">
-                  <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                  <div className="heading-3 mb-4 flex items-center gap-2 text-xl font-bold">
                     <Database className="h-5 w-5 text-primary" />
                     База даних авто
-                  </h3>
+                  </div>
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-green-500" />
@@ -223,10 +223,10 @@ export default function TyreSearchPage() {
                 </div>
               ) : (
                 <div className="rounded-2xl border border-border bg-card p-6">
-                  <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                  <div className="heading-3 mb-4 flex items-center gap-2 text-xl font-bold">
                     <CheckCircle className="h-5 w-5 text-primary" />
                     Поради щодо підбору
-                  </h3>
+                  </div>
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
@@ -248,10 +248,10 @@ export default function TyreSearchPage() {
                 </div>
               )}
               <div className="rounded-2xl border border-border bg-card p-6">
-                <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                <div className="heading-3 mb-4 flex items-center gap-2 text-xl font-bold">
                   <MapPin className="h-5 w-5 text-primary" />
                   Не знайшли потрібний розмір?
-                </h3>
+                </div>
                 <p className="mb-4 text-sm text-muted-foreground">
                   Зв&apos;яжіться з нашими експертами — ми допоможемо підібрати альтернативу
                   або знайти шини під замовлення.

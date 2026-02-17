@@ -123,7 +123,7 @@ export function CookiesBanner() {
             <div className="rounded-full bg-amber-500/15 p-2">
               <Cookie className="h-5 w-5 text-amber-500" />
             </div>
-            <h3 className="text-lg font-semibold">Cookies</h3>
+            <div className="heading-3 text-lg font-semibold">Cookies</div>
           </div>
           <button
             onClick={handleReject}

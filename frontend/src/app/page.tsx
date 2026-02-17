@@ -94,7 +94,7 @@ function FeaturedTyresCards({ featuredTyres }: { featuredTyres: FeaturedTyre[] }
             <Star className="h-6 w-6 text-purple-500" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold">{tyre.name}</h3>
+            <div className="heading-3 text-xl font-bold">{tyre.name}</div>
             <p className="text-sm uppercase tracking-wide text-primary">{tyre.tag}</p>
             <p className="mt-2 text-sm text-muted-foreground">{tyre.description}</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -135,7 +135,7 @@ async function ArticlesSection() {
     <section className="py-12">
       <div className="container mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-10 text-center">
-          <h2 className="mb-4 text-3xl font-bold">{t('home.adviceTitle')}</h2>
+          <div className="heading-2 mb-4 text-3xl font-bold">{t('home.adviceTitle')}</div>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             {t('home.adviceDescription')}
           </p>
@@ -150,7 +150,7 @@ async function ArticlesSection() {
               <div className="mb-4 inline-flex rounded-full bg-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                 {article.category}
               </div>
-              <h3 className="mb-2 text-xl font-bold">{article.title}</h3>
+              <div className="heading-3 mb-2 text-xl font-bold">{article.title}</div>
               <p className="mb-4 text-sm text-muted-foreground">{article.readingTime}</p>
               <Link
                 href={`/blog/${article.slug}`}
@@ -206,7 +206,7 @@ export default async function Home() {
       <section className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">{t('home.whyBridgestone')}</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">{t('home.whyBridgestone')}</div>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               {t('home.whyBridgestoneDescription')}
             </p>
@@ -221,7 +221,7 @@ export default async function Home() {
                 <div className={`mx-auto mb-4 inline-flex rounded-full ${feat.color.bg} p-3`}>
                   <feat.icon className={`h-6 w-6 ${feat.color.text}`} />
                 </div>
-                <h3 className="mb-2 text-xl font-bold">{feat.title}</h3>
+                <div className="heading-3 mb-2 text-xl font-bold">{feat.title}</div>
                 <p className="text-sm text-muted-foreground">{feat.description}</p>
               </AnimatedCard>
             ))}
@@ -233,7 +233,7 @@ export default async function Home() {
       <section className="py-12 bg-stone-50 dark:bg-stone-900/50">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Шини за типом авто</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Шини за типом авто</div>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               Оберіть категорію, що відповідає вашому автомобілю
             </p>
@@ -253,7 +253,7 @@ export default async function Home() {
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
-              <h2 className="mb-6 text-3xl font-bold">{t('home.tyresBySeason')}</h2>
+              <div className="heading-2 mb-6 text-3xl font-bold">{t('home.tyresBySeason')}</div>
               <p className="mb-8 text-lg text-muted-foreground">
                 {t('home.tyresBySeasonDescription')}
               </p>
@@ -276,7 +276,7 @@ export default async function Home() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-xl font-bold">{cat.name}</h3>
+                          <div className="heading-3 text-xl font-bold">{cat.name}</div>
                           {isFeatured && (
                             <span className="rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
                               Рекомендовано
@@ -297,7 +297,7 @@ export default async function Home() {
               </div>
             </div>
             <div>
-              <h2 className="mb-6 text-3xl font-bold">{t('home.popularModels')}</h2>
+              <div className="heading-2 mb-6 text-3xl font-bold">{t('home.popularModels')}</div>
               <p className="mb-8 text-lg text-muted-foreground">
                 {t('home.popularModelsDescription')}
               </p>
@@ -322,7 +322,7 @@ export default async function Home() {
               <Award className="h-4 w-4" />
               Незалежні тести
             </div>
-            <h2 className="text-2xl font-bold md:text-3xl">Підтверджена якість</h2>
+            <div className="heading-2 text-2xl font-bold md:text-3xl">Підтверджена якість</div>
             <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
               Шини Bridgestone регулярно отримують високі оцінки від провідних європейських тестових організацій
             </p>
@@ -402,7 +402,7 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <AnimatedCard className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h2 className="mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Не впевнені, які шини обрати?</div>
             <p className="mb-8 text-lg opacity-90">
               Наші експерти допоможуть підібрати ідеальні шини саме для вас —
               з урахуванням вашого стилю водіння та бюджету.

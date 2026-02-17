@@ -160,7 +160,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
                     <div className={`rounded-full ${config.heroOverlayIconBg} p-2`}>
                       <OverlayIcon className={`h-5 w-5 ${config.heroOverlayIconText}`} />
                     </div>
-                    <h3 className="text-xl font-semibold text-white">{config.heroOverlayTitle}</h3>
+                    <div className="heading-3 text-xl font-semibold text-white">{config.heroOverlayTitle}</div>
                   </div>
                   <p className="text-sm text-white/80">
                     {config.heroOverlayDescription}
@@ -176,7 +176,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
       <section id="catalog" className="py-12">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Оберіть сезонність</h2>
+            <div className="heading-2 mb-4 text-3xl font-bold">Оберіть сезонність</div>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               {config.seasonSectionDescription}
             </p>
@@ -204,7 +204,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
       {featuredTyres.length > 0 && (
         <section className="py-12 bg-gradient-to-b from-card to-background">
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
-            <h2 className="mb-8 text-3xl font-bold text-center">{config.featuredTitle}</h2>
+            <div className="heading-2 mb-8 text-3xl font-bold text-center">{config.featuredTitle}</div>
             <TyreCardGrid
               tyres={featuredTyres}
               variant="featured"
@@ -228,7 +228,7 @@ export function CategoryPage({ config, tyres }: CategoryPageProps) {
       <section className="py-16">
         <div className="container mx-auto max-w-4xl px-4 text-center md:px-8">
           <div className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700">
-            <h3 className="mb-4 text-3xl font-bold">{config.ctaTitle}</h3>
+            <div className="heading-3 mb-4 text-3xl font-bold">{config.ctaTitle}</div>
             <p className="mb-8 text-lg opacity-90">
               {config.ctaDescription}
             </p>

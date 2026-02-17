@@ -59,7 +59,7 @@ export function ReviewCard({ review, showTyreName = false }: ReviewCardProps) {
       </div>
 
       {/* Title */}
-      <h4 className="mb-2 text-base font-semibold">&ldquo;{review.title}&rdquo;</h4>
+      <div className="heading-4 mb-2 text-base font-semibold">&ldquo;{review.title}&rdquo;</div>
 
       {/* Content */}
       <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{review.content}</p>

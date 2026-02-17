@@ -90,7 +90,7 @@ export default function SitemapPage() {
           <div className="grid gap-8 md:grid-cols-3">
             {sitemapSections.map((section) => (
               <div key={section.title}>
-                <h2 className="mb-4 text-lg font-semibold">{section.title}</h2>
+                <div className="heading-2 mb-4 text-lg font-semibold">{section.title}</div>
                 <ul className="space-y-1">
                   {section.links.map((link) => (
                     <li key={link.href}>

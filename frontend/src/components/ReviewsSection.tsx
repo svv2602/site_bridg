@@ -54,7 +54,7 @@ export async function ReviewsSection({
             <div className="rounded-full bg-amber-100 p-2 dark:bg-amber-900/30">
               <MessageSquare className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <h2 className="text-2xl font-bold">{title}</h2>
+            <div className="heading-2 text-2xl font-bold">{title}</div>
           </div>
 
           {showAllLink && (

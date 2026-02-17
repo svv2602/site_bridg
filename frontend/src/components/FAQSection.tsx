@@ -28,7 +28,7 @@ export function FAQSection({ faqs, tireName }: FAQSectionProps) {
             <HelpCircle className="h-5 w-5 text-blue-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Часті запитання</h2>
+            <div className="heading-2 text-2xl font-bold">Часті запитання</div>
             <p className="text-sm text-stone-500 dark:text-stone-400">
               Відповіді на популярні питання про {tireName}
             </p>

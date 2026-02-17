@@ -16,7 +16,7 @@ function DealerCardCompact({ dealer }: { dealer: Dealer }) {
         <MapPin className="h-5 w-5 text-rose-500" />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-sm truncate">{dealer.name}</h4>
+        <div className="heading-4 font-semibold text-sm truncate">{dealer.name}</div>
         <p className="text-xs text-muted-foreground truncate">{dealer.city}, {dealer.address}</p>
       </div>
       {dealer.phone && (
@@ -66,9 +66,9 @@ export function DealerLocatorCompact({ initialDealers }: DealerLocatorCompactPro
               <Navigation className="h-3 w-3 text-primary" />
               Офіційна мережа
             </div>
-            <h2 className="mb-4 text-2xl font-bold md:text-3xl">
+            <div className="heading-2 mb-4 text-2xl font-bold md:text-3xl">
               Знайдіть найближчого дилера
-            </h2>
+            </div>
             <p className="mb-6 text-muted-foreground">
               Введіть ваше місто для пошуку офіційних дилерів та сервісних центрів Bridgestone
             </p>

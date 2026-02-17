@@ -258,7 +258,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
           ) : (
             <div className="py-16 text-center">
               <MessageSquare className="mx-auto h-16 w-16 text-muted-foreground/30" />
-              <h2 className="mt-4 text-xl font-semibold">Відгуки не знайдено</h2>
+              <div className="heading-2 mt-4 text-xl font-semibold">Відгуки не знайдено</div>
               <p className="mt-2 text-muted-foreground">
                 {activeFilters.length > 0
                   ? "Спробуйте змінити фільтри або скиньте їх."

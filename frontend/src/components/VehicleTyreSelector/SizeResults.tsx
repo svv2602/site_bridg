@@ -192,13 +192,13 @@ export function SizeResults({ searchResult, selectedSize, onSizeClick }: SizeRes
     <div className="space-y-6 animate-fade-in">
       {/* Vehicle info */}
       <div className="rounded-xl border border-stone-300 bg-stone-100 p-6 dark:border-stone-700 dark:bg-stone-800">
-        <h3 className="mb-4 text-xl font-bold text-stone-900 dark:text-stone-50">
+        <div className="heading-3 mb-4 text-xl font-bold text-stone-900 dark:text-stone-50">
           {searchResult.vehicle.brand} {searchResult.vehicle.model}{" "}
           {searchResult.vehicle.year}
           <span className="ml-2 text-base font-normal text-stone-500 dark:text-stone-400">
             {searchResult.vehicle.kit}
           </span>
-        </h3>
+        </div>
 
         {/* Tyre sizes */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -241,14 +241,14 @@ export function SizeResults({ searchResult, selectedSize, onSizeClick }: SizeRes
       {/* Matching Bridgestone tyres */}
       {filteredTyres.length > 0 ? (
         <div>
-          <h3 className="mb-4 text-xl font-bold text-stone-900 dark:text-stone-50">
+          <div className="heading-3 mb-4 text-xl font-bold text-stone-900 dark:text-stone-50">
             Шини Bridgestone для вашого авто
             {selectedSize && (
               <span className="ml-2 text-base font-normal text-stone-500 dark:text-stone-400">
                 ({filteredTyres.length} моделей для {selectedSize})
               </span>
             )}
-          </h3>
+          </div>
           <div className="grid gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-3">
             {filteredTyres.map((tyre, idx) => (
               <div
@@ -268,9 +268,9 @@ export function SizeResults({ searchResult, selectedSize, onSizeClick }: SizeRes
       ) : (
         <div className="rounded-xl border border-stone-300 bg-stone-100/50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/50">
           <AlertCircle className="mx-auto h-12 w-12 text-amber-500 dark:text-amber-400" />
-          <h3 className="mt-4 text-lg font-semibold text-stone-900 dark:text-stone-50">
+          <div className="heading-3 mt-4 text-lg font-semibold text-stone-900 dark:text-stone-50">
             Шин Bridgestone для цих розмірів наразі немає в каталозі
-          </h3>
+          </div>
           <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
             Зверніться до наших дилерів — вони допоможуть підібрати
             альтернативу або замовити потрібний розмір.

@@ -285,10 +285,10 @@ export function DealersClient({ initialDealers, phoneHref }: DealersClientProps)
             {/* Interactive Map - rendered on lg+ or when mobile viewMode is 'map' */}
             {(isLargeScreen || viewMode === "map") && (
               <div className={`rounded-2xl border border-border bg-card p-6 ${!isLargeScreen && viewMode === "map" ? "lg:hidden" : ""}`}>
-                <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                <div className="heading-3 mb-4 flex items-center gap-2 text-xl font-bold">
                   <MapPin className="h-5 w-5 text-primary" />
                   Інтерактивна карта
-                </h3>
+                </div>
                 <div className="h-80 overflow-hidden rounded-xl">
                   <DealersMap
                     dealers={initialDealers}
@@ -306,7 +306,7 @@ export function DealersClient({ initialDealers, phoneHref }: DealersClientProps)
       {/* Dealers List — hidden on mobile when map view is active */}
       <section className={`pb-8 ${!isLargeScreen && viewMode === "map" ? "hidden" : ""}`}>
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-4 text-2xl font-bold">Результати пошуку</h2>
+          <div className="heading-2 mb-4 text-2xl font-bold">Результати пошуку</div>
           <DealerList
             dealers={filteredDealers}
             isLoading={false}
@@ -324,7 +324,7 @@ export function DealersClient({ initialDealers, phoneHref }: DealersClientProps)
           <div
             className="rounded-3xl bg-graphite p-10 text-white shadow-2xl dark:ring-1 dark:ring-stone-700"
           >
-            <h3 className="mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</h3>
+            <div className="heading-3 mb-4 text-3xl font-bold">Не знайшли потрібного дилера?</div>
             <p className="mb-8 text-lg opacity-90">
               Зв&apos;яжіться з нами напряму — ми допоможемо знайти найближчу точку продажу
               або організуємо доставку шин у ваше місто.

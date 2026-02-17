@@ -56,7 +56,7 @@ export function ProductCarousel({ tyres, title = 'Популярні модел�
     return (
       <section className="py-12 bg-stone-50 dark:bg-stone-900">
         <div className="container mx-auto max-w-7xl px-4 md:px-8">
-          <h2 className="mb-8 text-2xl md:text-3xl font-bold text-center">{title}</h2>
+          <div className="heading-2 mb-8 text-2xl md:text-3xl font-bold text-center">{title}</div>
           <div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
             {tyres.map((tyre) => (
               <div key={tyre.slug} className="h-full">
@@ -74,7 +74,7 @@ export function ProductCarousel({ tyres, title = 'Популярні модел�
       <div className="container mx-auto max-w-7xl px-4 md:px-8">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
+          <div className="heading-2 text-2xl md:text-3xl font-bold">{title}</div>
         </div>
 
         {/* Carousel with side navigation */}

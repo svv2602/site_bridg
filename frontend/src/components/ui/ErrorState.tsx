@@ -17,7 +17,7 @@ export function ErrorState({
   return (
     <div role="alert" className="rounded-2xl border border-error/30 bg-error/10 p-12 text-center">
       <AlertTriangle className="mx-auto h-12 w-12 text-error mb-4" />
-      <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+      <div className="heading-3 text-xl font-semibold text-foreground">{title}</div>
       <p className="mt-2 text-stone-500 dark:text-stone-400">{message}</p>
       {onRetry && (
         <Button

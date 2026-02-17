@@ -32,7 +32,7 @@ export function SeasonCategoryCard({
           <div className={`rounded-full ${seasonBgLight[season]} p-2`}>
             <Icon className={`h-5 w-5 ${seasonTextColors[season]}`} aria-hidden="true" />
           </div>
-          <h3 className="text-xl font-bold">{seasonLabels[season]}</h3>
+          <div className="heading-3 text-xl font-bold">{seasonLabels[season]}</div>
         </div>
         <span className="rounded-full bg-stone-200 px-3 py-1 text-sm font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-200">
           {items.length} моделей
@@ -47,7 +47,7 @@ export function SeasonCategoryCard({
           >
             {/* Title - fixed height container */}
             <div className="h-[1.5rem]">
-              <h4 className="font-semibold line-clamp-1">{model.name}</h4>
+              <div className="heading-4 font-semibold line-clamp-1">{model.name}</div>
             </div>
             {/* Description - fixed height container */}
             <div className="mt-1 h-[2.5rem]">

@@ -57,7 +57,7 @@ export async function Footer() {
                 B
               </div>
               <div>
-                <h3 className="text-lg font-bold">Bridgestone <span className="text-[#FF6600]">&</span> Firestone</h3>
+                <div className="heading-3 text-lg font-bold">Bridgestone <span className="text-[#FF6600]">&</span> Firestone</div>
                 <p className="text-xs text-muted-foreground">Офіційний представник в Україні</p>
               </div>
             </Link>
@@ -85,9 +85,9 @@ export async function Footer() {
 
           {/* Column 2: Products */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+            <div className="heading-4 mb-4 text-sm font-semibold uppercase tracking-wide">
               Продукція
-            </h4>
+            </div>
             <ul className="space-y-2 text-sm">
               {productLinks.map((link) => (
                 <li key={link.href}>
@@ -105,9 +105,9 @@ export async function Footer() {
 
           {/* Column 3: Seasons */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+            <div className="heading-4 mb-4 text-sm font-semibold uppercase tracking-wide">
               За сезоном
-            </h4>
+            </div>
             <ul className="space-y-2 text-sm">
               {seasonLinks.map((link) => (
                 <li key={link.href}>
@@ -122,9 +122,9 @@ export async function Footer() {
               ))}
             </ul>
 
-            <h4 className="mb-4 mt-6 text-sm font-semibold uppercase tracking-wide">
+            <div className="heading-4 mb-4 mt-6 text-sm font-semibold uppercase tracking-wide">
               Інформація
-            </h4>
+            </div>
             <ul className="space-y-2 text-sm">
               {infoLinks.slice(0, 3).map((link) => (
                 <li key={link.href}>
@@ -142,9 +142,9 @@ export async function Footer() {
 
           {/* Column 4: Contacts */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+            <div className="heading-4 mb-4 text-sm font-semibold uppercase tracking-wide">
               Контакти
-            </h4>
+            </div>
             <address className="not-italic text-sm text-muted-foreground">
               <div className="mb-4 flex items-start gap-3">
                 <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />

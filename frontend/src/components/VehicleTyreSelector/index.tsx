@@ -109,9 +109,9 @@ export function VehicleTyreSelector({
         <div
           className="rounded-xl border border-stone-300 bg-stone-100/50 p-4 animate-fade-in dark:border-stone-700 dark:bg-stone-800/50"
         >
-          <h4 className="mb-2 text-sm font-semibold text-stone-900 dark:text-stone-50">
+          <div className="heading-4 mb-2 text-sm font-semibold text-stone-900 dark:text-stone-50">
             Параметри кріплення коліс
-          </h4>
+          </div>
           <div className="flex flex-wrap gap-4 text-sm text-stone-500 dark:text-stone-400">
             {selectedKit.pcd && (
               <span>

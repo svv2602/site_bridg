@@ -134,7 +134,7 @@ export function ContactForm() {
     <div
       className="rounded-2xl border border-border bg-card p-8 shadow-lg"
     >
-      <h2 className="mb-6 text-2xl font-bold">Надішліть нам повідомлення</h2>
+      <div className="heading-2 mb-6 text-2xl font-bold">Надішліть нам повідомлення</div>
       <p className="mb-8 text-muted-foreground">
         Заповніть форму, і наші фахівці зв&apos;яжуться з вами найближчим часом.
       </p>
@@ -142,9 +142,9 @@ export function ContactForm() {
       {status === 'success' ? (
         <div ref={successRef} tabIndex={-1} className="rounded-xl border border-green-200 bg-green-50 p-6 text-center dark:border-green-900 dark:bg-green-950 outline-none">
           <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-          <h3 className="mt-4 text-xl font-semibold text-green-800 dark:text-green-200">
+          <div className="heading-3 mt-4 text-xl font-semibold text-green-800 dark:text-green-200">
             Дякуємо за звернення!
-          </h3>
+          </div>
           <p className="mt-2 text-green-700 dark:text-green-300">
             Ваше повідомлення отримано. Ми зв&apos;яжемося з вами протягом 24 годин.
           </p>

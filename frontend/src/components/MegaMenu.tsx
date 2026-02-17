@@ -169,9 +169,9 @@ export function MegaMenu({ trigger, columns }: MegaMenuProps) {
             <div className={`grid gap-8 grid-cols-${columns.length}`} style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}>
               {columns.map((column) => (
                 <div key={column.title}>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-stone-400">
+                  <div className="heading-3 mb-3 text-xs font-semibold uppercase tracking-wider text-stone-400">
                     {column.title}
-                  </h3>
+                  </div>
                   <ul className="space-y-1" role="menu">
                     {column.items.map((item) => (
                       <li key={item.href} role="none">
