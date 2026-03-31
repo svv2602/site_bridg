@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Facebook, Instagram, Youtube, Phone, Mail, MapPin, ChevronRight } from 'lucide-react';
+import { Facebook, Instagram, Youtube, Mail, MapPin, ChevronRight } from 'lucide-react';
 import { getSiteSettingsWithDefaults } from '@/lib/constants';
 
 const productLinks = [
@@ -146,18 +146,6 @@ export async function Footer() {
               Контакти
             </div>
             <address className="not-italic text-sm text-muted-foreground">
-              <div className="mb-4 flex items-start gap-3">
-                <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Гаряча лінія:</p>
-                  <a
-                    href={settings.phoneHref}
-                    className="text-lg font-bold text-foreground hover:text-primary"
-                  >
-                    {settings.phoneDisplay}
-                  </a>
-                </div>
-              </div>
 
               <div className="mb-4 flex items-start gap-3">
                 <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />

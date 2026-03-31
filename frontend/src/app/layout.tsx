@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { MapPin, Phone } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { AnimatedMain } from "@/components/AnimatedMain";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MainHeader } from "@/components/MainHeader";
@@ -149,10 +149,6 @@ export default async function RootLayout({
                   <MapPin className="h-3 w-3" />
                   <span>Знайти дилера поруч</span>
                 </Link>
-                <div className="hidden items-center gap-1.5 sm:flex text-stone-500 dark:text-stone-400">
-                  <Phone className="h-3 w-3" />
-                  <span>Гаряча лінія: {settings.phoneDisplay}</span>
-                </div>
               </div>
               <ThemeToggle />
             </div>

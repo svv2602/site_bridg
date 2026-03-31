@@ -84,8 +84,6 @@ export default async function PrivacyPage() {
             З питань щодо політики конфіденційності звертайтесь:
             <br />
             Email: <a href={`mailto:${settings.emailPrivacy}`}>{settings.emailPrivacy}</a>
-            <br />
-            Телефон: {settings.phoneDisplay}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">

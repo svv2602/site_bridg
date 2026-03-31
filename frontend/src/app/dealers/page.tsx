@@ -92,7 +92,7 @@ export default async function DealersPage() {
       <OnlineStores />
 
       {/* Interactive client parts (filters, map, geolocation, dealer list) */}
-      <DealersClient initialDealers={allDealers} phoneHref={settings.phoneHref} />
+      <DealersClient initialDealers={allDealers} />
       <TrackDealerSearch />
     </div>
   );

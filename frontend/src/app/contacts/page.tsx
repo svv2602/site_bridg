@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Phone, Mail, MapPin, Clock, Send, ArrowRight } from "lucide-react";
+import { Mail, MapPin, Clock, Send, ArrowRight } from "lucide-react";
 import { Breadcrumb } from "@/components/ui";
 import { getSiteSettingsWithDefaults } from "@/lib/constants";
 import { ContactForm } from "./ContactForm";
@@ -8,21 +8,21 @@ import { ContactForm } from "./ContactForm";
 export const metadata: Metadata = {
   title: "Контакти",
   description:
-    "Зв'яжіться з Bridgestone Україна: гаряча лінія, електронна пошта, форма зворотного зв'язку. Консультація щодо підбору шин та пошук офіційних дилерів.",
+    "Зв'яжіться з Bridgestone Україна: електронна пошта, форма зворотного зв'язку. Консультація щодо підбору шин та пошук офіційних дилерів.",
   alternates: {
     canonical: "/contacts",
   },
   openGraph: {
     title: "Контакти — Bridgestone Україна",
     description:
-      "Зв'яжіться з Bridgestone Україна: гаряча лінія, електронна пошта, форма зворотного зв'язку.",
+      "Зв'яжіться з Bridgestone Україна: електронна пошта, форма зворотного зв'язку.",
   },
 };
 
 const faqs = [
   {
     question: "Як знайти найближчого дилера Bridgestone?",
-    answer: "Скористайтеся інтерактивною картою в розділі \u00ABДе купити\u00BB або зателефонуйте на гарячу лінію.",
+    answer: "Скористайтеся інтерактивною картою в розділі \u00ABДе купити\u00BB або напишіть нам через форму зворотного зв'язку.",
   },
   {
     question: "Чи можна замовити шини через сайт?",
@@ -34,7 +34,7 @@ const faqs = [
   },
   {
     question: "Чи можна отримати консультацію щодо підбору шин?",
-    answer: "Так, наші експерти готові допомогти за телефоном або через форму зворотного зв'язку.",
+    answer: "Так, наші експерти готові допомогти через форму зворотного зв'язку або месенджер.",
   },
 ];
 
@@ -42,15 +42,6 @@ export default async function ContactsPage() {
   const settings = await getSiteSettingsWithDefaults();
 
   const contactMethods = [
-    {
-      icon: Phone,
-      title: "Телефон гарячої лінії",
-      details: settings.phoneDisplay,
-      subtitle: "Безкоштовно з усіх телефонів",
-      action: "Зателефонувати",
-      href: settings.phoneHref,
-      color: { bg: "bg-green-500/15", text: "text-green-500" },
-    },
     {
       icon: Mail,
       title: "Електронна пошта",
@@ -211,16 +202,9 @@ export default async function ContactsPage() {
           >
             <div className="heading-2 mb-4 text-3xl font-bold">Потрібна негайна допомога?</div>
             <p className="mb-8 text-lg">
-              Зателефонуйте на гарячу лінію або напишіть у месенджер — ми відповімо протягом 15 хвилин.
+              Напишіть у месенджер — ми відповімо протягом 15 хвилин.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href={settings.phoneHref}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-semibold text-graphite transition-colors hover:bg-stone-100"
-              >
-                <Phone className="h-4 w-4" />
-                Зателефонувати зараз
-              </a>
               <a
                 href={settings.socialLinks.telegram}
                 target="_blank"

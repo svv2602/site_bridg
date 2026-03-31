@@ -3,7 +3,7 @@ import { SITE_URL, LOGO_URL_WHITE, getSiteSettingsWithDefaults } from "@/lib/con
 
 export const metadata: Metadata = {
   title: "Контакти | Bridgestone Україна",
-  description: "Зв'яжіться з офіційним представником Bridgestone в Україні. Телефон гарячої лінії, email, форма зворотного зв'язку.",
+  description: "Зв'яжіться з офіційним представником Bridgestone в Україні. Email, форма зворотного зв'язку.",
   alternates: {
     canonical: '/contacts',
   },
@@ -35,7 +35,6 @@ export default async function ContactsLayout({
       logo: `${SITE_URL}${LOGO_URL_WHITE}`,
       contactPoint: {
         "@type": "ContactPoint",
-        telephone: settings.phoneSchema,
         contactType: "customer service",
         availableLanguage: "Ukrainian",
         areaServed: "UA",

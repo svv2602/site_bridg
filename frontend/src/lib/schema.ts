@@ -168,7 +168,6 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
         ],
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: settings?.phoneSchema || "+380-800-123-456",
       contactType: "customer service",
       availableLanguage: ["Ukrainian"],
       areaServed: "UA",

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { ChevronRight, Star, Phone, Award } from "lucide-react";
+import { ChevronRight, Star, Award } from "lucide-react";
 import { getSiteSettingsWithDefaults } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -414,13 +414,6 @@ export default async function Home() {
               >
                 Допоможіть мені обрати
               </Link>
-              <a
-                href={settings.phoneHref}
-                className="inline-flex items-center gap-2 rounded-full border border-white bg-transparent px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
-              >
-                <Phone className="h-4 w-4" />
-                Зателефонувати
-              </a>
             </div>
           </AnimatedCard>
         </div>

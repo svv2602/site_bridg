@@ -80,8 +80,6 @@ export default async function TermsPage() {
             З питань щодо умов використання звертайтесь:
             <br />
             Email: <a href={`mailto:${settings.emailInfo}`}>{settings.emailInfo}</a>
-            <br />
-            Телефон: {settings.phoneDisplay}
           </p>
 
           <p className="mt-8 text-sm text-muted-foreground">
