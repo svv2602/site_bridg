@@ -8,6 +8,9 @@
  */
 import type { GlobalConfig } from 'payload';
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3010';
+const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET;
+
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Налаштування сайту',
@@ -18,6 +21,27 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: () => true,
     update: ({ req }) => !!req.user,
+  },
+  hooks: {
+    afterChange: [
+      ({ req }) => {
+        // Revalidate frontend cache so contact changes appear immediately
+        if (!REVALIDATION_SECRET) return;
+        const url = `${FRONTEND_URL}/api/revalidate`;
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret: REVALIDATION_SECRET, global: 'site-settings' }),
+        })
+          .then((res) => {
+            if (res.ok) req.payload.logger.info('[Revalidate] site-settings → layout cache cleared');
+            else req.payload.logger.error(`[Revalidate] site-settings failed (${res.status})`);
+          })
+          .catch((err) => {
+            req.payload.logger.error(`[Revalidate] site-settings error: ${err}`);
+          });
+      },
+    ],
   },
   fields: [
     // --- Контакти ---

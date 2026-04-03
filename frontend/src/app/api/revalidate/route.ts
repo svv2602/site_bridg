@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'REVALIDATION_SECRET not configured' }, { status: 500 });
   }
 
-  let body: { secret?: string; collection?: string; slug?: string };
+  let body: { secret?: string; collection?: string; global?: string; slug?: string };
   try {
     body = await request.json();
   } catch {
@@ -40,9 +40,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
   }
 
-  const { collection, slug } = body;
+  const { collection, global: globalSlug, slug } = body;
 
   const revalidatedPaths: string[] = [];
+
+  // Globals (e.g. site-settings): revalidate all pages that consume them
+  if (globalSlug === 'site-settings') {
+    revalidatePath('/', 'layout'); // revalidates entire site layout (footer, header, etc.)
+    revalidatedPaths.push('/ (layout)');
+    return NextResponse.json({ revalidated: true, paths: revalidatedPaths });
+  }
 
   // Category pages: revalidate mapped frontend routes by CMS slug
   if (collection === 'category-pages') {
