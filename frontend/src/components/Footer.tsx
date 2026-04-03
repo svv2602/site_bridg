@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Facebook, Instagram, Youtube, Mail, MapPin, ChevronRight } from 'lucide-react';
+import { Mail, MapPin, ChevronRight } from 'lucide-react';
 import { getSiteSettingsWithDefaults } from '@/lib/constants';
 
 const productLinks = [
@@ -21,27 +21,6 @@ const infoLinks = [
   { href: '/about', label: 'Про бренд' },
   { href: '/contacts', label: 'Контакти' },
   { href: '/technology', label: 'Технології' },
-];
-
-const socialLinks = [
-  {
-    href: 'https://www.facebook.com/BridgestoneUkraine',
-    label: 'Bridgestone у Facebook',
-    icon: Facebook,
-    color: 'text-[#1877F2]',
-  },
-  {
-    href: 'https://www.instagram.com/bridgestone_ukraine',
-    label: 'Bridgestone в Instagram',
-    icon: Instagram,
-    color: 'text-[#E4405F]',
-  },
-  {
-    href: 'https://www.youtube.com/@bridgestone',
-    label: 'Bridgestone на YouTube',
-    icon: Youtube,
-    color: 'text-[#FF0000]',
-  },
 ];
 
 export async function Footer() {
@@ -66,21 +45,6 @@ export async function Footer() {
               цінової категорії для легкових авто, SUV та комерційного транспорту.
             </p>
 
-            {/* Social links */}
-            <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.href}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="flex items-center justify-center rounded-full bg-stone-200 p-3 min-w-11 min-h-11 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700"
-                >
-                  <social.icon className={`h-5 w-5 ${social.color}`} />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Column 2: Products */}

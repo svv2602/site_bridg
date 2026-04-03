@@ -155,17 +155,9 @@ export function generateOrganizationSchema(baseUrl: string = "https://bridgeston
     url: baseUrl,
     logo: `${baseUrl}/bridgestone-logo-white.svg`,
     description: "Офіційний представник Bridgestone в Україні. Шини для легкових авто, SUV та комерційного транспорту.",
-    sameAs: settings
-      ? [
-          settings.socialLinks.website,
-          settings.socialLinks.facebook,
-          settings.socialLinks.instagram,
-        ]
-      : [
-          "https://www.bridgestone.com",
-          "https://www.facebook.com/BridgestoneUkraine",
-          "https://www.instagram.com/bridgestone_ukraine",
-        ],
+    sameAs: [
+      settings?.socialLinks.website || "https://www.bridgestone.com",
+    ],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",

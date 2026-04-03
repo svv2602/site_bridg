@@ -24,8 +24,6 @@ export const ADDRESS_COUNTRY = 'UA';
 // Social links
 export const SOCIAL_LINKS = {
   website: 'https://www.bridgestone.com',
-  facebook: 'https://www.facebook.com/BridgestoneUkraine',
-  instagram: 'https://www.instagram.com/bridgestone_ukraine',
   telegram: 'https://t.me/bridgestone_ua',
 } as const;
 
@@ -49,8 +47,6 @@ export interface MergedSiteSettings {
   country: string;
   socialLinks: {
     website: string;
-    facebook: string;
-    instagram: string;
     telegram: string;
   };
   workingHours: string;
@@ -82,8 +78,6 @@ export async function getSiteSettingsWithDefaults(): Promise<MergedSiteSettings>
     country: cms?.country || ADDRESS_COUNTRY,
     socialLinks: {
       website: cms?.website || SOCIAL_LINKS.website,
-      facebook: cms?.facebook || SOCIAL_LINKS.facebook,
-      instagram: cms?.instagram || SOCIAL_LINKS.instagram,
       telegram: cms?.telegram || SOCIAL_LINKS.telegram,
     },
     workingHours: cms?.workingHours || 'Пн-Пт 9:00-18:00',

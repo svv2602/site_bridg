@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Facebook, Linkedin, Check } from "lucide-react";
+import { Share2, Linkedin, Check } from "lucide-react";
 
 interface ShareButtonsProps {
   title: string;
@@ -50,12 +50,6 @@ export function ShareButtons({ title, url, className = "", variant = "default" }
   };
 
   const shareLinks = [
-    {
-      name: "Facebook",
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-      icon: Facebook,
-      color: "hover:text-[#1877F2]",
-    },
     {
       name: "X (Twitter)",
       href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,

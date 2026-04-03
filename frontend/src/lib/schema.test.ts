@@ -242,7 +242,7 @@ describe("generateOrganizationSchema", () => {
     expect(schema["@type"]).toBe("Organization");
     expect(schema.name).toBe("Bridgestone Україна");
     expect(schema.url).toBe("https://bridgestone.org.ua");
-    expect(schema.sameAs).toContain("https://www.facebook.com/BridgestoneUkraine");
+    expect(schema.sameAs).toContain("https://www.bridgestone.com");
     expect(schema.contactPoint.contactType).toBe("customer service");
   });
 
